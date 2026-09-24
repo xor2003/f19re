@@ -49,3 +49,6 @@ routine_123 redrawTacMap       # seg000:87ec  redraw tactical map (stub)
 routine_186 initTacMapView     # seg000:8751  scope clip/center init + zoomIn
 routine_280 clearStatusPanel   # seg000:7e62  drawPanelText(2,"",0)
 routine_343 initFlightParams    # seg000:4bf8  altitude=1000, range=6400
+routine_184 initFrameRandom     # seg000:4b53  seedRng+clearStatusPanel+night mode
+routine_337 updatePanelMode    # seg000:8610  mode 0=redrawTacMap,1=drawPanelText SET
+routine_177 recordFrame         # seg000:4caf  append {tick,y>>7,x>>7,a,b} to replay log

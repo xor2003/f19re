@@ -42,6 +42,23 @@ void clearStatusPanel(void) {
     drawPanelText(2, "", 0);
 }
 
+/* ==== seg000:0x8610 ==== */
+extern int16 g_viewX_, g_viewY_; /* word_3838C / word_3837C */
+void redrawTacMap(int16 x, int16 y);            /* sub_187EC */
+void updatePanelMode(int16 mode) {
+    if (g_panelLabelOn != 0) {
+        switch (mode) {
+        case 0:
+            redrawTacMap(g_viewX_, g_viewY_);
+            break;
+        case 1:
+            drawPanelText(1, "SET", 0);
+            break;
+        }
+        g_mapMode = mode;
+    }
+}
+
 /* ==== seg000:0x8751 ==== */
 extern int16 g_scopeCenterX;     /* word_354A8 */
 extern int16 g_scopeCenterY;     /* word_354AC */
@@ -61,8 +78,6 @@ void initTacMapView(void) {
 extern int16 g_viewMode;         /* word_3836E */
 extern int16 g_externalCamDist;  /* word_343C6 */
 extern int16 g_radarScopeRange;  /* word_346E6 */
-extern int16 g_viewX_, g_viewY_; /* word_3838C / word_3837C */
-void redrawTacMap(int16 x, int16 y);            /* sub_187EC */
 void zoomIn(void) {
     if (g_viewMode & 0x80) {
         g_externalCamDist--;

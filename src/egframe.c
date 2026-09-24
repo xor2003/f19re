@@ -8,7 +8,8 @@ void moveStuff(void);                            /* sub_14F18 */
 extern int16 flagFarToNear;              /* word_384CA */
 
 /* ==== seg000:0x4ef7 ==== */
-extern struct { int16 events[0x300]; } g_replayLog;  /* @0x8E64 */
+struct FrameRec { int16 tick; int8 y, x, a, b; };      /* packed 6-byte record */
+extern struct { struct FrameRec events[0x100]; } g_replayLog;  /* @0x8E64 */
 
 void moveDataFar() {
     int16 unused1, unused2;
@@ -51,6 +52,32 @@ void applyGravityFall(void) {
     }
 }
 
+/* ==== seg000:0x4b53 ==== */
+void seedRng(void);
+void clearStatusPanel(void);
+int16 randomRange(int16 range);
+extern int16 frameTick;                /* word_343B6 */
+extern int16 g_nightMode;              /* word_33D8A */
+extern int16 g_unusedFrameVal;         /* word_35450 */
+extern int16 g_missionTick;            /* word_354C0 */
+extern int16 g_setupSlots[];           /* @0x37622 (stride 0x12) */
+void initFrameRandom(void) {
+    int16 seedSum, unused0, unused1, unused2;
+    seedRng();
+    clearStatusPanel();
+    frameTick = randomRange(0x1000) & 0x7ff8;
+    seedSum = g_setupSlots[4] + g_setupSlots[0xD];
+    g_nightMode = ((seedSum & 3) == 0);
+    if (g_setupSlots[0] == 1 || g_setupSlots[9] == 1) {
+        g_nightMode = 0;
+    }
+    if (g_setupSlots[0] == 4 || g_setupSlots[9] == 4) {
+        g_nightMode = 1;
+    }
+    g_unusedFrameVal = (seedSum & 0xF) << 8;
+    g_missionTick = 0;
+}
+
 /* ==== seg000:0x4bc8 ==== */
 extern int16 g_trackedEnemyIdx;        /* word_343B4 */
 void resetSimObjectLocks(void) {
@@ -82,6 +109,21 @@ void initWeaponLoadout(void) {
 void hwPortWrite(int16 cmd);           /* sub_14CAC (noop hw thunk) */
 void sendSoundCmd(uint8 v) {
     hwPortWrite((v << 8) + 0xDB);
+}
+
+/* ==== seg000:0x4caf ==== */
+extern int16 g_replayCount;            /* word_351C4 */
+extern int16 g_missionTick;            /* word_354C0 */
+extern int16 g_viewX_, g_viewY_;       /* word_3838C / word_3837C */
+void recordFrame(uint8 a, uint8 b) {
+    if (g_replayCount < 0xFF) {
+        g_replayLog.events[g_replayCount].tick = g_missionTick;
+        g_replayLog.events[g_replayCount].y = (uint16)g_viewY_ >> 7;
+        g_replayLog.events[g_replayCount].x = (uint16)g_viewX_ >> 7;
+        g_replayLog.events[g_replayCount].a = a;
+        g_replayLog.events[g_replayCount].b = b;
+        g_replayLog.events[g_replayCount += 1].a = 0;
+    }
 }
 
 void moveStuff() {

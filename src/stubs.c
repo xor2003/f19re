@@ -246,3 +246,6 @@ void hwPortWrite(int16 cmd) { }        /* sub_14CAC noop */
 void redrawTacMap(int16 x, int16 y) { }   /* sub_187EC */
 int16 g_scopeCenterX, g_scopeCenterY;   /* word_354A8/354AC */
 int16 g_altitude, g_startRange;        /* word_33578/36E22 */
+int16 frameTick, g_nightMode, g_unusedFrameVal, g_missionTick; /* 343B6/33D8A/35450/354C0 */
+int16 g_setupSlots[0x20];              /* @0x37622 */
+int16 g_replayCount;                   /* word_351C4 */
