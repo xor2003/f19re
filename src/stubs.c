@@ -245,6 +245,9 @@ int16 g_wreckAlt;                      /* word_3845E */
 int16 g_wreckFallVel;                  /* word_379B8 */
 void hwPortWrite(int16 cmd) { }        /* sub_14CAC noop */
 void redrawTacMap(int16 x, int16 y) { }   /* sub_187EC */
+void drawStatusItem(int16 idx, int16 color) { }  /* sub_19007 */
+void drawPanelModeText(int16 mode) { }           /* sub_18651 */
+int16 g_weaponMask, g_curPanelMode;   /* word_33D64 / word_385CE */
 int16 g_scopeCenterX, g_scopeCenterY;   /* word_354A8/354AC */
 int16 g_altitude, g_startRange;        /* word_33578/36E22 */
 int16 frameTick, g_nightMode, g_unusedFrameVal, g_missionTick; /* 343B6/33D8A/35450/354C0 */

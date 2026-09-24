@@ -59,6 +59,21 @@ void updatePanelMode(int16 mode) {
     }
 }
 
+/* ==== seg000:0x86fc ==== */
+extern int16 g_weaponMask;         /* word_33D64 */
+extern int16 g_curPanelMode;       /* word_385CE */
+void drawStatusItem(int16 idx, int16 color);   /* sub_19007 */
+void drawPanelModeText(int16 mode);            /* sub_18651 */
+void updateStatusPanel(int16 arg) {
+    int16 i;
+    if (arg == 0x16) {
+        for (i = 0; i < 7; i++)
+            drawStatusItem(i + 0xA, (g_weaponMask & (1 << i)) ? 0xC : 0xA);
+    }
+    if (arg == g_curPanelMode)
+        drawPanelModeText(arg);
+}
+
 /* ==== seg000:0x8751 ==== */
 extern int16 g_scopeCenterX;     /* word_354A8 */
 extern int16 g_scopeCenterY;     /* word_354AC */
