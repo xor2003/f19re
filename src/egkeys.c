@@ -50,6 +50,24 @@ void recalcTimeScale(void) {
     g_threatDisplayTtl = 200 * g_frameRateScaling;
 }
 
+/* ==== seg000:0xdfb4 ==== */
+extern char colorLut[];               /* byte-ramp LUT @0x9E8 */
+extern int16 g_lodDistBase;           /* word_2F870 */
+extern int16 g_lodDistScale;          /* word_2F872 */
+extern int16 g_lodDistNear;           /* word_2F874 */
+extern int16 g_lodDistFar;            /* word_2F876 */
+extern int16 g_detailLevel;           /* word_354BC */
+
+void setupLodDistances(void) {
+    int16 lod;
+    for (lod = 0; lod < 6; lod++) {
+        ((int16 *)(colorLut + 0x10))[lod] = 0x20 << ((char)lod + (char)g_detailLevel);
+    }
+    g_lodDistNear = g_lodDistScale + g_lodDistBase;
+    g_lodDistFar = clampRange(g_lodDistScale << 1, 0x1000, 9999);
+    *(int16 *)(colorLut + 0x20) = g_detailLevel * 0xD05 + 0xD05;
+}
+
 /* ==== seg000:0xe010 ==== */
 void exitTimeAccel(void) {
     if (g_timeAccelMode == 2) {

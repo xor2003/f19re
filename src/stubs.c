@@ -200,6 +200,7 @@ int16 FAR misc_readJoystick(int16 a) { return 0; }
 void FAR audio_playSound(int16 a) {}
 void FAR audio_engineDroneOn(void) {}
 int16 g_engineThrust;                   /* word_33588 */
+int16 g_lodDistBase, g_lodDistScale, g_lodDistNear, g_lodDistFar;  /* word_2F870..876 */
 
 
 uint8 g_aircraftModels[4];
