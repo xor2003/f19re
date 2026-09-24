@@ -1,0 +1,22 @@
+# Manual routine renames for map/*.map — format: routine_N newname
+# (offsets verified against lst/EGAME.EXE.lst)
+routine_289 setViewPosition   # seg000:1b56
+routine_393 aspectScaleY      # seg000:19da  ax = y - (y>>2)
+routine_366 drawMapTileObject # seg000:178a  per-tile object draw (called from drawMapTiles)
+routine_276 scaleCoordToLod   # seg000:0918
+routine_277 process3dg        # seg000:099a
+routine_249 complementAngle  # seg000:3374  0x4000 - valueToAngle
+routine_143 rebuildOrientation # seg000:3253  far buildRotationMatrix + clear dirty/counter
+routine_74 moveNearFar        # seg000:5001
+routine_61 setCommWorldbufPtr  # seg000:5045
+routine_138 computeBearing     # seg000:d29d  atan2-style bearing
+routine_140 sinMul             # seg000:d3ec  fixedMulQ14(sine(a),b)
+routine_141 cosMul             # seg000:d404  sinMul(a+0x4000,b)
+routine_129 setDrawColor       # seg000:8f9c  pageFront[2]=pageBack[2]=c
+routine_128 drawStringActivePage # seg000:91e5 draws str when byte_388CA==0
+routine_305 drawTargetBox      # seg000:c4fc  4-arg box draw
+routine_200 rasterize3DWorld   # seg000:1a64  sub_20908 + far sub_2F0A2
+routine_158 sine               # seg000:1c2d  asm sin lookup (stays asm)
+routine_161 fixedMulQ14        # seg000:1bc6  asm fixed multiply (stays asm)
+routine_303 drawHudViewLine   # seg000:8f38  half-scale/clip line wrapper
+routine_111 drawStringCentered # seg000:9219  strStruct fields + gfx_drawString

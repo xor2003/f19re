@@ -1,0 +1,115 @@
+{
+    "preamble": [
+        ".8086",
+        // no DOSSEG: it makes LINK sort STACK-class segments before DGROUP,
+        // while the listing's declaration order already matches the original
+        // IDA merged the original _DATA/BSS split into one dseg; re-split
+        // it under a DGROUP so the uninit tail (bss) stays out of the exe
+        // while keeping group-relative addressing identical to the original
+        "dgroup group dseg, bss"
+    ],
+    "coda": [ "END start" ],
+    "include": "lst/egame.inc",
+    "in_segments": [ "seg000", "seg001", "seg002", "seg003", "seg004", "dseg", "seg006" ],
+    "code_segments": [ "seg000", "seg001", "seg002", "seg003" ],
+    "data_segments": [ "seg004", "dseg" ],
+    "data_size": "0x15e2f",
+    // dseg:0x65e0-0x9ebe is uninitialized in the original (exe image ends at
+    // dseg:0x65e0); mark it bss so alignment pads emit 'db ?' not 'db 0'
+    "bss": [ { "seg": "dseg", "begin": "0x65e0", "end": "0x9ebf" } ],
+    // segment regs that IDA assumed to dseg must reach all of DGROUP
+    "subs": [ { "from": "assume (ds|es|ss):dseg\\b", "to": "assume \\1:dgroup" } ],
+    "extract": [],
+    "replace": [
+        // 'assume' directives referencing fs/gs are illegal in 8086 mode, drop those regs
+        { "seg": "seg000", "off": "0x0",    "from": "fs:", "to": "assume es:nothing, ss:nothing, ds:dgroup" },
+        { "seg": "seg001", "off": "0x7",    "from": "fs:", "to": "assume es:nothing, ss:nothing, ds:dgroup" },
+        { "seg": "seg002", "off": "0x5",    "from": "fs:", "to": "assume es:nothing, ss:nothing, ds:dgroup" },
+        { "seg": "seg003", "off": "0xd",    "from": "fs:", "to": "assume es:nothing, ss:nothing, ds:dgroup" },
+        { "seg": "seg004", "off": "0x0",    "from": "fs:", "to": "assume es:nothing, ss:nothing, ds:dgroup" },
+        { "seg": "seg006", "off": "0x0",    "from": "fs:", "to": "assume es:nothing, ss:nothing, ds:dgroup" },
+        // SREGS field 'ds' in the IDA db collides with the DS register name; use _ds
+        { "seg": "seg000", "off": "0xbb4",  "from": "[bp+var_8.ds]", "to": "push [bp+var_8._ds]" },
+        { "seg": "seg000", "off": "0xd08",  "from": "[bp+var_8.ds]", "to": "push [bp+var_8._ds]" },
+        { "seg": "seg000", "off": "0xcc5b", "from": "[bp+var_8.ds]", "to": "push [bp+var_8._ds]" },
+        // encoding fixes: original code uses disp16 where MASM picks shorter forms
+        { "seg": "seg000", "off": "0x1ea",  "from": "push", "to": "db 0FFh, 0B7h, 7Ah, 00h" },
+        { "seg": "seg000", "off": "0xcdc9", "from": "lea",  "to": "db 8Dh, 87h, 00h, 00h" },
+        { "seg": "seg000", "off": "0xd157", "from": "lea",  "to": "db 8Dh, 87h, 00h, 00h" },
+        // original uses near jmp encoding where UASM shrinks to short
+        { "seg": "seg000", "off": "0xec02", "from": "jmp",  "to": "jmp near ptr loc_1EC84" },
+        // original uses grp1 imm16 where UASM picks sign-extended imm8
+        { "seg": "seg001", "off": "0x1255", "from": "adc",  "to": "db 15h, 00h, 00h" },
+        { "seg": "seg001", "off": "0x1280", "from": "adc",  "to": "db 15h, 00h, 00h" },
+        // IDA lists this as es:byte_38D30+5E0h but the binary encodes disp16=0
+        { "seg": "seg000", "off": "0xeca9", "from": "cmp",  "to": "cmp byte ptr es:[0], 0" },
+        // code alignment pads: original pads these sites with 0x00
+        // (module-boundary fill) rather than the usual 0x90 nop
+        { "seg": "seg000", "off": "0x445",  "from": "align", "to": "db 0" },
+        { "seg": "seg000", "off": "0x20cf", "from": "align", "to": "db 0" },
+        { "seg": "seg000", "off": "0x215b", "from": "align", "to": "db 0" },
+        { "seg": "seg000", "off": "0xe6af", "from": "align", "to": "db 0" },
+        { "seg": "seg000", "off": "0xe87f", "from": "align", "to": "db 0" },
+        { "seg": "seg000", "off": "0xeaa1", "from": "align", "to": "db 0" },
+        { "seg": "seg000", "off": "0xf6f5", "from": "align", "to": "db 0" },
+        { "seg": "seg000", "off": "0xf9e9", "from": "align", "to": "db 0" },
+        { "seg": "seg000", "off": "0xfaed", "from": "align", "to": "db 0" },
+        { "seg": "seg000", "off": "0xfb3b", "from": "align", "to": "db 0" },
+        { "seg": "seg000", "off": "0xfb57", "from": "align", "to": "db 0" },
+        { "seg": "seg000", "off": "0xfb83", "from": "align", "to": "db 0" },
+        { "seg": "seg000", "off": "0xfc35", "from": "align", "to": "db 0" },
+        { "seg": "seg000", "off": "0xfcf1", "from": "align", "to": "db 0" },
+        { "seg": "seg000", "off": "0xfd4d", "from": "align", "to": "db 0" },
+        { "seg": "seg000", "off": "0xfe3d", "from": "align", "to": "db 0" },
+        { "seg": "seg000", "off": "0xfe49", "from": "align", "to": "db 0" },
+        { "seg": "seg000", "off": "0xfe69", "from": "align", "to": "db 0" },
+        { "seg": "seg000", "off": "0xfe89", "from": "align", "to": "db 0" },
+        { "seg": "seg000", "off": "0xfeeb", "from": "align", "to": "db 0" },
+        { "seg": "seg001", "off": "0x7",    "from": "align", "to": "db 0" },
+        { "seg": "seg001", "off": "0x563",  "from": "align", "to": "db 0" },
+        { "seg": "seg001", "off": "0xd7b",  "from": "align", "to": "db 0" },
+        { "seg": "seg001", "off": "0x1169", "from": "align", "to": "db 0" },
+        { "seg": "seg001", "off": "0x12d1", "from": "align", "to": "db 0" },
+        { "seg": "seg001", "off": "0x1b67", "from": "align", "to": "db 0" },
+        { "seg": "seg001", "off": "0x1fbf", "from": "align", "to": "db 0" },
+        { "seg": "seg002", "off": "0x5",    "from": "align", "to": "db 0" },
+        { "seg": "seg003", "off": "0xd",    "from": "align", "to": "db 0" },
+        { "seg": "seg003", "off": "0x191",  "from": "align", "to": "db 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0" },
+        // close IDA's merged dseg at the original image end and reopen the
+        // uninit tail as a BSS-class segment (no file bytes, same addresses
+        // via DGROUP)
+        { "seg": "dseg", "off": "0x65df", "from": "db 0", "to": [ "db 0", "dseg ends", "bss segment word public 'BSS'" ] },
+        { "seg": "dseg", "off": "0x9ebe", "from": "ends", "to": "bss ends" }
+    ],
+    "remove": [
+        // IDA emits .686p/.mmx/.model directives at the top of the listing;
+        // target is 8086 and segments/procs are declared explicitly
+        { "seg": "seg000", "off": "0x0", "from": ".686p" },
+        { "seg": "seg000", "off": "0x0", "from": ".mmx" },
+        { "seg": "seg000", "off": "0x0", "from": ".model" },
+        // _main's stack-argument equates shadow the CRT globals argc/argv
+        // (data variables in dseg pushed by 'start'); remove the equates
+        { "seg": "seg000", "off": "0x10", "from": "argc" },
+        { "seg": "seg000", "off": "0x10", "from": "argv" },
+        { "seg": "seg000", "off": "0x10", "from": "envp" }
+    ],
+    "insert": [],
+    "preserves": [],
+    "externs": [],
+    "publics": [],
+    "header_preamble": [
+        "#ifndef F19_EGAME",
+        "#define F19_EGAME",
+        "#include <stdio.h>",
+        "",
+        "#if !defined(MSDOS) && !defined(__MSDOS__)",
+        "#define far",
+        "#endif",
+        "",
+        "#define __int32 long",
+        "#define __int8 char",
+        "#define __cdecl",
+        "#define __far far"
+    ],
+    "header_coda": "#endif // F19_EGAME"
+}
