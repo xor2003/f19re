@@ -230,3 +230,14 @@ FILE *fileHandle;
 int16 g_rngSeed;
 int16 g_unusedLoadDoneFlag;
 int16 getTimeOfDay(void) { return 0; }
+int16 g_trackedEnemyIdx;
+int16 g_gunAmmo;
+int16 g_fuelRemaining;
+int16 g_stores[4][2];
+int16 g_hudMsgTimer;
+char  g_hudMessageBuf[64];
+
+/* applyGravityFall + sendSoundCmd */
+int16 g_wreckAlt;                      /* word_3845E */
+int16 g_wreckFallVel;                  /* word_379B8 */
+void hwPortWrite(int16 cmd) { }        /* sub_14CAC noop */

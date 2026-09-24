@@ -36,3 +36,10 @@ routine_71  load3DAll          # seg000:0abe  load3DG+load3D3+load3DT(regnFile)
 routine_275 signExtendByte     # seg000:d419  byte->int16 sign extend
 routine_222 signOf             # seg000:d436  sgn(x): -1/0/1
 routine_279 seedRng            # seg000:d453  if(!g_inputDisabled) seed=time; srand
+routine_340 exitTimeAccel        # seg000:e010  if(timeAccelMode==2) reset to 1
+routine_211 resetSimObjectLocks  # seg000:4bc8
+routine_336 initWeaponLoadout    # seg000:4c05
+routine_137 hudMessage           # seg000:92b1
+routine_174 applyGravityFall   # seg000:4b38  wreck alt += fallVel, vel->-16
+routine_262 sendSoundCmd       # seg000:4c98  hwPortWrite((v<<8)+0xDB)
+routine_185 hwPortWrite        # seg000:4cac  noop hw thunk

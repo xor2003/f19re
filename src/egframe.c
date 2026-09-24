@@ -39,6 +39,51 @@ extern int16 g_targetSlots[0x12];       /* @0x87B2 */
 struct MapTarget { int16 f[8]; };        /* sizeof = 0x10 */
 struct SimObject { int16 f[0x12]; };     /* sizeof = 0x24 */
 
+/* ==== seg000:0x4b38 ==== */
+extern int16 g_wreckAlt;               /* word_3845E */
+extern int16 g_wreckFallVel;           /* word_379B8 */
+void applyGravityFall(void) {
+    if (g_wreckAlt > 0) {
+        if (g_wreckFallVel > -16) {
+            g_wreckFallVel -= 12;
+        }
+        g_wreckAlt += g_wreckFallVel;
+    }
+}
+
+/* ==== seg000:0x4bc8 ==== */
+extern int16 g_trackedEnemyIdx;        /* word_343B4 */
+void resetSimObjectLocks(void) {
+    int16 i;
+    for (i = 0; i < g_groundUnitCount; i++) {
+        ((struct SimObject *)g_simObjects)[i].f[0x10] = -1;
+    }
+    g_trackedEnemyIdx = -1;
+}
+
+/* ==== seg000:0x4c05 ==== */
+extern int16 g_gunHits;                /* word_33D64 */
+extern int16 g_bombDamageMask;         /* word_3844C */
+extern int16 g_gunAmmo;                /* word_33D82 */
+extern int16 g_fuelRemaining;          /* word_33D66 */
+extern int16 g_stores[][2];            /* @0x4F02 */
+void initWeaponLoadout(void) {
+    int16 i;
+    i = g_gunHits = g_bombDamageMask = 0;
+    do {
+        g_stores[i][0] = 9;
+        i++;
+    } while (i < 4);
+    g_gunAmmo = 0x3E8;
+    g_fuelRemaining = 0x1388;
+}
+
+/* ==== seg000:0x4c98 ==== */
+void hwPortWrite(int16 cmd);           /* sub_14CAC (noop hw thunk) */
+void sendSoundCmd(uint8 v) {
+    hwPortWrite((v << 8) + 0xDB);
+}
+
 void moveStuff() {
     moveNearFar(g_landTargetId, 1);
     moveNearFar(g_waterTargetId, 1);
@@ -117,4 +162,13 @@ void recalcTimeScale(void) {
     g_bulletTrackCount = clampRange(g_frameRateScaling << 1, 3, 16);
     g_threatTimerInit = 250 * g_frameRateScaling;
     g_threatDisplayTtl = 200 * g_frameRateScaling;
+}
+
+/* ==== seg000:0xe010 ==== */
+void exitTimeAccel(void) {
+    if (g_timeAccelMode == 2) {
+        g_timeAccelMode = 1;
+        g_frameRateScaling <<= 1;
+        recalcTimeScale();
+    }
 }

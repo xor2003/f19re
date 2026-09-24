@@ -178,6 +178,15 @@ int16 readScreenPixel(int16 screenX, int16 screenY) {
     return regs.h.al;
 }
 
+/* ==== seg000:0x92b1 ==== */
+extern int16 g_frameRateScaling;    /* word_33D92 */
+extern int16 g_hudMsgTimer;         /* word_346EC */
+extern char  g_hudMessageBuf[];     /* @dseg:958C */
+void hudMessage(const char *src) {
+    strcpy(g_hudMessageBuf, src);
+    g_hudMsgTimer = g_frameRateScaling * 3;
+}
+
 /* ==== seg000:0xa23f / 0xa26c / 0xa2c5 ==== */
 
 extern int16 *g_pageOffscreen;   /* word_34676 */
