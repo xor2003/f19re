@@ -276,6 +276,9 @@ int16 g_selStoreIdx;                    /* word_37626 */
 int32 g_worldX, g_worldY;               /* word_37CB8 / word_382D4 */
 int16 g_scopeCenterX, g_scopeCenterY;   /* word_354A8/354AC */
 int16 g_altitude, g_startRange;        /* word_33578/36E22 */
+int16 g_keyCode;                        /* word_384CE: pending keycode */
+int16 g_gaugeLevel;                     /* word_343B2: HUD gauge position */
+int16 dispatchKeyCmd(int16 key) { return 0; }   /* sub_1D4C6: key-command dispatch */
 int16 frameTick, g_nightMode, g_unusedFrameVal, g_missionTick; /* 343B6/33D8A/35450/354C0 */
 int16 g_setupSlots[0x20];              /* @0x37622 */
 int16 g_replayCount;                   /* word_351C4 */
