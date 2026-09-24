@@ -246,8 +246,10 @@ int16 g_wreckFallVel;                  /* word_379B8 */
 void hwPortWrite(int16 cmd) { }        /* sub_14CAC noop */
 void redrawTacMap(int16 x, int16 y) { }   /* sub_187EC */
 void drawStatusItem(int16 idx, int16 color) { }  /* sub_19007 */
-void drawPanelModeText(int16 mode) { }           /* sub_18651 */
+void sub_19979(void) { } void sub_19E4F(void) { } void sub_1A0BD(void) { }
+void sub_1A300(void) { } void nullsub_3(void) { }
 int16 g_weaponMask, g_curPanelMode;   /* word_33D64 / word_385CE */
+int16 g_scanDir;                      /* word_38D1A */
 struct StoreDef { int16 subIdx; uint16 coordX; uint16 coordY; int8 pad[8]; int16 nameIdx; };
 struct StoreDef g_storeDefs[4];         /* @0x80C8 */
 char *g_nameTab[0x80];                  /* @0x9696 */

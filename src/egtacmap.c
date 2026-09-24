@@ -59,6 +59,36 @@ void updatePanelMode(int16 mode) {
     }
 }
 
+/* ==== seg000:0x8651 ==== */
+extern int16 g_scanDir;            /* word_38D1A (0/0x4000/0x8000/0xC000 heading) */
+extern int16 g_curPanelMode;       /* word_385CE */
+extern char g_nameBuf[];           /* @0x65E6 */
+void sub_19979(void); void sub_19E4F(void); void sub_1A0BD(void);
+void sub_1A300(void); void nullsub_3(void);
+void drawPanelModeText(int16 mode) {
+    int16 unused[10];
+    if (g_panelLabelOn == 0)
+        return;
+    switch (mode) {
+    case 0x13:
+        strcpy(g_nameBuf, "Skanner ");
+        switch (g_scanDir) {
+        case 0x8000: strcat(g_nameBuf, "tyl"); break;
+        case 0xC000: strcat(g_nameBuf, "lew."); break;
+        case 0:      strcat(g_nameBuf, "front"); break;
+        case 0x4000: strcat(g_nameBuf, "praw."); break;
+        }
+        drawPanelText(2, g_nameBuf, 3);
+        break;
+    case 0x14: sub_19979(); break;
+    case 0x15: sub_19E4F(); break;
+    case 0x16: sub_1A0BD(); break;
+    case 0x18: sub_1A300(); break;
+    case 0x19: nullsub_3(); break;
+    }
+    g_curPanelMode = mode;
+}
+
 /* ==== seg000:0x86fc ==== */
 extern int16 g_weaponMask;         /* word_33D64 */
 extern int16 g_curPanelMode;       /* word_385CE */
