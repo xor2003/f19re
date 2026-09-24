@@ -88,6 +88,36 @@ void blitGaugeSprite(int16 srcCol, int16 srcRow, int16 destX, int16 destY) {
     gfx_blitSpriteClipped((int16 *)&gaugeSpriteParams);
 }
 
+/* sprite-blit descriptor for blitSprite — dseg 0x5856 */
+struct SpriteParams {
+    int16 bufPtr, srcX, srcY, page, dstX, dstY, width, height;  /* +0x00..+0x0E */
+    int16 pad16[4];         /* +0x10..+0x17 */
+    uint8 flags;            /* +0x18 */
+    uint8 transparent;      /* +0x19 */
+};
+extern struct SpriteParams blitSpriteParams;
+void far gfx_blitSpriteOpaque(int16 *params);   /* sub_2F197 */
+
+/* ==== seg000:0x9912 ==== */
+void blitSprite(int16 destX, int16 destY, int16 srcX, int16 srcY, int16 width, int16 height, int16 transparent) {
+    blitSpriteParams.bufPtr = gfxBufPtr;
+    blitSpriteParams.srcX = srcX;
+    blitSpriteParams.srcY = srcY;
+    blitSpriteParams.page = (g_drawPage != 0);
+    blitSpriteParams.dstX = destX;
+    blitSpriteParams.dstY = destY;
+    blitSpriteParams.width = width;
+    blitSpriteParams.height = height;
+    blitSpriteParams.transparent = transparent;
+    if (transparent != 0) {
+        blitSpriteParams.flags = 1;
+        gfx_blitSpriteClipped((int16 *)&blitSpriteParams);
+    } else {
+        blitSpriteParams.flags = 0x10;
+        gfx_blitSpriteOpaque((int16 *)&blitSpriteParams);
+    }
+}
+
 extern int16 g_missionTick;      /* word_35450 */
 extern int16 g_nightMode;        /* word_33D8A */
 extern char g_nameBuf[];         /* @0x65E6 */

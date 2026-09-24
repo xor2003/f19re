@@ -30,9 +30,17 @@ int16 fixedMulQ14(int16 a, int16 b) { return 0; }
 
 struct GaugeParams { int16 bufPtr, srcX, srcY, page, dstX, dstY, width, height; };
 struct GaugeParams gaugeSpriteParams;
+struct SpriteParams {
+    int16 bufPtr, srcX, srcY, page, dstX, dstY, width, height;  /* +0x00..+0x0E */
+    int16 pad16[4];         /* +0x10..+0x17 */
+    uint8 flags;            /* +0x18 */
+    uint8 transparent;      /* +0x19 */
+};
+struct SpriteParams blitSpriteParams;   /* @0x5856 */
 int16 gfxBufPtr;
 uint8 g_drawPage;
 void gfx_blitSpriteClipped(int16 *p) {}
+void gfx_blitSpriteOpaque(int16 *p) {}
 int16 g_lineX1, g_lineX2, g_lineY1, g_lineY2, g_viewCenterX, g_viewCenterY;
 char far *g_modelStreamPtr;
 void gfx_setColor(uint8 c) {}

@@ -45,7 +45,7 @@ MODULE_FLAGS = {
     'egmath.c':   ['/AS', '/Gs', '/Os'],
     'egtacmap.c': ['/AS', '/Gs', '/Os', '/Oa'],
     'egtarget.c': ['/AS', '/Gs', '/Os', '/Oa'],
-    'egui.c':     ['/AS', '/Gs', '/Ot'],
+    'egui.c':     ['/AS', '/Gs', '/Os'],
     'stparse.c':  ['/AS', '/Gs', '/Ot'],
 }
 DEFAULT_FLAGS = ['/AS', '/Gs', '/Ot']
