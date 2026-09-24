@@ -106,6 +106,55 @@ void tickWeaponSlots(void) {
         }
 }
 
+/* ==== seg000:0x4956 ==== */
+struct BulletTrack { int16 posX, posY, alt, velX, velY, velZ; };  /* stride 0xC @0x9BA6 */
+extern struct BulletTrack bulletTracks[];
+extern int16 g_bulletTrackCount;      /* word_373EC */
+extern int16 g_gunAmmo;               /* word_33D82 */
+extern int16 g_gunFiredFlag;          /* word_354C6 */
+extern int16 g_ourHead;               /* word_33570 */
+extern int16 g_ourPitch;              /* word_33572 */
+extern int16 g_viewZ;                 /* word_33576 */
+extern int16 g_ejectState;            /* word_382D8 */
+extern int16 frameTick;               /* word_343B6 */
+int16 readAxisInput(int16 axis);      /* sub_1D484 */
+int16 sinMul(int16 angle, int16 val); /* sub_1D3EC */
+int16 cosMul(int16 angle, int16 val); /* sub_1D404 */
+int16 clampRange(int16 v, int16 lo, int16 hi);  /* sub_1D1FA */
+void updateBulletsAndFire(void) {
+    int16 tmp, sel, i, j, n;
+
+    for (i = 0; i < g_bulletTrackCount + 4; i++) {
+        if (bulletTracks[i].posX != 0) {
+            bulletTracks[i].posX += bulletTracks[i].velX;
+            bulletTracks[i].posY += bulletTracks[i].velY;
+            bulletTracks[i].alt += bulletTracks[i].velZ;
+        }
+    }
+    if (!(frameTick & 1)) {
+        return;
+    }
+    n = (frameTick >> 1) % g_bulletTrackCount;
+    if (!readAxisInput(0)) goto no_fire;
+    if (g_gunAmmo <= 0) goto no_fire;
+    if (g_ejectState != 0) goto no_fire;
+    g_gunAmmo = clampRange(g_gunAmmo - 40 / g_frameRateScaling, 0, 1000);
+    makeSound(4, 2);
+    j = 0x70 / g_frameRateScaling;
+    bulletTracks[n].velZ = sinMul(g_ourPitch, j) << 5;
+    j = cosMul(g_ourPitch, j);
+    bulletTracks[n].velX = sinMul(g_ourHead, j);
+    bulletTracks[n].velY = -cosMul(g_ourHead, j);
+    bulletTracks[n].posX = bulletTracks[n].velX + g_viewX_;
+    bulletTracks[n].posY = bulletTracks[n].velY + g_viewY_;
+    bulletTracks[n].alt = bulletTracks[n].velZ + g_viewZ - 2;
+    g_gunFiredFlag = 1;
+    return;
+no_fire:
+    bulletTracks[n].posX = 0;
+    g_gunFiredFlag = 0;
+}
+
 /* ==== seg000:0x4aa8 ==== */
 struct StoreDef {
     int16  subIdx;   /* +0x0 */
