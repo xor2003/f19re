@@ -183,6 +183,28 @@ int16 mapYToScreen(int16 mapY) {
     return (((mapY - g_mapCenterY) >> (10 - (uint8)g_mapZoomLevel)) * 3 >> 1 >> 1) + 0x9F;
 }
 
+/* ==== seg000:0x8b41 ==== */
+void drawMapPoint(int16 x, int16 y, int16 color);            /* sub_18FE7 */
+int16 plotMapObject(int16 mapX, int16 mapY, int16 color, int16 big) {
+    int16 screenX, screenY;
+    if (g_mapMode != 0 || g_panelLabelOn == 0)
+        return 0;
+    screenX = mapXToScreen(mapX);
+    screenY = mapYToScreen(mapY);
+    if (color != -1 && screenX >= g_scopeClipLeft && screenX < g_scopeClipRight - 1 &&
+        screenY >= g_scopeClipTop && screenY < g_scopeClipBottom - 1) {
+        drawMapPoint(screenX, screenY, color);
+        if (big != 0) {
+            drawMapPoint(screenX + 1, screenY, color);
+            drawMapPoint(screenX, screenY + 1, color);
+            drawMapPoint(screenX + 1, screenY + 1, color);
+        }
+        return 0;
+    } else {
+        return 1;
+    }
+}
+
 /* ==== seg000:0x8bea ==== */
 int16 readMapPixelColor(int16 mapX, int16 mapY) {
     int16 screenX, screenY, color;
@@ -354,6 +376,15 @@ extern char  g_hudMessageBuf[];     /* @dseg:958C */
 void hudMessage(const char *src) {
     strcpy(g_hudMessageBuf, src);
     g_hudMsgTimer = g_frameRateScaling * 3;
+}
+
+/* ==== seg000:0x92cd ==== */
+struct StoreDef { int16 subIdx; uint16 coordX; uint16 coordY; int8 pad[8]; int16 nameIdx; };
+extern struct StoreDef g_storeDefs[];   /* @0x80C8, stride 0x10 */
+extern int8 g_classTab[];               /* @0x95F0 */
+extern int8 g_statTab[][0xD];           /* @0x512C */
+int16 getWeaponStat(int16 statIdx, int16 sel) {
+    return g_statTab[statIdx][ g_classTab[g_storeDefs[sel].nameIdx & 0x7F] & 0xF ];
 }
 
 /* ==== seg000:0xa23f / 0xa26c / 0xa2c5 ==== */
