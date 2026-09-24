@@ -193,6 +193,7 @@ int16 g_scopeArcColor, g_targetBearing, g_targetRange, g_viewX_2, g_vprojXlo, g_
 char g_itoaScratch[24];
 
 int16 g_inputDisabled, g_axisInputAccum[4], g_soundPriorityFloor, g_ejectState;
+int8 g_commEventFlag;                  /* byte_38D18 */
 int16 g_frameRateScaling, g_frameSyncWait, g_timeAccelMode, g_bulletTrackCount;
 int16 g_threatDisplayTtl;
 int16 FAR misc_readJoystick(int16 a) { return 0; }

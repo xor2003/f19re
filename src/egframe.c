@@ -105,6 +105,38 @@ void initWeaponLoadout(void) {
     g_fuelRemaining = 0x1388;
 }
 
+/* ==== seg000:0x4c3c ==== */
+struct CommSnap {
+    int8  pad_0[0x26];
+    int16 type;                     /* +0x26 */
+    int16 arg;                      /* +0x28 */
+    int8  pad_2a[0x0A];
+    int16 gunHits;                  /* +0x34 */
+    int16 dmgMask;                  /* +0x36 */
+    int8  pad_38[0x3C];
+    int16 viewY;                    /* +0x74 */
+    int16 viewX;                    /* +0x76 */
+};
+struct CommData;
+extern struct CommData FAR *commData;   /* dword_38B10 */
+extern int16 g_ejectState;              /* word_382D8 */
+extern int8 g_commEventFlag;            /* byte_38D18 */
+extern int16 g_viewX_, g_viewY_;        /* word_3838C / word_3837C */
+void recordFrame(uint8 a, uint8 b);
+void commitCommSnapshot(int16 arg) {
+    if (g_ejectState == 0 || arg == 0) {
+        g_commEventFlag = 1;
+        ((struct CommSnap FAR *)commData)->arg = arg;
+        if (arg == 0 && g_ejectState == 0)
+            ((struct CommSnap FAR *)commData)->type = 3;
+        ((struct CommSnap FAR *)commData)->viewY = g_viewY_;
+        ((struct CommSnap FAR *)commData)->viewX = g_viewX_;
+        ((struct CommSnap FAR *)commData)->gunHits = g_gunHits;
+        ((struct CommSnap FAR *)commData)->dmgMask = g_bombDamageMask;
+        recordFrame(8, 0);
+    }
+}
+
 /* ==== seg000:0x4c98 ==== */
 void hwPortWrite(int16 cmd);           /* sub_14CAC (noop hw thunk) */
 void sendSoundCmd(uint8 v) {
