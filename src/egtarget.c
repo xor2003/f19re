@@ -94,7 +94,7 @@ void buildRangeString(int16 rangeRaw) {
 }
 
 /* ==== seg000:0xca74 ==== */
-struct StoreDef { int16 subIdx; uint16 coordX; uint16 coordY; int8 pad[8]; int16 nameIdx; };
+struct StoreDef { int16 subIdx; uint16 coordX; uint16 coordY; int16 f6; int8 flags; int8 f9; int16 padA; int16 padC; int16 nameIdx; };
 struct SimObject { int16 f[0x12]; };
 extern struct StoreDef g_storeDefs[];   /* @0x80C8 */
 extern struct SimObject g_simObjects[]; /* @0x8870 */
@@ -118,6 +118,25 @@ int16 computeTargetBearing(int16 targetX, int16 targetY, int16 wantBearing) {
     }
     g_targetRange = rangeApprox(dx, dy);
     return g_targetRange;
+}
+
+/* ==== seg000:0xcaf2 ==== */
+extern int16 g_ourPitch;                /* word_33572 */
+extern int16 g_viewZ;                   /* word_33576 */
+int16 abs(int16);
+int16 hudPitchScale(void) {
+    return (int16)(((int32)(0x4000 - abs(g_ourPitch)) << 12) / (uint32)(uint16)(g_viewZ + 0x1000) - 0x4000);
+}
+
+/* ==== seg000:0xcb1a ==== */
+extern int8 g_airTargetMark;            /* byte_38380 */
+extern int8 g_gndTargetMark;            /* byte_384E0 */
+int16 isTargetOverWater(int16 wpIdx);   /* sub_1CB53 */
+int16 getStoreMapCode(int16 idx) {
+    if (g_storeDefs[idx].flags & 0x80) {
+        return (isTargetOverWater(idx) != 0 ? g_airTargetMark : g_gndTargetMark) + 0x100;
+    }
+    return g_storeDefs[idx].nameIdx;
 }
 
 /* ==== seg000:0xcb53 ==== */

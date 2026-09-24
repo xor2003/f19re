@@ -256,6 +256,7 @@ int8 g_projClipFlag;                  /* byte_32242 */
 int16 g_statCells[0x50];              /* struct StatCell[] @0x56AA */
 struct StoreDef { int16 subIdx; uint16 coordX; uint16 coordY; int8 pad[8]; int16 nameIdx; };
 struct StoreDef g_storeDefs[4];         /* @0x80C8 */
+int8  g_airTargetMark, g_gndTargetMark; /* byte_38380 / byte_384E0 */
 int8  g_classTab[0x80];                /* @0x95F0: nameIdx -> class nibble */
 int8  g_statTab[8][0xD];               /* @0x512C: [statIdx][class] */
 char *g_nameTab[0x80];                  /* @0x9696 */
