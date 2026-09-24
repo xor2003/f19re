@@ -15,6 +15,11 @@ void FAR fillSpanRect(const int16 *dst, int16 left, int16 top, int16 right, int1
 void drawStringCentered(int16 *page, const char *text, int16 x, int16 y, int16 color); /* sub_19219 */
 void drawViewportLine(int16 x1, int16 y1, int16 x2, int16 y2);   /* sub_18D9A */
 void FAR gfx_drawString(int16 *page, const char *str, int16 len); /* sub_2F043 */
+void fillPanelBox(int16 panelId, int16 color);               /* sub_190E8 */
+void drawCenteredLabelBox(int16 panelId, const char *text);  /* sub_19123 */
+void drawStringBothPages(const char *text, int16 x, int16 y, int16 color); /* sub_191B4 */
+
+extern int16 g_panelLabelOn;     /* word_33D90 */
 
 extern int16 g_scopeClipLeft;    /* word_384D2 */
 extern int16 g_scopeClipRight;   /* word_388C8 */
@@ -94,6 +99,42 @@ void setDrawColor(int16 color) {
 void fillRectBoth(int16 x1, int16 y1, int16 x2, int16 y2) {
     fillSpanRect(g_pageFront, x1, y1, x2, y2);
     fillSpanRect(g_pageBack, x1, y1, x2, y2);
+}
+
+/* ==== seg000:0x90cb ==== */
+void drawPanelText(int16 panelId, const char *text, int16 color) {
+    fillPanelBox(panelId, color);
+    drawCenteredLabelBox(panelId, text);
+}
+
+/* ==== seg000:0x90e8 ==== */
+void fillPanelBox(int16 panelId, int16 color) {
+    setDrawColor(color);
+    if (panelId == 1) {
+        fillRectBoth(0x28, 0x7C, 0x8F, 0xC3);
+    } else {
+        fillRectBoth(0xB0, 0x7C, 0x118, 0xC4);
+    }
+}
+
+/* ==== seg000:0x9123 ==== */
+void drawCenteredLabelBox(int16 panelId, const char *text) {
+    int16 xl, y, xr;
+    if (strlen(text) == 0 || g_panelLabelOn == 0) {
+        return;
+    }
+    if (panelId == 1) {
+        xl = 0x28;
+        xr = 0x8F;
+    } else {
+        xl = 0xB0;
+        xr = 0x118;
+    }
+    y = 0x7C;
+    y -= 8;
+    setDrawColor(8);
+    fillRectBoth(xl + 5, y, xr - 5, y + 4);
+    drawStringBothPages(text, ((xl + xr) >> 1) - (strlen(text) << 1), y, 0xB);
 }
 
 /* ==== seg000:0x91b4 ==== */

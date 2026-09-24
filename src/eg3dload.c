@@ -23,6 +23,15 @@ void printError(char *msg) {
     getch();
 }
 
+/* ==== seg000:0x1068 ==== */
+void strcpyFromDot(char *dst, const char *src) {
+    char ch;
+    while ((ch = *dst) != '.' && ch != 0) {
+        dst++;
+    }
+    strcpy(dst, src);
+}
+
 /* ==== seg000:0xcb8c ==== */
 void load15Flt3d3(void) {
     char FAR *dst;

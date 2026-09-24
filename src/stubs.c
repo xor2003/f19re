@@ -150,6 +150,7 @@ struct CommData FAR *commData;
 
 int16 g_scopeClipLeft = 0, g_scopeClipRight = 0, g_scopeClipTop = 0, g_scopeClipBottom = 0;
 int16 g_mapMode = 0;
+int16 g_panelLabelOn;
 int16 *g_pageFront, *g_pageBack;
 union REGS regs;
 
@@ -209,4 +210,4 @@ int16 sign3d3;
 size_t size3d3;
 uint8 flt15_buf2[0x800];
 FILE *fileHandle;
-void strcpyFromDot(char *d, const char *s) {}
+
