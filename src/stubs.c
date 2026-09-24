@@ -140,7 +140,7 @@ int16 cosine(int16 a) { return a; }
 const int16 g_angleLut[260] = {0};
 
 void FAR audio_engineDroneOff(void) {}
-void updateEngineSound(void) {}
+
 int16 g_frameTimingAccum = 0;
 
 int16 flagFarToNear = 0;
@@ -198,6 +198,8 @@ int16 g_frameRateScaling, g_frameSyncWait, g_timeAccelMode, g_bulletTrackCount;
 int16 g_threatDisplayTtl;
 int16 FAR misc_readJoystick(int16 a) { return 0; }
 void FAR audio_playSound(int16 a) {}
+void FAR audio_engineDroneOn(void) {}
+int16 g_engineThrust;                   /* word_33588 */
 
 
 uint8 g_aircraftModels[4];

@@ -41,6 +41,7 @@ MODULE_FLAGS = {
     'egcombat.c': ['/AS', '/Gs', '/Os'],
     'egflight.c': ['/AS', '/Gs', '/Os'],
     'egframe.c':  ['/AS', '/Gs', '/Os', '/Oa'],
+    'egkeys.c':   ['/AS', '/Gs', '/Ot'],
     'egmath.c':   ['/AS', '/Gs', '/Os'],
     'egtacmap.c': ['/AS', '/Gs', '/Os', '/Oa'],
     'egtarget.c': ['/AS', '/Gs', '/Os', '/Oa'],
