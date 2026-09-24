@@ -160,7 +160,13 @@ void recordFrame(uint8 a, uint8 b) {
 }
 
 /* ==== seg000:0x4d03 ==== */
-struct StoreDef { int16 subIdx; int8 pad[0xC]; int16 nameIdx; }; /* stride 0x10 */
+struct StoreDef {
+    int16  subIdx;   /* +0x0 */
+    uint16 coordX;   /* +0x2 */
+    uint16 coordY;   /* +0x4 */
+    int8   pad[8];   /* +0x6 */
+    int16  nameIdx;  /* +0xE */
+};                                              /* stride 0x10 */
 extern struct StoreDef g_storeDefs[];   /* @0x80C8 */
 extern char *g_nameTab[];               /* @0x9696 (word_38506) */
 extern char g_nameBuf[];                /* @0x65E6 (byte_35456) */
@@ -174,6 +180,27 @@ void buildStoreName(int16 i) {
         g_nameBuf[0x18] = '.';
         g_nameBuf[0x19] = 0;
     }
+}
+
+/* ==== seg000:0x4d77 ==== */
+extern char g_strpool[];               /* @0x9764 */
+extern char *g_nameTabBase;            /* word_38506 = g_nameTab[0] slot */
+extern int16 g_selStoreIdx;            /* word_37626 */
+extern int32 g_worldX, g_worldY;       /* word_37CB8 / word_382D4 */
+extern int16 flagFarToNear;            /* word_384CA */
+void initStoreData(void) {
+    int16 n, i;
+    setCommWorldbufPtr();
+    flagFarToNear = 1;
+    moveStuff();
+    g_nameTabBase = g_strpool;
+    n = 1;
+    for (i = 0; i < 0x2EE; i++) {
+        if (g_strpool[i] == 0 && n < 0x64)
+            g_nameTab[n++] = &g_strpool[i + 1];
+    }
+    g_worldX = ((uint32)g_storeDefs[g_selStoreIdx].coordX << 5) + 2;
+    g_worldY = ((int32)0x8000 - g_storeDefs[g_selStoreIdx].coordY) << 5;
 }
 
 void moveStuff() {

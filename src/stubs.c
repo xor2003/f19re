@@ -248,10 +248,14 @@ void redrawTacMap(int16 x, int16 y) { }   /* sub_187EC */
 void drawStatusItem(int16 idx, int16 color) { }  /* sub_19007 */
 void drawPanelModeText(int16 mode) { }           /* sub_18651 */
 int16 g_weaponMask, g_curPanelMode;   /* word_33D64 / word_385CE */
-struct StoreDef { int16 subIdx; int8 pad[0xC]; int16 nameIdx; };
+struct StoreDef { int16 subIdx; uint16 coordX; uint16 coordY; int8 pad[8]; int16 nameIdx; };
 struct StoreDef g_storeDefs[4];         /* @0x80C8 */
 char *g_nameTab[0x80];                  /* @0x9696 */
+char *g_nameTabBase;                    /* word_38506 = g_nameTab[0] slot */
 char g_nameBuf[0x20];                   /* @0x65E6 */
+char g_strpool[0x300];                  /* @0x9764 */
+int16 g_selStoreIdx;                    /* word_37626 */
+int32 g_worldX, g_worldY;               /* word_37CB8 / word_382D4 */
 int16 g_scopeCenterX, g_scopeCenterY;   /* word_354A8/354AC */
 int16 g_altitude, g_startRange;        /* word_33578/36E22 */
 int16 frameTick, g_nightMode, g_unusedFrameVal, g_missionTick; /* 343B6/33D8A/35450/354C0 */
