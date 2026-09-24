@@ -23,10 +23,23 @@ extern int16 g_scopeClipBottom;  /* word_38A0C */
 extern int16 g_mapMode;          /* word_38504 */
 extern int16 *g_pageFront;       /* word_34646 */
 extern int16 *g_pageBack;        /* word_3465E */
+extern int16 g_mapCenterX;       /* word_346E8 */
+extern int16 g_mapCenterY;       /* word_346EA */
+extern uint8 g_mapZoomLevel;     /* byte_346E4 */
 extern union REGS regs;          /* @0x95DE */
 extern uint16 FAR *g_viewParamsFar; /* dword_354D0 */
 extern int8  g_halfScaleRender;  /* byte_330EA */
 extern int8  g_drawPage;         /* byte_388CA */
+
+/* ==== seg000:0x8b06 ==== */
+int16 mapXToScreen(int16 mapX) {
+    return ((mapX - g_mapCenterX) >> (10 - g_mapZoomLevel)) + 0x5B;
+}
+
+/* ==== seg000:0x8b1d ==== */
+int16 mapYToScreen(int16 mapY) {
+    return (((mapY - g_mapCenterY) >> (10 - g_mapZoomLevel)) * 3 >> 1 >> 1) + 0x9F;
+}
 
 /* ==== seg000:0x8bea ==== */
 int16 readMapPixelColor(int16 mapX, int16 mapY) {

@@ -21,6 +21,8 @@ int16 mapMul(int16 a, int16 b) { return 0; }
 int16 mapDiv(int16 a, int16 b) { return 0; }
 
 uint8 g_radarScopeRange;
+int16 g_mapCenterX, g_mapCenterY;
+uint8 g_mapZoomLevel;
 int16 g_viewX_, g_viewY_, g_projDepth, g_ourHead, g_vprojX, g_vprojY;
 int16 sine(int16 a) { return 0; }
 int16 fixedMulQ14(int16 a, int16 b) { return 0; }
@@ -150,10 +152,9 @@ int16 g_scopeClipLeft = 0, g_scopeClipRight = 0, g_scopeClipTop = 0, g_scopeClip
 int16 g_mapMode = 0;
 int16 *g_pageFront, *g_pageBack;
 union REGS regs;
-int16 mapXToScreen(int16 x) { return x; }
-int16 mapYToScreen(int16 y) { return y; }
+
 void drawClippedLineRegion(int16 a,int16 b,int16 c,int16 d,int16 e,int16 f,int16 g,int16 h,int16 i) {}
-int16 clampRange(int16 v,int16 lo,int16 hi) { return v; }
+
 void FAR fillSpanRect(int16 a,int16 b,int16 c,int16 d,int16 e) {}
 void FAR gfx_drawString(int16 *a,const char *b,int16 c) {}
 
@@ -170,7 +171,7 @@ struct { int16 lead[3]; struct { int16 active; int16 f02; int16 alertLevel; int1
 struct { int16 state; int16 pad[8]; } g_targetSlots[4];
 struct { int16 mapX,mapY,u4,type,ttl,uA; } mapEvents[4];
 void appendMapEvent(int16 a, int16 b) {}
-int16 randomRange(int16 n) { return 0; }
+
 void refreshActivePanel(int16 a) {}
 
 int16 g_scopeArcColor, g_targetBearing, g_targetRange, g_viewX_2, g_vprojXlo, g_vprojYlo;
@@ -209,4 +210,3 @@ size_t size3d3;
 uint8 flt15_buf2[0x800];
 FILE *fileHandle;
 void strcpyFromDot(char *d, const char *s) {}
-void printError(char *m) {}

@@ -6,7 +6,8 @@
 #include <string.h>
 
 void strcpyFromDot(char *dst, const char *src); /* sub_11068 */
-void printError(char *msg);                      /* sub_1104C */
+void drawStringBothPages(const char *text, int16 x, int16 y, int16 color); /* sub_191B4 */
+int  getch(void);
 
 extern char regnStr[];              /* "STFLT.xxx" @dseg:5C56 */
 extern int16 sign3d3;               /* @dseg:6376 */
@@ -15,6 +16,12 @@ extern uint16 buf3d3[];             /* @dseg:6378 */
 extern uint8 flt15_buf2[];          /* @dseg:238A staging */
 extern char FAR g_world3dData[];    /* seg004:A430 */
 extern FILE *fileHandle;            /* word_354C8 */
+
+/* ==== seg000:0x104c ==== */
+void printError(char *msg) {
+    drawStringBothPages(msg, 0, 0x60, 0xF);
+    getch();
+}
 
 /* ==== seg000:0xcb8c ==== */
 void load15Flt3d3(void) {

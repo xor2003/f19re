@@ -75,6 +75,37 @@ int16 rangeApprox(int16 deltaX, int16 deltaY) {
     return (int16)dist;
 }
 
+/* ==== seg000:0xd1fa ==== */
+int16 clampRange(int16 value, int16 minVal, int16 maxVal) {
+    /* Unlike a plain clamp, very negative wrapped angles select the high end. */
+    if (value > maxVal) {
+        return maxVal;
+    }
+    if (value >= minVal) {
+        return value;
+    }
+    if (value <= (int16)0xC000) {
+        return maxVal;
+    }
+    return minVal;
+}
+
+/* ==== seg000:0xd223 ==== */
+int16 clampValue(int16 value, int16 minVal, int16 maxVal) {
+    if (value > maxVal) {
+        return maxVal;
+    }
+    if (value < minVal) {
+        return minVal;
+    }
+    return value;
+}
+
+/* ==== seg000:0xd46b ==== */
+int16 randomRange(int16 maxVal) {
+    return (int16)(((int32)rand() * (int32)maxVal) >> 0xF);
+}
+
 /* ==== seg000:0x3387 ==== */
 int16 isqrt(int16 value) {
     int16 quotient, estimate;

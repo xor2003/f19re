@@ -20,3 +20,9 @@ routine_158 sine               # seg000:1c2d  asm sin lookup (stays asm)
 routine_161 fixedMulQ14        # seg000:1bc6  asm fixed multiply (stays asm)
 routine_303 drawHudViewLine   # seg000:8f38  half-scale/clip line wrapper
 routine_111 drawStringCentered # seg000:9219  strStruct fields + gfx_drawString
+routine_253 mapXToScreen      # seg000:8b06  (mapX-centerX)>>(10-zoom)+0x5B
+routine_254 mapYToScreen      # seg000:8b1d  ((mapY-centerY)>>(10-zoom))*3>>2 +0x9F
+routine_149 clampValue        # seg000:d223  plain clamp v>max?max:v<min?min:v
+routine_152 randomRange       # seg000:d46b  (rand()*max)>>15
+routine_115 clampRange        # seg000:d1fa  clamp with <=-0x4000 wrap-to-max
+routine_66  printError        # seg000:104c  drawStringBothPages(msg,0,0x60,0xF)+getch
