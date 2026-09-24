@@ -76,3 +76,13 @@ void exitTimeAccel(void) {
         recalcTimeScale();
     }
 }
+
+/* ==== seg000:0xe026 ==== */
+struct StoreDef { int16 subIdx; uint16 coordX; uint16 coordY; int16 f6; int8 flags; int8 f9; int16 padA; int16 padC; int16 nameIdx; };
+extern struct StoreDef g_storeDefs[];   /* @0x80C8 */
+extern int16 waypoints[];              /* @0x4880 — {mapX,mapY} pairs */
+
+void copyStoreToWaypoint(int16 dst, int16 src) {
+    waypoints[dst * 2] = g_storeDefs[src].coordX;
+    waypoints[dst * 2 + 1] = g_storeDefs[src].coordY;
+}
