@@ -101,6 +101,39 @@ int16 clampValue(int16 value, int16 minVal, int16 maxVal) {
     return value;
 }
 
+/* ==== seg000:0xd419 ==== */
+int16 signExtendByte(int16 v) {
+    if ((uint8)v < 0x80) {
+        v = (uint8)v;
+    } else {
+        v = (uint8)v - 0x100;
+    }
+    return v;
+}
+
+/* ==== seg000:0xd436 ==== */
+int16 signOf(int16 value) {
+    if (value == 0) {
+        return 0;
+    }
+    if (value > 0) {
+        return 1;
+    }
+    return -1;
+}
+
+extern int16 g_inputDisabled;         /* word_33D8C */
+extern int16 g_rngSeed;               /* word_35236 */
+int16 getTimeOfDay(void);             /* sub_11FE2 */
+
+/* ==== seg000:0xd453 ==== */
+void seedRng(void) {
+    if (g_inputDisabled == 0) {
+        g_rngSeed = getTimeOfDay();
+    }
+    srand(g_rngSeed);
+}
+
 /* ==== seg000:0xd46b ==== */
 int16 randomRange(int16 maxVal) {
     return (int16)(((int32)rand() * (int32)maxVal) >> 0xF);
@@ -122,7 +155,6 @@ int16 isqrt(int16 value) {
 }
 
 /* ==== seg000:0xd484 ==== */
-extern int16 g_inputDisabled;         /* word_33D8C */
 extern int16 g_axisInputAccum[];      /* @0x5C94 */
 int16 FAR misc_readJoystick(int16 axis);  /* sub_2F1FB thunk */
 struct CommSetup { int8 pad[0x72]; int16 setupUseJoy; };

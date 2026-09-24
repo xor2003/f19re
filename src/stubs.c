@@ -227,3 +227,6 @@ size_t size3d3;
 uint8 flt15_buf2[0x800];
 FILE *fileHandle;
 
+int16 g_rngSeed;
+int16 g_unusedLoadDoneFlag;
+int16 getTimeOfDay(void) { return 0; }

@@ -7,6 +7,9 @@
 
 void strcpyFromDot(char *dst, const char *src); /* sub_11068 */
 void drawStringBothPages(const char *text, int16 x, int16 y, int16 color); /* sub_191B4 */
+void load3DG(void);
+void load3D3(char *fileName);
+void load3DT(char *fileName);
 int  getch(void);
 
 extern char regnStr[];              /* "STFLT.xxx" @dseg:5C56 */
@@ -46,6 +49,15 @@ extern uint16 g_modelVertY[];       /* @dseg:94AC */
 extern uint16 g_modelVertZ[];       /* @dseg:94EC */
 struct TargetSlot { int16 flags; uint8 _pad[0x10]; }; /* 0x12 bytes */
 extern struct TargetSlot g_targetSlots[]; /* @dseg:87B8 */
+extern int16 g_unusedLoadDoneFlag;  /* word_2F7D2 */
+
+/* ==== seg000:0x0abe ==== */
+void load3DAll(void) {
+    load3DG();
+    load3D3(regnFile);
+    load3DT(regnFile);
+    g_unusedLoadDoneFlag = 0;
+}
 
 #pragma pack(1)
 struct TileSceneObject {

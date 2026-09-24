@@ -32,3 +32,7 @@ routine_313 drawCenteredLabelBox # seg000:9123 panel title bar+centered text
 routine_99  load3DG            # seg000:0f7c  regn.3DG loader
 routine_101 load3DT            # seg000:0e1a  .3dT tile-matrix loader
 routine_100 load3D3            # seg000:0adc  full .3D3 loader (model + 2 LOD files)
+routine_71  load3DAll          # seg000:0abe  load3DG+load3D3+load3DT(regnFile)
+routine_275 signExtendByte     # seg000:d419  byte->int16 sign extend
+routine_222 signOf             # seg000:d436  sgn(x): -1/0/1
+routine_279 seedRng            # seg000:d453  if(!g_inputDisabled) seed=time; srand
