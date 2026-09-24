@@ -237,6 +237,7 @@ int16 g_trackedEnemyIdx;
 int16 g_gunAmmo;
 int16 g_fuelRemaining;
 int16 g_stores[4][2];
+int16 g_wpnSlots[0x18];               /* @0x5236: 4 weapon-slot records, stride 0xC */
 int16 g_hudMsgTimer;
 char  g_hudMessageBuf[64];
 

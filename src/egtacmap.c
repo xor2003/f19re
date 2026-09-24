@@ -127,6 +127,19 @@ void initTacMapView(void) {
     zoomIn();
 }
 
+/* ==== seg000:0x877f ==== */
+void setDrawColor(int16 color);                              /* sub_18F9C */
+void fillRectBoth(int16 x1, int16 y1, int16 x2, int16 y2);   /* sub_18FB2 */
+void drawGaugeBar(int16 val, int16 color, int16 x1, int16 x2) {
+    if (g_panelLabelOn == 0)
+        return;
+    setDrawColor(color);
+    if (val < 0)
+        fillRectBoth(x1 + 0x9A, 0x7B, x2 + 0x9A, 0x7B - val / 2);
+    if (val > 0)
+        fillRectBoth(x1 + 0x9A, 0xAD - val / 2, x2 + 0x9A, 0xAD);
+}
+
 /* ==== seg000:0x8a1b ==== */
 extern int16 g_viewMode;         /* word_3836E */
 extern int16 g_externalCamDist;  /* word_343C6 */

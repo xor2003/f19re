@@ -41,6 +41,21 @@ extern int16 g_targetSlots[0x12];       /* @0x87B2 */
 struct MapTarget { int16 f[8]; };        /* sizeof = 0x10 */
 struct SimObject { int16 f[0x12]; };     /* sizeof = 0x24 */
 
+/* ==== seg000:0x4905 ==== */
+struct WSlot { int16 state, timer, pad[4]; };      /* sizeof = 0xC */
+extern struct WSlot g_wpnSlots[];      /* @0x5236 */
+void drawStatusItem(int16 idx, int16 val);         /* sub_19007 */
+void tickWeaponSlots(void) {
+    int16 i;
+    for (i = 0; i < 4; i++)
+        if (g_wpnSlots[i].timer != 0) {
+            g_wpnSlots[i].timer--;
+            if (g_wpnSlots[i].state == 3)
+                drawStatusItem(7, g_wpnSlots[i].timer != 0 ? 0xC : 0);
+            return;
+        }
+}
+
 /* ==== seg000:0x4b38 ==== */
 extern int16 g_wreckAlt;               /* word_3845E */
 extern int16 g_wreckFallVel;           /* word_379B8 */
