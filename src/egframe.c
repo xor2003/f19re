@@ -41,6 +41,56 @@ extern int16 g_targetSlots[0x12];       /* @0x87B2 */
 struct MapTarget { int16 f[8]; };        /* sizeof = 0x10 */
 struct SimObject { int16 f[0x12]; };     /* sizeof = 0x24 */
 
+/* ==== seg000:0x47f1 ==== */
+struct FireRec { int16 viewX, viewY, unk4, type, timer, unkA; };  /* stride 0xC @0x5230 */
+extern struct FireRec g_fireRecs[];      /* @0x5230 */
+extern int16 g_eventTimers[];            /* @0x4EF8 */
+extern int16 g_viewX_, g_viewY_;         /* word_3837C / word_3838C */
+extern int16 g_missionStatus;            /* word_33D86 */
+extern int16 g_frameRateScaling;         /* word_33D92 */
+extern int16 g_weaponMask;               /* word_33D64 */
+extern char  g_nameBuf[];                /* @0x65E6 */
+void hudMessage(const char *s);          /* sub_192B1 */
+void makeSound(int16 id, int16 pri);     /* sub_1DEF2 */
+void countermeasures(int16 type) {
+    int16 n, i;
+    n = -1;
+    if (g_eventTimers[type]-- <= 0) {
+        g_eventTimers[type] = 0;
+        hudMessage("Zapas is~erpan");
+        return;
+    }
+    if (type == 3) {
+        if (g_fireRecs[0].timer == 0 && !(g_weaponMask & 0x40))
+            n = 0;
+    } else {
+        for (i = 1; i < 4; i++)
+            if (g_fireRecs[i].timer == 0)
+                n = i;
+    }
+    if (n != -1) {
+        g_fireRecs[n].viewX = g_viewX_;
+        g_fireRecs[n].viewY = g_viewY_;
+        g_fireRecs[n].type = type;
+        g_fireRecs[n].timer = (9 - 2 * g_missionStatus) * g_frameRateScaling;
+        switch (type) {
+        case 1:
+            strcpy(g_nameBuf, "Flare");
+            break;
+        case 2:
+            strcpy(g_nameBuf, "Chaff");
+            break;
+        case 3:
+            strcpy(g_nameBuf, "\\kran");
+            g_fireRecs[n].timer <<= 3;
+            break;
+        }
+        strcat(g_nameBuf, " wypu}en");
+        hudMessage(g_nameBuf);
+    }
+    makeSound(0x16, 2);
+}
+
 /* ==== seg000:0x4905 ==== */
 struct WSlot { int16 state, timer, pad[4]; };      /* sizeof = 0xC */
 extern struct WSlot g_wpnSlots[];      /* @0x5236 */
@@ -54,6 +104,40 @@ void tickWeaponSlots(void) {
                 drawStatusItem(7, g_wpnSlots[i].timer != 0 ? 0xC : 0);
             return;
         }
+}
+
+/* ==== seg000:0x4aa8 ==== */
+struct StoreDef {
+    int16  subIdx;   /* +0x0 */
+    uint16 coordX;   /* +0x2 */
+    uint16 coordY;   /* +0x4 */
+    int8   pad[8];   /* +0x6 */
+    int16  nameIdx;  /* +0xE */
+};                                              /* stride 0x10 */
+extern struct StoreDef g_storeDefs[];   /* @0x80C8 */
+struct Particle { int16 posX, posY, alt, spin; };   /* stride 8 */
+extern struct Particle g_particles[8];  /* @0x5260 */
+extern int16 g_smokeSourceIdx;          /* word_343BE */
+extern int16 g_smokeParticleSlot;       /* word_34110 */
+extern int16 frameTick;                 /* word_343B6 */
+int16 randomRange(int16 range);         /* sub_1D46B */
+void updateTracerParticles(void) {
+    int16 i, slot;
+    if (g_smokeSourceIdx != -1) {
+        for (i = 0; i < 8; i++) {
+            g_particles[i].alt += 10;
+            g_particles[i].posY += g_particles[i].alt >> 9;
+            *(((char *)&g_particles[i].spin) + 1) += 6;
+        }
+        if (!((char)frameTick & 0x0f)) {
+            slot = (frameTick >> 4) & 7;
+            g_particles[slot].posX = g_storeDefs[g_smokeSourceIdx].coordX;
+            g_particles[slot].posY = g_storeDefs[g_smokeSourceIdx].coordY;
+            g_particles[slot].alt = 0x80;
+            g_particles[slot].spin = randomRange(0x100) << 8;
+            g_smokeParticleSlot = slot;
+        }
+    }
 }
 
 /* ==== seg000:0x4b38 ==== */
@@ -175,14 +259,6 @@ void recordFrame(uint8 a, uint8 b) {
 }
 
 /* ==== seg000:0x4d03 ==== */
-struct StoreDef {
-    int16  subIdx;   /* +0x0 */
-    uint16 coordX;   /* +0x2 */
-    uint16 coordY;   /* +0x4 */
-    int8   pad[8];   /* +0x6 */
-    int16  nameIdx;  /* +0xE */
-};                                              /* stride 0x10 */
-extern struct StoreDef g_storeDefs[];   /* @0x80C8 */
 extern char *g_nameTab[];               /* @0x9696 (word_38506) */
 extern char g_nameBuf[];                /* @0x65E6 (byte_35456) */
 void buildStoreName(int16 i) {

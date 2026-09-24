@@ -201,6 +201,8 @@ void FAR audio_playSound(int16 a) {}
 void FAR audio_engineDroneOn(void) {}
 int16 g_engineThrust;                   /* word_33588 */
 int16 g_lodDistBase, g_lodDistScale, g_lodDistNear, g_lodDistFar;  /* word_2F870..876 */
+int16 g_particles[32];                  /* @0x5260 struct Particle[8] ring */
+int16 g_smokeSourceIdx, g_smokeParticleSlot;  /* word_343BE / word_34110 */
 
 
 uint8 g_aircraftModels[4];
@@ -241,6 +243,8 @@ int16 g_gunAmmo;
 int16 g_fuelRemaining;
 int16 g_stores[4][2];
 int16 g_wpnSlots[0x18];               /* @0x5236: 4 weapon-slot records, stride 0xC */
+int16 g_fireRecs[0x18];               /* @0x5230: stride-0xC fire records (g_wpnSlots aliases +6) */
+int16 g_eventTimers[4];               /* @0x4EF8: countermeasure cooldown counters */
 int16 g_hudMsgTimer;
 char  g_hudMessageBuf[64];
 
