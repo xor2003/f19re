@@ -37,6 +37,14 @@ extern uint16 FAR *g_viewParamsFar; /* dword_354D0 */
 extern int8  g_halfScaleRender;  /* byte_330EA */
 extern int8  g_drawPage;         /* byte_388CA */
 
+/* ==== seg000:0x7e29 ==== */
+extern int8 g_projClipFlag;          /* byte_32242 */
+void projectVertex(int32 vx, int32 vy, int32 vz);  /* sub_11372 */
+void projectWorldPoint(int16 x, int16 y, int16 z) {
+    g_projClipFlag = 0;
+    projectVertex((int32)x << 5, ((int32)0x8000 - y) << 5, (int32)z);
+}
+
 /* ==== seg000:0x7e62 ==== */
 void clearStatusPanel(void) {
     drawPanelText(2, "", 0);
@@ -215,6 +223,38 @@ void setDrawColor(int16 color) {
 void fillRectBoth(int16 x1, int16 y1, int16 x2, int16 y2) {
     fillSpanRect(g_pageFront, x1, y1, x2, y2);
     fillSpanRect(g_pageBack, x1, y1, x2, y2);
+}
+
+/* ==== seg000:0x8fe7 ==== */
+void drawMapPoint(int16 x, int16 y, int16 color) {
+    setDrawColor(color);
+    drawFullscreenLine(x, y, x, y);
+}
+
+/* ==== seg000:0x9007 ==== */
+struct StatCell { int16 x1, y1, x2, y2, val; };
+extern struct StatCell g_statCells[];   /* @0x56AA */
+void FAR gfx_drawStatusBox(int16 *page, int16 x1, int16 y1, int16 x2, int16 y2, int16 old, int16 val); /* sub_2F0F7 */
+void drawStatusItem(int16 idx, int16 val) {
+    if (g_panelLabelOn == 0)
+        return;
+    if (g_statCells[idx].val != val) {
+        gfx_drawStatusBox(g_pageFront, g_statCells[idx].x1, g_statCells[idx].y1,
+                          g_statCells[idx].x2, g_statCells[idx].y2, g_statCells[idx].val, val);
+        gfx_drawStatusBox(g_pageBack,  g_statCells[idx].x1, g_statCells[idx].y1,
+                          g_statCells[idx].x2, g_statCells[idx].y2, g_statCells[idx].val, val);
+        g_statCells[idx].val = val;
+    }
+}
+
+/* ==== seg000:0x9071 ==== */
+void drawPanelGridText(int16 panel, int16 col, int16 row, const char *text, int16 color) {
+    if (g_panelLabelOn == 0)
+        return;
+    if (panel == 1)
+        drawStringBothPages(text, col * 4 + 0x28, row * 6 + 0x7C, color);
+    if (panel == 2)
+        drawStringBothPages(text, col * 4 + 0xB0, row * 6 + 0x7C, color);
 }
 
 /* ==== seg000:0x90cb ==== */

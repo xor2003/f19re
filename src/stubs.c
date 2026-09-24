@@ -245,11 +245,14 @@ int16 g_wreckAlt;                      /* word_3845E */
 int16 g_wreckFallVel;                  /* word_379B8 */
 void hwPortWrite(int16 cmd) { }        /* sub_14CAC noop */
 void redrawTacMap(int16 x, int16 y) { }   /* sub_187EC */
-void drawStatusItem(int16 idx, int16 color) { }  /* sub_19007 */
 void sub_19979(void) { } void sub_19E4F(void) { } void sub_1A0BD(void) { }
 void sub_1A300(void) { } void nullsub_3(void) { }
+void projectVertex(int32 x, int32 y, int32 z) { }       /* sub_11372 */
+void FAR gfx_drawStatusBox(int16 *p,int16 a,int16 b,int16 c,int16 d,int16 e,int16 f) { } /* sub_2F0F7 */
 int16 g_weaponMask, g_curPanelMode;   /* word_33D64 / word_385CE */
 int16 g_scanDir;                      /* word_38D1A */
+int8 g_projClipFlag;                  /* byte_32242 */
+int16 g_statCells[0x50];              /* struct StatCell[] @0x56AA */
 struct StoreDef { int16 subIdx; uint16 coordX; uint16 coordY; int8 pad[8]; int16 nameIdx; };
 struct StoreDef g_storeDefs[4];         /* @0x80C8 */
 char *g_nameTab[0x80];                  /* @0x9696 */
