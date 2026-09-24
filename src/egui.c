@@ -88,6 +88,43 @@ void blitGaugeSprite(int16 srcCol, int16 srcRow, int16 destX, int16 destY) {
     gfx_blitSpriteClipped((int16 *)&gaugeSpriteParams);
 }
 
+extern int16 g_missionTick;      /* word_35450 */
+extern int16 g_nightMode;        /* word_33D8A */
+extern char g_nameBuf[];         /* @0x65E6 */
+extern char g_itoaScratch[];     /* @0x9678 */
+int16 clampRange(int16 v, int16 lo, int16 hi);   /* sub_1D1FA */
+void fillRectBoth(int16 x1, int16 y1, int16 x2, int16 y2);  /* sub_18FB2 */
+void formatTwoDigit(int16 val);  /* sub_19E0F */
+
+/* ==== seg000:0x9d5e ==== */
+void drawStatusBar(int16 val, int16 color) {
+    val = clampRange(val, 0, 0x2710);
+    if (val > 0x6F) {
+        setDrawColor(color);
+        fillRectBoth(0xB4, 0xBB, 0xB4 + val / 0x70, 0xC1);
+    }
+}
+
+/* ==== seg000:0x9da3 ==== */
+void formatMissionClock(uint16 time) {
+    time += g_missionTick;
+    strcpy(g_nameBuf, ":");
+    formatTwoDigit(time / 0x708);
+    g_nameBuf[0] += *(char *)&g_nightMode + 1;
+    strcat(g_nameBuf, ":");
+    formatTwoDigit(time / 0x1E);
+    strcat(g_nameBuf, ":");
+    formatTwoDigit(time << 1);
+}
+
+/* ==== seg000:0x9e0f ==== */
+void formatTwoDigit(int16 val) {
+    val %= 60;
+    if (val < 10)
+        strcat(g_nameBuf, "0");
+    strcat(g_nameBuf, itoa(val, g_itoaScratch, 10));
+}
+
 extern int16 g_lineX1, g_lineX2, g_lineY1, g_lineY2;
 extern int16 g_viewCenterX, g_viewCenterY;
 extern char far *g_modelStreamPtr;  /* dword_2F8F8 */
