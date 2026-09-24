@@ -60,6 +60,19 @@ struct TileSceneObject { int16 x, y, z; uint8 shape; };
 int16 g_mapOriginX, g_mapOriginY;
 int16 g_mapLodIndex, g_curLod, g_modelEvenOddBit, g_tileZoomShift, g_tileWorldSize, g_tileGridDim;
 const int16 g_mapTileLodTable[5] = {0};
+int16 sign3dt;
+uint16 sizes3dt[5];
+uint8 buf_3dt[8192];
+int16 size3d3_2;
+int16 size3d3_3;
+int16 size3d3_4;
+int16 size3d3_5;
+int16 size3d3_6;
+int16 size3d3_7;
+uint8 buf3d3_3[256];
+uint16 g_modelOffsetTable[64];
+uint16 g_modelVertX[256];
+uint16 g_modelVertZ[256];
 struct TileSceneObject *matrix3dt_2[5][32];
 uint16 matrix3dt[5][32];
 struct TileSceneObject *g_curTileEntry;
@@ -202,10 +215,13 @@ int16 g_trkRoll, g_trkBearing, g_trkPitch, g_trkRange, g_trkSize, g_trkScale;
 int16 g_viewX_, g_viewY_, g_ourHead, g_ourRoll, g_extViewPitch;
 int8  g_extraScaleShift, g_offscreenRender;
 uint16 FAR *g_viewParamsFar;
+int16 sign3dg;
+uint8 g_theaterGrids[2048];
 
 /* eg3dload.c load15Flt3d3 stubs */
 #include <stdio.h>
 char regnStr[32] = "STFLT.xxx";
+char *regnFile = "regn.xxx";
 int16 sign3d3;
 size_t size3d3;
 uint8 flt15_buf2[0x800];

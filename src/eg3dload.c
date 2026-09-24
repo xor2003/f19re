@@ -10,12 +10,49 @@ void drawStringBothPages(const char *text, int16 x, int16 y, int16 color); /* su
 int  getch(void);
 
 extern char regnStr[];              /* "STFLT.xxx" @dseg:5C56 */
+extern char *regnFile;              /* ->"regn.xxx" off_2EEE8 @dseg:0078 */
 extern int16 sign3d3;               /* @dseg:6376 */
 extern size_t size3d3;              /* word_35228 @dseg:63B8 */
 extern uint16 buf3d3[];             /* @dseg:6378 */
 extern uint8 flt15_buf2[];          /* @dseg:238A staging */
 extern char FAR g_world3dData[];    /* seg004:A430 */
 extern FILE *fileHandle;            /* word_354C8 */
+extern int16 sign3dg;               /* @dseg:0860 */
+extern uint8 buf1_3dg[];            /* @dseg:6ECC */
+extern uint8 buf2_3dg[];            /* @dseg:6C76 */
+extern uint8 buf3_3dg[];            /* @dseg:6870 */
+extern uint8 buf4_3dg[];            /* @dseg:666C */
+extern uint8 g_topLodGrid[];        /* @dseg:7F6E */
+extern uint8 g_theaterGrids[];      /* @dseg:0862 */
+extern uint16 FAR *g_viewParamsFar; /* dword_354D0 (game data; +0x38 = theater) */
+extern int16 sign3dt;               /* @dseg:06CC */
+extern uint16 sizes3dt[5];          /* @dseg:06CE */
+extern uint16 matrix3dt[5][32];     /* @dseg:06D8 */
+extern uint8 buf_3dt[];             /* @dseg:6FCC */
+struct TileSceneObject;
+extern struct TileSceneObject *matrix3dt_2[5][32]; /* @dseg:9A5C */
+extern int16 size3d3_2;             /* word_2F53A @dseg:06CA */
+extern int16 size3d3_3;             /* @dseg:085E */
+extern int16 size3d3_4;             /* @dseg:0858 */
+extern int16 size3d3_5;             /* @dseg:085A */
+extern int16 size3d3_6;             /* @dseg:085C */
+extern int16 size3d3_7;             /* @dseg:9EBE */
+extern uint8 buf3d3_1[];            /* @dseg:857E */
+extern uint8 buf3d3_2[];            /* @dseg:871C */
+extern uint8 buf3d3_3[];            /* @dseg:87D6 */
+extern uint16 g_modelOffsetTable[]; /* @dseg:0818 */
+extern uint16 g_modelVertX[];       /* @dseg:946A */
+extern uint16 g_modelVertY[];       /* @dseg:94AC */
+extern uint16 g_modelVertZ[];       /* @dseg:94EC */
+struct TargetSlot { int16 flags; uint8 _pad[0x10]; }; /* 0x12 bytes */
+extern struct TargetSlot g_targetSlots[]; /* @dseg:87B8 */
+
+#pragma pack(1)
+struct TileSceneObject {
+    int16 x, y, z;
+    uint8 shape;
+};
+#pragma pack()
 
 /* ==== seg000:0x104c ==== */
 void printError(char *msg) {
@@ -30,6 +67,113 @@ void strcpyFromDot(char *dst, const char *src) {
         dst++;
     }
     strcpy(dst, src);
+}
+
+/* ==== seg000:0x0adc ==== */
+void load3D3(char *fileName) {
+    char FAR *objDataEnd;
+    char FAR *dstPtr;
+    struct SREGS sregs;
+    int16 slot, subCount, sub;
+    int16 chunk;
+    strcpyFromDot(fileName, ".3D3");
+    fileHandle = fopen(fileName, "rb");
+    fread(&sign3d3, 2, 1, fileHandle);
+    fread(&size3d3, 2, 1, fileHandle);
+    fread(buf3d3, 2, size3d3, fileHandle);
+    fread(&size3d3_2, 2, 1, fileHandle);
+    objDataEnd = g_world3dData + size3d3_2;
+    buf3d3[size3d3] = size3d3_2;
+    segread(&sregs);
+    for (dstPtr = g_world3dData; size3d3_2 > 0; size3d3_2 -= 0x800, dstPtr += 0x800) {
+        chunk = (size3d3_2 >= 0x800) ? 0x800 : size3d3_2;
+        fread(flt15_buf2, 1, chunk, fileHandle);
+        movedata(sregs.ds, PTR_OFF(flt15_buf2), FP_SEG(dstPtr), FP_OFF(dstPtr), chunk);
+    }
+    fread(&size3d3_3, 1, 1, fileHandle);
+    if (size3d3_3 != 0) {
+        fread(buf3d3_1, 1, size3d3_3, fileHandle);
+        fread(buf3d3_2, 1, size3d3_3, fileHandle);
+        fread(buf3d3_3, 1, size3d3_3, fileHandle);
+        fread(&size3d3_4, 1, 1, fileHandle);
+        fread(g_modelVertX, 2, size3d3_4, fileHandle);
+        fread(&size3d3_5, 1, 1, fileHandle);
+        fread(g_modelVertY, 2, size3d3_5, fileHandle);
+        fread(&size3d3_6, 1, 1, fileHandle);
+        fread(g_modelVertZ, 2, size3d3_6, fileHandle);
+    }
+    fclose(fileHandle);
+    for (slot = 0; slot < 2; slot++) {
+        if ((subCount = g_targetSlots[slot].flags >> 8) != 0) {
+            fileHandle = fopen("photo.3d3", "rb");
+            fread(&sign3d3, 2, 1, fileHandle);
+            fread(&size3d3_7, 2, 1, fileHandle);
+            fread(g_modelOffsetTable, 2, size3d3_7, fileHandle);
+            fread(&size3d3_2, 2, 1, fileHandle);
+            g_modelOffsetTable[size3d3_7] = size3d3_2;
+            for (sub = 0; sub <= subCount; sub++) {
+                chunk = g_modelOffsetTable[sub + 1] - g_modelOffsetTable[sub];
+                while (chunk > 0x800) {
+                    fread(flt15_buf2, 1, 0x800, fileHandle);
+                    chunk -= 0x800;
+                }
+                segread(&sregs);
+                fread(flt15_buf2, 1, chunk, fileHandle);
+                movedata(sregs.ds, PTR_OFF(flt15_buf2), FP_SEG(objDataEnd), FP_OFF(objDataEnd), chunk);
+            }
+            objDataEnd += chunk;
+            if (slot == 0) {
+                buf3d3[size3d3 + 1] = buf3d3[size3d3] + chunk;
+            }
+            fclose(fileHandle);
+        }
+    }
+    if (objDataEnd - g_world3dData > 0x7530) {
+        drawStringBothPages("ObjData overflow", 0, 0x60, 0xF);
+    }
+}
+
+/* ==== seg000:0xf7c ==== */
+void load3DG(void) {
+    int16 unused_1, unused_2, unused_3;
+    strcpyFromDot(regnFile, ".3dG");
+    fileHandle = fopen(regnFile, "rb");
+    fread(&sign3dg, 2, 1, fileHandle);
+    fread(buf1_3dg, 1, 0x10, fileHandle);
+    fread(buf1_3dg, 1, 0x100, fileHandle);
+    fread(buf2_3dg, 1, 0x200, fileHandle);
+    fread(buf3_3dg, 1, 0x200, fileHandle);
+    fread(buf4_3dg, 1, 0x200, fileHandle);
+    fclose(fileHandle);
+    memcpy(g_topLodGrid, g_theaterGrids + ((int16)g_viewParamsFar[0x1C] << 6), 0x40);
+}
+
+/* ==== seg000:0xe1a ==== */
+#define OBJ(off) ((struct TileSceneObject *)(buf_3dt + (off)))
+void load3DT(char *fileName) {
+    int16 cat, tile, obj, byteOff, shape;
+    strcpyFromDot(fileName, ".3dT");
+    fileHandle = fopen(fileName, "rb");
+    fread(&sign3dt, 2, 1, fileHandle);
+    fread(sizes3dt, 2, 5, fileHandle);
+    for (cat = 0; cat < 5; cat++) {
+        fread(matrix3dt[cat], 2, sizes3dt[cat], fileHandle);
+    }
+    byteOff = 0;
+    for (cat = 0; cat < 5; cat++) {
+        for (tile = 0; sizes3dt[cat] > tile; tile++) {
+            matrix3dt_2[cat][tile] = OBJ(byteOff);
+            for (obj = 0; matrix3dt[cat][tile] > obj; obj++) {
+                fread(&OBJ(byteOff)->x, 2, 1, fileHandle);
+                fread(&OBJ(byteOff)->y, 2, 1, fileHandle);
+                fread(&OBJ(byteOff)->z, 2, 1, fileHandle);
+                fread(&shape, 2, 1, fileHandle);
+                OBJ(byteOff)->shape = (uint8)shape;
+                byteOff += sizeof(struct TileSceneObject);
+            }
+        }
+    }
+    fclose(fileHandle);
 }
 
 /* ==== seg000:0xcb8c ==== */
