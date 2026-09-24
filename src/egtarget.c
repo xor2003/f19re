@@ -93,6 +93,21 @@ void buildRangeString(int16 rangeRaw) {
     strcat(strBuf, " km");
 }
 
+/* ==== seg000:0xca74 ==== */
+struct StoreDef { int16 subIdx; uint16 coordX; uint16 coordY; int8 pad[8]; int16 nameIdx; };
+struct SimObject { int16 f[0x12]; };
+extern struct StoreDef g_storeDefs[];   /* @0x80C8 */
+extern struct SimObject g_simObjects[]; /* @0x8870 */
+int16 computeTargetBearing(int16 targetX, int16 targetY, int16 wantBearing); /* sub_1CAB4 */
+int16 bearingToStore(int16 i) {
+    return computeTargetBearing(g_storeDefs[i].coordX, g_storeDefs[i].coordY, 1);
+}
+
+/* ==== seg000:0xca94 ==== */
+int16 bearingToSimObject(int16 i) {
+    return computeTargetBearing(g_simObjects[i].f[1], g_simObjects[i].f[2], 0);
+}
+
 /* ==== seg000:0xcab4 ==== */
 int16 computeTargetBearing(int16 targetX, int16 targetY, int16 wantBearing) {
     int16 dx, dy;
