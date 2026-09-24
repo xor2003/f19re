@@ -1,5 +1,6 @@
 /* egframe.c — frame/state transfer routines (F19) */
 #include "inttype.h"
+#include <string.h>
 
 void moveNearFar(void *nearPtr, int16 count);   /* sub_15001 */
 int16 setCommWorldbufPtr(void);                  /* sub_15045 */
@@ -158,6 +159,23 @@ void recordFrame(uint8 a, uint8 b) {
     }
 }
 
+/* ==== seg000:0x4d03 ==== */
+struct StoreDef { int16 subIdx; int8 pad[0xC]; int16 nameIdx; }; /* stride 0x10 */
+extern struct StoreDef g_storeDefs[];   /* @0x80C8 */
+extern char *g_nameTab[];               /* @0x9696 (word_38506) */
+extern char g_nameBuf[];                /* @0x65E6 (byte_35456) */
+void buildStoreName(int16 i) {
+    strcpy(g_nameBuf, g_nameTab[g_storeDefs[i].nameIdx & 0x7F]);
+    if (strlen(g_nameTab[g_storeDefs[i].subIdx]) != 0) {
+        strcat(g_nameBuf, " ");
+        strcat(g_nameBuf, g_nameTab[g_storeDefs[i].subIdx]);
+    }
+    if ((int16)strlen(g_nameBuf) > 0x19) {
+        g_nameBuf[0x18] = '.';
+        g_nameBuf[0x19] = 0;
+    }
+}
+
 void moveStuff() {
     moveNearFar(g_landTargetId, 1);
     moveNearFar(g_waterTargetId, 1);
@@ -181,6 +199,7 @@ void moveStuff() {
 #include "pointers.h"
 #include <memory.h>
 #include <dos.h>
+#include <string.h>
 extern uint8 FAR *farPointer;          /* word_351C6/351C8 */
 
 void moveNearFar(void *nearPtr, int16 count) {
