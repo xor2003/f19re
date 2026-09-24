@@ -7,6 +7,9 @@ void appendMapEvent(int16 type, int16 arg);      /* sub_14CAF */
 int16 randomRange(int16 n);                      /* sub_1D46B */
 void refreshActivePanel(int16 id);               /* sub_186FC */
 void makeSound(int16 a, int16 b);                /* sub_1DEF2 */
+int16 rangeApprox(int16 dx, int16 dy);           /* sub_1D23B */
+int16 computeBearing(int16 dx, int16 dy);        /* sub_1D29D */
+int16 abs(int16 v);
 
 extern int16 g_threatActiveTimer;   /* word_343B8 */
 extern int16 g_threatTimerInit;     /* word_3758A */
@@ -26,6 +29,10 @@ extern int16 g_viewX_;              /* word_3837C */
 extern int16 g_viewY_;              /* word_3838C */
 extern int16 g_viewZ;               /* word_33576 */
 extern int16 g_ourHead;             /* word_33570 */
+extern int16 g_acqRange;            /* word_351CE */
+extern int16 g_acqAimY;             /* word_351D0 */
+struct Projectile { int16 mapX, mapY, alt, speed, worldX, worldY, worldZ, ttl, specIdx, weaponIdx, targetLock, targetRef; };
+extern struct Projectile g_projectiles[];  /* @0x5422 */
 extern int16 g_autopilotEngaged;
 extern int16 waypointIndex;         /* word_33700 */
 extern char  strBuf[];              /* @0x65E6 */
@@ -65,6 +72,28 @@ void updateThreatAlert(void) {
             g_planeTable.planes[planeIdx].alertLevel = clampRange(g_planeTable.planes[planeIdx].alertLevel, ((g_missionStatus + g_difficultyTier) << 4) - 16, 0xFF);
         }
     }
+}
+
+/* ==== seg000:0x7757 ==== */
+int16 samCanAcquireTarget(int16 slot, int16 targetX, int16 targetY, int16 targetAlt, int16 mode) {
+    int16 dx, dy, rng, bd;
+
+    dx = targetX - g_projectiles[slot].mapX;
+    dy = targetY - g_projectiles[slot].mapY;
+    rng = rangeApprox(dx, dy);
+    g_acqAimY = computeBearing(dx, -dy);
+    bd = abs(g_acqAimY - g_projectiles[slot].worldX);
+    if (bd > 0x1000 && mode != 3) {
+        if (bd > 0x6000 && slot < 8 && g_projectiles[slot].speed < rng) {
+            g_projectiles[slot].ttl = 0;
+        }
+        return 0;
+    }
+    if (mode == 0 && abs(g_projectiles[slot].worldX - g_ourHead) > 0x2000) {
+        return 0;
+    }
+    g_acqRange = rng;
+    return 1;
 }
 
 /* ==== seg000:0x7aaf ==== */

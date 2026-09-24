@@ -290,3 +290,7 @@ int16 dispatchKeyCmd(int16 key) { return 0; }   /* sub_1D4C6: key-command dispat
 int16 frameTick, g_nightMode, g_unusedFrameVal, g_missionTick; /* 343B6/33D8A/35450/354C0 */
 int16 g_setupSlots[0x20];              /* @0x37622 */
 int16 g_replayCount;                   /* word_351C4 */
+struct Projectile { int16 mapX, mapY, alt, speed, worldX, worldY, worldZ, ttl, specIdx, weaponIdx, targetLock, targetRef; };
+struct Projectile g_projectiles[12];   /* @0x5422: stride 0x18 guided-weapon slots */
+int16 g_acqRange;                      /* word_351CE */
+int16 g_acqAimY;                       /* word_351D0 */
