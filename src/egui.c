@@ -18,7 +18,7 @@ void setDrawColor(int16 color);
 void drawLine(int16 x1, int16 y1, int16 x2, int16 y2);
 int16 openFile(const char *path, int16 mode);
 void picBlit(int16 handle, int16 page, int16 mode);
-void closeFile(int16 handle);
+int16 closeFile(int16 handle);
 
 /* ==== seg000:0x0504 ==== */
 void loadColorPalette(int16 idx) {
@@ -35,6 +35,16 @@ void drawMapMarkerBox(int16 unused1, int16 unused2, int16 color) {
 }
 
 /* seg000:0xe40a openBlitClosePic — stays asm (0xE1xx pic/file cluster) */
+
+/* ==== seg000:0xe19a ==== */
+int16 resFileOpen(const char *path, int16 mode) {
+    return openFile(path, mode);
+}
+
+/* ==== seg000:0xe1be ==== */
+int16 resFileClose(int16 handle) {
+    return closeFile(handle);
+}
 
 extern int16 g_radarScopeRange;  /* byte at word_346E6 */
 extern int16 g_viewX_;           /* word_3837C */

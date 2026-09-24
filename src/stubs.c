@@ -13,7 +13,7 @@ char g_colorPalettes[256];
 void drawLine(int16 a, int16 b, int16 c, int16 d) {}
 int16 openFile(const char *p, int16 m) { return 0; }
 void picBlit(int16 h, int16 p, int16 m) {}
-void closeFile(int16 h) {}
+int16 closeFile(int16 h) { return 0; }
 
 int8 g_lodShift;
 int16 g_mapOriginX, g_mapOriginY, g_projErr, g_viewScale, g_projX, g_projY;
