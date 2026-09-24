@@ -36,7 +36,7 @@ void drawMapMarkerBox(int16 unused1, int16 unused2, int16 color) {
 
 /* seg000:0xe40a openBlitClosePic — stays asm (0xE1xx pic/file cluster) */
 
-extern uint8 g_radarScopeRange;  /* byte at word_346E6 */
+extern int16 g_radarScopeRange;  /* byte at word_346E6 */
 extern int16 g_viewX_;           /* word_3837C */
 extern int16 g_viewY_;           /* word_3838C */
 extern int16 g_projDepth;        /* word_384D0 */

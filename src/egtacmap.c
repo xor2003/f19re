@@ -30,20 +30,55 @@ extern int16 *g_pageFront;       /* word_34646 */
 extern int16 *g_pageBack;        /* word_3465E */
 extern int16 g_mapCenterX;       /* word_346E8 */
 extern int16 g_mapCenterY;       /* word_346EA */
-extern uint8 g_mapZoomLevel;     /* byte_346E4 */
+extern int16 g_mapZoomLevel;     /* word_346E4 */
 extern union REGS regs;          /* @0x95DE */
 extern uint16 FAR *g_viewParamsFar; /* dword_354D0 */
 extern int8  g_halfScaleRender;  /* byte_330EA */
 extern int8  g_drawPage;         /* byte_388CA */
 
+/* ==== seg000:0x8a1b ==== */
+extern int16 g_viewMode;         /* word_3836E */
+extern int16 g_externalCamDist;  /* word_343C6 */
+extern int16 g_radarScopeRange;  /* word_346E6 */
+extern int16 g_viewX_, g_viewY_; /* word_3838C / word_3837C */
+void redrawTacMap(int16 x, int16 y);            /* sub_187EC */
+void zoomIn(void) {
+    if (g_viewMode & 0x80) {
+        g_externalCamDist--;
+    } else {
+        if (g_mapMode == 0 && g_mapZoomLevel < 9) {
+            g_mapZoomLevel++;
+            redrawTacMap(g_viewX_, g_viewY_);
+        }
+        if (g_mapMode == 1) {
+            g_radarScopeRange++;
+        }
+    }
+}
+
+/* ==== seg000:0x8a54 ==== */
+void zoomOut(void) {
+    if (g_viewMode & 0x80) {
+        g_externalCamDist++;
+    } else {
+        if (g_mapMode == 0 && g_mapZoomLevel > 2) {
+            g_mapZoomLevel--;
+            redrawTacMap(g_viewX_, g_viewY_);
+        }
+        if (g_mapMode == 1 && g_radarScopeRange != 0) {
+            g_radarScopeRange--;
+        }
+    }
+}
+
 /* ==== seg000:0x8b06 ==== */
 int16 mapXToScreen(int16 mapX) {
-    return ((mapX - g_mapCenterX) >> (10 - g_mapZoomLevel)) + 0x5B;
+    return ((mapX - g_mapCenterX) >> (10 - (uint8)g_mapZoomLevel)) + 0x5B;
 }
 
 /* ==== seg000:0x8b1d ==== */
 int16 mapYToScreen(int16 mapY) {
-    return (((mapY - g_mapCenterY) >> (10 - g_mapZoomLevel)) * 3 >> 1 >> 1) + 0x9F;
+    return (((mapY - g_mapCenterY) >> (10 - (uint8)g_mapZoomLevel)) * 3 >> 1 >> 1) + 0x9F;
 }
 
 /* ==== seg000:0x8bea ==== */

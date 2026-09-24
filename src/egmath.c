@@ -180,7 +180,7 @@ extern int32 g_ViewY;                 /* word_382D4/382D6 */
 extern int32 g_camEyeX;               /* word_376DC/37DE */
 extern int32 g_camEyeY;               /* word_379B4/9B6 */
 extern int16 g_camEyeZ;               /* word_379BE */
-extern int8  g_viewMode;              /* byte_3836E */
+extern int16 g_viewMode;              /* byte_3836E */
 extern int8  g_halfScaleRender;       /* byte_330EA */
 extern int16 g_curLod;                /* word_388C2 */
 extern int16 g_viewZ;

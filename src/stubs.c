@@ -20,9 +20,10 @@ int16 g_mapOriginX, g_mapOriginY, g_projErr, g_viewScale, g_projX, g_projY;
 int16 mapMul(int16 a, int16 b) { return 0; }
 int16 mapDiv(int16 a, int16 b) { return 0; }
 
-uint8 g_radarScopeRange;
+int16 g_radarScopeRange;
 int16 g_mapCenterX, g_mapCenterY;
-uint8 g_mapZoomLevel;
+int16 g_mapZoomLevel;
+int16 g_externalCamDist;
 int16 g_viewX_, g_viewY_, g_projDepth, g_ourHead, g_vprojX, g_vprojY;
 int16 sine(int16 a) { return 0; }
 int16 fixedMulQ14(int16 a, int16 b) { return 0; }
@@ -203,7 +204,8 @@ int16 flt15_buf1[16];
 /* egmath.c drawWorldObject stubs */
 int32 g_ViewX, g_ViewY, g_camEyeX, g_camEyeY;
 int16 g_camEyeZ;
-int8  g_viewMode, g_halfScaleRender;
+int16 g_viewMode;
+int8  g_halfScaleRender;
 int16 g_curLod;
 void pascal shiftLongLeftInPlace(int16 c, int32 *p) { *p <<= c; }
 void pascal shiftLongRightInPlace(int16 c, int32 *p) { *p >>= c; }
@@ -241,3 +243,4 @@ char  g_hudMessageBuf[64];
 int16 g_wreckAlt;                      /* word_3845E */
 int16 g_wreckFallVel;                  /* word_379B8 */
 void hwPortWrite(int16 cmd) { }        /* sub_14CAC noop */
+void redrawTacMap(int16 x, int16 y) { }   /* sub_187EC */
