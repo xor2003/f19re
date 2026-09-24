@@ -172,3 +172,11 @@ void exitTimeAccel(void) {
         recalcTimeScale();
     }
 }
+
+/* ==== seg000:0x4bf8 ==== */
+extern int16 g_altitude;               /* word_33578 */
+extern int16 g_startRange;             /* word_36E22 */
+void initFlightParams(void) {
+    g_altitude = 0x3E8;
+    g_startRange = 0x1900;
+}

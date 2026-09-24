@@ -17,6 +17,7 @@ void drawViewportLine(int16 x1, int16 y1, int16 x2, int16 y2);   /* sub_18D9A */
 void FAR gfx_drawString(int16 *page, const char *str, int16 len); /* sub_2F043 */
 void fillPanelBox(int16 panelId, int16 color);               /* sub_190E8 */
 void drawCenteredLabelBox(int16 panelId, const char *text);  /* sub_19123 */
+void drawPanelText(int16 panelId, const char *text, int16 color); /* sub_190CB */
 void drawStringBothPages(const char *text, int16 x, int16 y, int16 color); /* sub_191B4 */
 
 extern int16 g_panelLabelOn;     /* word_33D90 */
@@ -35,6 +36,26 @@ extern union REGS regs;          /* @0x95DE */
 extern uint16 FAR *g_viewParamsFar; /* dword_354D0 */
 extern int8  g_halfScaleRender;  /* byte_330EA */
 extern int8  g_drawPage;         /* byte_388CA */
+
+/* ==== seg000:0x7e62 ==== */
+void clearStatusPanel(void) {
+    drawPanelText(2, "", 0);
+}
+
+/* ==== seg000:0x8751 ==== */
+extern int16 g_scopeCenterX;     /* word_354A8 */
+extern int16 g_scopeCenterY;     /* word_354AC */
+void zoomIn(void);                              /* sub_18A1B */
+void initTacMapView(void) {
+    g_mapMode = 0;
+    g_scopeClipLeft = 0x28;
+    g_scopeClipRight = 0x90;
+    g_scopeClipTop = 0x7C;
+    g_scopeClipBottom = 0xC4;
+    g_scopeCenterX = 0x68;
+    g_scopeCenterY = 0x48;
+    zoomIn();
+}
 
 /* ==== seg000:0x8a1b ==== */
 extern int16 g_viewMode;         /* word_3836E */
