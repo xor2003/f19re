@@ -278,12 +278,14 @@ int16 g_wreckX, g_wreckY;              /* word_3837E / word_38392 — wreck worl
 int16 g_liveObjCount;                  /* word_384FC — remaining live objects */
 int16 g_selSimObj;                     /* word_343C4 — selected/viewed sim object idx */
 int16 g_missionStage;                  /* word_37622 — campaign progress counter */
-int16 g_extViewActive;                 /* word_388C4 — external-view enabled flag */
-int16 g_viewObjIdx;                    /* word_343BA — externally-viewed object */
-int16 g_extViewReset;                  /* word_35AE4 — reset external view flag */
+int16 g_currentWeaponType;             /* word_388C4 — current weapon/target type */
+int16 g_airTargetLock;                 /* word_343BA — locked air target index */
+int16 g_groundTargetLock;              /* word_343BC — locked ground target index */
+int16 g_lockedTargetKilled;            /* word_35AE4 — locked target was destroyed */
 int16 g_objTypes[0x40];                /* @0x49D6: 32B type records name[30]+kills */
 void notifyViewObj(int16 idx) { }      /* sub_14C98: hwPortWrite view-target cmd */
-void completeObjective(int16 n) { }    /* sub_17AAF: set mission-objective bit */
+int16 placeString(int16 idx) { return 0; }   /* sub_14D03: build target name */
+int16 g_enemyGroundRemaining;        /* word_38500 — live ground-target count */
 void hwPortWrite(int16 cmd) { }        /* sub_14CAC noop */
 void redrawTacMap(int16 x, int16 y) { }   /* sub_187EC */
 void sub_19979(void) { } void sub_19E4F(void) { } void sub_1A0BD(void) { }

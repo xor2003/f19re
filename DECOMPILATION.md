@@ -240,6 +240,15 @@ compiled *without* `/Gs`.
   brute-force names.
 - Dead stores still get slots and still emit `mov [bp-var],const` — e.g.
   `spawnSamThreat`'s `specIdx = 0x21` is stored at `var_2` then never read.
+- **Scope controls slot order.** Vars at function-block scope are pooled at
+  entry and ranked by hash; a var declared inside a nested block is allocated
+  *lazily* — it gets the next free slot only when its block opens, *after* all
+  outer vars. `destroyGroundTarget` (seg000:0x790e) is the case: `eventType`
+  stays at `bp-2` only because the loop counter `slot` and `symbol` are
+  declared inside the `if(!(flags&0x80))` block — at function scope `slot`
+  out-ranks `eventType` for `bp-2` every time. When a genuinely-hot local sits
+  at a *higher* offset than a cooler one, suspect it was declared in an inner
+  block, not that the hash model broke.
 - `x = -y + K` compiles to `neg ax; add ax,K` — write unary minus, not `K-y`.
 
 ### Signedness leaks through shifts

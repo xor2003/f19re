@@ -49,16 +49,33 @@ struct MapEvent {                  /* 12-byte marker record */
 };
 extern struct MapEvent mapEvents[];   /* [0] @0x340A0 */
 
-struct MapTarget {                 /* F19 layout, 16 bytes */
-    int16 active;                  /* +0 */
-    int16 field02;
-    int16 alertLevel;              /* +4 */
-    int16 pad[5];
+struct MapTarget {                 /* F19 layout, 16 bytes @0x80C8 */
+    int16 objType;                 /* +0 */
+    int16 mapX;                    /* +2 */
+    int16 mapY;                    /* +4 */
+    int16 active;                  /* +6 */
+    int16 flags;                   /* +8  (was field02) */
+    int16 alertLevel;              /* +A */
+    int16 padC;                    /* +C */
+    int16 symbol;                  /* +E */
 };
-extern struct { int16 lead[3]; struct MapTarget planes[74]; } g_planeTable;  /* planes @0x80CE */
+extern struct MapTarget g_planeTable[];    /* @0x80C8 */
 
-struct TargetSlot { int16 state; int16 pad[8]; };  /* 0x12 bytes, state@0 */
+struct TargetSlot { int16 state; int16 planeIndex; int16 pad[7]; };  /* 0x12 bytes, state@0 */
 extern struct TargetSlot g_targetSlots[];          /* @0x87B2 */
+
+struct TileObject { int16 id; int16 pad[0xB]; };
+extern struct TileObject *g_nearestTileObj;   /* word_35CE6 */
+struct TileObject *findNearestTileObject(uint32 wx, uint32 wy);  /* sub_11092 */
+int16 placeString(int16 idx);                 /* sub_14D03 */
+int16 getStoreMapCode(int16 idx);             /* sub_1CB1A */
+int16 isTargetOverWater(int16 idx);           /* sub_1CB53 */
+int16 shapeDataOffset(int16 shapeId);         /* sub_1D1C8 */
+void addTileEntry(struct TileObject *rec, int16 value, char tag);  /* sub_112DC */
+extern int8  g_tileKillTally[];    /* @0x9524 */
+extern int8  g_airTargetMark;      /* byte_38380 */
+extern int8  g_gndTargetMark;      /* byte_384E0 */
+extern int16 g_enemyGroundRemaining; /* word_38500 */
 
 struct SimObject {
     int16 objType;      /* +0x00 */
@@ -85,11 +102,14 @@ extern int16 g_wreckY;              /* word_38392 */
 extern int16 g_wreckAlt;            /* word_3845E */
 extern int16 g_wreckFallVel;        /* word_379B8 */
 extern int16 g_missionStage;        /* word_37622 */
-extern int16 g_extViewActive;       /* word_388C4 */
-extern int16 g_viewObjIdx;          /* word_343BA — externally-viewed object idx */
-extern int16 g_extViewReset;        /* word_35AE4 */
+extern int16 g_currentWeaponType;   /* word_388C4 */
+extern int16 g_airTargetLock;       /* word_343BA — locked air target index */
+extern int16 g_groundTargetLock;    /* word_343BC — locked ground target index */
+extern int16 g_lockedTargetKilled;  /* word_35AE4 */
+extern int16 g_mapMode;             /* word_38504 */
 void notifyViewObj(int16 idx);      /* sub_14C98 */
-void completeObjective(int16 n);    /* sub_17AAF */
+int16 markTargetReached(int16 n);   /* sub_17AAF */
+void redrawTacMap(int16 x, int16 y);/* sub_187EC */
 
 /* ==== seg000:0x57db ==== */
 void updateThreatAlert(void) {
@@ -106,8 +126,8 @@ void updateThreatAlert(void) {
     g_threatRefHead = g_ourHead;
     g_unusedEventHist0 = 0xFF;
     for (planeIdx = 0; planeIdx < g_planeScanCount; planeIdx++) {
-        if (g_planeTable.planes[planeIdx].active != 0) {
-            g_planeTable.planes[planeIdx].alertLevel = clampRange(g_planeTable.planes[planeIdx].alertLevel, ((g_missionStatus + g_difficultyTier) << 4) - 16, 0xFF);
+        if (g_planeTable[planeIdx].active != 0) {
+            g_planeTable[planeIdx].alertLevel = clampRange(g_planeTable[planeIdx].alertLevel, ((g_missionStatus + g_difficultyTier) << 4) - 16, 0xFF);
         }
     }
 }
@@ -195,7 +215,7 @@ void destroySimObject(int16 idx) {
         g_wreckFallVel = 0x80;
         evt = 3;
         if (g_missionStage >= 5 && idx == 0) {
-            completeObjective(0);
+            markTargetReached(0);
             evt |= 0x80;
         }
         appendMapEvent(evt, g_simObjects[idx].spec + (g_simObjects[idx].flags.w & 0x4000 ? 0x80 : 0));
@@ -204,8 +224,58 @@ void destroySimObject(int16 idx) {
     }
     strcpy(strBuf, g_objTypes[g_simObjects[idx].spec].name);
     makeSound(2, 2);
-    if (g_extViewActive == 1 && idx == g_viewObjIdx)
-        g_extViewReset = 1;
+    if (g_currentWeaponType == 1 && idx == g_airTargetLock)
+        g_lockedTargetKilled = 1;
+}
+
+/* ==== seg000:0x790e ==== */
+void destroyGroundTarget(int16 planeIdx) {
+    int16 eventType;
+
+    placeString(planeIdx);
+    eventType = 1;
+    if ((g_planeTable[planeIdx].flags & 0x80) == 0) {
+        int16 slot;
+        int16 symbol;
+        if (g_planeTable[planeIdx].flags & 0x1000)
+            --g_enemyGroundRemaining;
+        g_nearestTileObj = findNearestTileObject(
+            (int32)(uint16)g_planeTable[planeIdx].mapX << 5,
+            ((int32)0x8000 - (uint16)g_planeTable[planeIdx].mapY) << 5);
+        notifyViewObj(planeIdx + 0x40);
+        if (planeIdx != 0) {
+            if (g_planeTable[planeIdx].active == 0)
+                eventType = 12;
+            *(uint8 *)&g_planeTable[planeIdx].flags |= 0x80;
+            g_planeTable[planeIdx].active = 0;
+            for (slot = 0; slot < 2; slot++) {
+                if (g_targetSlots[slot].state == 2 && g_targetSlots[slot].planeIndex == planeIdx) {
+                    markTargetReached(slot);
+                    eventType |= (slot != 0 ? 0x40 : 0x80);
+                }
+            }
+            appendMapEvent(eventType, planeIdx);
+            symbol = getStoreMapCode(planeIdx);
+        } else {
+            symbol = isTargetOverWater(planeIdx) ? g_airTargetMark : g_gndTargetMark;
+            if (symbol != g_nearestTileObj->id) {
+                g_tileKillTally[g_nearestTileObj->id]++;
+                appendMapEvent(2, g_nearestTileObj->id);
+            }
+            symbol |= 0x100;
+            g_planeTable[planeIdx].symbol = symbol;
+        }
+        if (g_nearestTileObj != 0)
+            addTileEntry(g_nearestTileObj, shapeDataOffset(symbol), symbol);
+    }
+    g_smokeSourceIdx = planeIdx;
+    makeSound(2, 2);
+    if (g_currentWeaponType == 2 && planeIdx == g_groundTargetLock)
+        g_lockedTargetKilled = 1;
+    if (g_mapMode == 0)
+        redrawTacMap(g_viewX_, g_viewY_);
+    if (g_missionStatus < 2)
+        updateThreatAlert();
 }
 
 /* ==== seg000:0x7aaf ==== */
