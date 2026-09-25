@@ -72,6 +72,17 @@ ports verified against the original binary.
   CSEs the flag into a reg + retests it. Used in drawThreatIndicator.
 - `>>` on `int16` emits `sar`; cast the shifted operand to `uint16` for `shr`
   (e.g. `((uint16)(viewZ-0x80)) >> 7`) — drawThreatIndicator.
+- Scaled index persistence: for `tab[i].f` reads reused across intervening
+  calls, MSC dedicates `si = i*stride` (emitting `push si` in the prologue)
+  ONLY when the colour/select args in between are `?:` expressions — an
+  interleaved `if/else` makes it drop to a recomputed `bx`. drawMissionObjectives.
+- Switch on ≥4 compact cases emits a `jmp cs:[bx+tab]` jump table; the table +
+  MSC's reordered case bodies (here 1,4,3,2,5,7,6,8) land in the map's
+  `U`(unreachable) region, so `portcheck` passes `--map` to mzdiff to skip them.
+  mzretools tolerates `jmp/call cs:[bx+disp]` table operands (no code-offset map).
+- Inside a deferred chunk, which arm MSC emits forward vs backward isn't fixed
+  by `?:` polarity — try `if (c) A else B` vs `if (!c) B else A` to flip the
+  deferred arm (`jnz` vs `jz`). drawMissionObjectives `WTORI`/`OSNOWN.` select.
 
 ## Routines that are asm in the original (do NOT port)
 
@@ -97,7 +108,7 @@ ports verified against the original binary.
 - seg003 setInt9Handler, seg000 installCBreakHandler: int21h/int9h handlers.
 - `start` (seg000:e880): DOS crt0.
 
-## Verified C ports so far (all MATCH — 159)
+## Verified C ports so far (all MATCH — 160)
 
 eg3dload.c(/Os):  load3DAll, load3D3, load3DT, load3DG, printError
                   strcpyFromDot, load15Flt3d3
@@ -142,7 +153,8 @@ egtacmap.c(/Os+/Oa):projectWorldPoint, clearStatusPanel, renderHudFrame
                   drawStringBothPages, drawStringActivePage
                   drawStringCentered, drawNumber, readScreenPixel
                   hudMessage, getWeaponStat, cacheScopePanel
-                  restoreScopePanel, captureScopePanel, drawThreatIndicator
+                  restoreScopePanel, captureScopePanel, drawMissionObjectives,
+                  drawThreatIndicator
 egcombat.c(/Os+/Oa):updateThreatSites, fireGroundThreat
                   computeThreatRangeBearing, updateThreatAlert
                   updateObjects, fireAirThreat, spawnEnemyAircraft

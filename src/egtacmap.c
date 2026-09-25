@@ -665,6 +665,71 @@ void captureScopePanel(void) {
     gfx_copyRect(*g_pageOffscreen, 0x28, 0x7C, g_drawPage ? *g_pageBack : *g_pageFront, 0x28, 0x7C, 0x69, 0x49);
 }
 
+/* ==== seg000:0xa300 ==== */
+extern int16 g_selStoreIdx;            /* word_37626 */
+extern int16 g_missionTimeLimit;       /* word_384C6 */
+extern int16 g_missionTick;            /* word_354C0 */
+extern int16 g_liveObjCount;           /* word_384FC */
+extern int16 g_enemyGroundRemaining;   /* word_38500 */
+struct TargetSlot { int16 state; int16 planeIndex; int16 viewIndex; int16 flags;
+                    int16 seedNoise; int16 pad[4]; };      /* 0x12 bytes */
+extern struct TargetSlot g_targetSlots[];                  /* @0x87B2 */
+void buildStoreName(int16 i);                              /* sub_14D03 */
+void formatMissionClock(uint16 time);                      /* sub_19DA3 */
+
+void drawMissionObjectives(void) {
+    int16 n, i;
+    int8 work[24];
+    n = 0;
+    drawPanelText(2, "ZADANIE", 0);
+    drawPanelGridText(2, 5, n++, "BOEWAQ ZADA^A ", 0xF);
+    n++;
+    drawPanelGridText(2, 1, n++, "WZLET S ", 0xA);
+    buildStoreName(g_selStoreIdx);
+    drawPanelGridText(2, 1, n++, g_nameBuf, 0xA);
+    for (i = 0; i < 2; i++) {
+        if (g_playerPlaneFlags & (0x4000 >> i)) {
+            if (i != 0)
+                strcpy(g_nameBuf, "WTORI^NAQ");
+            else
+                strcpy(g_nameBuf, "OSNOWN.");
+            strcat(g_nameBuf, " ZADA^A");
+            drawPanelGridText(2, 1, n++, g_nameBuf, 0xF);
+            drawPanelGridText(2, 1, n++, "WYPOLNENA", 0xF);
+        } else {
+            switch (g_targetSlots[i].state) {
+                case 1: strcpy(g_nameBuf, "Sfotografirowatx"); break;
+                case 2: strcpy(g_nameBuf, "Uni^tovitx"); break;
+                case 3: strcpy(g_nameBuf, "Sbrositx gruz nad"); break;
+                case 4: strcpy(g_nameBuf, "Dostawitx gruz w"); break;
+                case 5: strcpy(g_nameBuf, "Sbitx AN72 letq]ij na"); break;
+                case 6: strcpy(g_nameBuf, "Samolet uhodq]. na"); break;
+                case 7: strcpy(g_nameBuf, "Sbitx AN72 letq]ij iz"); break;
+                case 8: strcpy(g_nameBuf, "Sbitx samolet nad "); break;
+            }
+            drawPanelGridText(2, 1, n++, g_nameBuf, (i != 0) ? 0xC : 0xE);
+            buildStoreName(g_targetSlots[i].planeIndex);
+            drawPanelGridText(2, 1, n++, g_nameBuf, (i != 0) ? 0xC : 0xE);
+            if (g_targetSlots[i].flags & 2) {
+                formatMissionClock(g_missionTimeLimit);
+                strcpy(work, "");
+                strcat(work, g_nameBuf);
+                if (g_missionTick > g_missionTimeLimit)
+                    strcpy(g_nameBuf, "Wremq wy[lo");
+                drawPanelGridText(2, 1, n++, work, 7);
+            }
+        }
+    }
+    drawPanelGridText(2, 1, n++, "POSADKA W", 0xA);
+    buildStoreName(g_homeBaseIdx);
+    drawPanelGridText(2, 1, n++, g_nameBuf, 0xA);
+    strcpy(g_nameBuf, "Polovenie  W ");
+    strcat(g_nameBuf, itoa(g_liveObjCount, g_itoaScratch, 10));
+    strcat(g_nameBuf, "  R ");
+    strcat(g_nameBuf, itoa(g_enemyGroundRemaining, g_itoaScratch, 10));
+    drawPanelGridText(2, 3, 0xB, g_nameBuf, 7);
+}
+
 /* ==== seg000:0xa5c8 ==== */
 extern int16 g_vprojXlo, g_vprojYlo;   /* word_2FF24 / word_30108 */
 int16 signOf(int16 v);                 /* sub_1D436 */
