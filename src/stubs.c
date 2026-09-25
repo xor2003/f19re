@@ -324,7 +324,10 @@ int16 g_threatLabelTarget;              /* word_38372: >=0 plane idx, <0 ~idx si
 int16 g_threatRadarFlag;                /* word_38B14 */
 int16 g_scopeArcStart, g_scopeArcEnd;   /* word_383F8 / word_383FA */
 int16 g_unusedEventHist1;               /* word_3845C: event-history shift stage 2 */
-void fireGroundThreat(int16 idx) { }    /* sub_15311 */
+int16 g_threatToneLevel;                /* word_343C2 */
+int16 g_enemyThreatCount;               /* word_36E24 */
+int16 g_nearestThreatRange;             /* word_354CE */
+int16 g_enemyAlertFlag;                 /* word_38502 */
 int16 dispatchKeyCmd(int16 key) { return 0; }   /* sub_1D4C6: key-command dispatch */
 int16 frameTick, g_nightMode, g_unusedFrameVal, g_missionTick; /* 343B6/33D8A/35450/354C0 */
 int16 g_setupSlots[0x20];              /* @0x37622 */

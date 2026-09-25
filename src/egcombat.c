@@ -132,8 +132,8 @@ void notifyViewObj(int16 idx);      /* sub_14C98 */
 int16 markTargetReached(int16 n);   /* sub_17AAF */
 void redrawTacMap(int16 x, int16 y);/* sub_187EC */
 
-struct CommData { int8 pad[0x78]; int16 gfxModeNum; };
-extern struct CommData FAR *commData;   /* dword_38B10 */
+struct CommData { int8 pad1[0x2C]; int16 restartFlag; int8 pad2[0x4A]; int16 gfxModeNum; };
+extern struct CommData FAR *commData;   /* dword_38B10 — +0x2C restartFlag, +0x78 gfxModeNum */
 extern int16 g_scopeSweepTimer;         /* word_343C0 */
 extern int16 g_prevScopeRange;          /* word_384F6 */
 extern int16 g_scopeArcRange;           /* word_3831A */
@@ -152,7 +152,13 @@ void captureScopePanel(void);           /* sub_1A2C5 */
 int16 plotMapObject(int16 x, int16 y, int16 color, int16 big);  /* sub_18B41 */
 void drawMapArc(int16 cx, int16 cy, int16 r, int16 color, int16 lines, int16 a0, int16 a1); /* sub_18C76 */
 void drawGaugeBar(int16 val, int16 color, int16 x1, int16 x2);  /* sub_1877F */
+void cacheScopePanel(void);             /* sub_1A23F */
+void updateThreatAlert(void);           /* sub_157DB — defined below */
 void fireGroundThreat(int16 idx);       /* sub_15311 */
+extern int16 g_threatToneLevel;         /* word_343C2 — threat tone/arc color level */
+extern int16 g_enemyThreatCount;        /* word_36E24 */
+extern int16 g_nearestThreatRange;      /* word_354CE */
+extern int16 g_enemyAlertFlag;          /* word_38502 */
 
 /* ==== seg000:0x505a ==== */
 void updateThreatSites(void) {
@@ -217,6 +223,108 @@ void updateThreatSites(void) {
         }
     }
     g_scopeSweepTimer--;
+}
+
+/* ==== seg000:0x5311 ==== */
+void fireGroundThreat(int16 siteIdx) {
+    int16 p[11];                 /* bearing buffer — only p[0] (bp-16) live */
+    uint16 r[4];                 /* range buffer — only r[0] (bp-1E) live */
+    int16 d, e, rad, x, i, score;
+
+    e = g_planeTable[siteIdx].active;
+    score = computeThreatRangeBearing(g_planeTable[siteIdx].mapX,
+                                      g_planeTable[siteIdx].mapY, 0, e,
+                                      p, (int16 *)r);
+    g_threatToneLevel = 0;
+    if (score > 0) {
+        d = score;
+        if (d > 0x63)
+            d = 0x63;
+        g_threatToneLevel = 4;
+        if (score + g_threatScopeRange > 0x32)
+            g_threatToneLevel = 0xC;
+        if (score + g_threatScopeRange > 0x64)
+            g_threatToneLevel = 0xE;
+        drawGaugeBar(-d, g_threatToneLevel, 1, 4);
+        g_scopeArcRange = (uint16)((int32)(score + g_threatScopeRange) * r[0] / 100);
+        g_scopeSweepTimer = g_frameRateScaling;
+        g_threatLabelTarget = siteIdx;
+        g_threatRadarFlag = g_samSpecs[e].flags & 1;
+        if (g_planeTable[siteIdx].alertLevel != 0) {
+            g_scopeArcStart = (p[0] >> 8) - 0x20;
+            g_scopeArcEnd = (p[0] >> 8) + 0x20;
+        }
+        g_scopeArcColor = g_threatToneLevel;
+        if (!(*(uint8 *)&g_planeTable[siteIdx].flags & 4)) {
+            if (g_mapMode == 0 && g_hudVisible != 0) {
+                restoreScopePanel();
+                plotMapObject(g_planeTable[siteIdx].mapX, g_planeTable[siteIdx].mapY, 0, 1);
+                cacheScopePanel();
+            }
+            *(uint8 *)&g_planeTable[siteIdx].flags |= 4;
+            placeString(siteIdx);
+            strcat(strBuf, " obnaruv.");
+            hudMessage(strBuf);
+        }
+    }
+    if (score + g_threatScopeRange > 0x64) {
+        if (!(*(uint8 *)&g_planeTable[siteIdx].flags & 0x10))
+            makeSound(8, 1);
+        g_planeTable[siteIdx].alertLevel +=
+            (((g_difficultyTier + g_missionStatus) << 4) + 0x10) >>
+            ((g_playerPlaneFlags & 0x10) != 0);
+        if (g_planeTable[siteIdx].alertLevel > 0xFF)
+            g_planeTable[siteIdx].alertLevel = 0xFF;
+        if (!(g_planeTable[siteIdx].flags & 0x100) && mapEvents[0].ttl == 0 &&
+            g_planeTable[siteIdx].alertLevel > 0x7F)
+            updateThreatAlert();
+        if (g_enemyThreatCount <= g_missionStatus) {
+            if (g_planeTable[siteIdx].alertLevel > 0xC0) {
+                if (e != 0x15) {
+                    if (g_nearestThreatRange > 0x500) {
+                        g_enemyAlertFlag++;
+                        if (!(g_planeTable[siteIdx].flags & 0x1000) &&
+                            g_planeTable[siteIdx].alertLevel >= 0xFA) {
+                            g_planeTable[siteIdx].flags |= 0x1000;
+                            g_enemyGroundRemaining++;
+                            placeString(siteIdx);
+                            strcat(strBuf, " - Radar ID");
+                            hudMessage(strBuf);
+                            makeSound(8, 1);
+                            appendMapEvent(7, siteIdx);
+                        } else {
+                            rad = siteIdx & 7;
+                            if (g_projectiles[rad].ttl == 0 &&
+                                sams[e].lockRange > r[0]) {
+                                g_projectiles[rad].mapX = g_planeTable[siteIdx].mapX + 8;
+                                g_projectiles[rad].mapY = g_planeTable[siteIdx].mapY;
+                                g_projectiles[rad].alt = 0;
+                                g_projectiles[rad].speed = sams[e].maxSpeed >> 6;
+                                g_projectiles[rad].worldX = p[0];
+                                g_projectiles[rad].worldY = 0x4000;
+                                g_projectiles[rad].ttl = ((int32)sams[e].lockRange << 4) *
+                                                         g_frameRateScaling / g_projectiles[rad].speed;
+                                g_projectiles[rad].specIdx = e;
+                                g_projectiles[rad].targetRef = siteIdx;
+                                placeString(siteIdx);
+                                strcat(strBuf, " pu}en ");
+                                strcat(strBuf, sams[e].name);
+                                hudMessage(strBuf);
+                                notifyViewObj(siteIdx + 0x40);
+                                commData->restartFlag++;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        *(uint8 *)&g_planeTable[siteIdx].flags |= 0x10;
+    } else {
+        *(uint8 *)&g_planeTable[siteIdx].flags &= ~0x10;
+        g_planeTable[siteIdx].alertLevel -= 0x10;
+        if (g_planeTable[siteIdx].alertLevel < 0)
+            g_planeTable[siteIdx].alertLevel = 0;
+    }
 }
 
 /* ==== seg000:0x5689 ==== */
