@@ -309,6 +309,12 @@ int16 g_selStoreIdx;                    /* word_37626 */
 int32 g_worldX, g_worldY;               /* word_37CB8 / word_382D4 */
 int16 g_scopeCenterX, g_scopeCenterY;   /* word_354A8/354AC */
 int16 g_altitude, g_startRange;        /* word_33578/36E22 */
+int16 missileSpecIndex;                /* word_33D80 — selected missile slot */
+int16 g_lastMissileSlot;               /* word_36E1E — last fired projectile slot */
+int16 computeLoftAngle(void) { return 0; }   /* sub_1CAF2 */
+int16 missleSpec[0x10];                /* @0x4F00 4B {weaponIdx,ammo} records */
+int16 missiles[0x140];                 /* @0x4F24 26B records */
+int16 sams[0x80];                      /* @0x4C36 18B records */
 int16 g_keyCode;                        /* word_384CE: pending keycode */
 int16 g_gaugeLevel;                     /* word_343B2: HUD gauge position */
 int16 dispatchKeyCmd(int16 key) { return 0; }   /* sub_1D4C6: key-command dispatch */

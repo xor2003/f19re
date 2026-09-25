@@ -42,6 +42,23 @@ extern int16 g_frameRateScaling;    /* word_33D92 */
 extern int16 g_samRange;            /* word_33D00 */
 extern int16 g_samSpeed;            /* word_33D02 */
 extern int8  g_mapCellFlags[];      /* @0x861A */
+extern int16 g_ourRoll;             /* word_33574 */
+extern int16 g_ourPitch;            /* word_33572 */
+extern int16 g_startRange;          /* word_36E22 — velocity source */
+extern int16 g_fuelRemaining;       /* word_33D66 */
+extern int16 g_curPanelMode;        /* word_385CE */
+extern int16 missileSpecIndex;      /* word_33D80 */
+extern int16 g_lastMissileSlot;     /* word_36E1E */
+struct MissileSpec { int16 weaponIdx; int16 ammo; };
+extern struct MissileSpec missleSpec[];    /* @0x4F00 */
+struct Missile { char shortName[10]; char longName[12]; int16 specIndex; int16 weaponCategory; };
+extern struct Missile missiles[];          /* @0x4F24 */
+struct Sam { char name[8]; int16 lockRange, maxSpeed, weaponClass, turnRate, modelId; };
+extern struct Sam sams[];                  /* @0x4C36 */
+int16 computeLoftAngle(void);       /* sub_1CAF2 */
+void exitTimeAccel(void);           /* sub_1E010 */
+void hwPortWrite(int16 cmd);        /* sub_14CAC */
+void sub_19979(void);               /* fuel/panel refresh */
 void hudMessage(const char *s);     /* sub_192B1 */
 
 struct MapEvent {                  /* 12-byte marker record */
@@ -317,4 +334,72 @@ void bombTarget(void) {
         g_damageTakenFlag = 1;
         makeSound(0, 2);
     }
+}
+
+/* ==== seg000:0x7ba0 ==== */
+void fireMissile(void) {
+    int16 spec, tmp, weaponIdx, slot;
+
+    if (abs((int16)g_ourRoll) > 0x3000) return;
+    if (missleSpec[missileSpecIndex].ammo == 0) return;
+    weaponIdx = missleSpec[missileSpecIndex].weaponIdx;
+    spec = missiles[weaponIdx].specIndex;
+    if (spec == 0) return;
+    if (spec == -1) return;
+    if (!(g_playerPlaneFlags & 4) && spec != -2) {
+        hudMessage("L@K ZAKRYT");
+        return;
+    }
+    missleSpec[missileSpecIndex].ammo--;
+    if (spec == -2) {
+        g_fuelRemaining += 0x76C;
+        hudMessage(" PEREK^ANO");
+        if (g_curPanelMode == 0x14)
+            sub_19979();
+        return;
+    }
+    appendMapEvent(4, missileSpecIndex);
+    exitTimeAccel();
+    slot = -1;
+    tmp = 8;
+    do {
+        if (g_projectiles[tmp].ttl == 0)
+            slot = tmp;
+        tmp++;
+    } while (tmp < 12);
+    if (slot == -1) goto check_end;
+    g_projectiles[slot].mapX = g_viewX_;
+    g_projectiles[slot].mapY = g_viewY_;
+    g_projectiles[slot].alt = g_viewZ - 20;
+    g_projectiles[slot].speed = (uint16)g_startRange >> 11;
+    g_projectiles[slot].worldX = g_ourHead;
+    g_projectiles[slot].worldY = g_ourPitch;
+    g_projectiles[slot].worldZ = g_ourRoll;
+    g_projectiles[slot].ttl = (int16)(((int32)sams[spec].lockRange << 5) * (int32)g_frameRateScaling / (int32)((sams[spec].maxSpeed >> 6) + 1)) + 6;
+    if (g_projectiles[slot].ttl <= 6)
+        g_projectiles[slot].ttl = 999;
+    g_projectiles[slot].specIdx = spec;
+    g_projectiles[slot].weaponIdx = weaponIdx;
+    g_projectiles[slot].targetLock = -1;
+    if (spec != 30)
+        g_projectiles[slot].worldY -= 0x1000;
+    else
+        g_projectiles[slot].targetRef = computeLoftAngle() - 0x400;
+    if (g_groundTargetLock >= 0 && sams[spec].weaponClass == 6)
+        g_projectiles[slot].targetLock = g_groundTargetLock;
+    if (g_groundTargetLock >= 0 && sams[spec].weaponClass == 5 && (g_planeTable[g_groundTargetLock].flags & 8))
+        g_projectiles[slot].targetLock = g_groundTargetLock;
+    if (spec == 29) {
+        g_projectiles[slot].worldY = 0xC000;
+        g_projectiles[slot].speed = 1;
+    }
+    g_lastMissileSlot = slot;
+    strcpy(strBuf, missiles[weaponIdx].longName);
+    strcat(strBuf, " pu}en");
+    hudMessage(strBuf);
+    makeSound(sams[spec].lockRange != 0 ? 18 : 24, 2);
+check_end:
+    hwPortWrite(0xD6);
+    if (g_curPanelMode == 0x15)
+        refreshActivePanel(0x15);
 }
