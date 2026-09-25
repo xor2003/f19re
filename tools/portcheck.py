@@ -192,7 +192,8 @@ def main():
         size = ext[1] - ext[0]
         spec_ref = f'{ref_exe}:0x{ext[0]:x}-0x{ext[1]:x}'
         spec_tgt = f'{testexe}:0x{tgt:x}-0x{tgt + size:x}'
-        cmd = [MZDIFF, spec_ref, spec_tgt, '--nocall', '--loose']
+        cmd = [MZDIFF, spec_ref, spec_tgt, '--nocall', '--loose',
+               '--map', map_path]
         r = subprocess.run(cmd, capture_output=True, text=True)
         ok = r.returncode == 0
         if not ok:

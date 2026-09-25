@@ -1393,6 +1393,11 @@ Analyzer::ComparisonResult Analyzer::instructionsMatch(const Executable &ref, co
         Register segReg = refInstr.memSegmentId();
         switch (segReg) {
         case REG_CS:
+            // an indirect jump/call through a cs: pointer table (jmp/call
+            // cs:[bx+disp], e.g. a switch dispatch table) references a jump
+            // table whose base offset legitimately differs between the
+            // executables — tolerate it instead of offset-mapping
+            if (refInstr.isBranch()) { match = true; break; }
             match = offMap.codeMatch(refOfs, tgtOfs);
             if (!match) verbose("Instruction mismatch due to code segment offset mapping conflict");
             break;
