@@ -48,6 +48,10 @@ extern int16 g_startRange;          /* word_36E22 — velocity source */
 extern int16 g_fuelRemaining;       /* word_33D66 */
 extern int16 g_curPanelMode;        /* word_385CE */
 extern int16 missileSpecIndex;      /* word_33D80 */
+struct Weapon { int8 name[8]; int16 lethality, dangerTier, flags; };   /* 14-byte @0x4894 */
+extern struct Weapon g_samSpecs[];
+extern int16 g_gaugeLevel;          /* word_343B2 */
+void   exitTimeAccel(void);         /* sub_1E010 */
 extern int16 g_lastMissileSlot;     /* word_36E1E */
 struct MissileSpec { int16 weaponIdx; int16 ammo; };
 extern struct MissileSpec missleSpec[];    /* @0x4F00 */
@@ -127,6 +131,36 @@ extern int16 g_mapMode;             /* word_38504 */
 void notifyViewObj(int16 idx);      /* sub_14C98 */
 int16 markTargetReached(int16 n);   /* sub_17AAF */
 void redrawTacMap(int16 x, int16 y);/* sub_187EC */
+
+/* ==== seg000:0x5689 ==== */
+int16 computeThreatRangeBearing(int16 threatX, int16 threatY, int16 threatAlt,
+                                 int16 threatType, int16 *outBearing, int16 *outRange) {
+    int16 bearingErr, isRadar, bearing, dx, dy, result;
+    uint16 distance;
+
+    if (threatType == 0 || threatType == -1) return 0;
+    dx = g_viewX_ - threatX;
+    dy = g_viewY_ - threatY;
+    distance = (uint16)rangeApprox(dx, dy) >> 6;
+    result = ((int32)(g_mapCellFlags[(g_viewY_ >> 0xB) * 0x10 + (g_viewX_ >> 0xB)] & 0xC) *
+              (int32)((int32)g_samSpecs[threatType].lethality - distance) *
+              (int32)(g_samSpecs[threatType].dangerTier + g_missionStatus * 2 + 1))
+             / g_samSpecs[threatType].lethality;
+    bearing = computeBearing(dx, -dy);
+    bearingErr = abs(bearing - g_ourHead) >> 8;
+    if (bearingErr > 0x40) bearingErr = 0x80 - bearingErr;
+    isRadar = 0;
+    if (g_samSpecs[threatType].flags & 1) {
+        bearingErr = (uint16)(0x60 - bearingErr) * ((uint16)g_startRange >> 5) >> 9;
+        isRadar = 1;
+    }
+    result = ((bearingErr + 0x20) >> 1) * (result >> 1) >> 4;
+    if ((uint16)(abs(threatAlt - g_viewZ) >> 0xA) > (uint16)distance) result = 0;
+    if (result + g_gaugeLevel > 0x64) exitTimeAccel();
+    *outBearing = bearing;
+    *outRange = distance;
+    return result;
+}
 
 /* ==== seg000:0x57db ==== */
 void updateThreatAlert(void) {

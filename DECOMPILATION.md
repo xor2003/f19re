@@ -259,13 +259,63 @@ compiled *without* `/Gs`.
 
 ### 32-bit arithmetic
 
-`(int32)` ops emit the `__aNl*` helpers with a strict push order (operands
-pushed left-to-right as seen in the source):
+`(int32)` ops emit the `__aNl*` helpers (`__aNlmul`, `__aNldiv`,
+`__aNlshl`, …). For a flat chain `a*b*c/d` MSC pushes **all** leaf operands
+onto the stack first, then calls the helpers — so the listing shows a run of
+`…cwd; push dx; push ax` blocks followed by the `call __aNl*` run.
 
 ```asm
 ; a * (b<<4) / c   →   push c(cwd); push b(cwd); shl by cl (__aNlshl);
 ;                      push result; __aNlmul; push; __aNldiv
 ```
+
+**Push order is *not* raw source order.** MSC schedules the leaves itself:
+
+- The **divisor is pushed first** (for `X/Y` in a chain, `Y` leads the pushes
+  even though it is the rightmost operand in the source).
+- The remaining numerator leaves follow in an order MSC picks by leaf
+  cost/dependency — permuting the source order does *not* change the emitted
+  order (verified: all six orderings of a three-factor numerator produce
+  identical code). You cannot fix the order by reordering the expression.
+- **A `(int32)` cast makes a distinct leaf** — it is a different expression
+  node from the bare operand, so MSC reloads it instead of reusing a register.
+  But a cast is also a *composite* node that the leaf scheduler ranks
+  differently: it can push a leaf later than an equivalent clean leaf.
+
+**Signedness of the whole chain follows the operand types.** MSC 5.1 is
+*unsigned-preserving*: a single `uint16` operand anywhere in the `int32`
+chain flips every helper to `__aNulmul`/`__aNuldiv`. Sub-typing:
+
+- `int32 - int16`: subtrahend is sign-extended → a register-register
+  `mov cx,ax; …; sub ax,cx; sbb dx,bx` pair (the operand is materialised in
+  `cx:bx`).
+- `int32 - uint16`: subtrahend is zero-extended → the cheap
+  `sub ax,[mem]; sbb dx,0` — but the result is `uint32`, i.e. unsigned.
+- `(int32)(a - b)`: a 16-bit `sub` *then* `cwd` — different opcode order.
+
+**Case — `computeThreatRangeBearing` (seg000:0x5689).** Target leaf order:
+`lethality`(divisor) → `dangerTier+ms*2+1` → `lethality-distance` → `terrain`,
+with `lethality` loaded twice (no CSE) and `sub ax,[mem]; sbb dx,0` for the
+difference. That push order is what a plain `terrain * ltRange * dt / lt`
+chain *should* give (divisor first, then numerator in reverse source order).
+The conflict:
+
+- `(int32)lethality - (int16)distance` → register sub (wrong form) but clean
+  leaf → correct order.
+- `(int32)lethality - (uint16)distance` → correct `sub/sbb` form and order,
+  but the leaf is `uint32` → `__aNul*` (unsigned) helpers.
+- `(int32)((int32)lethality - (uint16)distance)` → correct form + signed, but
+  the inner `(uint16)` cast makes a composite leaf → deferred to last (wrong
+  order).
+
+The winning combination: declare `distance` itself as **`uint16`** (not a
+cast), and write the leaf `(int32)((int32)lethality - distance)`. The operand
+is a clean `uint16` *variable* (zero-extends to `sbb dx,0`), the result is
+re-cast to `int32` for signed helpers, and — because the leaf carries no inner
+cast node — it stays in the si-group and pushes third, byte-exact. The lesson:
+a local's *declared* type and a `(cast)` on its use produce different leaf
+nodes that MSC schedules differently; match both the type and the cast
+placement to the original's instruction shape.
 
 Match the push order in the disasm to pin down operand order — the dividend
 is pushed *last* (top of stack) for `__aNldiv`.
