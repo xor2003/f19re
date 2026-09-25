@@ -117,7 +117,7 @@ struct SimObject {
     int16  damage;      /* +0x22 */
 };                                    /* 36 bytes */
 extern struct SimObject g_simObjects[];    /* @0x8870 */
-struct ObjType { char name[0x12]; int16 maxSpeed; int16 range; int16 pad[4]; int16 kills; };  /* 32 bytes */
+struct ObjType { char name[0x12]; int16 maxSpeed; int16 range; int16 pad16; int16 modelId; int16 pad1A, pad1C; int16 kills; };  /* 32 bytes */
 extern struct ObjType g_objTypes[];                  /* @0x49D6 */
 extern int16 g_liveObjCount;        /* word_384FC */
 extern int16 g_selSimObj;           /* word_343C4 */
@@ -165,6 +165,7 @@ extern int16 g_nearestThreatRange;      /* word_354CE */
 extern int16 g_enemyAlertFlag;          /* word_38502 */
 extern int16 g_northSouthSign;          /* word_37484 — theater N/S direction sign */
 extern int16 g_groundUnitCount;         /* word_384FE — live g_simObjects count */
+extern int16 g_threatSpec;              /* word_351CA — spec of selected threat */
 int16 readMapPixelColor(int16 x, int16 y);  /* sub_18BEA (egtacmap) */
 
 /* ==== seg000:0x505a ==== */
@@ -426,6 +427,96 @@ void spawnSamThreat(register int16 off) {
     strcat(strBuf, " pu}en");
     hudMessage(strBuf);
     updateThreatAlert();
+}
+
+/* ==== seg000:0x673d ==== */
+void fireAirThreat(int16 objIdx) {
+    int16 p, a, b, c, bearing, e, f;
+    uint16 acqRange;
+    int16 gauge, j, k, l, nn, range, n, wofs;
+
+    j = g_objTypes[g_threatSpec].modelId;
+    range = computeThreatRangeBearing(g_simObjects[objIdx].posX,
+                                      g_simObjects[objIdx].posY,
+                                      g_simObjects[objIdx].alt, j,
+                                      &bearing, (int16 *)&acqRange);
+    g_threatToneLevel = 4;
+    if (range > 0) {
+        g_scopeArcRange = (uint16)((int32)(range + g_threatScopeRange) * acqRange / 100);
+        if (!(*(uint8 *)&g_samSpecs[j].flags & 2)) {
+            g_scopeArcStart = (g_simObjects[objIdx].heading.w >> 8) - 0x30;
+            g_scopeArcEnd = (g_simObjects[objIdx].heading.w >> 8) + 0x30;
+            if (abs(bearing - g_simObjects[objIdx].heading.w) >> 8 > 0x30)
+                range = 0;
+        }
+        if (g_simObjects[objIdx].flags.b[0] & 8) {
+            g_scopeArcStart = (bearing >> 8) - 0x20;
+            g_scopeArcEnd = (bearing >> 8) + 0x20;
+        }
+        g_threatToneLevel = (range + g_threatScopeRange > 0x64) ? 0xF : 0xB;
+        gauge = range;
+        if (gauge > 0x63)
+            gauge = 0x63;
+        drawGaugeBar(-gauge, g_threatToneLevel, 7, 0xA);
+        g_scopeSweepTimer = g_frameRateScaling;
+        g_threatLabelTarget = -objIdx - 1;
+        g_scopeArcColor = g_threatToneLevel;
+        g_threatRadarFlag = g_samSpecs[j].flags & 1;
+    }
+    if (range + g_threatScopeRange > 0x64) {
+        g_simObjects[objIdx].damage += (((g_difficultyTier + g_missionStatus) << 4) + 0x20) >>
+                                       ((g_playerPlaneFlags & 0x10) != 0);
+        if (g_simObjects[objIdx].damage > 0xC0) {
+            g_enemyAlertFlag++;
+            g_simObjects[objIdx].flags.b[1] |= 0x40;
+            updateThreatAlert();
+            if (!(g_simObjects[objIdx].flags.w & 0x800)) {
+                if ((8 >> g_nightMode) > acqRange) {
+                    g_simObjects[objIdx].flags.b[1] |= 8;
+                    g_liveObjCount++;
+                    strcpy(strBuf, "izualxn.ID ");
+                    strcat(strBuf, g_objTypes[g_threatSpec].name);
+                    hudMessage(strBuf);
+                    makeSound(6, 1);
+                    appendMapEvent(6, g_threatSpec);
+                }
+            }
+            k = objIdx & 7;
+            if (g_missionStatus * 2 >= g_enemyThreatCount &&
+                g_projectiles[k].ttl == 0 &&
+                abs(bearing - g_simObjects[objIdx].heading.w) < 0x1800) {
+                j = g_simObjects[objIdx].weaponType;
+                wofs = j * 0x12;
+                if (sams[j].lockRange > acqRange &&
+                    (uint16)(-(g_missionStatus * 2 - 8)) < acqRange && j != 0) {
+                    g_projectiles[k].mapX = g_simObjects[objIdx].posX;
+                    g_projectiles[k].mapY = g_simObjects[objIdx].posY;
+                    g_projectiles[k].alt = g_simObjects[objIdx].alt - 0x19;
+                    g_projectiles[k].speed = sams[j].maxSpeed >> 6;
+                    g_projectiles[k].worldX = g_simObjects[objIdx].heading.w;
+                    g_projectiles[k].worldY = g_simObjects[objIdx].pitch;
+                    g_projectiles[k].worldZ = g_simObjects[objIdx].bank.w;
+                    g_projectiles[k].ttl = (int16)(((int32)sams[j].lockRange << 5) *
+                        g_frameRateScaling / g_projectiles[k].speed);
+                    g_projectiles[k].specIdx = j;
+                    g_projectiles[k].targetRef = -objIdx;
+                    strcpy(strBuf, sams[j].name);
+                    strcat(strBuf, "wypu}en ");
+                    strcat(strBuf, g_objTypes[g_threatSpec].name);
+                    hudMessage(strBuf);
+                    commData->restartFlag++;
+                    notifyViewObj(objIdx + 0x20);
+                }
+            }
+        }
+        if (!(g_simObjects[objIdx].flags.b[0] & 8))
+            makeSound(6, 1);
+        g_simObjects[objIdx].flags.b[0] |= 8;
+    } else {
+        g_simObjects[objIdx].flags.b[0] &= 0xF7;
+        g_simObjects[objIdx].damage -= 0x20;
+    }
+    g_simObjects[objIdx].damage = clampRange(g_simObjects[objIdx].damage, 0, 0xFF);
 }
 
 /* ==== seg000:0x6ad2 ==== */

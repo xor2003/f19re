@@ -328,6 +328,7 @@ int16 g_threatToneLevel;                /* word_343C2 */
 int16 g_enemyThreatCount;               /* word_36E24 */
 int16 g_nearestThreatRange;             /* word_354CE */
 int16 g_enemyAlertFlag;                 /* word_38502 */
+int16 g_threatSpec;                     /* word_351CA — spec of threat being prosecuted */
 int16 g_northSouthSign;                 /* word_37484: theater N/S direction sign */
 int16 dispatchKeyCmd(int16 key) { return 0; }   /* sub_1D4C6: key-command dispatch */
 int16 frameTick, g_nightMode, g_unusedFrameVal, g_missionTick; /* 343B6/33D8A/35450/354C0 */
