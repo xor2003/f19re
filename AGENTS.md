@@ -89,47 +89,65 @@ ports verified against the original binary.
 - seg003 setInt9Handler, seg000 installCBreakHandler: int21h/int9h handlers.
 - `start` (seg000:e880): DOS crt0.
 
-## Verified C ports so far (all MATCH — 115)
+## Verified C ports so far (all MATCH — 158)
 
-eg3dload.c(/Os):  load15Flt3d3
-stparse.c (/Ot):  replaceExtension
-enfile.c  (/Ot):  loadFileNear, loadFileSection, writeFileSection
-egui.c(/Os+/Oa):  loadColorPalette, drawMapMarkerBox, projectMapPoint,
-                  blitGaugeSprite, blitSprite, drawModelPoint, drawViewportLine,
-                  resFileOpen, resFileCreate, resFileClose, resFileRead,
-                  resFileReadFar, resFileWrite, drawStatusBar, formatMissionClock,
-                  formatTwoDigit, updateHudGauge, drawClippedLineRegion
-eg3dmap.c (/Ot):  buildVertexSignMask, computeTileBounds, process3dg,
-                  drawMapTileObject, drawMapTiles, worldToTileIndex,
-                  aspectScaleY, projectModelVertices, drawNearestTileObject,
-                  lookupTileEntry, addTileEntry, findNearestTileObject,
-                  scaleCoordToLod
-eg3dview.c(/Ot):  setup3DTransform, renderMapTerrain, setupViewport,
-                  setViewRotation, setViewPosition
-egmath.c  (/Os):  sinMul, cosMul, computeBearing, rangeApprox, clampRange,
-                  clampValue, signExtendByte, signOf, seedRng, randomRange,
-                  isqrt, readAxisInput, matVecDotAxis, drawWorldObject
-egflight.c(/Os):  applyRotationDelta, computeAttitudeAngles, signedRatio16,
-                  valueToAngle, complementAngle, rebuildOrientation,
-                  waitForKeyPress
-egframe.c (/Os):  moveStuff, moveDataFar, moveNearFar, setCommWorldbufPtr,
-                  makeSound, recalcTimeScale, findWaypointFeatures,
-                  initFrameRandom, initFlightParams, recordFrame
-egtacmap.c(/Os):  readScreenPixel, readMapPixelColor, drawMapArc, drawMapLine,
-                  drawFullscreenLine, drawScreenLineOnePage, fillRectBoth,
-                  drawStringBothPages, drawNumber, cacheScopePanel,
-                  restoreScopePanel, captureScopePanel, plotMapObject,
-                  clearStatusPanel, renderHudFrame, updatePanelMode,
-                  initTacMapView, drawPanelText
-egcombat.c(/Os+/Oa): updateThreatAlert, markTargetReached, bombTarget,
-                  samCanAcquireTarget, destroySimObject, destroyGroundTarget,
-                  fireMissile, computeThreatRangeBearing, updateThreatSites,
-                  fireGroundThreat, spawnEnemyAircraft, fireAirThreat,
-                  updateObjects, updateThreatTargeting
-egtarget.c(/Os+/Oa): drawTargetBox, drawLockReticle, drawTargetLabel,
-                  buildRangeString, findStoreAtGrid, bearingToStore,
-                  bearingToSimObject, computeTargetBearing,
-                  isTargetOverWater, shapeDataOffset, drawTargetView
+eg3dload.c(/Os):  load3DAll, load3D3, load3DT, load3DG, printError
+                  strcpyFromDot, load15Flt3d3
+stparse.c(/Ot):   replaceExtension
+enfile.c(/Ot):    loadFileNear, loadFileSection, writeFileSection
+egui.c(/Os+/Oa):  loadColorPalette, drawModelPoint, drawViewportLine
+                  drawClippedLineRegion, drawMapMarkerBox, projectMapPoint
+                  blitGaugeSprite, blitSprite, drawStatusBar
+                  formatMissionClock, formatTwoDigit, resFileOpen
+                  resFileCreate, resFileClose, resFileRead, resFileReadFar
+                  resFileWrite
+eg3dmap.c(/Ot):   scaleCoordToLod, process3dg, findNearestTileObject
+                  addTileEntry, lookupTileEntry, drawNearestTileObject
+                  drawMapTiles, computeTileBounds, worldToTileIndex
+                  drawMapTileObject, buildVertexSignMask
+                  projectModelVertices, aspectScaleY
+eg3dview.c(/Ot):  renderMapTerrain, setup3DTransform, rasterize3DWorld
+                  setupViewport, setViewRotation, setViewPosition
+egmath.c(/Os):    isqrt, matVecDotAxis, drawWorldObject, clampRange
+                  clampValue, rangeApprox, computeBearing, sinMul, cosMul
+                  signExtendByte, signOf, seedRng, randomRange
+                  readAxisInput
+egflight.c(/Os):  applyRotationDelta, computeAttitudeAngles
+                  rebuildOrientation, signedRatio16, valueToAngle
+                  complementAngle, waitForKeyPress
+egframe.c(/Os+/Oa):updateHudGauge, countermeasures, tickWeaponSlots
+                  updateBulletsAndFire, updateTracerParticles
+                  applyGravityFall, initFrameRandom, resetSimObjectLocks
+                  initFlightParams, initWeaponLoadout, commitCommSnapshot
+                  sendSoundCmd, recordFrame, buildStoreName, initStoreData
+                  findWaypointFeatures, moveDataFar, moveStuff
+                  moveNearFar, setCommWorldbufPtr
+egtacmap.c(/Os+/Oa):projectWorldPoint, clearStatusPanel, renderHudFrame
+                  updatePanelMode, drawPanelModeText, updateStatusPanel
+                  initTacMapView, drawGaugeBar, zoomIn, zoomOut
+                  mapXToScreen, mapYToScreen, plotMapObject
+                  readMapPixelColor, drawMapArc, drawMapLine
+                  drawFullscreenLine, drawScreenLineOnePage
+                  drawHudViewLine, setDrawColor, fillRectBoth
+                  drawMapPoint, drawStatusItem, drawPanelGridText
+                  drawPanelText, fillPanelBox, drawCenteredLabelBox
+                  drawStringBothPages, drawStringActivePage
+                  drawStringCentered, drawNumber, readScreenPixel
+                  hudMessage, getWeaponStat, cacheScopePanel
+                  restoreScopePanel, captureScopePanel
+egcombat.c(/Os+/Oa):updateThreatSites, fireGroundThreat
+                  computeThreatRangeBearing, updateThreatAlert
+                  updateObjects, fireAirThreat, spawnEnemyAircraft
+                  updateThreatTargeting, samCanAcquireTarget
+                  destroySimObject, destroyGroundTarget, markTargetReached
+                  bombTarget, fireMissile
+egtarget.c(/Os+/Oa):drawTargetBox, drawLockReticle, drawTargetLabel
+                  buildRangeString, findStoreAtGrid, bearingToStore
+                  bearingToSimObject, computeTargetBearing, hudPitchScale
+                  getStoreMapCode, isTargetOverWater, drawTargetView
+                  shapeDataOffset
+egkeys.c(/Ot):    makeSound, updateEngineSound, recalcTimeScale
+                  setupLodDistances, exitTimeAccel, copyStoreToWaypoint
 
 ## Verified semantically (NOT byte-exact)
 
