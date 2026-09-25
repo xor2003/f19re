@@ -51,7 +51,7 @@ struct SimObject { int16 f[0x12]; };     /* sizeof = 0x24 */
 
 /* ==== seg000:0x4769 ==== */
 extern int16 g_keyCode;                  /* word_384CE: pending keycode from _bios_keybrd */
-extern int16 g_gaugeLevel;               /* word_343B2: HUD gauge position */
+extern int16 g_threatScopeRange;               /* word_343B2 */
 extern int16 g_ourRoll;                  /* word_33574 */
 extern int16 g_viewZ;                    /* word_33576 */
 extern int16 g_missionStatus;            /* word_33D86 */
@@ -68,12 +68,12 @@ void updateHudGauge(void) {
     val = abs(signExtendByte(g_ourRoll >> 8));
     if (val >= 0x40)
         val = 0x80 - val;
-    g_gaugeLevel = computeBearing((uint16)g_viewZ / 3 * (g_missionStatus + 1), 0x800) >> 8;
-    g_gaugeLevel += (val >> 1) + ((uint16)g_startRange >> 10);
+    g_threatScopeRange = computeBearing((uint16)g_viewZ / 3 * (g_missionStatus + 1), 0x800) >> 8;
+    g_threatScopeRange += (val >> 1) + ((uint16)g_startRange >> 10);
     if (g_playerPlaneFlags & 4)
-        g_gaugeLevel += 0x18;
+        g_threatScopeRange += 0x18;
     if (g_playerPlaneFlags & 0x10)
-        g_gaugeLevel += 0x10;
+        g_threatScopeRange += 0x10;
 }
 
 /* ==== seg000:0x47f1 ==== */

@@ -50,7 +50,7 @@ extern int16 g_curPanelMode;        /* word_385CE */
 extern int16 missileSpecIndex;      /* word_33D80 */
 struct Weapon { int8 name[8]; int16 lethality, dangerTier, flags; };   /* 14-byte @0x4894 */
 extern struct Weapon g_samSpecs[];
-extern int16 g_gaugeLevel;          /* word_343B2 */
+extern int16 g_threatScopeRange;    /* word_343B2 */
 void   exitTimeAccel(void);         /* sub_1E010 */
 extern int16 g_lastMissileSlot;     /* word_36E1E */
 struct MissileSpec { int16 weaponIdx; int16 ammo; };
@@ -77,7 +77,7 @@ struct MapTarget {                 /* F19 layout, 16 bytes @0x80C8 */
     int16 active;                  /* +6 */
     int16 flags;                   /* +8  (was field02) */
     int16 alertLevel;              /* +A */
-    int16 padC;                    /* +C */
+    int16 threatTimer;             /* +C */
     int16 symbol;                  /* +E */
 };
 extern struct MapTarget g_planeTable[];    /* @0x80C8 */
@@ -132,6 +132,93 @@ void notifyViewObj(int16 idx);      /* sub_14C98 */
 int16 markTargetReached(int16 n);   /* sub_17AAF */
 void redrawTacMap(int16 x, int16 y);/* sub_187EC */
 
+struct CommData { int8 pad[0x78]; int16 gfxModeNum; };
+extern struct CommData FAR *commData;   /* dword_38B10 */
+extern int16 g_scopeSweepTimer;         /* word_343C0 */
+extern int16 g_prevScopeRange;          /* word_384F6 */
+extern int16 g_scopeArcRange;           /* word_3831A */
+extern int16 g_threatLabelTarget;       /* word_38372 — >=0: g_planeTable idx, <0: ~idx into g_simObjects */
+extern int16 g_threatRadarFlag;         /* word_38B14 */
+extern int16 g_scopeArcStart;           /* word_383F8 */
+extern int16 g_scopeArcEnd;             /* word_383FA */
+extern int16 g_targetEntityCount;       /* word_354D6 */
+extern int16 g_unusedEventHist1;        /* word_3845C */
+extern int16 g_scopeArcColor;           /* word_35452 */
+extern int16 g_detailLevel;             /* word_354BC */
+extern int16 g_hudVisible;              /* word_33D90 */
+extern int16 frameTick;                 /* word_343B6 */
+void restoreScopePanel(void);           /* sub_1A26C */
+void captureScopePanel(void);           /* sub_1A2C5 */
+int16 plotMapObject(int16 x, int16 y, int16 color, int16 big);  /* sub_18B41 */
+void drawMapArc(int16 cx, int16 cy, int16 r, int16 color, int16 lines, int16 a0, int16 a1); /* sub_18C76 */
+void drawGaugeBar(int16 val, int16 color, int16 x1, int16 x2);  /* sub_1877F */
+void fireGroundThreat(int16 idx);       /* sub_15311 */
+
+/* ==== seg000:0x505a ==== */
+void updateThreatSites(void) {
+    int16 p, arc, rad, x, siteIdx, arcRadius;
+
+    if ((g_scopeSweepTimer == 0 || g_prevScopeRange != g_threatScopeRange) &&
+        g_hudVisible != 0) {
+        g_prevScopeRange = g_threatScopeRange;
+        drawGaugeBar(-clampRange(0x64 - g_threatScopeRange, 0, 0x63), 1, 0, 0xB);
+        drawGaugeBar(clampRange(g_threatScopeRange, 0, 0x63), 4, 0, 0xB);
+        if (g_scopeSweepTimer == 0 && g_mapMode == 0) {
+            restoreScopePanel();
+            if (g_curPanelMode == 0x14)
+                sub_19979();
+            g_scopeArcStart = 0;
+            g_scopeArcEnd = 0x100;
+        }
+    }
+
+    for (siteIdx = 0; siteIdx < g_targetEntityCount; siteIdx++) {
+        if (g_planeTable[siteIdx].active != 0 &&
+            !(*(uint8 *)&g_planeTable[siteIdx].flags & 0x80) &&
+            (((uint8)(siteIdx * (frameTick >> 10) * 7) & 7) <=
+                 (g_unusedEventHist1 < 0x80 ? g_difficultyTier * 2 + 1 : g_difficultyTier * 2 + 3) ||
+             g_planeTable[siteIdx].alertLevel != 0 ||
+             (g_planeTable[siteIdx].flags & 0x100) != 0)) {
+            g_planeTable[siteIdx].threatTimer--;
+            if (g_planeTable[siteIdx].threatTimer <= 0)
+                g_planeTable[siteIdx].threatTimer =
+                    ((int16)(int8)g_frameRateScaling << 8) /
+                    ((g_planeTable[siteIdx].alertLevel >> 2) + 0x10) + siteIdx;
+            if (g_planeTable[siteIdx].threatTimer == 4 && g_scopeSweepTimer < 0) {
+                fireGroundThreat(siteIdx);
+                *(uint8 *)&g_planeTable[siteIdx].flags |= 2;
+            }
+        } else {
+            *(uint8 *)&g_planeTable[siteIdx].flags &= ~2;
+        }
+    }
+
+    if (commData->gfxModeNum == 0)
+        g_scopeArcColor = 0;
+    if (g_mapMode == 0 && g_scopeSweepTimer > 0 && g_hudVisible != 0 && g_scopeArcRange > 1) {
+        if (g_detailLevel != 0 && commData->gfxModeNum != 0) {
+            captureScopePanel();
+            arc = (int16)((int32)clampRange(g_frameRateScaling - g_scopeSweepTimer, 1, g_frameRateScaling) *
+                          g_scopeArcRange / g_frameRateScaling) << 6;
+        } else {
+            arc = g_scopeArcRange << 6;
+            g_scopeArcRange = 0;
+        }
+        if (g_threatLabelTarget >= 0) {
+            plotMapObject(g_planeTable[g_threatLabelTarget].mapX, g_planeTable[g_threatLabelTarget].mapY,
+                          (g_scopeSweepTimer & 1) ? 0xF : 0, 1);
+            drawMapArc(g_planeTable[g_threatLabelTarget].mapX, g_planeTable[g_threatLabelTarget].mapY,
+                       arc, g_scopeArcColor, g_threatRadarFlag, g_scopeArcStart, g_scopeArcEnd);
+        } else {
+            plotMapObject(g_simObjects[-1 - g_threatLabelTarget].posX, g_simObjects[-1 - g_threatLabelTarget].posY,
+                          (g_scopeSweepTimer & 1) ? 0xF : 0, 1);
+            drawMapArc(g_simObjects[-1 - g_threatLabelTarget].posX, g_simObjects[-1 - g_threatLabelTarget].posY,
+                       arc, g_scopeArcColor, g_threatRadarFlag, g_scopeArcStart, g_scopeArcEnd);
+        }
+    }
+    g_scopeSweepTimer--;
+}
+
 /* ==== seg000:0x5689 ==== */
 int16 computeThreatRangeBearing(int16 threatX, int16 threatY, int16 threatAlt,
                                  int16 threatType, int16 *outBearing, int16 *outRange) {
@@ -156,7 +243,7 @@ int16 computeThreatRangeBearing(int16 threatX, int16 threatY, int16 threatAlt,
     }
     result = ((bearingErr + 0x20) >> 1) * (result >> 1) >> 4;
     if ((uint16)(abs(threatAlt - g_viewZ) >> 0xA) > (uint16)distance) result = 0;
-    if (result + g_gaugeLevel > 0x64) exitTimeAccel();
+    if (result + g_threatScopeRange > 0x64) exitTimeAccel();
     *outBearing = bearing;
     *outRange = distance;
     return result;

@@ -316,7 +316,15 @@ int16 missleSpec[0x10];                /* @0x4F00 4B {weaponIdx,ammo} records */
 int16 missiles[0x140];                 /* @0x4F24 26B records */
 int16 sams[0x80];                      /* @0x4C36 18B records */
 int16 g_keyCode;                        /* word_384CE: pending keycode */
-int16 g_gaugeLevel;                     /* word_343B2: HUD gauge position */
+int16 g_threatScopeRange;               /* word_343B2: threat gauge level / scope range */
+int16 g_scopeSweepTimer;                /* word_343C0: threat-scope sweep countdown */
+int16 g_prevScopeRange;                 /* word_384F6: last drawn scope range */
+int16 g_scopeArcRange;                  /* word_3831A */
+int16 g_threatLabelTarget;              /* word_38372: >=0 plane idx, <0 ~idx simObjects */
+int16 g_threatRadarFlag;                /* word_38B14 */
+int16 g_scopeArcStart, g_scopeArcEnd;   /* word_383F8 / word_383FA */
+int16 g_unusedEventHist1;               /* word_3845C: event-history shift stage 2 */
+void fireGroundThreat(int16 idx) { }    /* sub_15311 */
 int16 dispatchKeyCmd(int16 key) { return 0; }   /* sub_1D4C6: key-command dispatch */
 int16 frameTick, g_nightMode, g_unusedFrameVal, g_missionTick; /* 343B6/33D8A/35450/354C0 */
 int16 g_setupSlots[0x20];              /* @0x37622 */
