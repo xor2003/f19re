@@ -61,6 +61,11 @@ ports verified against the original binary.
   openBlitClosePic wrappers): hand-asm style (reg args, int21h, jmp error tail).
 - Pic-decode cluster seg000:0xE4F8+ (picBlit/decodePicRow/picReadDataAndMakeDict/
   picMakeDict/doPicDecode/dictionaryLookup): hand-asm.
+- Overlay trampolines seg000:0xe04e & 0xe0ae: MSC overlay-manager entry/exit
+  stubs (`call far ptr sub_2F07A`/`sub_2F075` prologue/epilogue + far calls to
+  overlay-resident sub_2F0xx, register-convention args in bx). Stay asm.
+  (The resident file loaders they bracket — loadFileNear/loadFileSection/
+  writeFileSection + the resFile* shims — are ported C in enfile.c/egui.c.)
 - seg001 clip/outcode/3D-pipeline/rasterize helpers (the whole Code4 cluster:
   projectVertexToScreen, rotatePoint3d, transformModelVertices, transformVertexList,
   projectModelEdges, buildInverseRotationMatrix, multiplyMatrix3x3,
@@ -74,12 +79,15 @@ ports verified against the original binary.
 - seg003 setInt9Handler, seg000 installCBreakHandler: int21h/int9h handlers.
 - `start` (seg000:e880): DOS crt0.
 
-## Verified C ports so far (all MATCH — 63)
+## Verified C ports so far (all MATCH — 73)
 
 eg3dload.c(/Os):  load15Flt3d3
 stparse.c (/Ot):  replaceExtension
+enfile.c  (/Ot):  loadFileNear, loadFileSection, writeFileSection
 egui.c    (/Ot):  loadColorPalette, drawMapMarkerBox, projectMapPoint,
-                  blitGaugeSprite, drawModelPoint, drawViewportLine
+                  blitGaugeSprite, drawModelPoint, drawViewportLine,
+                  resFileOpen, resFileCreate, resFileClose, resFileRead,
+                  resFileReadFar, resFileWrite
 eg3dmap.c (/Ot):  buildVertexSignMask, computeTileBounds, process3dg,
                   drawMapTileObject, drawMapTiles, worldToTileIndex,
                   aspectScaleY, projectModelVertices, drawNearestTileObject,
@@ -92,11 +100,27 @@ egflight.c(/Os):  applyRotationDelta, computeAttitudeAngles, signedRatio16,
                   valueToAngle, complementAngle, rebuildOrientation,
                   waitForKeyPress
 egframe.c (/Os):  moveStuff, moveDataFar, moveNearFar, setCommWorldbufPtr,
-                  makeSound, recalcTimeScale
+                  makeSound, recalcTimeScale, findWaypointFeatures
 egtacmap.c(/Os):  readScreenPixel, readMapPixelColor, drawMapLine,
                   drawFullscreenLine, drawScreenLineOnePage, fillRectBoth,
                   drawStringBothPages, drawNumber, cacheScopePanel,
                   restoreScopePanel, captureScopePanel
-egcombat.c(/Os):  updateThreatAlert, markTargetReached, bombTarget
+egcombat.c(/Os):  updateThreatAlert, markTargetReached, bombTarget,
+                  samCanAcquireTarget
 egtarget.c(/Os+/Oa): drawTargetLabel, buildRangeString, computeTargetBearing,
                   isTargetOverWater, shapeDataOffset, drawTargetView
+
+## Verified semantically (NOT byte-exact)
+
+- `spawnSamThreat` (egcombat.c, seg000:0x585c): instruction-for-instruction
+  identical to the original except one prologue `mov si,[bp+4]` — MSC 5.1
+  emits a register-param init because `off`'s first store sits past the guard
+  branches. Byte-exact is unreachable under MSC 5.1 (si-dedication needs a
+  register var = extra home slot, or a param = the init load). See
+  DECOMPILATION.md §5.
+- `drawWeaponRadarInfo` (egui.c, seg000:0xab2d): identical except prologue
+  `mov si,[bp+8]`. Same mechanism: `register int16 off` (param, phantom arg3)
+  is the only way to commit `si = weaponIdx*14` for the `[si+base+fieldoff]`
+  record reads — the name(addr)+flag(test)+lethality+dangerTier cluster shares
+  `i*14` in `si`, recomputed once after `strcpy("Maks dalxn.")`. Plain indexing
+  or `off` locals give `bx`/`sub sp,2` instead. Byte-exact unreachable.

@@ -25,8 +25,8 @@ extern int16 g_playerPlaneFlags;    /* word_356DC */
 extern int16 g_bombDamageMask;      /* word_33D64 */
 extern int16 g_gunHits;             /* word_3844C */
 extern int16 g_damageTakenFlag;     /* word_354CA */
-extern int16 g_viewX_;              /* word_3837C */
-extern int16 g_viewY_;              /* word_3838C */
+extern uint16 g_viewX_;             /* word_3837C */
+extern uint16 g_viewY_;             /* word_3838C */
 extern int16 g_viewZ;               /* word_33576 */
 extern int16 g_ourHead;             /* word_33570 */
 extern int16 g_acqRange;            /* word_351CE */
@@ -36,6 +36,13 @@ extern struct Projectile g_projectiles[];  /* @0x5422 */
 extern int16 g_autopilotEngaged;
 extern int16 waypointIndex;         /* word_33700 */
 extern char  strBuf[];              /* @0x65E6 */
+extern int16 g_missionTick;         /* word_354C0 */
+extern int16 g_nightMode;           /* word_33D8A */
+extern int16 g_frameRateScaling;    /* word_33D92 */
+extern int16 g_samRange;            /* word_33D00 */
+extern int16 g_samSpeed;            /* word_33D02 */
+extern int8  g_mapCellFlags[];      /* @0x861A */
+void hudMessage(const char *s);     /* sub_192B1 */
 
 struct MapEvent {                  /* 12-byte marker record */
     int16 mapX, mapY, unused4, type, ttl, unusedA;
@@ -72,6 +79,49 @@ void updateThreatAlert(void) {
             g_planeTable.planes[planeIdx].alertLevel = clampRange(g_planeTable.planes[planeIdx].alertLevel, ((g_missionStatus + g_difficultyTier) << 4) - 16, 0xFF);
         }
     }
+}
+
+/* ==== seg000:0x585c ====
+ * `off` is a code-generation device, not a real parameter: the original caller
+ * passes nothing (plain `call`).  Declaring it `register` makes MSC 5.1 commit
+ * si to slot*24 (the projectile byte offset) for the whole body and leaves di
+ * free for the map index, matching the original's `[bx+di]` addressing and
+ * `imul [bp-4]`.  A register *local* would also work but adds a home slot
+ * (sub sp,10); the param uses [bp+4] as its home instead, keeping sub sp,8.
+ * Residual diff vs original: MSC emits `mov si,[bp+4]` in the prologue because
+ * `off`'s first store sits after the guard branches; the original has none.
+ * Every other instruction (all ~150) is identical — verified by inspection. */
+void spawnSamThreat(register int16 off) {
+    int16 dy, dx, slot, specIdx;
+
+    if ((g_missionTick & 0xF) != 0)
+        return;
+    if (!(g_mapCellFlags[(g_viewX_ >> 11) + ((g_viewY_ >> 11) << 4)] & 0x10))
+        return;
+    if (g_nightMode != 0)
+        return;
+    slot = (g_missionTick >> 4) & 7;
+    specIdx = 0x21;
+    off = slot * 24;
+    if (*(int16 *)((char *)g_projectiles + off + 14) != 0)
+        return;
+    *(int16 *)((char *)g_projectiles + off) = randomRange(0x800) + (g_viewX_ & 0xF800);
+    *(int16 *)((char *)g_projectiles + off + 2) = randomRange(0x800) + (g_viewY_ & 0xF800);
+    dx = g_viewX_ - *(int16 *)((char *)g_projectiles + off);
+    dy = g_viewY_ - *(int16 *)((char *)g_projectiles + off + 2);
+    if ((uint16)((4 - g_missionStatus) << 8) >= (uint16)rangeApprox(dx, dy))
+        return;
+    *(int16 *)((char *)g_projectiles + off + 4) = 0;
+    *(int16 *)((char *)g_projectiles + off + 6) = g_samSpeed >> 6;
+    *(int16 *)((char *)g_projectiles + off + 8) = computeBearing(dx, -dy);
+    *(int16 *)((char *)g_projectiles + off + 10) = 0x2000;
+    *(int16 *)((char *)g_projectiles + off + 14) = (int16)(((int32)g_frameRateScaling * ((int32)g_samRange << 4)) / (int32) * (int16 *)((char *)g_projectiles + off + 6));
+    *(int16 *)((char *)g_projectiles + off + 16) = 0x21;
+    *(int16 *)((char *)g_projectiles + off + 22) = 1;
+    strcpy(strBuf, "SA-14");
+    strcat(strBuf, " pu}en");
+    hudMessage(strBuf);
+    updateThreatAlert();
 }
 
 /* ==== seg000:0x7757 ==== */

@@ -14,6 +14,10 @@ void drawLine(int16 a, int16 b, int16 c, int16 d) {}
 int16 openFile(const char *p, int16 m) { return 0; }
 void picBlit(int16 h, int16 p, int16 m) {}
 int16 closeFile(int16 h) { return 0; }
+int16 createFile(const char *p, int16 a) { return 0; }
+int16 readFile1(int16 h, int16 c, int16 o) { return 0; }
+int16 readFile2(int16 h, int16 c, int16 o, int16 s) { return 0; }
+int16 writeFileAtRaw(int16 h, int16 o, int16 bo, int16 bs, int16 c) { return 0; }
 
 int8 g_lodShift;
 int16 g_mapOriginX, g_mapOriginY, g_projErr, g_viewScale, g_projX, g_projY;
@@ -192,6 +196,8 @@ int16 g_viewX_, g_viewY_, g_viewZ, g_ourHead, g_autopilotEngaged, waypointIndex;
 char strBuf[64];
 struct { int16 lead[3]; struct { int16 active; int16 f02; int16 alertLevel; int16 pad[5]; } planes[74]; } g_planeTable;
 struct { int16 state; int16 pad[8]; } g_targetSlots[4];
+int16 g_waypointNameBase;
+void *g_nearestTileObj;
 struct { int16 mapX,mapY,u4,type,ttl,uA; } mapEvents[4];
 void appendMapEvent(int16 a, int16 b) {}
 
@@ -199,6 +205,7 @@ void refreshActivePanel(int16 a) {}
 
 int16 g_scopeArcColor, g_targetBearing, g_targetRange, g_viewX_2, g_vprojXlo, g_vprojYlo;
 char g_itoaScratch[24];
+struct { int8 name[8]; int16 lethality, dangerTier, flags; } g_samSpecs[16]; /* @0x4894 threat/weapon spec table (aNone) — 'Net ','SA-2',... 14-byte records */
 
 int16 g_inputDisabled, g_axisInputAccum[4], g_soundPriorityFloor, g_ejectState;
 int8 g_commEventFlag;                  /* byte_38D18 */
@@ -293,4 +300,6 @@ int16 g_replayCount;                   /* word_351C4 */
 struct Projectile { int16 mapX, mapY, alt, speed, worldX, worldY, worldZ, ttl, specIdx, weaponIdx, targetLock, targetRef; };
 struct Projectile g_projectiles[12];   /* @0x5422: stride 0x18 guided-weapon slots */
 int16 g_acqRange;                      /* word_351CE */
+int16 g_samRange;                      /* word_33D00: SA-14 spec range factor (=16) */
+int16 g_samSpeed;                      /* word_33D02: SA-14 spec speed (>>6 = 14) */
 int16 g_acqAimY;                       /* word_351D0 */

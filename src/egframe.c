@@ -36,7 +36,15 @@ extern int8  g_mapCellFlags[0x100];      /* @0x861A */
 extern int16 g_unusedSavedWord;          /* @0x9656 */
 extern int16 g_padlockAircraft;          /* @0x5554 */
 extern int16 waypoints[8];             /* @0x4880 */
-extern int16 g_targetSlots[0x12];       /* @0x87B2 */
+struct TargetSlot {
+    int16 state;      /* +0x0 */
+    int16 planeIndex; /* +0x2  index into g_storeDefs */
+    int16 viewIndex;  /* +0x4 */
+    int16 flags;      /* +0x6 */
+    int16 seedNoise;  /* +0x8 */
+    int16 pad[4];     /* +0xA..+0x12 (18-byte stride) */
+};
+extern struct TargetSlot g_targetSlots[2];   /* @0x87B2 */
 
 struct MapTarget { int16 f[8]; };        /* sizeof = 0x10 */
 struct SimObject { int16 f[0x12]; };     /* sizeof = 0x24 */
@@ -368,6 +376,51 @@ void initStoreData(void) {
     }
     g_worldX = ((uint32)g_storeDefs[g_selStoreIdx].coordX << 5) + 2;
     g_worldY = ((int32)0x8000 - g_storeDefs[g_selStoreIdx].coordY) << 5;
+}
+
+/* ==== seg000:0x4e09 ==== */
+extern int16 g_waypointNameBase;                 /* word_2F470 @dseg:0600 */
+extern int16 g_render3DTiles;                    /* word_343CC */
+#pragma pack(1)
+struct TileObject {
+    int16 id;                      /* +0x00 */
+    int16 dist;                    /* +0x02 */
+    int32 x;                       /* +0x04 */
+    int32 y;                       /* +0x08 */
+    int16 entry;                   /* +0x0C */
+    uint8 lod;                     /* +0x0E */
+    uint8 subIndex;                /* +0x0F */
+    uint8 tileX;                   /* +0x10 */
+    uint8 tileY;                   /* +0x11 */
+    int16 shapeOff;                /* +0x12 */
+    uint8 flag;                    /* +0x14 */
+    uint8 pad15;                   /* +0x15 */
+};
+#pragma pack()
+extern struct TileObject *g_nearestTileObj;      /* word_35CE6 */
+struct TileObject *findNearestTileObject(uint32 worldX, uint32 worldY);
+int16 shapeDataOffset(int16 shapeId);            /* sub_1D1C8 */
+void addTileEntry(struct TileObject *rec, int16 value, char tag);   /* sub_112DC */
+
+void findWaypointFeatures(void) {
+    int16 nameIdx, slot;
+    nameIdx = g_waypointNameBase;
+    for (slot = 0; slot < 2; slot++) {
+        if (g_targetSlots[slot].flags >> 8 != 0) {
+            g_nearestTileObj = findNearestTileObject(
+                (uint32)(uint16)g_storeDefs[g_targetSlots[slot].planeIndex].coordX << 5,
+                ((int32)0x8000 - g_storeDefs[g_targetSlots[slot].planeIndex].coordY) << 5);
+            if (g_nearestTileObj != 0) {
+                g_shapeTargetCategory[nameIdx] = g_shapeTargetCategory[g_nearestTileObj->id];
+                strcpy(g_nameTab[nameIdx], g_nameTab[g_nearestTileObj->id]);
+                g_nameTab[nameIdx + 1] = g_nameTab[nameIdx] + strlen(g_nameTab[nameIdx]) + 1;
+                addTileEntry(g_nearestTileObj, shapeDataOffset(nameIdx + 0x100), nameIdx + 0x100);
+            }
+            g_storeDefs[g_targetSlots[slot].planeIndex].nameIdx = nameIdx + 0x100;
+            nameIdx++;
+        }
+    }
+    g_render3DTiles = 0;
 }
 
 void moveStuff() {

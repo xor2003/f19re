@@ -41,6 +41,8 @@ routine_211 resetSimObjectLocks  # seg000:4bc8
 routine_336 initWeaponLoadout    # seg000:4c05
 routine_137 hudMessage           # seg000:92b1
 routine_174 applyGravityFall   # seg000:4b38  wreck alt += fallVel, vel->-16
+routine_183 findWaypointFeatures # seg000:4e09  name/copy 2 target slots via storeDefs
+routine_362 drawWeaponRadarInfo # seg000:ab2d  <name> <doppler|impul> radar + max/eff range
 routine_262 sendSoundCmd       # seg000:4c98  hwPortWrite((v<<8)+0xDB)
 routine_185 hwPortWrite        # seg000:4cac  noop hw thunk
 routine_281 zoomIn             # seg000:8a1b  zoom/map level up
@@ -83,3 +85,4 @@ routine_139 blitSprite         # seg000:9912  fill SpriteParams + clipped/opaque
 routine_58 resFileOpen       # seg000:e19a  forwards to openFile
 routine_60 resFileClose      # seg000:e1be  forwards to closeFile
 routine_266 samCanAcquireTarget # seg000:7757  SAM/weapon acquisition cone check
+routine_170 spawnSamThreat     # seg000:585c  periodic SA-14 SAM launch spawner

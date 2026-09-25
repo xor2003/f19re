@@ -41,9 +41,33 @@ int16 resFileOpen(const char *path, int16 mode) {
     return openFile(path, mode);
 }
 
+/* ==== seg000:0xe1ac ==== */
+int16 createFile(const char *path, int16 attr);
+int16 resFileCreate(const char *path, int16 attr) {
+    return createFile(path, attr);
+}
+
 /* ==== seg000:0xe1be ==== */
 int16 resFileClose(int16 handle) {
     return closeFile(handle);
+}
+
+/* ==== seg000:0xe1cc ==== */
+int16 readFile1(int16 handle, int16 count, int16 bufOff);
+int16 resFileRead(int16 handle, int16 count, int16 bufOff) {
+    return readFile1(handle, count, bufOff);
+}
+
+/* ==== seg000:0xe1e0 ==== */
+int16 readFile2(int16 handle, int16 count, int16 bufOff, int16 bufSeg);
+int16 resFileReadFar(int16 handle, int16 count, int16 bufOff, int16 bufSeg) {
+    return readFile2(handle, count, bufOff, bufSeg);
+}
+
+/* ==== seg000:0xe1f8 ==== */
+int16 writeFileAtRaw(int16 handle, int16 off, int16 bufOff, int16 bufSeg, int16 count);
+int16 resFileWrite(int16 handle, int16 off, int16 bufOff, int16 bufSeg, int16 count) {
+    return writeFileAtRaw(handle, off, bufOff, bufSeg, count);
 }
 
 extern int16 g_radarScopeRange;  /* byte at word_346E6 */
@@ -163,6 +187,41 @@ void formatTwoDigit(int16 val) {
     if (val < 10)
         strcat(g_nameBuf, "0");
     strcat(g_nameBuf, itoa(val, g_itoaScratch, 10));
+}
+
+/* ==== seg000:0xab2d ==== */
+void drawPanelGridText(int16 panel, int16 col, int16 row, const char *text, int16 color); /* sub_19071 */
+struct Weapon {                       /* 14-byte stride @0x4894 (aNone/SAM spec table) */
+    int8  name[8];          /* +0x00 */
+    int16 lethality;        /* +0x08 max range (km) */
+    int16 dangerTier;       /* +0x0A effective-range multiplier */
+    int16 flags;            /* +0x0C bit0 = radar-guided (doppler) */
+};
+extern struct Weapon g_samSpecs[];    /* @0x4894 */
+/* 'off' is a register (si) param: MSC 5.1 commits si to the weaponIdx*14 byte
+ * offset so every field read uses [si+base+fieldoff]. It cannot be a real
+ * argument (callers push 2 args) — its prologue load 'mov si,[bp+8]' is a
+ * dead read of nonexistent arg3, immediately overwritten. One dead instr off
+ * byte-exact, like spawnSamThreat. */
+void drawWeaponRadarInfo(int16 weaponIdx, int16 row, register int16 off) {
+    if (weaponIdx > 0) {
+        off = weaponIdx * 14;
+        strcpy(g_nameBuf, (char*)g_samSpecs + off);
+        strcat(g_nameBuf, (*(int16*)((char*)g_samSpecs + off + 12) & 1) ? " doppler" : " impul");
+        strcat(g_nameBuf, " radar");
+        drawPanelGridText(2, 2, row++, g_nameBuf, 0xF);
+        strcpy(g_nameBuf, "Maks dalxn.");
+        off = weaponIdx * 14;
+        strcat(g_nameBuf, itoa(*(int16*)((char*)g_samSpecs + off + 8), g_itoaScratch, 10));
+        strcat(g_nameBuf, " km");
+        drawPanelGridText(2, 2, row++, g_nameBuf, 7);
+        strcpy(g_nameBuf, "\\ff. dalxn.");
+        strcat(g_nameBuf, itoa(*(int16*)((char*)g_samSpecs + off + 8) *
+                               *(int16*)((char*)g_samSpecs + off + 10) / 10,
+                               g_itoaScratch, 10));
+        strcat(g_nameBuf, " km");
+        drawPanelGridText(2, 2, row++, g_nameBuf, 7);
+    }
 }
 
 extern int16 g_lineX1, g_lineX2, g_lineY1, g_lineY2;
