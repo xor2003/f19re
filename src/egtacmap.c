@@ -220,6 +220,44 @@ int16 readMapPixelColor(int16 mapX, int16 mapY) {
     return color;
 }
 
+/* ==== seg000:0x8c76 ==== */
+int16 sinMul(int16 angle, int16 value);
+int16 cosMul(int16 angle, int16 value);
+void drawMapLine(int16 x1, int16 y1, int16 x2, int16 y2);
+
+/* Draw a map arc/circle centred at (cx,cy) with radius r.  Sweeps the angle
+ * from startA to endA in 0x10 steps; each point is x=cx+r*sin, y=cy-r*cos.
+ * The first point is plotted via plotMapObject; later points connect to the
+ * previous with drawMapLine when drawLines is set. */
+void drawMapArc(int16 cx, int16 cy, int16 r, int16 color, int16 drawLines, int16 startA, int16 endA) {
+    int16 angle, anorm, px, py, prevX, prevY;
+    if (endA < startA) {
+        startA += 0x100;
+    }
+    setDrawColor(color);
+    angle = startA;
+    goto TEST;
+PLOT:
+    plotMapObject(px, py, color, 0);
+UPDATE:
+    prevX = px;
+    prevY = py;
+    angle += 0x10;
+TEST:
+    if (angle <= endA) {
+        anorm = angle << 8;
+        px = cx + sinMul(anorm, r);
+        py = cy - cosMul(anorm, r);
+        if ((uint16)px > 0xC000) px = 0;
+        if ((uint16)py > 0xC000) py = 0;
+        if (angle == startA || drawLines == 0) {
+            goto PLOT;
+        }
+        drawMapLine(px, py, prevX, prevY);
+        goto UPDATE;
+    }
+}
+
 /* ==== seg000:0x8d2a ==== */
 void drawMapLine(int16 x1, int16 y1, int16 x2, int16 y2) {
     drawClippedLineRegion(mapXToScreen(x1), mapYToScreen(y1), mapXToScreen(x2), mapYToScreen(y2), g_scopeClipLeft, g_scopeClipRight, g_scopeClipTop, g_scopeClipBottom, 1);
