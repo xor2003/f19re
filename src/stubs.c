@@ -290,7 +290,6 @@ int16 g_aamSeekerY;                  /* word_38B16 — AAM seeker screen Y */
 int16 g_waypointBearing;             /* word_3836C — bearing to active waypoint */
 int16 g_homeBaseIdx;                 /* word_37638 — home/carrier object slot */
 void  far gfx_setDacAnimCount(int16 n) {}        /* sub_2F1B5 */
-void  drawThreatIndicator(void) {}               /* sub_1A5C8 */
 void  drawTacticalMap(int8 page) {}              /* sub_192FA */
 
 /* applyGravityFall + sendSoundCmd */

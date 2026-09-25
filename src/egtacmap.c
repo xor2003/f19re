@@ -664,3 +664,34 @@ void restoreScopePanel(void) {
 void captureScopePanel(void) {
     gfx_copyRect(*g_pageOffscreen, 0x28, 0x7C, g_drawPage ? *g_pageBack : *g_pageFront, 0x28, 0x7C, 0x69, 0x49);
 }
+
+/* ==== seg000:0xa5c8 ==== */
+extern int16 g_vprojXlo, g_vprojYlo;   /* word_2FF24 / word_30108 */
+int16 signOf(int16 v);                 /* sub_1D436 */
+int16 abs(int16 v);                    /* libc _abs */
+
+void drawThreatIndicator(void) {
+    int16 bearing, deltaX, deltaY;
+    if (g_hudVisible == 0) return;
+    if (g_halfScaleRender != 0) return;
+    if (g_planeTable[g_closestThreatIndex].flags & 0x800) return;
+    deltaX = g_planeTable[g_closestThreatIndex].mapX - g_viewX_;
+    deltaY = g_planeTable[g_closestThreatIndex].mapY - g_viewY_;
+    bearing = computeBearing(deltaX, -deltaY + signOf(deltaY) * abs(deltaX));
+    if (deltaY < 0) {
+        deltaY = -deltaY;
+        deltaX = -deltaX;
+    }
+    if (deltaY < 0x40) return;
+    if (deltaY > 0xA00) return;
+    setDrawColor(0xF);
+    g_vprojXlo = clampRange(((bearing - g_ourHead) >> 8) + 0x9F, 0x8B, 0xB5);
+    drawScreenLineOnePage(g_vprojXlo, 0x27, g_vprojXlo, 0x49);
+    drawStringActivePage("GLS", g_vprojXlo - 6, 0x21, 0xF);
+    if (g_planeTable[g_closestThreatIndex].flags & 0x200)
+        g_vprojYlo = ((uint16)(g_viewZ - 0x80) >> 7) - ((abs(deltaY) - 0x18) >> 5);
+    else
+        g_vprojYlo = ((uint16)g_viewZ >> 7) - ((abs(deltaY) - 0x38) >> 6);
+    g_vprojYlo = clampRange(g_vprojYlo, -0x10, 0x10) + 0x38;
+    drawScreenLineOnePage(0x8C, g_vprojYlo, 0xB4, g_vprojYlo);
+}

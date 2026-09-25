@@ -64,6 +64,14 @@ ports verified against the original binary.
 - Early-exit `goto` chains (`if (x==0) goto TAIL; ...; if (y!=0) goto MID;`)
   reproduce MSC's function-chunk layout where a shared continuation label is
   reached from several jumps — nested `if`s give a different block topology.
+- Two converging register temps (`ax`+`dx`, no stack slots) from an `if/else`:
+  assign the SAME lvalue per-branch with the shared ops OUTSIDE the differing
+  terms — `if (c) V = (A>>s)-f1(); else V = (B>>s)-f2();` tail-merges into one
+  `shr/sub/store` while each branch only computes its own ax/dx operands.
+  Storing into named locals forces `mov [bp],r` stores; `?:` on two operands
+  CSEs the flag into a reg + retests it. Used in drawThreatIndicator.
+- `>>` on `int16` emits `sar`; cast the shifted operand to `uint16` for `shr`
+  (e.g. `((uint16)(viewZ-0x80)) >> 7`) — drawThreatIndicator.
 
 ## Routines that are asm in the original (do NOT port)
 
@@ -89,7 +97,7 @@ ports verified against the original binary.
 - seg003 setInt9Handler, seg000 installCBreakHandler: int21h/int9h handlers.
 - `start` (seg000:e880): DOS crt0.
 
-## Verified C ports so far (all MATCH — 158)
+## Verified C ports so far (all MATCH — 159)
 
 eg3dload.c(/Os):  load3DAll, load3D3, load3DT, load3DG, printError
                   strcpyFromDot, load15Flt3d3
@@ -134,7 +142,7 @@ egtacmap.c(/Os+/Oa):projectWorldPoint, clearStatusPanel, renderHudFrame
                   drawStringBothPages, drawStringActivePage
                   drawStringCentered, drawNumber, readScreenPixel
                   hudMessage, getWeaponStat, cacheScopePanel
-                  restoreScopePanel, captureScopePanel
+                  restoreScopePanel, captureScopePanel, drawThreatIndicator
 egcombat.c(/Os+/Oa):updateThreatSites, fireGroundThreat
                   computeThreatRangeBearing, updateThreatAlert
                   updateObjects, fireAirThreat, spawnEnemyAircraft
