@@ -114,11 +114,60 @@ void buildRangeString(int16 rangeRaw) {
     strcat(strBuf, " km");
 }
 
-/* ==== seg000:0xca74 ==== */
+/* ==== seg000:0xc9b2 ==== */
 struct StoreDef { int16 subIdx; uint16 coordX; uint16 coordY; int16 f6; int8 flags; int8 f9; int16 padA; int16 padC; int16 nameIdx; };
 struct SimObject { int16 f[0x12]; };
+struct TileObject {
+    int16 id;                      /* +0x00 */
+    int16 dist;                    /* +0x02 */
+    int32 x;                       /* +0x04 */
+    int32 y;                       /* +0x08 */
+    int16 entry;                   /* +0x0C */
+    uint8 lod;                     /* +0x0E */
+    uint8 subIndex;                /* +0x0F */
+    uint8 tileX;                   /* +0x10 */
+    uint8 tileY;                   /* +0x11 */
+    int16 shapeOff;                /* +0x12 */
+    uint8 flag;                    /* +0x14 */
+    uint8 pad15;                   /* +0x15 */
+};
 extern struct StoreDef g_storeDefs[];   /* @0x80C8 */
 extern struct SimObject g_simObjects[]; /* @0x8870 */
+extern struct TileObject *g_nearestTileObj;  /* word_35CE6 */
+struct TileObject *findNearestTileObject(uint32 worldX, uint32 worldY); /* sub_11092 (eg3dmap.c) */
+extern int16 g_storeDefCount;    /* word_3838E — number of g_storeDefs entries */
+extern int16 g_selGridX;         /* word_36F3A — last queried grid coord */
+extern int16 g_selGridY;         /* word_36F3C */
+extern int16 g_selTileId;        /* word_36F46 — last tile-object id + 0x100 */
+extern int16 g_selStoreState;    /* word_343BE — store-selection state (-1/0) */
+
+/* Map a grid coordinate to its g_storeDefs index: convert to world coords,
+ * find the nearest tile object, recover its grid coords, then linear-search
+ * the store table.  Returns the store index, 0 on a miss (caching the coords
+ * and tile id), or -1 when no tile object exists at the position. */
+int16 findStoreAtGrid(int16 gridX, int16 gridY) {
+    int16 i;
+    g_nearestTileObj = findNearestTileObject((uint32)gridX << 5, ((uint32)0x8000 - gridY) << 5);
+    if (g_nearestTileObj != 0) {
+        gridX = (int16)(g_nearestTileObj->x >> 5);
+        gridY = (int16)(0x8000 - (g_nearestTileObj->y >> 5));
+        for (i = 1; i < g_storeDefCount; i++) {
+            if (g_storeDefs[i].coordX == gridX && g_storeDefs[i].coordY == gridY) {
+                return i;
+            }
+        }
+        g_selGridX = gridX;
+        g_selGridY = gridY;
+        g_selTileId = g_nearestTileObj->id + 0x100;
+        if (g_selStoreState == 0) {
+            g_selStoreState = -1;
+        }
+        return 0;
+    }
+    return -1;
+}
+
+/* ==== seg000:0xca74 ==== */
 int16 computeTargetBearing(int16 targetX, int16 targetY, int16 wantBearing); /* sub_1CAB4 */
 int16 bearingToStore(int16 i) {
     return computeTargetBearing(g_storeDefs[i].coordX, g_storeDefs[i].coordY, 1);

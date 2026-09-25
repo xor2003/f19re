@@ -197,9 +197,13 @@ char strBuf[64];
 struct { int16 lead[3]; struct { int16 active; int16 f02; int16 alertLevel; int16 pad[5]; } planes[74]; } g_planeTable;
 struct { int16 state; int16 pad[8]; } g_targetSlots[4];
 int16 g_waypointNameBase;
-void *g_nearestTileObj;
+struct TileObject;                  /* full def in eg3dmap.c / egtarget.c */
+struct TileObject *g_nearestTileObj;
 int16 g_rotMatrix[9];                 /* @0x80B6 — 3x3 camera/view rotation matrix */
 int16 g_targetLock;                   /* word_351D8 — target-lock acquired flag */
+int16 g_storeDefCount;                /* word_3838E — number of g_storeDefs entries */
+int16 g_selGridX, g_selGridY, g_selTileId;  /* word_36F3A/3C/46 — store-query cache */
+int16 g_selStoreState;                /* word_343BE — store-selection state */
 struct { int16 mapX,mapY,u4,type,ttl,uA; } mapEvents[4];
 void appendMapEvent(int16 a, int16 b) {}
 
