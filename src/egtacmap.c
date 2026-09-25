@@ -50,6 +50,228 @@ void clearStatusPanel(void) {
     drawPanelText(2, "", 0);
 }
 
+/* ==== seg000:0x7e74 ==== */
+extern int16 g_hudVisible;           /* word_33D90 */
+extern int16 g_damageTakenFlag;      /* word_354CA */
+extern int16 g_viewMode;             /* word_3836E */
+extern int16 g_viewZ;                /* word_33576 */
+extern int8  g_hudDrawnFlag;         /* byte_330F5 */
+extern uint8 joyAxes[];              /* @0x3345A (byte_3345A/3345B) */
+extern int16 g_nightMode;            /* word_33D8A */
+extern int16 g_cornerSpeed;          /* word_38A10 */
+extern int16 g_knots;                /* word_373E8 */
+extern int16 g_climbRate;            /* word_38D1E */
+extern int16 g_closestThreatIndex;   /* word_385D2 */
+extern int16 g_groundAltitude;       /* word_3837A */
+extern int16 frameTick;              /* word_343B6 */
+extern int16 missileSpecIndex;       /* word_33D80 */
+extern int16 g_gunAmmo;              /* word_33D82 */
+extern int16 g_currentWeaponType;    /* word_388C4 */
+extern int16 g_rollPitchTrim;        /* word_354A6 */
+extern int16 g_flightPathMarkerY;    /* word_384C4 */
+extern int16 g_aamSeekerX;           /* word_38B0E */
+extern int16 g_aamSeekerY;           /* word_38B16 */
+extern uint16 g_altitude;            /* word_33578 */
+extern int16 g_timeAccelMode;        /* word_343D0 */
+extern int16 g_bombDamageMask;       /* word_33D64 */
+extern int16 waypointIndex;          /* word_33700 */
+extern int16 g_viewX_;               /* word_3837C */
+extern int16 g_viewY_;               /* word_3838C */
+extern int16 g_waypointBearing;      /* word_3836C */
+extern int16 g_ourHead;              /* word_33570 */
+extern int16 g_homeBaseIdx;          /* word_37638 */
+extern int16 g_fuelRemaining;        /* word_33D66 */
+extern int16 g_playerPlaneFlags;     /* word_356DC */
+extern int16 waypoints[];            /* @0x4880 — {mapX,mapY} pairs */
+extern char  g_nameBuf[];            /* @0x65E6 */
+extern char  g_itoaScratch[];        /* @0x9678 */
+extern char  g_hudMessageBuf[];      /* @0x958C */
+extern int16 g_hudMsgTimer;          /* word_346EC */
+extern int16 g_inputDisabled;        /* word_33D8C */
+struct CommData { int8 pad72[0x72]; int16 setupUseJoy; };
+extern struct CommData FAR *commData;    /* dword_38B10 */
+struct MissileSpec { int16 weaponIdx; int16 ammo; };
+extern struct MissileSpec missleSpec[];  /* @0x4F00 */
+struct Missile { char shortName[10]; char longName[12]; int16 specIndex; int16 weaponCategory; };
+extern struct Missile missiles[];        /* @0x4F24 */
+struct Sam { char name[8]; int16 lockRange, maxSpeed, weaponClass, turnRate, modelId; };
+extern struct Sam sams[];                /* @0x4C36 */
+struct MapTarget { int16 objType; uint16 mapX; uint16 mapY; int16 active; int16 flags;
+                   int16 alertLevel; int16 threatTimer; int16 symbol; };
+extern struct MapTarget g_planeTable[];  /* @0x80C8 */
+uint8 far gfx_getDrawPage(void);         /* sub_2F10B */
+void  far gfx_setDacAnimCount(int16 n);  /* sub_2F1B5 */
+void setDrawColor(int16 color);                              /* sub_18F9C */
+void fillRectBoth(int16 x1, int16 y1, int16 x2, int16 y2);   /* sub_18FB2 */
+void drawStatusItem(int16 idx, int16 color);                 /* sub_19007 */
+void drawStringActivePage(const char *t, int16 x, int16 y, int16 c); /* sub_191E5 */
+void blitSprite(int16 dx, int16 dy, int16 sx, int16 sy, int16 w, int16 h, int16 t); /* sub_19912 */
+int16 computeBearing(int16 dx, int16 dy);  /* sub_1D29D */
+int16 rangeApprox(int16 dx, int16 dy);     /* sub_1D23B */
+void drawNumber(int16 v, int16 x, int16 y, int16 color);   /* sub_19257 */
+void hudMessage(const char *s);            /* sub_192B1 */
+void drawThreatIndicator(void);            /* sub_1A5C8 */
+void drawTacticalMap(int8 page);           /* sub_192FA */
+
+void renderHudFrame(void) {
+    int16 climbMarkerY, angleFixed, waypointMarkerX, circleX, angle,
+          circleY, prevX, speedBarLen, prevY, markerX, deltaX, markerY, deltaY;
+    int8 seekerShift;
+
+    g_drawPage = gfx_getDrawPage();
+    if (g_hudVisible == 0)
+        goto HUDMSG;
+    if (g_damageTakenFlag != 0) {
+        g_damageTakenFlag = 0;
+        if (!(g_viewMode & 0x80)) {
+            setDrawColor(0xD);
+            fillRectBoth(0, 0, 0x13F, 0x6B);
+            gfx_setDacAnimCount(0x3C);
+        }
+    }
+    g_hudDrawnFlag = 1;
+    if (g_viewMode != 0)
+        goto MAPCHECK;
+    if (g_halfScaleRender != 0)
+        goto MAPCHECK;
+    setDrawColor(0xF);
+    drawViewportLine(0x18, 0x6C, 0x127, 0x6C);
+    if (commData->setupUseJoy == 0) {
+        setDrawColor(0);
+        drawViewportLine(0x100, 0x5E, 0x110, 0x5E);
+        drawViewportLine(0x110, 0x5E, 0x110, 0x6A);
+        drawViewportLine(0x110, 0x6A, 0x100, 0x6A);
+        drawViewportLine(0x100, 0x6A, 0x100, 0x5E);
+        drawViewportLine(0x108, 0x64, 0x108, 0x64);
+        setDrawColor(0xF);
+        markerX = ((int16)(joyAxes[0] - 0x78) >> 4) + 0x108;
+        markerY = (((int16)joyAxes[1] * 3 - 0x168) >> 6) + 0x64;
+        drawViewportLine(markerX - 1, markerY, markerX + 1, markerY);
+        drawViewportLine(markerX, markerY + 1, markerX, markerY - 1);
+    }
+    if (g_playerPlaneFlags & 0x200) {
+        setDrawColor(0xF);
+        drawViewportLine(0x9C, 0x59, 0xA4, 0x59);
+        drawViewportLine(0xA0, 0x56, 0xA0, 0x5C);
+    }
+    setDrawColor(g_nightMode != 0 ? 4 : 0);
+    speedBarLen = clampRange((g_cornerSpeed - g_knots) * 2 / 5 + 0x1D, 0, 0x3D);
+    if (speedBarLen != 0)
+        drawViewportLine(0x48, 0x55 - speedBarLen, 0x48, 0x55);
+    drawViewportLine(0xF7, 0x38, 0xF7,
+                     clampRange(-((g_climbRate >> 4) - 0x38), 0x14, 0x55));
+    if (!(g_playerPlaneFlags & 1) && (frameTick & 1) &&
+        g_viewParamsFar[0x20] != 0 && g_climbRate < 0) {
+        climbMarkerY = ((uint16)(g_planeTable[g_closestThreatIndex].flags & 0x200
+                                  ? 0x100 : 0x80) / g_viewParamsFar[0x20] >> 4) + 0x38;
+        setDrawColor(0xF);
+        drawViewportLine(0xF2, climbMarkerY - 2, 0xF4, climbMarkerY);
+        drawViewportLine(0xF2, climbMarkerY + 2, 0xF4, climbMarkerY);
+    }
+    if (g_knots < g_cornerSpeed && g_groundAltitude != g_viewZ &&
+        (frameTick & 1))
+        drawStringActivePage("ugroza {topora", 0x84, 0x1E, 0xF);
+    strcpy(g_nameBuf, "");
+    strcat(g_nameBuf, itoa(missleSpec[missileSpecIndex].ammo, g_itoaScratch, 10));
+    strcat(g_nameBuf, " ");
+    strcat(g_nameBuf, missiles[missleSpec[missileSpecIndex].weaponIdx].longName);
+    drawStringBothPages(g_nameBuf, 0x38, 0x60, 0xF);
+    strcpy(g_nameBuf, "PU[ ");
+    strcat(g_nameBuf, itoa(g_gunAmmo, g_itoaScratch, 10));
+    drawStringBothPages(g_nameBuf, 0x38, 0x66, 0xF);
+    if (g_playerPlaneFlags & 0x400)
+        drawThreatIndicator();
+    if (g_currentWeaponType == 0 || g_currentWeaponType == 2) {
+        setDrawColor(7);
+        g_flightPathMarkerY = (g_rollPitchTrim >> 6) + 0x38;
+        if (g_flightPathMarkerY > 0xA && g_flightPathMarkerY < 0x6F)
+            blitSprite(0x9A, g_flightPathMarkerY - 4, 0x94, 0x15, 0xB, 7, 0xF);
+        if (g_currentWeaponType == 2)
+            drawStringBothPages("WOZ-ZEM   ", 0x88, 0x66, 0xF);
+        else
+            drawStringBothPages("NAW", 0x98, 0x66, 0xF);
+    }
+    if (g_currentWeaponType == 1) {
+        seekerShift = g_halfScaleRender + 4;
+        markerX = (g_aamSeekerX >> seekerShift) + 0x9F;
+        markerY = (g_aamSeekerY >> seekerShift) + 0x38;
+        if (markerX > 0xA && markerX < 0x135 && markerY > 8 && markerY < 0x68)
+            blitSprite(markerX - 6, markerY - 5, 0x91, 4, 0xD, 0xB, 0xE);
+        if (sams[missiles[missleSpec[missileSpecIndex].weaponIdx].specIndex].weaponClass == 7) {
+            setDrawColor(7);
+            angle = 0;
+            do {
+                angleFixed = angle << 8;
+                circleX = sinMul(angleFixed, 0x28) + 0x9F;
+                circleY = -(cosMul(angleFixed, 0x23) - 0x38);
+                if (angle != 0)
+                    drawViewportLine(circleX, circleY, prevX, prevY);
+                prevX = circleX;
+                prevY = circleY;
+                angle += 0x10;
+            } while (angle <= 0x100);
+        }
+        drawStringBothPages("WOZ-WOZ", 0x8C, 0x66, 0xF);
+    }
+    drawNumber(g_knots, 0x50, 0x36, 0xF);
+    if (g_altitude <= 0x4E20)
+        drawNumber(g_altitude < 0x64 ? g_altitude : g_altitude / 5 * 5,
+                   0xE4, 0x36, 0xF);
+    if (g_playerPlaneFlags & 2)
+        drawStringBothPages("ZAKR ", 0xFC, 0x66, 0xF);
+    if (g_playerPlaneFlags & 8)
+        drawStringBothPages("TORM ", 0xE4, 0x66, 0xF);
+    if (g_timeAccelMode > 1)
+        drawStringBothPages("USKOR", 0xE4, 0x60, 0xF);
+    if (g_playerPlaneFlags & 0x1000)
+        drawStringBothPages("TRENAV  ", 0xE4, 0x5A, 0xF);
+    if (!(g_bombDamageMask & 8)) {
+        deltaX = waypoints[waypointIndex * 2] - g_viewX_;
+        deltaY = waypoints[waypointIndex * 2 + 1] - g_viewY_;
+        if (rangeApprox(deltaX, deltaY) < 0x200 && waypointIndex < 3) {
+            waypointIndex++;
+            strcpy(g_nameBuf, "UKAZATELX");
+            strcat(g_nameBuf, itoa(waypointIndex, g_itoaScratch, 10));
+            strcat(g_nameBuf, " najden");
+            hudMessage(g_nameBuf);
+        }
+        g_waypointBearing = computeBearing(deltaX, -deltaY);
+        waypointMarkerX = clampRange(((g_waypointBearing - g_ourHead) >> 6) / 3 + 0x9F,
+                                     0x59, 0xE5);
+        setDrawColor(0xB);
+        drawViewportLine(waypointMarkerX - 2, 0xF, waypointMarkerX, 0x11);
+        drawViewportLine(waypointMarkerX, 0x11, waypointMarkerX + 2, 0xF);
+        drawViewportLine(waypointMarkerX - 2, 0xF, waypointMarkerX + 2, 0xF);
+    }
+    /* The drawStatusItem(9,3) arm is reached by two gotos and ends in
+     * `goto MAPCHECK` just like the 0xE arm: MSC tail-merges the two
+     * calls into a shared push/call tail and emits ARM3 as a deferred
+     * block that jumps back into it (the original's "mov ax,3; jmp"
+     * cold arm).  Plain if/else or ?: would instead emit the 3-arm
+     * inline next to the merge. */
+    if (frameTick & 1) {
+        if ((rangeApprox(g_viewX_ - g_planeTable[g_homeBaseIdx].mapX,
+                         g_viewY_ - g_planeTable[g_homeBaseIdx].mapY) >> 4)
+            <= g_fuelRemaining)
+            goto ARM3;
+        drawStatusItem(9, 0xE);
+        goto MAPCHECK;
+    }
+ARM3:
+    drawStatusItem(9, 3);
+    goto MAPCHECK;
+MAPCHECK:
+    if (g_mapMode == 1)
+        drawTacticalMap(g_drawPage);
+HUDMSG:
+    if (g_hudMsgTimer != 0 &&
+        ((g_viewMode == 0 && g_halfScaleRender == 0) || g_inputDisabled != 0)) {
+        drawStringActivePage(g_hudMessageBuf,
+            -(((int16)strlen(g_hudMessageBuf) >> 1) - 0x28) * 4, 0x18, 0xF);
+        g_hudMsgTimer--;
+    }
+}
+
 /* ==== seg000:0x8610 ==== */
 extern int16 g_viewX_, g_viewY_; /* word_3838C / word_3837C */
 void redrawTacMap(int16 x, int16 y);            /* sub_187EC */

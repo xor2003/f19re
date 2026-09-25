@@ -54,6 +54,16 @@ ports verified against the original binary.
 - `x = -y + K` compiles to `neg ax; add ax,K` (use unary minus, not `K - y`).
 - 16-bit `labs(x)` (no int32 cast) emits `cmp ax,0x7fff`; a `(int32)` cast
   emits `cwd` instead.
+- Deferred "cold" arm (`mov ax,K; jmp` merging BACKWARD into a shared tail):
+  MSC sinks a low-frequency arm to just before a multi-edge `goto` label /
+  function chunk only when both arms end in an explicit `goto cont`. Write it
+  as `if (C) { if (D) goto ARM; call(x); goto CONT; } ARM: call(y); goto CONT;
+  CONT:` — the shared `goto CONT` tail forces a backward tail-merge and ARM
+  emits after the continuation jump. Plain `if/else` or `?:` keep arms inline.
+  Used in renderHudFrame (egtacmap.c); same pattern drives computeBearing.
+- Early-exit `goto` chains (`if (x==0) goto TAIL; ...; if (y!=0) goto MID;`)
+  reproduce MSC's function-chunk layout where a shared continuation label is
+  reached from several jumps — nested `if`s give a different block topology.
 
 ## Routines that are asm in the original (do NOT port)
 
@@ -79,7 +89,7 @@ ports verified against the original binary.
 - seg003 setInt9Handler, seg000 installCBreakHandler: int21h/int9h handlers.
 - `start` (seg000:e880): DOS crt0.
 
-## Verified C ports so far (all MATCH — 102)
+## Verified C ports so far (all MATCH — 115)
 
 eg3dload.c(/Os):  load15Flt3d3
 stparse.c (/Ot):  replaceExtension
@@ -103,11 +113,14 @@ egflight.c(/Os):  applyRotationDelta, computeAttitudeAngles, signedRatio16,
                   valueToAngle, complementAngle, rebuildOrientation,
                   waitForKeyPress
 egframe.c (/Os):  moveStuff, moveDataFar, moveNearFar, setCommWorldbufPtr,
-                  makeSound, recalcTimeScale, findWaypointFeatures
+                  makeSound, recalcTimeScale, findWaypointFeatures,
+                  initFrameRandom, initFlightParams, recordFrame
 egtacmap.c(/Os):  readScreenPixel, readMapPixelColor, drawMapArc, drawMapLine,
                   drawFullscreenLine, drawScreenLineOnePage, fillRectBoth,
                   drawStringBothPages, drawNumber, cacheScopePanel,
-                  restoreScopePanel, captureScopePanel, plotMapObject
+                  restoreScopePanel, captureScopePanel, plotMapObject,
+                  clearStatusPanel, renderHudFrame, updatePanelMode,
+                  initTacMapView, drawPanelText
 egcombat.c(/Os+/Oa): updateThreatAlert, markTargetReached, bombTarget,
                   samCanAcquireTarget, destroySimObject, destroyGroundTarget,
                   fireMissile, computeThreatRangeBearing, updateThreatSites,
