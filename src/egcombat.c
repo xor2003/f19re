@@ -85,7 +85,20 @@ extern struct MapTarget g_planeTable[];    /* @0x80C8 */
 struct TargetSlot { int16 state; int16 planeIndex; int16 pad[7]; };  /* 0x12 bytes, state@0 */
 extern struct TargetSlot g_targetSlots[];          /* @0x87B2 */
 
-struct TileObject { int16 id; int16 pad[0xB]; };
+struct TileObject {
+    int16 id;                      /* +0x00 */
+    int16 dist;                    /* +0x02 */
+    int32 x;                       /* +0x04 */
+    int32 y;                       /* +0x08 */
+    int16 entry;                   /* +0x0C */
+    uint8 lod;                     /* +0x0E */
+    uint8 subIndex;                /* +0x0F */
+    uint8 tileX;                   /* +0x10 */
+    uint8 tileY;                   /* +0x11 */
+    int16 shapeOff;                /* +0x12 */
+    uint8 flag;                    /* +0x14 */
+    uint8 pad15;                   /* +0x15 */
+};
 extern struct TileObject *g_nearestTileObj;   /* word_35CE6 */
 struct TileObject *findNearestTileObject(uint32 wx, uint32 wy);  /* sub_11092 */
 int16 placeString(int16 idx);                 /* sub_14D03 */
@@ -187,7 +200,17 @@ extern int16 g_enemyAlertFlag;          /* word_38502 */
 extern int16 g_northSouthSign;          /* word_37484 — theater N/S direction sign */
 extern int16 g_groundUnitCount;         /* word_384FE — live g_simObjects count */
 extern int16 g_threatSpec;              /* word_351CA — spec of selected threat */
+extern int16 g_missionTimeLimit;        /* word_384C6 — mission deadline, ticks */
 int16 readMapPixelColor(int16 x, int16 y);  /* sub_18BEA (egtacmap) */
+void drawStatusItem(int16 item, int16 attr);            /* sub_19007 (egui) */
+int16 getWeaponStat(int16 statIdx, int16 target);       /* sub_192CD */
+int16 findStoreAtGrid(int16 x, int16 y);                /* sub_1C9B2 */
+int16 signOf(int16 v);                                  /* sub_1D436 (egmath) */
+int16 samCanAcquireTarget(int16 slot, int16 targetX, int16 targetY,
+                          int16 targetAlt, int16 mode); /* defined below */
+void destroySimObject(int16 idx);                       /* defined below */
+void destroyGroundTarget(int16 planeIdx);               /* defined below */
+void bombTarget(void);                                  /* defined below */
 
 /* ==== seg000:0x505a ==== */
 void updateThreatSites(void) {
@@ -917,6 +940,321 @@ void spawnEnemyAircraft(int16 slot, int16 objType) {
     strcat(strBuf, "WZLET");
     if (slot < g_groundUnitCount - 4) {
         hudMessage(strBuf);
+    }
+}
+
+/* ==== seg000:0x6c66 ==== */
+void updateThreatTargeting(void) {
+    int16 lockedn, acqk, wpXb, aimYa, ringb, wpYb;
+    uint16 beste, disto;
+    int16 bestIdxa, speci, wpn, stepi, slotd, deltal, scanb, foundk,
+          bearn, modec, e0d, tileXc, tileYc, viewXg, viewYg, u0f,
+          storeIdxj, alt0k;
+
+    drawStatusItem(0, 0);
+    drawStatusItem(1, 0);
+    drawStatusItem(8, (g_enemyAlertFlag != 0 && (frameTick & 1)) ? 0xE : 3);
+    if (mapEvents[0].ttl != 0) {
+        viewXg = mapEvents[0].mapX;
+        viewYg = mapEvents[0].mapY;
+    } else {
+        viewXg = g_viewX_;
+        viewYg = g_viewY_;
+    }
+
+    for (slotd = 0; slotd < 12; slotd++) {
+        if (g_projectiles[slotd].ttl != 0) {
+            speci = g_projectiles[slotd].specIdx;
+            lockedn = 0;
+            aimYa = 0;
+            modec = sams[speci].weaponClass;
+
+            if (slotd < 8) {
+                plotMapObject(g_projectiles[slotd].mapX, g_projectiles[slotd].mapY,
+                              g_projectiles[slotd].targetLock);
+                alt0k = g_viewZ;
+                lockedn = samCanAcquireTarget(slotd, viewXg, viewYg, g_viewZ, modec);
+                beste = g_acqRange;
+                aimYa = g_acqAimY;
+                if ((g_playerPlaneFlags & 0x10) && modec > 0)
+                    goto lock_eval;
+                if ((g_playerPlaneFlags & 0x20) && modec <= 0)
+                    goto lock_eval;
+                if (g_threatActiveTimer < g_threatDisplayTtl &&
+                    g_projectiles[slotd].specIdx != 0x21) {
+lock_eval:
+                    if ((g_missionStatus << 8) + 0x180 < beste ||
+                        modec == 1 || modec == -1) {
+                        aimYa = g_projectiles[slotd].worldX;
+                        lockedn = 0;
+                    }
+                }
+                scanb = 1;
+                do {
+                    if ((mapEvents[scanb].type == 1 && modec <= 0) ||
+                        (mapEvents[scanb].type == 2 &&
+                         (modec == 1 || modec == 2 ||
+                          (modec == 3 &&
+                           -(g_missionStatus * 12 - 0x40) >
+                               abs(abs((aimYa - g_ourHead) >> 8) - 0x40))))) {
+                        acqk = samCanAcquireTarget(slotd, mapEvents[scanb].mapX,
+                                                   mapEvents[scanb].mapY, g_viewZ, modec);
+                        if (acqk != 0) {
+                            aimYa = acqk;
+                            lockedn = 0;
+                        }
+                    }
+                    scanb++;
+                } while (scanb < 4);
+
+                if (beste > 0x200) {
+                    if (g_projectiles[slotd].targetRef > 2 &&
+                        !(*(uint8 *)&g_planeTable[g_projectiles[slotd].targetRef].flags & 0x10))
+                        lockedn = 0;
+                    if (g_projectiles[slotd].targetRef <= 0 &&
+                        !(g_simObjects[-g_projectiles[slotd].targetRef].flags.b[0] & 8))
+                        lockedn = 0;
+                }
+            } else {
+                beste = 0x7fff;
+                if (modec == 7) {
+                    for (scanb = 0; scanb < g_groundUnitCount; scanb++) {
+                        if ((g_simObjects[scanb].flags.b[0] & 2) &&
+                            g_simObjects[scanb].speed != 0) {
+                            acqk = samCanAcquireTarget(slotd, g_simObjects[scanb].posX,
+                                                       g_simObjects[scanb].posY,
+                                                       g_simObjects[scanb].alt, modec);
+                            if (g_acqRange < beste && acqk != 0) {
+                                aimYa = g_acqAimY;
+                                beste = g_acqRange;
+                                bestIdxa = scanb;
+                                alt0k = g_simObjects[scanb].alt;
+                                lockedn = 1;
+                                if (beste < 0x180)
+                                    g_simObjects[scanb].flags.b[0] |= 0x10;
+                            }
+                        }
+                    }
+                }
+                if (g_projectiles[slotd].speed < (sams[speci].maxSpeed >> 6) &&
+                    (frameTick & 1)) {
+                    g_projectiles[slotd].speed++;
+                    aimYa = g_projectiles[slotd].worldX;
+                }
+                if (modec == 4 || modec == 6 || modec == 5 || modec == 0x1C) {
+                    if (g_projectiles[slotd].targetLock == -1) {
+                        for (scanb = 0; scanb < g_storeDefCount; scanb++) {
+                            if (modec == 4 && g_planeTable[scanb].active == 0)
+                                continue;
+                            if (((modec == 5 || modec == 6) &&
+                                 (g_planeTable[scanb].flags & 8)) ||
+                                (modec != 5 && !(g_planeTable[scanb].flags & 8))) {
+                                acqk = samCanAcquireTarget(slotd, g_planeTable[scanb].mapX,
+                                                           g_planeTable[scanb].mapY, 0, modec);
+                                if (g_acqRange < beste && acqk != 0) {
+                                    aimYa = g_acqAimY;
+                                    beste = g_acqRange;
+                                    bestIdxa = scanb;
+                                    alt0k = 0;
+                                    lockedn = 1;
+                                }
+                            }
+                        }
+                    } else {
+                        scanb = g_projectiles[slotd].targetLock;
+                        acqk = samCanAcquireTarget(slotd, g_planeTable[scanb].mapX,
+                                                   g_planeTable[scanb].mapY, 0, modec);
+                        if (acqk != 0) {
+                            aimYa = g_acqAimY;
+                            beste = g_acqRange;
+                            bestIdxa = scanb;
+                            alt0k = 0;
+                            lockedn = 1;
+                        }
+                    }
+                }
+            }
+
+            if (lockedn != 0 && slotd < 8 &&
+                abs(g_acqAimY - g_projectiles[slotd].worldX) < 0x1000 &&
+                !(g_bombDamageMask & 1) && mapEvents[0].ttl == 0) {
+                if (modec <= 0 && (frameTick & 2))
+                    drawStatusItem(1, 0xC);
+                if (modec != 0 && !(frameTick & 2))
+                    drawStatusItem(0, 0xE);
+                if (!(frameTick & 3) &&
+                    (uint16)(g_projectiles[slotd].speed << 4) > beste)
+                    makeSound(0xA, 1);
+            }
+
+            if (aimYa != 0 && lockedn != 0) {
+                deltal = aimYa - g_projectiles[slotd].worldX;
+                if (slotd < 8)
+                    deltal = clampRange(deltal, -(g_missionStatus + 1) << 8,
+                                        (g_missionStatus + 1) << 8);
+                deltal = clampRange(deltal, -(sams[speci].turnRate << 7),
+                                    sams[speci].turnRate << 7);
+                g_projectiles[slotd].worldX += (deltal << 2) / g_frameRateScaling;
+                g_projectiles[slotd].worldZ = deltal << 1;
+                aimYa = computeBearing(((alt0k - g_projectiles[slotd].alt) >> 5) +
+                                       (abs((int16)beste) >> 3), abs((int16)beste));
+                bearn = aimYa - g_projectiles[slotd].worldY;
+                if (slotd < 8)
+                    bearn = clampRange(bearn, -(g_missionStatus + 1) << 9,
+                                       (g_missionStatus + 1) << 9);
+                bearn = clampRange(bearn, -(sams[speci].turnRate << 8),
+                                   sams[speci].turnRate << 8);
+                g_projectiles[slotd].worldY += (bearn << 2) / g_frameRateScaling;
+            } else {
+                if (g_projectiles[slotd].worldY > 0 && modec != 0x1E)
+                    g_projectiles[slotd].worldY -=
+                        (signOf(g_projectiles[slotd].worldY) << 0xB) / g_frameRateScaling;
+            }
+
+            if (modec == 0x1C && g_projectiles[slotd].worldY > -0x800)
+                g_projectiles[slotd].worldY = -0x800;
+            if (modec == 0x1E || g_projectiles[slotd].alt == 1) {
+                g_projectiles[slotd].worldY -= 0x800 / g_frameRateScaling;
+                if (g_projectiles[slotd].worldY < g_projectiles[slotd].targetRef)
+                    g_projectiles[slotd].worldY = g_projectiles[slotd].targetRef;
+            }
+
+            stepi = (cosMul(g_projectiles[slotd].worldY, g_projectiles[slotd].speed) << 2) /
+                    g_frameRateScaling;
+            g_projectiles[slotd].mapX += sinMul(g_projectiles[slotd].worldX, stepi);
+            g_projectiles[slotd].mapY -= cosMul(g_projectiles[slotd].worldX, stepi);
+            g_projectiles[slotd].alt += sinMul(g_projectiles[slotd].worldY,
+                                               (g_projectiles[slotd].speed << 7) /
+                                                   g_frameRateScaling);
+            g_projectiles[slotd].ttl--;
+            g_projClipFlag = 0;
+            if ((slotd & 3) == (frameTick & 3))
+                testWorldPosVisible(g_projectiles[slotd].mapX, g_projectiles[slotd].mapY,
+                                    g_projectiles[slotd].alt);
+
+            if (g_projectiles[slotd].alt < 0 || g_projClipFlag != 0) {
+                g_hitMapX = g_projectiles[slotd].mapX;
+                g_hitMapY = g_projectiles[slotd].mapY;
+                g_hitAlt = g_projectiles[slotd].alt;
+                g_hitEffectTimer = -3;
+                g_projectiles[slotd].ttl = 0;
+                strcpy(strBuf, missiles[g_projectiles[slotd].weaponIdx].longName);
+                if (modec == 0x1E || modec == 0x1D || modec == 0x1C) {
+                    {   /* pjbase is a codegen device: `register` commits si to the
+                         * slotd*24 byte offset region-wide, so the original's
+                         * [si+543x] index-form field accesses fall out instead of
+                         * a folded &projectiles[slotd].weaponIdx pointer. */
+                    register int16 pjbase = slotd * (int16)sizeof(struct Projectile);
+                    if (*(int16 *)((char *)g_projectiles + pjbase + 16) == 0x26) {
+                        goto cluster_imp;
+                    } else {
+                        makeSound(2, 2);
+                        strcat(strBuf, " promah ");
+                        storeIdxj = findStoreAtGrid(g_hitMapX, g_hitMapY);
+                        if (storeIdxj != -1 &&
+                            !(g_planeTable[storeIdxj].flags & 0x80)) {
+                            tileXc = (int16)(g_nearestTileObj->x >> 5);
+                            tileYc = -((int16)(g_nearestTileObj->y >> 5) - 0x8000);
+                            disto = rangeApprox(g_hitMapX - tileXc, g_hitMapY - tileYc);
+                            if (disto < (uint16)((getWeaponStat(
+                                                     *(int16 *)((char *)g_projectiles + pjbase + 18),
+                                                     storeIdxj) << 6) /
+                                                 (g_missionStatus + 2))) {
+                                destroyGroundTarget(storeIdxj);
+                                strcat(strBuf, " uni~toven ");
+                                strcat(strBuf,
+                                       missiles[*(int16 *)((char *)g_projectiles + pjbase + 18)].longName);
+                                g_hitEffectTimer = 8;
+                                g_hitAlt = 0;
+                            }
+                        }
+                        hudMessage(strBuf);
+                        pjbase = slotd * (int16)sizeof(struct Projectile);
+                        disto = rangeApprox(g_viewX_ - *(int16 *)((char *)g_projectiles + pjbase),
+                                            g_viewY_ - *(int16 *)((char *)g_projectiles + pjbase + 2)) +
+                                ((uint16)g_viewZ >> 5);
+                        if ((uint16)(g_missionStatus << 5) > disto) {
+                            bombTarget();
+                            strcpy(strBuf, "Porav. oskol");
+                        }
+                        goto impact_done;
+                    }
+                    }
+cluster_imp:
+                    foundk = 0;
+                    scanb = 0;
+                    do {
+                        disto = g_targetSlots[scanb].planeIndex;
+                        if ((uint16)rangeApprox(g_projectiles[slotd].mapX -
+                                                g_planeTable[disto].mapX,
+                                                g_projectiles[slotd].mapY -
+                                                g_planeTable[disto].mapY) < 0x100 &&
+                            g_targetSlots[scanb].state == 3 &&
+                            g_missionTick < g_missionTimeLimit) {
+                            hudMessage("  GRUZ DOSTAWLEN   ");
+                            markTargetReached(scanb);
+                            foundk = 1;
+                        }
+                    } while (++scanb < 2);
+                    if (foundk == 0)
+                        hudMessage("Plh sbros udar o grunt");
+                } else if (slotd >= 8 &&
+                           g_projectiles[slotd].ttl > g_frameRateScaling * 2) {
+                    strcat(strBuf, " udar o grunt");
+                    hudMessage(strBuf);
+                }
+            }
+impact_done:
+
+            if ((uint16)((abs(alt0k - g_projectiles[slotd].alt) >> 5) + beste) <
+                    (uint16)(g_projectiles[slotd].speed << 1) &&
+                lockedn != 0 && g_projectiles[slotd].ttl > g_frameRateScaling * 4) {
+                g_hitMapX = g_projectiles[slotd].mapX;
+                g_hitMapY = g_projectiles[slotd].mapY;
+                g_hitAlt = g_projectiles[slotd].alt;
+                g_hitEffectTimer = 8;
+                g_projectiles[slotd].ttl = g_frameRateScaling * 2;
+                if (slotd < 8) {
+                    if (mapEvents[0].ttl != 0)
+                        goto hit_done;
+                    strcpy(strBuf, "Porav. ");
+                    strcat(strBuf, sams[speci].name);
+                    hudMessage(strBuf);
+                    bombTarget();
+                    if (!(g_playerPlaneFlags & 0x1000))
+                        appendMapEvent(5, speci);
+                    notifyViewObj(slotd);
+                } else {
+                    if (modec == 7) {
+                        destroySimObject(bestIdxa);
+                    } else {
+                        g_projectiles[slotd].ttl = 0;
+                        if (getWeaponStat(g_projectiles[slotd].weaponIdx, bestIdxa) >
+                            randomRange(4))
+                            destroyGroundTarget(bestIdxa);
+                        else
+                            strcpy(strBuf, "Ne|ffektiw.");
+                        g_threatActiveTimer = g_threatTimerInit;
+                        g_threatRefX = g_hitMapX;
+                        g_threatRefY = g_hitMapY;
+                        g_threatRefZ = 0xBB8;
+                    }
+                    strcat(strBuf, " porav. ");
+                    strcat(strBuf, sams[speci].name);
+                    hudMessage(strBuf);
+                }
+            }
+hit_done:
+
+            if (slotd < 8 && g_projectiles[slotd].ttl != 0) {
+                g_projectiles[slotd].targetLock =
+                    readMapPixelColor(g_projectiles[slotd].mapX,
+                                      g_projectiles[slotd].mapY);
+                if (frameTick & 1)
+                    plotMapObject(g_projectiles[slotd].mapX, g_projectiles[slotd].mapY,
+                                  0xE);
+            }
+        }
     }
 }
 

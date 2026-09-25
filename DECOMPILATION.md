@@ -252,6 +252,21 @@ the *word lvalue* only when the operand is a plain `int16` lvalue:
 - A `register` var used for int16 array indexing still produces
   `mov bx,reg; arr[bx]`; byte-cast `*(charptr)` indexing uses the register
   directly (`[si+off]`).
+- When the original keeps `si = i*stride` as a **region-wide** index (bound
+  once, then reused `[si+base+off]` across calls and blocks), a plain
+  `arr[i].f` is not enough: if two uses hit the *same* field, MSC CSEs
+  `&arr[i].f` instead (`add si,arr+off`) and the merged recompute sites fall
+  back to `bx`. The fix is a **scoped `register` byte-offset local** —
+  `{ register int16 base = i*stride; *(int16*)((char*)arr + base + off) }` —
+  declared in a nested block so si is freed at its end and the extra home
+  slot overlaps the dead range instead of growing `sub sp`. Reassigning it
+  (`base = i*stride;` again) re-emits `mov ax,stride; imul var; mov si,ax` —
+  the same rematerialization the original performs after a call — while a
+  still-live register would have pushed the fresh value to `di`.
+  `updateThreatTargeting`'s impact block needed exactly this (test, both
+  `weaponIdx` reads, and the post-`hudMessage` recompute all `si`-bound;
+  the `cluster_imp` code sits *outside* the register scope so its own
+  `scanb*18` gets `si` back).
 
 ### Locals & the name hash
 
