@@ -37,6 +37,7 @@ extern struct { int16 lead[3]; struct MapTarget planes[74]; } g_planeTable;
 void drawHudViewLine(int16 x1, int16 y1, int16 x2, int16 y2); /* sub_18F38 */
 extern int16 g_hudVisible;         /* word_33D90 */
 extern int8  g_halfScaleRender;    /* byte_330EA */
+extern int8  g_drawPage;           /* byte_388CA */
 
 void drawTargetBox(int16 centerX, int16 centerY, int16 size, int16 mode) {
     int16 halfHeight, left, top, right, bottom;
@@ -63,6 +64,26 @@ void drawTargetBox(int16 centerX, int16 centerY, int16 size, int16 mode) {
         drawHudViewLine(centerX, bottom, left, centerY + (halfHeight >> 1));
         drawHudViewLine(left, centerY + (halfHeight >> 1), left, centerY - (halfHeight >> 1));
         drawHudViewLine(left, centerY - (halfHeight >> 1), centerX, top);
+    }
+}
+
+/* ==== seg000:0xc60c ==== */
+extern int16 g_targetLock;            /* word_351D8 — target-lock acquired flag */
+void drawFullscreenLine(int16 x1, int16 y1, int16 x2, int16 y2); /* sub_18D71 (egtacmap.c) */
+
+/* Draw the target-lock reticle: "Zahvat celi" label plus a + crosshair at
+ * (0xE4,0xA0).  cx/cy are stored then constant-folded into the line args. */
+void drawLockReticle(void) {
+    int16 cx, cy;
+    if (g_targetLock != 0 && g_hudVisible != 0) {
+        if (g_drawPage != 0) {
+            drawStringActivePage("Zahvat celi", 0xCE, 0x8E, 0x0E);
+        }
+        setDrawColor(0x0E);
+        cx = 0xE4;
+        cy = 0xA0;
+        drawFullscreenLine(cx - 0x0A, cy, cx + 0x0A, cy);
+        drawFullscreenLine(cx, cy - 0x08, cx, cy + 0x08);
     }
 }
 
@@ -184,7 +205,6 @@ extern uint8 colorLut[];              /* byte_2F85B base-3 */
 extern char  strBuf[];                /* 0x65E6 */
 extern char  g_itoaScratch[];         /* 0x9678 */
 
-extern int8  g_drawPage;
 extern int16 g_viewZ;
 int16 cosMul(int16, int16);                    /* sub_1D404 */
 int16 sinMul(int16, int16);                    /* sub_1D3EC */
