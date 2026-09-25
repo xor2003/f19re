@@ -60,6 +60,37 @@ extern struct { int16 lead[3]; struct MapTarget planes[74]; } g_planeTable;  /* 
 struct TargetSlot { int16 state; int16 pad[8]; };  /* 0x12 bytes, state@0 */
 extern struct TargetSlot g_targetSlots[];          /* @0x87B2 */
 
+struct SimObject {
+    int16 objType;      /* +0x00 */
+    uint16 posX;        /* +0x02 */
+    uint16 posY;        /* +0x04 */
+    int16  alt;         /* +0x06 */
+    int16  motion[8];   /* +0x08..+0x15 */
+    int16  spec;        /* +0x16 */
+    union { uint16 w; uint8 b[2]; } flags;  /* +0x18 */
+    int16  speed;       /* +0x1A */
+    int16  timer;       /* +0x1C */
+    int16  weaponType;  /* +0x1E */
+    int16  terrainColor;/* +0x20 */
+    int16  damage;      /* +0x22 */
+};                                    /* 36 bytes */
+extern struct SimObject g_simObjects[];    /* @0x8870 */
+struct ObjType { char name[30]; int16 kills; };      /* 32 bytes */
+extern struct ObjType g_objTypes[];                  /* @0x49D6 */
+extern int16 g_liveObjCount;        /* word_384FC */
+extern int16 g_selSimObj;           /* word_343C4 */
+extern int16 g_smokeSourceIdx;      /* word_343BE */
+extern int16 g_wreckX;              /* word_3837E */
+extern int16 g_wreckY;              /* word_38392 */
+extern int16 g_wreckAlt;            /* word_3845E */
+extern int16 g_wreckFallVel;        /* word_379B8 */
+extern int16 g_missionStage;        /* word_37622 */
+extern int16 g_extViewActive;       /* word_388C4 */
+extern int16 g_viewObjIdx;          /* word_343BA — externally-viewed object idx */
+extern int16 g_extViewReset;        /* word_35AE4 */
+void notifyViewObj(int16 idx);      /* sub_14C98 */
+void completeObjective(int16 n);    /* sub_17AAF */
+
 /* ==== seg000:0x57db ==== */
 void updateThreatAlert(void) {
     int16 planeIdx;
@@ -144,6 +175,37 @@ int16 samCanAcquireTarget(int16 slot, int16 targetX, int16 targetY, int16 target
     }
     g_acqRange = rng;
     return 1;
+}
+
+/* ==== seg000:0x7800 ==== */
+void destroySimObject(int16 idx) {
+    int16 evt;
+    if (!(g_simObjects[idx].flags.b[0] & 0x20)) {
+        g_objTypes[g_simObjects[idx].spec].kills++;
+        if (g_simObjects[idx].flags.w & 0x800)
+            --g_liveObjCount;
+        notifyViewObj(idx + 0x20);
+        if (g_selSimObj == idx)
+            g_selSimObj = -1;
+        g_simObjects[idx].flags.b[0] |= 0x20;
+        g_smokeSourceIdx = -1;
+        g_wreckX = g_simObjects[idx].posX;
+        g_wreckY = g_simObjects[idx].posY;
+        g_wreckAlt = g_simObjects[idx].alt;
+        g_wreckFallVel = 0x80;
+        evt = 3;
+        if (g_missionStage >= 5 && idx == 0) {
+            completeObjective(0);
+            evt |= 0x80;
+        }
+        appendMapEvent(evt, g_simObjects[idx].spec + (g_simObjects[idx].flags.w & 0x4000 ? 0x80 : 0));
+        if (g_simObjects[idx].speed == 0)
+            g_simObjects[idx].flags.w &= 0x1C1;
+    }
+    strcpy(strBuf, g_objTypes[g_simObjects[idx].spec].name);
+    makeSound(2, 2);
+    if (g_extViewActive == 1 && idx == g_viewObjIdx)
+        g_extViewReset = 1;
 }
 
 /* ==== seg000:0x7aaf ==== */

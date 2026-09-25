@@ -79,7 +79,7 @@ ports verified against the original binary.
 - seg003 setInt9Handler, seg000 installCBreakHandler: int21h/int9h handlers.
 - `start` (seg000:e880): DOS crt0.
 
-## Verified C ports so far (all MATCH — 92)
+## Verified C ports so far (all MATCH — 93)
 
 eg3dload.c(/Os):  load15Flt3d3
 stparse.c (/Ot):  replaceExtension
@@ -108,8 +108,8 @@ egtacmap.c(/Os):  readScreenPixel, readMapPixelColor, drawMapArc, drawMapLine,
                   drawFullscreenLine, drawScreenLineOnePage, fillRectBoth,
                   drawStringBothPages, drawNumber, cacheScopePanel,
                   restoreScopePanel, captureScopePanel, plotMapObject
-egcombat.c(/Os):  updateThreatAlert, markTargetReached, bombTarget,
-                  samCanAcquireTarget
+egcombat.c(/Os+/Oa): updateThreatAlert, markTargetReached, bombTarget,
+                  samCanAcquireTarget, destroySimObject
 egtarget.c(/Os+/Oa): drawTargetBox, drawLockReticle, drawTargetLabel,
                   buildRangeString, findStoreAtGrid, bearingToStore,
                   bearingToSimObject, computeTargetBearing,
