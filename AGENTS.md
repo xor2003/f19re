@@ -42,6 +42,10 @@ ports verified against the original binary.
 - Optimize on: `/Gs` + `/Os` or `/Ot` — never `/Od`. The choice is per-module
   and recorded in `tools/portcheck.py` `MODULE_FLAGS`; `/Os` vs `/Ot` shows on
   routines with early returns (shared vs inlined epilogue).
+- MSC 5.1 has no working `volatile` (accepted syntactically, ignored). Code
+  touching timer/interrupt-updated globals was likely shipped under `/Zi`
+  (debug) because optimized builds broke — if a routine resists matching under
+  `/Os` or `/Ot`, check whether it was ever optimized at all.
 - `/Oa` (assume no aliasing): needed where a global stays cached in a register
   across a pointer store — e.g. drawTargetView emits `push bx` not
   `push [gmem]` only under `/Oa`. Currently set on egtarget.c.
@@ -52,6 +56,17 @@ ports verified against the original binary.
   names — or brute-forcing names to hit buckets — reproduces the frame.
 - Far stream pointers: `p++; c=*p++` emits inc/bx/inc/es read pattern.
 - `x = -y + K` compiles to `neg ax; add ax,K` (use unary minus, not `K - y`).
+  But a bare `x = -x` emits `mov ax,[x]; neg ax; mov [x],ax`; the original's
+  `sub ax,ax; sub ax,[x]; mov [x],ax` needs `x = 0x10000 - x` (the constant
+  overflows to 0 — yes, really). f15se2 computeHudAttitude.
+- `v = v;` (self-assignment) evicts the compiler's cached register copy of a
+  value, forcing recomputation; likewise splitting `&&` chains into nested
+  `if`s makes MSC forget register-resident condition operands. Used to get
+  `bx` (not `di`) for `sams[i]` scaling in f15se2 fireAirThreat.
+- `register` at FUNCTION scope is unreliable ("now register, now you don't");
+  declaring `register int i` inside a NESTED `{}` scope instead frees si/di
+  for code outside it — f15se2 drawProjectionSphere. (The phantom-slot
+  register params in spawnSamThreat/drawWeaponRadarInfo are a different case.)
 - 16-bit `labs(x)` (no int32 cast) emits `cmp ax,0x7fff`; a `(int32)` cast
   emits `cwd` instead.
 - Deferred "cold" arm (`mov ax,K; jmp` merging BACKWARD into a shared tail):
