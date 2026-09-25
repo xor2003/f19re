@@ -257,6 +257,24 @@ compiled *without* `/Gs`.
   routine's shift opcode fixes the global's type (e.g. `g_viewX_`/`g_viewY_`
   are `uint16` where `shr` is used, `int16` where `sar`).
 
+### Signedness steers commutative-add folding
+
+For `posX = mul_result + memleaf`, MSC either folds the leaf
+(`add ax,[di+ofs]` — product stays in ax, sum in ax) or materialises it
+(`mov cx,[di+ofs]; add cx,ax` — sum in cx). Source order does **not** decide
+this — `a*b + m` and `m + a*b` emit identically. The decider is the leaf's
+*declared* signedness:
+
+- leaf `int16` → materialised in `cx` (`mov cx,[mem]; add cx,ax`).
+- leaf `uint16` → folded (`add ax,[mem]`).
+
+`spawnEnemyAircraft` (seg000:0x6ad2) is the case: `posX = g_northSouthSign*3
++ g_planeTable[objType].mapX` only emits `add ax,[di-0x7f36]` once
+`MapTarget.mapX/mapY` are `uint16`. So `add ax,[mem]` after `imul` proves the
+added field/global is unsigned even when no `shr`/`sar`/`mul` ever touches it.
+(A bare local or global *scalar* uint16/int16 leaf folds either way — the
+divergence shows on indexed `[reg+ofs]` operands.)
+
 ### 32-bit arithmetic
 
 `(int32)` ops emit the `__aNl*` helpers (`__aNlmul`, `__aNldiv`,

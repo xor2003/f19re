@@ -72,8 +72,8 @@ extern struct MapEvent mapEvents[];   /* [0] @0x340A0 */
 
 struct MapTarget {                 /* F19 layout, 16 bytes @0x80C8 */
     int16 objType;                 /* +0 */
-    int16 mapX;                    /* +2 */
-    int16 mapY;                    /* +4 */
+    uint16 mapX;                   /* +2 */
+    uint16 mapY;                   /* +4 */
     int16 active;                  /* +6 */
     int16 flags;                   /* +8  (was field02) */
     int16 alertLevel;              /* +A */
@@ -100,10 +100,14 @@ extern int16 g_enemyGroundRemaining; /* word_38500 */
 
 struct SimObject {
     int16 objType;      /* +0x00 */
-    uint16 posX;        /* +0x02 */
-    uint16 posY;        /* +0x04 */
+    int16 posX;         /* +0x02 */
+    int16 posY;         /* +0x04 */
     int16  alt;         /* +0x06 */
-    int16  motion[8];   /* +0x08..+0x15 */
+    int32  worldX;      /* +0x08 */
+    int32  worldY;      /* +0x0C */
+    union { int16 w; uint8 b[2]; } heading; /* +0x10 */
+    int16  pitch;       /* +0x12 */
+    union { int16 w; uint8 b[2]; } bank;    /* +0x14 */
     int16  spec;        /* +0x16 */
     union { uint16 w; uint8 b[2]; } flags;  /* +0x18 */
     int16  speed;       /* +0x1A */
@@ -113,7 +117,7 @@ struct SimObject {
     int16  damage;      /* +0x22 */
 };                                    /* 36 bytes */
 extern struct SimObject g_simObjects[];    /* @0x8870 */
-struct ObjType { char name[30]; int16 kills; };      /* 32 bytes */
+struct ObjType { char name[0x12]; int16 maxSpeed; int16 range; int16 pad[4]; int16 kills; };  /* 32 bytes */
 extern struct ObjType g_objTypes[];                  /* @0x49D6 */
 extern int16 g_liveObjCount;        /* word_384FC */
 extern int16 g_selSimObj;           /* word_343C4 */
@@ -159,6 +163,9 @@ extern int16 g_threatToneLevel;         /* word_343C2 — threat tone/arc color 
 extern int16 g_enemyThreatCount;        /* word_36E24 */
 extern int16 g_nearestThreatRange;      /* word_354CE */
 extern int16 g_enemyAlertFlag;          /* word_38502 */
+extern int16 g_northSouthSign;          /* word_37484 — theater N/S direction sign */
+extern int16 g_groundUnitCount;         /* word_384FE — live g_simObjects count */
+int16 readMapPixelColor(int16 x, int16 y);  /* sub_18BEA (egtacmap) */
 
 /* ==== seg000:0x505a ==== */
 void updateThreatSites(void) {
@@ -419,6 +426,44 @@ void spawnSamThreat(register int16 off) {
     strcat(strBuf, " pu}en");
     hudMessage(strBuf);
     updateThreatAlert();
+}
+
+/* ==== seg000:0x6ad2 ==== */
+void spawnEnemyAircraft(int16 slot, int16 objType) {
+    int16 spec;
+
+    spec = g_simObjects[slot].spec;
+    g_simObjects[slot].heading.w = (g_northSouthSign == 1) ? 0 : (int16)0x8000;
+    if (g_planeTable[objType].flags & 0x200) {
+        g_simObjects[slot].posX = g_northSouthSign * 3 + g_planeTable[objType].mapX;
+        g_simObjects[slot].posY = g_planeTable[objType].mapY - g_northSouthSign * 12;
+        g_simObjects[slot].alt = 140;
+        g_simObjects[slot].speed = 100;
+        g_simObjects[slot].heading.b[1] += 0xfc;
+    } else {
+        g_simObjects[slot].posX = g_planeTable[objType].mapX;
+        g_simObjects[slot].posY = 30 * g_northSouthSign + g_planeTable[objType].mapY;
+        g_simObjects[slot].alt = 12;
+        g_simObjects[slot].speed = 10;
+    }
+    g_simObjects[slot].worldX = (int32)(uint16)g_simObjects[slot].posX << 5;
+    g_simObjects[slot].worldY = (int32)(uint16)g_simObjects[slot].posY << 5;
+    g_simObjects[slot].pitch = 0;
+    g_simObjects[slot].bank.w = 0;
+    g_simObjects[slot].flags.w |= 0x403;
+    g_simObjects[slot].objType = objType;
+    g_simObjects[slot].timer = (int16)(((int32)g_objTypes[spec].range << 11) * g_frameRateScaling / g_objTypes[spec].maxSpeed);
+    g_simObjects[slot].terrainColor = readMapPixelColor(g_planeTable[objType].mapX, g_planeTable[objType].mapY);
+    if (g_selSimObj == -1) {
+        g_simObjects[slot].flags.b[1] &= 0xfe;
+    }
+    placeString(objType);
+    strcat(strBuf, "- ");
+    strcat(strBuf, g_objTypes[g_simObjects[slot].spec].name);
+    strcat(strBuf, "WZLET");
+    if (slot < g_groundUnitCount - 4) {
+        hudMessage(strBuf);
+    }
 }
 
 /* ==== seg000:0x7757 ==== */
