@@ -100,7 +100,7 @@ extern int16 g_enemyGroundRemaining; /* word_38500 */
 
 struct SimObject {
     int16 objType;      /* +0x00 */
-    int16 posX;         /* +0x02 */
+    uint16 posX;        /* +0x02 */
     int16 posY;         /* +0x04 */
     int16  alt;         /* +0x06 */
     int32  worldX;      /* +0x08 */
@@ -117,7 +117,7 @@ struct SimObject {
     int16  damage;      /* +0x22 */
 };                                    /* 36 bytes */
 extern struct SimObject g_simObjects[];    /* @0x8870 */
-struct ObjType { char name[0x12]; int16 maxSpeed; int16 range; int16 pad16; int16 modelId; int16 pad1A, pad1C; int16 kills; };  /* 32 bytes */
+struct ObjType { char name[0x12]; int16 maxSpeed; int16 range; int16 maneuverability; int16 modelId; int16 pad1A, pad1C; int16 kills; };  /* 32 bytes */
 extern struct ObjType g_objTypes[];                  /* @0x49D6 */
 extern int16 g_liveObjCount;        /* word_384FC */
 extern int16 g_selSimObj;           /* word_343C4 */
@@ -159,6 +159,27 @@ void drawGaugeBar(int16 val, int16 color, int16 x1, int16 x2);  /* sub_1877F */
 void cacheScopePanel(void);             /* sub_1A23F */
 void updateThreatAlert(void);           /* sub_157DB — defined below */
 void fireGroundThreat(int16 idx);       /* sub_15311 */
+int16 sinMul(int16 angle, int16 val);   /* sub_1D3EC */
+int16 cosMul(int16 angle, int16 val);   /* sub_1D404 */
+void  testWorldPosVisible(int16 x, int16 y, int16 z); /* sub_17E29 */
+void  fireAirThreat(int16 idx);         /* sub_1673D — defined below */
+void  spawnEnemyAircraft(int16 slot, int16 objType); /* sub_16AD2 — defined below */
+struct BulletTrack { int16 posX, posY, alt, velX, velY, velZ; }; /* stride 0xC */
+extern struct BulletTrack bulletTracks[]; /* @0x9BA6 */
+struct Particle { int16 posX, posY, alt, spin; };              /* stride 8 */
+extern struct Particle g_particles[];     /* @0x5260 */
+extern int16 g_maneuverTable[][8][8];     /* @0x52A2 — [skill][relBearing][aspect] */
+extern int16 g_bulletTrackCount;          /* word_373EC */
+extern int16 g_activeThreatCount;         /* word_351CC */
+extern int16 g_threatDisplayTtl;          /* word_35D38 */
+extern int16 g_closestThreatIndex;        /* word_385D2 */
+extern int16 g_hitMapX;                   /* word_38378 */
+extern int16 g_hitMapY;                   /* word_38384 */
+extern int16 g_hitAlt;                    /* word_3838A */
+extern int16 g_hitEffectTimer;            /* word_35AE2 */
+extern int16 g_smokeParticleSlot;         /* word_34110 */
+extern int16 g_storeDefCount;             /* word_3838E */
+extern int8  g_projClipFlag;              /* byte_32242 — set by testWorldPosVisible */
 extern int16 g_threatToneLevel;         /* word_343C2 — threat tone/arc color level */
 extern int16 g_enemyThreatCount;        /* word_36E24 */
 extern int16 g_nearestThreatRange;      /* word_354CE */
@@ -427,6 +448,348 @@ void spawnSamThreat(register int16 off) {
     strcat(strBuf, " pu}en");
     hudMessage(strBuf);
     updateThreatAlert();
+}
+
+/* ==== seg000:0x59a4 ==== */
+void updateObjects(void) {
+    int16 candBear, pitchReq, viewBrgK, aggr, toTgt, offBoresight, selTgt, maxRange,
+          hdgA, asp, e0, u0, best8, distToTgt, move, mode2, fireSlot, objIdx8, bVel,
+          scnIdx, pDelta, trackSlot3, tgtX4, deltaX9, deltaY9, rollC, horizMoveJ, tY,
+          smokeSlotM, tZ, color;
+
+    if (!(frameTick & 1) && g_smokeSourceIdx == -1)
+        g_particles[(frameTick >> 1) & 7].posX = 0;
+    bulletTracks[((frameTick >> 2) & 3) + g_bulletTrackCount].posX = 0;
+    g_enemyThreatCount = g_activeThreatCount;
+    g_activeThreatCount = 0;
+
+    for (objIdx8 = 0; objIdx8 < g_groundUnitCount; objIdx8++) {
+        if (g_simObjects[objIdx8].flags.b[0] & 1) {
+            g_threatSpec = g_simObjects[objIdx8].spec;
+            if ((g_simObjects[objIdx8].flags.b[0] & 2) && g_simObjects[objIdx8].speed != 0) {
+                if (g_detailLevel != 0)
+                    plotMapObject(g_simObjects[objIdx8].posX, g_simObjects[objIdx8].posY,
+                                  g_simObjects[objIdx8].terrainColor, 1);
+                mode2 = 0;
+                if (!((uint8)*(int16 *)&g_simObjects[objIdx8].flags & 4)) {
+                    if (g_threatActiveTimer != 0) {
+                        if (!(*(int16 *)&g_simObjects[objIdx8].flags & 0x140) ||
+                            g_threatActiveTimer > g_threatDisplayTtl) {
+                        tgtX4 = g_threatRefX;
+                        tY = g_threatRefY;
+                        tZ = g_threatRefZ;
+                        mode2 = 1;
+                        if (mapEvents[0].ttl != 0)
+                            goto padlock_target;
+                        goto got_target;
+                        }
+                    }
+                    mode2 = 3;
+                    if (g_simObjects[objIdx8].flags.w & 0x100) {
+                        if (g_selSimObj != -1) {
+                            tgtX4 = sinMul((objIdx8 & 7) * 0x800 + g_simObjects[g_selSimObj].heading.w - 0x1800,
+                                          g_simObjects[g_selSimObj].speed) +
+                                   g_simObjects[g_selSimObj].posX;
+                            tY = g_simObjects[g_selSimObj].posY -
+                                   cosMul((objIdx8 & 7) * 0x800 + g_simObjects[g_selSimObj].heading.w - 0x1800,
+                                          g_simObjects[g_selSimObj].speed);
+                            tZ = g_simObjects[g_selSimObj].alt + (objIdx8 & 7) * 0x40;
+                            goto set_target_alt;
+                        }
+                    }
+                    if (((uint8)(objIdx8 * 8) + (uint8)g_missionTick) & 0xbf)
+                        goto after_retarget;
+                    if (!(g_simObjects[objIdx8].flags.b[0] & 0x40)) {
+                        best8 = 0x7fff;
+                        viewBrgK = computeBearing(g_viewX_ - g_simObjects[objIdx8].posX,
+                                                     g_simObjects[objIdx8].posY - g_viewY_);
+                        for (scnIdx = 0; scnIdx < 8; scnIdx++) {
+                            selTgt = randomRange(g_storeDefCount) + 1;
+                            if (!(g_planeTable[selTgt].flags & 0x400)) {
+                                candBear = computeBearing(g_planeTable[selTgt].mapX - g_simObjects[objIdx8].posX,
+                                                             g_simObjects[objIdx8].posY - g_planeTable[selTgt].mapY);
+                                if (abs(viewBrgK - candBear) < best8) {
+                                    best8 = abs(viewBrgK - candBear);
+                                    g_simObjects[objIdx8].objType = selTgt;
+                                    if (-(g_missionStatus * 0x1000 - 0x4000) > best8)
+                                        break;
+                                }
+                            }
+                        }
+                        if ((uint16)rangeApprox(g_viewX_ - g_simObjects[objIdx8].posX,
+                                                g_viewY_ - g_simObjects[objIdx8].posY) >> 6 > 0x15e &&
+                            objIdx8 != 0) {
+                            g_simObjects[objIdx8].flags.w &= 0x1c1;
+                            g_simObjects[objIdx8].timer = 0;
+                        }
+                    }
+                after_retarget:
+                    selTgt = g_simObjects[objIdx8].objType;
+                    tgtX4 = g_planeTable[selTgt].mapX;
+                    tY = g_planeTable[selTgt].mapY;
+                    tZ = clampRange(g_viewZ + 1000, 5000, 20000);
+                set_target_alt:
+                    tZ = tZ;
+                    goto got_target;
+                padlock_target:
+                    tgtX4 = mapEvents[0].mapX;
+                    tY = mapEvents[0].mapY;
+                    tZ = clampRange(g_viewZ, 1000, 30000);
+                    goto got_target;
+                }
+                tgtX4 = g_planeTable[g_simObjects[objIdx8].objType].mapX;
+                if (g_simObjects[objIdx8].flags.w & 0x200) {
+                    tZ = g_simObjects[objIdx8].posX - tgtX4;
+                    tY = g_planeTable[g_simObjects[objIdx8].objType].mapY;
+                    tgtX4 = tgtX4 - tZ * 2;
+                    tZ = ((g_planeTable[g_simObjects[objIdx8].objType].flags + abs(tZ)) & 0x200)
+                               ? 140 : 12;
+                } else {
+                    tY = g_planeTable[g_simObjects[objIdx8].objType].mapY + g_northSouthSign * 0x280;
+                    tZ = rangeApprox(g_simObjects[objIdx8].posX - tgtX4,
+                                       g_simObjects[objIdx8].posY - tY) + 2000;
+                }
+                mode2 = 2;
+            got_target:
+                if (mode2 == 3 && (g_simObjects[objIdx8].flags.b[0] & 8)) {
+                    tgtX4 = g_viewX_;
+                    tY = g_viewY_;
+                    tZ = g_simObjects[objIdx8].alt;
+                }
+                deltaX9 = tgtX4 - g_simObjects[objIdx8].posX;
+                deltaY9 = tY - g_simObjects[objIdx8].posY;
+                toTgt = computeBearing(deltaX9, -deltaY9);
+                distToTgt = rangeApprox(deltaX9, deltaY9);
+                pitchReq = computeBearing((tZ - g_simObjects[objIdx8].alt) >> 5, distToTgt);
+                pitchReq = clampRange(pitchReq, -0x2000, 0x1000);
+                if (mode2 == 1 && (uint16)distToTgt < 0x400) {
+                    g_activeThreatCount++;
+                    if ((uint16)distToTgt < 0x200 && !(frameTick & 3) &&
+                        g_threatActiveTimer > g_threatDisplayTtl &&
+                        abs(g_simObjects[objIdx8].heading.w - toTgt) < 0x400 &&
+                        abs(g_simObjects[objIdx8].pitch - pitchReq) < 0x400) {
+                    trackSlot3 = ((frameTick >> 2) & 3) + g_bulletTrackCount;
+                    bVel = 0xe0 / g_frameRateScaling;
+                    bulletTracks[trackSlot3].velZ = sinMul(-g_simObjects[objIdx8].pitch, bVel) << 5;
+                    bVel = cosMul(g_simObjects[objIdx8].pitch, bVel);
+                    bulletTracks[trackSlot3].velX = sinMul(g_simObjects[objIdx8].heading.w, bVel);
+                    bulletTracks[trackSlot3].velY = -cosMul(g_simObjects[objIdx8].heading.w, bVel);
+                    bulletTracks[trackSlot3].posX = g_simObjects[objIdx8].posX;
+                    bulletTracks[trackSlot3].posY = g_simObjects[objIdx8].posY;
+                    bulletTracks[trackSlot3].alt = g_simObjects[objIdx8].alt;
+                    }
+                after_missile_table:
+                    aggr = clampRange((objIdx8 & 3) + g_missionStatus, 0, 2);
+                    if (objIdx8 == 0)
+                        aggr = 1;
+                    hdgA = g_simObjects[objIdx8].heading.w;
+                    if (abs(g_simObjects[objIdx8].bank.w) < 0x4000)
+                        hdgA += g_simObjects[objIdx8].bank.w >> 2;
+                    offBoresight = (toTgt - hdgA) >> 13 & 7;
+                    hdgA = g_ourHead;
+                    if (abs(g_ourRoll) < 0x4000)
+                        hdgA += g_ourRoll >> 1;
+                    asp = (((g_simObjects[objIdx8].heading.w - hdgA) >> 13) + 4) & 7;
+                    {
+                        register int16 maneuver;
+                        maneuver = g_maneuverTable[aggr][offBoresight][asp];
+                        rollC = (maneuver & 0xf) << 12;
+                        if (maneuver == 0x100) {
+                            pitchReq = 0x6000;
+                            rollC = ((frameTick >> 8) & 8) * 0x1000 - 0x4000;
+                        }
+                    }
+                    if (g_maneuverTable[aggr][offBoresight][asp] == 0x200) {
+                        pitchReq = (int16)0xa000;
+                        rollC = (((frameTick >> 8) & 8) - 4) * -0x1000;
+                    }
+                    if (pitchReq == (int16)0xa000) {
+                        if (-((g_simObjects[objIdx8].pitch >> 3) - 3000) > g_simObjects[objIdx8].alt)
+                            pitchReq = g_simObjects[objIdx8].pitch + 0x1000;
+                    }
+                    if (abs(g_simObjects[objIdx8].bank.w) > 0x4000) {
+                        pitchReq = rollC = 0;
+                    }
+                    goto after_accel;
+                }
+                rollC = clampRange(toTgt - g_simObjects[objIdx8].heading.w, -0x2000, 0x2000) << 1;
+                if (mode2 == 1 && g_missionStatus * 2 < g_enemyThreatCount)
+                    rollC = 0x3000;
+            after_accel:
+                if (mode2 == 1 && (g_planeTable[g_closestThreatIndex].flags & 0x400) &&
+                    g_nearestThreatRange < 0x780)
+                    rollC = 0x3000;
+                rollC = clampRange(rollC, -g_objTypes[g_threatSpec].maneuverability * 0x1000,
+                                     g_objTypes[g_threatSpec].maneuverability * 0x1000);
+                rollC = clampRange(rollC - g_simObjects[objIdx8].bank.w,
+                                     -g_objTypes[g_threatSpec].maneuverability * 256,
+                                     g_objTypes[g_threatSpec].maneuverability * 256);
+                if (g_simObjects[objIdx8].flags.w & 0x400) {
+                    if (g_simObjects[objIdx8].speed < 150) {
+                        g_simObjects[objIdx8].pitch = 0;
+                    } else {
+                        g_simObjects[objIdx8].pitch += 0x100;
+                    }
+                    rollC = 0;
+                    if (g_simObjects[objIdx8].speed < g_objTypes[g_threatSpec].maxSpeed) {
+                        g_simObjects[objIdx8].speed += 40 / g_frameRateScaling;
+                    } else if (g_simObjects[objIdx8].alt > 300) {
+                        g_simObjects[objIdx8].flags.b[1] &= 0xfb;
+                    }
+                }
+                if (g_simObjects[objIdx8].flags.b[0] & 0x30)
+                    rollC = 0x400;
+                if (((uint8)objIdx8 & 3) == ((uint8)frameTick & 3)) {
+                    testWorldPosVisible(g_simObjects[objIdx8].posX,
+                                        g_simObjects[objIdx8].posY,
+                                        g_simObjects[objIdx8].alt);
+                    if (g_projClipFlag != 0) {
+                        g_simObjects[objIdx8].flags.b[1] |= 0x20;
+                    } else {
+                        g_simObjects[objIdx8].flags.b[1] &= 0xdf;
+                    }
+                }
+                if (g_simObjects[objIdx8].flags.w & 0x2000)
+                    pitchReq = 0x3000;
+                g_simObjects[objIdx8].bank.w += (rollC << 2) / g_frameRateScaling;
+                g_simObjects[objIdx8].heading.w += (g_simObjects[objIdx8].bank.w >> 3) / g_frameRateScaling;
+                pDelta = pitchReq - g_simObjects[objIdx8].pitch;
+                if (g_simObjects[objIdx8].flags.b[0] & 0x20) {
+                    pDelta = -0x200;
+                    if (!(frameTick & 3)) {
+                        smokeSlotM = (frameTick >> 1) & 7;
+                        g_particles[smokeSlotM].posX = g_simObjects[objIdx8].posX;
+                        g_particles[smokeSlotM].posY = g_simObjects[objIdx8].posY;
+                        g_particles[smokeSlotM].alt = g_simObjects[objIdx8].alt;
+                        g_particles[smokeSlotM].spin = randomRange(32) << 11;
+                        g_smokeParticleSlot = smokeSlotM;
+                    }
+                }
+            no_smoke:
+                if (g_simObjects[objIdx8].pitch < 0 &&
+                    -(sinMul(g_simObjects[objIdx8].pitch, 2000) - 200) > g_simObjects[objIdx8].alt &&
+                    (g_simObjects[objIdx8].flags.w & 0x220) == 0)
+                    pDelta = 0x400;
+                pDelta = clampRange(pDelta, -0x400, 0x400);
+                g_simObjects[objIdx8].pitch += (pDelta << 2) / g_frameRateScaling;
+                if (abs(g_simObjects[objIdx8].pitch) > 0x4000) {
+                    g_simObjects[objIdx8].heading.b[1] += (char)0x80;
+                    g_simObjects[objIdx8].bank.b[1] += (char)0x80;
+                    g_simObjects[objIdx8].pitch = (int16)0x8000 - g_simObjects[objIdx8].pitch;
+                }
+                g_simObjects[objIdx8].flags.b[0] &= 0xef;
+                move = (int16)((uint32)((uint16)(0x8000 - g_simObjects[objIdx8].pitch) *
+                                           (int32)g_simObjects[objIdx8].speed) >> 15);
+                move -= abs(sinMul(g_simObjects[objIdx8].bank.w, move)) >> 1;
+                if (mode2 == 1 && g_enemyThreatCount <= g_missionStatus)
+                    move += move >> 1;
+                move = move * 4 / g_frameRateScaling;
+                move >>= 2;
+                horizMoveJ = cosMul(g_simObjects[objIdx8].pitch, move);
+                g_simObjects[objIdx8].worldX += sinMul(g_simObjects[objIdx8].heading.w, horizMoveJ);
+                g_simObjects[objIdx8].worldY -= cosMul(g_simObjects[objIdx8].heading.w, horizMoveJ);
+                g_simObjects[objIdx8].alt += sinMul(g_simObjects[objIdx8].pitch, move);
+                g_simObjects[objIdx8].posX = (int16)(g_simObjects[objIdx8].worldX >> 5);
+                g_simObjects[objIdx8].posY = (int16)(g_simObjects[objIdx8].worldY >> 5);
+                if (g_simObjects[objIdx8].alt > 30000)
+                    g_simObjects[objIdx8].pitch = 0;
+            alt_ok:
+                if (g_simObjects[objIdx8].alt < 0) {
+                    g_simObjects[objIdx8].flags.w &= (objIdx8 != 0) ? 0x1c1 : 0;
+                    g_hitMapX = g_simObjects[objIdx8].posX;
+                    g_hitMapY = g_simObjects[objIdx8].posY;
+                    g_hitAlt = g_simObjects[objIdx8].alt;
+                    g_hitEffectTimer = -8;
+                    if (objIdx8 == g_airTargetLock)
+                        g_airTargetLock = -1;
+                }
+                if ((uint16)distToTgt < 0x10 && mode2 == 2) {
+                    placeString(g_simObjects[objIdx8].objType);
+                    strcat(strBuf, "- ");
+                    strcat(strBuf, g_objTypes[g_threatSpec].name);
+                    if (g_simObjects[objIdx8].flags.w & 0x200) {
+                        g_simObjects[objIdx8].flags.b[1] |= 0x10;
+                        strcat(strBuf, "posadka");
+                    } else {
+                        g_simObjects[objIdx8].flags.b[1] |= 2;
+                        strcat(strBuf, "v|let");
+                    }
+                    if (objIdx8 < g_groundUnitCount - 4)
+                        hudMessage(strBuf);
+                }
+                if (g_simObjects[objIdx8].flags.w & 0x1000) {
+                    g_simObjects[objIdx8].bank.w = g_simObjects[objIdx8].pitch = 0;
+                    g_simObjects[objIdx8].heading.w = (g_northSouthSign == 1) ? 0 : (int16)0x8000;
+                    g_simObjects[objIdx8].alt = (g_planeTable[g_closestThreatIndex].flags & 0x200) ? 140 : 12;
+                    if (g_simObjects[objIdx8].speed > 0) {
+                        g_simObjects[objIdx8].speed -= 60 / g_frameRateScaling;
+                    } else {
+                        g_simObjects[objIdx8].flags.w &= 0x1c1;
+                        if (objIdx8 == 0 && g_missionStage >= 5)
+                            g_simObjects[objIdx8].flags.w = 0;
+                    }
+                    if (objIdx8 >= g_groundUnitCount - 4 && g_simObjects[objIdx8].speed < 100) {
+                        g_simObjects[objIdx8].flags.w &= 0x1c1;
+                        g_simObjects[objIdx8].flags.w |= 0x406;
+                    }
+                }
+                if (--g_simObjects[objIdx8].timer == 0) {
+                    g_simObjects[objIdx8].flags.b[0] |= 4;
+                    best8 = 0x7fff;
+                    for (scnIdx = 3; scnIdx < g_planeScanCount; scnIdx++) {
+                        if ((g_planeTable[scnIdx].flags & 0x101) == 1) {
+                            smokeSlotM = rangeApprox(g_simObjects[objIdx8].posX - g_planeTable[scnIdx].mapX,
+                                                    g_simObjects[objIdx8].posY - g_planeTable[scnIdx].mapY);
+                            if (smokeSlotM < best8) {
+                                g_simObjects[objIdx8].objType = scnIdx;
+                                best8 = smokeSlotM;
+                            }
+                        }
+                    }
+                }
+                g_simObjects[objIdx8].terrainColor =
+                    readMapPixelColor(g_simObjects[objIdx8].posX, g_simObjects[objIdx8].posY);
+                if (g_simObjects[objIdx8].flags.b[0] & 2) {
+                    color = (commData->gfxModeNum == 0 && (frameTick & 1)) ? 8 : 0xc;
+                    if (objIdx8 == 0 && g_missionStage >= 5 && (frameTick & 1))
+                        color = 0;
+                    if (g_detailLevel != 0 || objIdx8 == 0)
+                        plotMapObject(g_simObjects[objIdx8].posX, g_simObjects[objIdx8].posY,
+                                      color, 1);
+                    fireSlot = (((uint8)objIdx8 & 8) >> 3) + (objIdx8 & 7) * 2;
+                    if (frameTick % (g_frameRateScaling << 4) == fireSlot * g_frameRateScaling &&
+                        !(g_simObjects[objIdx8].flags.b[0] & 0x20))
+                        fireAirThreat(objIdx8);
+                }
+            } else {
+                if (((uint8)(g_missionTick >> ((uint8)g_difficultyTier + 4)) & 7) == ((uint8)objIdx8 & 7)) {
+                    if (objIdx8 < g_groundUnitCount - 4) {
+                        if (objIdx8 != 0) {
+                            selTgt = randomRange(g_planeScanCount);
+                            if (g_threatActiveTimer > g_threatDisplayTtl ||
+                                (g_simObjects[objIdx8].flags.b[0] & 0x80)) {
+                                if ((g_planeTable[selTgt].flags & 0x181) == 1) {
+                                    if (g_simObjects[objIdx8].spec == g_planeTable[selTgt].alertLevel) {
+                                        deltaX9 = g_threatRefX - g_planeTable[selTgt].mapX;
+                                        deltaY9 = g_threatRefY - g_planeTable[selTgt].mapY;
+                                        distToTgt = (uint16)rangeApprox(deltaX9, deltaY9) >> 6;
+                                        maxRange = g_objTypes[g_threatSpec].range;
+                                        if ((uint16)maxRange > (uint16)distToTgt) {
+                                            spawnEnemyAircraft(objIdx8, selTgt);
+                                            notifyViewObj(selTgt + 0x40);
+                                            frameTick += 0x20;
+                                            notifyViewObj(objIdx8 + 0x20);
+                                            frameTick -= 0x20;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
 }
 
 /* ==== seg000:0x673d ==== */

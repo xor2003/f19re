@@ -224,6 +224,11 @@ int16 g_engineThrust;                   /* word_33588 */
 int16 g_lodDistBase, g_lodDistScale, g_lodDistNear, g_lodDistFar;  /* word_2F870..876 */
 int16 g_particles[32];                  /* @0x5260 struct Particle[8] ring */
 int16 g_smokeSourceIdx, g_smokeParticleSlot;  /* word_343BE / word_34110 */
+int16 g_maneuverTable[3*8*8];             /* @0x52A2 — [skill][relBearing][aspect] */
+int16 g_activeThreatCount;                /* word_351CC */
+int16 g_closestThreatIndex;               /* word_385D2 */
+int16 g_hitMapX, g_hitMapY, g_hitAlt;     /* word_38378/38384/3838A */
+int16 g_hitEffectTimer;                   /* word_35AE2 */
 
 
 uint8 g_aircraftModels[4];
@@ -288,6 +293,7 @@ int16 placeString(int16 idx) { return 0; }   /* sub_14D03: build target name */
 int16 g_enemyGroundRemaining;        /* word_38500 — live ground-target count */
 void hwPortWrite(int16 cmd) { }        /* sub_14CAC noop */
 void redrawTacMap(int16 x, int16 y) { }   /* sub_187EC */
+void testWorldPosVisible(int16 x, int16 y, int16 z) { } /* sub_17E29: sets g_projClipFlag */
 void sub_19979(void) { } void sub_19E4F(void) { } void sub_1A0BD(void) { }
 void sub_1A300(void) { } void nullsub_3(void) { }
 void projectVertex(int32 x, int32 y, int32 z) { }       /* sub_11372 */

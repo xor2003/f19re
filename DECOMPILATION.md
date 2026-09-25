@@ -217,6 +217,28 @@ compiled *without* `/Gs`.
   operand must stay in `al` (read the just-stored global under `/Oa`, which
   forwards `al`), with `ax` free for the bool — a `uint8` temp var adds a
   stack slot and shifts the result to `cx`.
+- `&&`-chains and nested `if`s keep an index CSE (`si = idx*stride`) live
+  across every gated block between the set and the use; splitting the same
+  tests into separate `if ... goto label` statements forces MSC to recompute
+  `idx*stride` into `bx` at each gate. `updateObjects` needed the gun gates
+  and the smoke guards as nested/`&&` conditions for exactly this reason.
+
+### Union members vs plain word lvalues
+
+`mov si,[bx+flags]; mov ax,si; test al,4 ... test ax,0x140` — the original
+loads a flags word into `si`, copies it to `ax` so the byte test can use
+`al`, then reuses `ax` for a later word test. The `mov ax,si` binds `ax` to
+the *word lvalue* only when the operand is a plain `int16` lvalue:
+
+- `u.w & K` where `w` is a `union { uint16 w; uint8 b[2]; }` member, and a
+  `register` local copy of `u.w`, both keep the second test on `si` — the
+  `mov ax,si` copy binds `ax` to the byte-cast node instead.
+- A plain `int16 flags` field, or a word lvalue manufactured by dereferencing
+  a casted address — `*(int16*)&u.flags` or `*(int16*)&u.flags.b[0]` — binds
+  `ax` to the word, so `(uint8)*(int16*)&u.flags & 4` emits `test al,4` and
+  `*(int16*)&u.flags & 0x140` emits `test ax,0x140` (byte-exact in
+  `updateObjects`'s tail dispatcher). Verified `fireGroundThreat` shows the
+  same pattern: `*(uint8*)&g_planeTable[i].flags` on a plain `int16` field.
 
 ### Addressing modes
 

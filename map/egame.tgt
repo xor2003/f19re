@@ -1,19 +1,22 @@
 #
 # Size of the executable's load module covered by the map
 #
-Size 787
+Size 8627
 #
-# Discovered segments, one per line, syntax is "SegmentName Type(CODE/DATA/STACK) Address"
+# Discovered segments, one per line, syntax is "SegmentName Type(CODE/DATA/STACK) Address [default]"
+# The default data segment is assumed to be used by all routines which don't have data segment overrides.
+# If no default segment is specified, the first one will be used as default.
 #
 Code1 CODE 0000
 #
-# Discovered routines, one per line, syntax is "RoutineName: Segment Type(NEAR/FAR) Extents [R/U]Block1 [R/U]Block2... [annotation1] [annotation2]..."
+# Discovered routines, one per line, syntax is "RoutineName: Segment Type(NEAR/FAR) Extents[DS] [R/U]Block1[DS] [R/U]Block2[DS]... [annotation1] [annotation2]..."
 # The routine extents is the largest continuous block of instructions attributed to this routine and originating
 # at the location determined to be the routine's entrypoint.
 # Blocks are offset ranges relative to the segment that the routine belongs to, specifying address as belonging to the routine.
 # Blocks starting with R contain code that was determined reachable, U were unreachable but still likely belong to the routine.
 # The routine blocks may cover a greater area than the extents if the routine has disconected chunks it jumps into.
-# Possible annotation types:
+# The extents block and/or the individual routine blocks can have an optional data segment override which is the name
+# of the data segment assumed to be selected within that block.# Possible annotation types:
 # ignore - ignore this routine in processing (comparison, signature extraction etc.)
 # complete - this routine was completely reconstructed into C, only influences stat display when printing map
 # external - is part of an external library (e.g. libc), ignore in comparison, don't count as uncompleted in stats
@@ -21,8 +24,9 @@ Code1 CODE 0000
 # assembly - routine was written in assembly, don't include in comparisons by default
 # duplicate - routine is a duplicate of another
 #
-rangeApprox: Code1 NEAR 0010-0070 R0010-0070
-addTileEntry: Code1 NEAR 01f0-01f5 R01f0-01f5
+addTileEntry: Code1 NEAR 10fe-113e R10fe-113e
+spawnEnemyAircraft: Code1 NEAR 2d8c-2f1d R2d8c-2f1d
+applyGravityFall: Code1 NEAR 36ad-36ba R36ad-36ba
 #
 # Discovered variables, one per line, syntax is "VariableName: Segment VAR OffsetWithinSegment"
 #
