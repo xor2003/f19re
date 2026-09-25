@@ -938,12 +938,36 @@ string Analyzer::symbolName(const Executable &exe, const Instruction &i) const {
         const Routine r = exe.map().findByEntrypoint(i.op1.farAddr());
         return r.name;
     }
-    // byte offsets implausible?
+    // TODO: byte offsets implausible?
     else if (operandIsMemWithWordOffset(i.op1.type) || operandIsMemWithWordOffset(i.op2.type)) {
         const Word offset = operandIsMemWithWordOffset(i.op1.type) ? i.op1.wordValue() : i.op2.wordValue();
-        string ret;
-        for (const Variable &v : exe.map().getVariables(offset)) ret += (ret.empty() ? "" : "|") + v.name;
-        return ret;
+        // find data segment of current block; either a custom override, or the executable's default segment
+        Segment varSeg;
+        // handle segment override prefixes
+        switch (i.prefix) {
+        case PRF_SEG_CS:
+            // cs override, can determine from instruction address
+            varSeg = exe.map().findSegment(i.addr.segment);
+            break;
+        case PRF_SEG_ES:
+        case PRF_SEG_SS:
+            // values of es and ss are unknown, unable to determine symbol name
+            return {};
+        case PRF_NONE:
+        case PRF_SEG_DS:
+        default:
+            // no seg override or ds, search for data segment
+            varSeg = !compareBlock.segName.empty() ? exe.map().findSegment(compareBlock.segName) : exe.map().defaultSegment();
+            break;
+        }
+        if (varSeg.type == Segment::SEG_NONE) {
+            verbose("Unable to find segment for memory offset " + hexVal(offset) + ", instruction address " + i.addr.toString() + ", compare block: " + compareBlock.toString());
+            return {};
+        }
+        Address varAddr{varSeg.address, offset};
+        Variable v = exe.map().getVariable(varAddr, true);
+        if (v.addr.isValid()) return v.symbol();
+        else debug("Unable to find variable for address " + varAddr.toString());
     }
     return {};
 }
@@ -1607,6 +1631,7 @@ bool Analyzer::findDuplicates(const SignatureLibrary signatures, Executable &tgt
     // store relationship between reference routines and their duplicates
     map<RoutineIdx, Duplicate> duplicates;
     Size ignoreCount = 0, ignoreTotalInstr = 0, missCount = 0, sigTotalInstr = 0, tgtTotalInstr = 0, missTotalInstr = 0;
+    bool collision = false;
     // iterate over routines to find duplicates for
     for (Size sigIdx = 0; sigIdx < signatures.signatureCount(); ++sigIdx) {
         const SignatureItem &sig = signatures.getSignature(sigIdx);
@@ -1674,6 +1699,7 @@ bool Analyzer::findDuplicates(const SignatureLibrary signatures, Executable &tgt
             for (auto& [otherSigIdx, otherDup] : duplicates) {
                 if (otherDup.dupIdx != curDup.dupIdx || otherSigIdx == sigIdx) continue;
                 // target routine which we just identified as a duplicate of the currently processed reference exe routine was already marked a duplicate of another
+                collision = true;
                 Size clearIdx;
                 const SignatureItem &otherSig = signatures.getSignature(otherSigIdx);
                 // current duplicate better than other, clear other
@@ -1734,9 +1760,8 @@ bool Analyzer::findDuplicates(const SignatureLibrary signatures, Executable &tgt
     }
     else info("No duplicates found, ignored " + to_string(ignoreCount) + " routines", OUT_RED);
 
-    // a collision is only real if a target routine is still claimed by more than one signature
-    // after resolution - cleared duplicates may leave collision candidates that no longer apply
-    if (uniqueDups < dupCount) {
+    if (collision) {
+        assert(uniqueDups < dupCount);
         warn("Some routines were found as duplicates of more than one routine. This is possible, but unlikely. Try using a longer minimum routine size and/or lower distance threshold to avoid false positives.", OUT_BRIGHTRED);
     }
 
