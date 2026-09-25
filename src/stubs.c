@@ -180,9 +180,9 @@ int16 g_panelLabelOn;
 int16 *g_pageFront, *g_pageBack;
 union REGS regs;
 
-void drawClippedLineRegion(int16 a,int16 b,int16 c,int16 d,int16 e,int16 f,int16 g,int16 h,int16 i) {}
-
 void FAR fillSpanRect(int16 a,int16 b,int16 c,int16 d,int16 e) {}
+uint8 far gfx_getDrawPage(void) { return 0; }
+void  far gfx_setDrawPage(int16 a) {}
 void FAR gfx_drawString(int16 *a,const char *b,int16 c) {}
 
 int16 *g_pageOffscreen;

@@ -191,6 +191,33 @@ compiled *without* `/Gs`.
   computed *before* the map check, si is already committed and the map row
   falls to `di` naturally.
 
+### `/Oa` enables cross-call register CSE (no home slot)
+
+- When the original holds a *computed value* in `si`/`di` across a `call far`
+  and there is **no** extra `sub sp` slot and **no** register-param init-load,
+  the value is a committed **register CSE**, not a `register` var. Write the
+  expression twice (once per block) and let MSC common-subexpression it.
+- This only fires under **`/Oa` (assume no aliasing)**: without it MSC
+  recomputes the expression in the second block (`sub sp` shrinks, no
+  `push si`/`push di`). With `/Oa`, MSC promotes the repeated
+  `sxN-clipZ` into callee-saved `si`/`di` (so it survives the call) and spills
+  the next two CSEs to anonymous stack temps.
+- `drawClippedLineRegion` (seg000:0x8e12) is the canonical case: four
+  `g_lineXX = sN-clipZ` stores appear in the page-1 block and again in the
+  dual-page block. Under `/Os` alone MSC recomputed them (`sub sp,4`, no
+  si/di); under `/Os /Oa` it kept `sx1-clipL`→`si`, `sy1-clipT`→`di`, and
+  spilled `sx2-clipL`/`sy2-clipT` to `[bp-6]`/`[bp-8]` — byte-exact.
+- This is how the routine needed **no** `register` keyword and **no** named
+  coord locals at all: just `int16 clipH, clipW` plus the repeated
+  expressions. Adding `/Oa` to a module is safe only after re-verifying every
+  sibling (here `egui.c` moved `/Os`→`/Os /Oa`; all siblings still matched).
+- Related bool lowering: a `uint8` comparison against `0`/`1` that feeds an
+  argument lowers to `sbb ax,ax; neg|inc ax` only when written as `x == 0` /
+  `x != 0` — `x < 1`/`x >= 1` produce a `jnb`/`jae` branch instead. And the
+  operand must stay in `al` (read the just-stored global under `/Oa`, which
+  forwards `al`), with `ax` free for the bool — a `uint8` temp var adds a
+  stack slot and shifts the result to `cx`.
+
 ### Addressing modes
 
 - `g_projectiles[slot]` (struct, size 24) → `mov ax,24; imul [bp-var]; mov si,ax`

@@ -266,3 +266,40 @@ void drawViewportLine(int16 x1, int16 y1, int16 x2, int16 y2) {
     drawClipLineGlobal();
     gfx_nop23();
 }
+
+uint8 far gfx_getDrawPage(void);            /* sub_2F10B */
+void  far gfx_setDrawPage(int16 page);      /* sub_2F070 */
+
+/* ==== seg000:0x8e12 ==== */
+void drawClippedLineRegion(int16 sx1, int16 sy1, int16 sx2, int16 sy2,
+                           int16 clipL, int16 clipR, int16 clipT, int16 clipB, int16 both) {
+    int16 clipH, clipW;
+
+    clipW = clipR - clipL + 1;
+    clipH = clipB - clipT + 1;
+    gfx_setBlitOffset(gfx_calcRowAddr(clipL, clipT));
+    g_clipMaxX = clipW - 1;
+    g_clipMaxY = clipH - 1;
+    gfx_setColor(g_vpParms->f[2]);
+    g_lineX1 = sx1 - clipL;
+    g_lineY1 = sy1 - clipT;
+    g_lineX2 = sx2 - clipL;
+    g_lineY2 = sy2 - clipT;
+    drawClipLineGlobal();
+    gfx_nop23();
+    if (both != 0) {
+        g_drawPage = gfx_getDrawPage();
+        gfx_setDrawPage(g_drawPage == 0);
+        gfx_setColor(g_vpParms->f[2]);
+        g_lineX1 = sx1 - clipL;
+        g_lineY1 = sy1 - clipT;
+        g_lineX2 = sx2 - clipL;
+        g_lineY2 = sy2 - clipT;
+        drawClipLineGlobal();
+        gfx_setDrawPage(g_drawPage != 0);
+        gfx_nop23();
+    }
+    g_clipMaxX = 0x13F;
+    g_clipMaxY = 0xC7;
+    gfx_setBlitOffset(0);
+}

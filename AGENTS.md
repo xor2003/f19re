@@ -79,15 +79,16 @@ ports verified against the original binary.
 - seg003 setInt9Handler, seg000 installCBreakHandler: int21h/int9h handlers.
 - `start` (seg000:e880): DOS crt0.
 
-## Verified C ports so far (all MATCH — 91)
+## Verified C ports so far (all MATCH — 92)
 
 eg3dload.c(/Os):  load15Flt3d3
 stparse.c (/Ot):  replaceExtension
 enfile.c  (/Ot):  loadFileNear, loadFileSection, writeFileSection
-egui.c    (/Ot):  loadColorPalette, drawMapMarkerBox, projectMapPoint,
-                  blitGaugeSprite, drawModelPoint, drawViewportLine,
+egui.c(/Os+/Oa):  loadColorPalette, drawMapMarkerBox, projectMapPoint,
+                  blitGaugeSprite, blitSprite, drawModelPoint, drawViewportLine,
                   resFileOpen, resFileCreate, resFileClose, resFileRead,
-                  resFileReadFar, resFileWrite
+                  resFileReadFar, resFileWrite, drawStatusBar, formatMissionClock,
+                  formatTwoDigit, updateHudGauge, drawClippedLineRegion
 eg3dmap.c (/Ot):  buildVertexSignMask, computeTileBounds, process3dg,
                   drawMapTileObject, drawMapTiles, worldToTileIndex,
                   aspectScaleY, projectModelVertices, drawNearestTileObject,
