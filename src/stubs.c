@@ -198,6 +198,7 @@ struct { int16 lead[3]; struct { int16 active; int16 f02; int16 alertLevel; int1
 struct { int16 state; int16 pad[8]; } g_targetSlots[4];
 int16 g_waypointNameBase;
 void *g_nearestTileObj;
+int16 g_rotMatrix[9];                 /* @0x80B6 — 3x3 camera/view rotation matrix */
 struct { int16 mapX,mapY,u4,type,ttl,uA; } mapEvents[4];
 void appendMapEvent(int16 a, int16 b) {}
 

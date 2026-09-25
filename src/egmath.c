@@ -171,6 +171,21 @@ int16 readAxisInput(int16 axisIdx) {
     return value;
 }
 
+/* ==== seg000:0xc95f ==== */
+extern int16 g_rotMatrix[];           /* @0x80B6 — 3x3 camera/view rotation matrix (flat) */
+
+/* One component of the world->view rotation: dot(vector, matrix column i).
+ * Returns a 32-bit fixed-point result in dx:ax.  Each axis term is a Q14
+ * fixed multiply sign-extended to 32 bits and accumulated. */
+int32 matVecDotAxis(int16 i, int16 a, int16 b, int16 c, register int16 off) {
+    int32 acc;
+    off = i * 2;
+    acc = (int32)fixedMulQ14(*(int16 *)((char *)g_rotMatrix + off), a);
+    acc += (int32)fixedMulQ14(*(int16 *)((char *)g_rotMatrix + off + 6), c);
+    acc += (int32)fixedMulQ14(*(int16 *)((char *)g_rotMatrix + off + 12), b);
+    return acc;
+}
+
 /* ==== seg000:0xcc7e ==== */
 extern int8  g_drawPage;              /* byte_388CA */
 extern int16 *g_pageFront;            /* word_34646 */

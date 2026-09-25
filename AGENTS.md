@@ -79,7 +79,7 @@ ports verified against the original binary.
 - seg003 setInt9Handler, seg000 installCBreakHandler: int21h/int9h handlers.
 - `start` (seg000:e880): DOS crt0.
 
-## Verified C ports so far (all MATCH — 73)
+## Verified C ports so far (all MATCH — 84)
 
 eg3dload.c(/Os):  load15Flt3d3
 stparse.c (/Ot):  replaceExtension
@@ -95,7 +95,9 @@ eg3dmap.c (/Ot):  buildVertexSignMask, computeTileBounds, process3dg,
                   scaleCoordToLod
 eg3dview.c(/Ot):  setup3DTransform, renderMapTerrain, setupViewport,
                   setViewRotation, setViewPosition
-egmath.c  (/Os):  rangeApprox, isqrt, readAxisInput, drawWorldObject
+egmath.c  (/Os):  sinMul, cosMul, computeBearing, rangeApprox, clampRange,
+                  clampValue, signExtendByte, signOf, seedRng, randomRange,
+                  isqrt, readAxisInput, matVecDotAxis, drawWorldObject
 egflight.c(/Os):  applyRotationDelta, computeAttitudeAngles, signedRatio16,
                   valueToAngle, complementAngle, rebuildOrientation,
                   waitForKeyPress
