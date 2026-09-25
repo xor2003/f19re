@@ -98,6 +98,37 @@ ports verified against the original binary.
 - Inside a deferred chunk, which arm MSC emits forward vs backward isn't fixed
   by `?:` polarity — try `if (c) A else B` vs `if (!c) B else A` to flip the
   deferred arm (`jnz` vs `jz`). drawMissionObjectives `WTORI`/`OSNOWN.` select.
+- Boolean-from-comparison is branchless: `(x == NULL)` → `cmp ax,1; sbb cx,cx;
+  neg cx`. Write as nested assignment in the condition, e.g.
+  `if ((arr[i] = ((h = fopen(p,"rb")) == NULL))) count--;` — keeps values in
+  registers, avoids the store-then-load a named temp forces.
+- Compiler scratch slots: `[bp-x]` stores that appear "from nowhere" are often
+  MSC temporaries, NOT source variables. If a store looks impossible to order,
+  remove the explicit variable/assignment and write the bare expression —
+  `(a<<5) - b` — the compiler allocates its own stack temp in the right spot.
+- Assignment chaining reuses partial results across widths: for mixed 8/16/32b
+  zero-init `f1E = f1F = f16 = f1A = f1D = f1C = 0` — ORDER matters (brute-force
+  it) and makes MSC carry 0 through al/ax/dx instead of `mov [x],0` per field.
+- Whole-struct assignment `a[i+1] = a[i]` → `rep movsw` intrinsic (size is a
+  compile-time const). A far-pointer argument is one DX:AX arg, not two words —
+  declare `func(uint8 far *p)` so `func(ptr+off)` pushes seg+off correctly.
+- Signedness flips `cmp` operand direction too: `uint16 vs int16` local changes
+  `cmp [es:bx],ax` vs `cmp ax,[es:bx]` (which operand lands in ax).
+- Loop-condition assignments: `do { if ((v=f()) != 4) break; } while
+  ((v=f()+4) == 8)` puts the call+store at the loop bottom; `while (v=g, true)
+  switch(...)` uses the comma operator to run an assignment in the test slot.
+- `for(;;) switch(x){...}` WITHOUT braces around the switch emits the
+  `jmp short` to the bottom-tested loop; bracing the switch removes it.
+  Shared case-tail code = `goto label` placed INSIDE the last case.
+- Code dedup across switch cases: identical code written in EACH case gets
+  coalesced by MSC into one block that later cases jump into mid-block — write
+  the repeated code redundantly, don't factor it out with goto.
+- Non-orthogonality: later code affects earlier emission — a `return` vs
+  `break` can drop a `les bx` reload; fixing a LATER mismatch can change an
+  earlier jump to near (jnz+jmp) when a short no longer reaches.
+- `/Oi` folds libc calls into intrinsics: memcpy → `rep movsw` (+`adc cx,cx;
+  rep movsb` for odd tails — MSC 5.1 doesn't eliminate the tail even when the
+  count is known-even; that residual may be genuinely unmatchable).
 
 ## Routines that are asm in the original (do NOT port)
 
