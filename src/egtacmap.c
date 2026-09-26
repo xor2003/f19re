@@ -1036,3 +1036,54 @@ void drawTargetInfoPanel(void) {
     g_pageFront[1] = 2;
     g_pageBack[1] = 2;
 }
+
+/* ==== seg000:0xa8bb ==== */
+struct ObjType { char name[0x12]; int16 maxSpeed; int16 range; int16 maneuverability;
+                 int16 modelId; int16 pad1A, pad1C; int16 kills; };  /* 32 bytes */
+extern struct ObjType g_objTypes[];              /* @0x49D6 */
+
+void drawAirTargetInfoPanel(void) {
+    int16 specIdx, type, row;
+
+    if ((uint8)g_airTargetLock & 0x80)
+        return;
+    if (g_hudVisible == 0)
+        return;
+    g_pageFront[1] = 4;
+    g_pageBack[1] = 4;
+    drawPanelText(2, "Dannye", 1);
+    loadColorPalette(0);
+    g_camSavedHead = g_ourHead;
+    g_camSavedRoll = g_ourRoll;
+    g_ourHead = g_ourRoll = 0;
+    g_extViewPitch = 0xFF40;
+    specIdx = g_simObjects[g_airTargetLock].spec;
+    drawTargetView(g_objTypes[specIdx].pad1A, g_viewX_, g_viewY_ - 0x64,
+                   g_viewZ, 0x6000, 0, 0x1000, 2, 1);
+    gfx_copyRect(g_drawPage, 0xB0, 0x7C, 1 - g_drawPage, 0xB0, 0x7C, 0x68, 0x48);
+    g_ourHead = g_camSavedHead;
+    g_ourRoll = g_camSavedRoll;
+    strcpy(g_nameBuf, g_objTypes[specIdx].name);
+    strcat(g_nameBuf, g_objTypes[specIdx].name + 7);
+    drawPanelGridText(2, 0xA, 1, g_nameBuf, 0xF);
+    row = 6;
+    if (g_simObjects[g_airTargetLock].weaponType != 0) {
+        strcpy(g_nameBuf, "6 ");
+        strcat(g_nameBuf, sams[g_simObjects[g_airTargetLock].weaponType].name);
+        strcat(g_nameBuf, " raket");
+        drawPanelGridText(2, 1, row++, g_nameBuf, 0xF);
+        strcpy(g_nameBuf, "Dalxn. raket - ");
+        strcat(g_nameBuf, itoa(sams[g_simObjects[g_airTargetLock].weaponType].lockRange,
+                               g_itoaScratch, 10));
+        strcat(g_nameBuf, " km");
+        drawPanelGridText(2, 1, row++, g_nameBuf, 0xF);
+    }
+    strcpy(g_nameBuf, "Maks skor. ");
+    strcat(g_nameBuf, itoa(g_objTypes[specIdx].maxSpeed, g_itoaScratch, 10));
+    strcat(g_nameBuf, " M/^");
+    drawPanelGridText(2, 1, row++, g_nameBuf, 7);
+    type = g_objTypes[specIdx].modelId;
+    drawWeaponRadarInfo(type, row);
+    g_pageFront[1] = 2;
+    g_pageBack[1] = 2;
+}
