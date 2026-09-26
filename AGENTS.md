@@ -98,6 +98,10 @@ ports verified against the original binary.
 - Inside a deferred chunk, which arm MSC emits forward vs backward isn't fixed
   by `?:` polarity — try `if (c) A else B` vs `if (!c) B else A` to flip the
   deferred arm (`jnz` vs `jz`). drawMissionObjectives `WTORI`/`OSNOWN.` select.
+- A guarded call that FALLS THROUGH into a second call is sequential
+  statements, not if/else: `if (!c) callA; callB;` — MSC defers callA's body
+  early, and `jnz` jumps backward to callB which then runs in both paths.
+  redrawTacMap loop2 (planeIndex call + always-run viewIndex call).
 - Boolean-from-comparison is branchless: `(x == NULL)` → `cmp ax,1; sbb cx,cx;
   neg cx`. Write as nested assignment in the condition, e.g.
   `if ((arr[i] = ((h = fopen(p,"rb")) == NULL))) count--;` — keeps values in
@@ -154,7 +158,7 @@ ports verified against the original binary.
 - seg003 setInt9Handler, seg000 installCBreakHandler: int21h/int9h handlers.
 - `start` (seg000:e880): DOS crt0.
 
-## Verified C ports so far (all MATCH — 160)
+## Verified C ports so far (all MATCH — 161)
 
 eg3dload.c(/Os):  load3DAll, load3D3, load3DT, load3DG, printError
                   strcpyFromDot, load15Flt3d3
@@ -189,7 +193,8 @@ egframe.c(/Os+/Oa):updateHudGauge, countermeasures, tickWeaponSlots
                   moveNearFar, setCommWorldbufPtr
 egtacmap.c(/Os+/Oa):projectWorldPoint, clearStatusPanel, renderHudFrame
                   updatePanelMode, drawPanelModeText, updateStatusPanel
-                  initTacMapView, drawGaugeBar, zoomIn, zoomOut
+                  initTacMapView, drawGaugeBar, redrawTacMap
+                  zoomIn, zoomOut
                   mapXToScreen, mapYToScreen, plotMapObject
                   readMapPixelColor, drawMapArc, drawMapLine
                   drawFullscreenLine, drawScreenLineOnePage

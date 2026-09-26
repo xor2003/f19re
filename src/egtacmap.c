@@ -88,7 +88,7 @@ extern char  g_itoaScratch[];        /* @0x9678 */
 extern char  g_hudMessageBuf[];      /* @0x958C */
 extern int16 g_hudMsgTimer;          /* word_346EC */
 extern int16 g_inputDisabled;        /* word_33D8C */
-struct CommData { int8 pad72[0x72]; int16 setupUseJoy; };
+struct CommData { int8 pad72[0x72]; int16 setupUseJoy; int8 pad74[4]; int16 gfxModeNum; };
 extern struct CommData FAR *commData;    /* dword_38B10 */
 struct MissileSpec { int16 weaponIdx; int16 ammo; };
 extern struct MissileSpec missleSpec[];  /* @0x4F00 */
@@ -360,6 +360,54 @@ void drawGaugeBar(int16 val, int16 color, int16 x1, int16 x2) {
         fillRectBoth(x1 + 0x9A, 0x7B, x2 + 0x9A, 0x7B - val / 2);
     if (val > 0)
         fillRectBoth(x1 + 0x9A, 0xAD - val / 2, x2 + 0x9A, 0xAD);
+}
+
+/* ==== seg000:0x87ec ==== */
+extern int16 g_storeDefCount;    /* word_3838E */
+extern int16 *g_mapTerrainMode;  /* word_3468E */
+extern int16 *g_pageOffscreen;   /* word_34676 */
+struct TargetSlot { int16 state; int16 planeIndex; int16 viewIndex; int16 flags;
+                    int16 seedNoise; int16 pad[4]; };      /* 0x12 bytes */
+extern struct TargetSlot g_targetSlots[];                  /* @0x87B2 */
+void far gfx_setFadeSteps(int16 n);   /* sub_2F15B */
+void resetSimObjectLocks(void);       /* sub_14BC8 */
+void cacheScopePanel(void);           /* sub_1A23F */
+void restoreScopePanel(void);         /* sub_1A26C */
+void far gfx_copyRect(int16 src, int16 sx, int16 sy, int16 dst, int16 dx, int16 dy, int16 w, int16 h); /* sub_2F0FC */
+void redrawTacMap(int16 centerX, int16 centerY) {
+    int16 i, j, sx, sy, n, modeFlg;
+    g_mapMode = 0;
+    if (g_hudVisible == 0)
+        return;
+    drawPanelText(1, "KAR", 0);
+    i = 0x68 << (9 - g_mapZoomLevel);
+    g_mapCenterX = clampRange(sinMul(g_ourHead, 0x8000 >> g_mapZoomLevel) + centerX, i, 0x7fff - i);
+    i = (0x48 << (9 - g_mapZoomLevel)) / 3 * 4;
+    g_mapCenterY = clampRange(centerY - cosMul(g_ourHead, 0x8000 >> g_mapZoomLevel), i, 0x7fff - i);
+    loadColorPalette(commData->gfxModeNum ? 0 : 3);
+    gfx_setFadeSteps(0x13);
+    renderMapTerrain(g_mapTerrainMode, g_mapCenterX / 2, -(g_mapCenterY / 2 - 0x4000), 9 - g_mapZoomLevel);
+    gfx_setFadeSteps(g_viewParamsFar[0x1C] < 2 ? 0xC : 0x10);
+    modeFlg = commData->gfxModeNum == 0;
+    for (i = 1; i < g_storeDefCount; i++) {
+        if (g_planeTable[i].active != 0 && (*(uint8 *)&g_planeTable[i].flags & 0x84) == 4)
+            plotMapObject(g_planeTable[i].mapX, g_planeTable[i].mapY,
+                          (*(uint8 *)&g_planeTable[i].flags & 2 || modeFlg) ? 0 : 8, 1);
+    }
+    for (i = 0; i < 2; i++) {
+        if (!(g_playerPlaneFlags & (0x4000 >> i)))
+            plotMapObject(g_planeTable[g_targetSlots[i].planeIndex].mapX,
+                          g_planeTable[g_targetSlots[i].planeIndex].mapY,
+                          modeFlg ? 0 : 0xD, 1);
+        plotMapObject(g_planeTable[g_targetSlots[i].viewIndex].mapX,
+                      g_planeTable[g_targetSlots[i].viewIndex].mapY, 0xA, 1);
+    }
+    if ((char)gfx_getDrawPage() == 0)
+        cacheScopePanel();
+    else
+        gfx_copyRect(*g_pageBack, 0x28, 0x7C, *g_pageOffscreen, 0x28, 0x7C, 0x68, 0x48);
+    restoreScopePanel();
+    resetSimObjectLocks();
 }
 
 /* ==== seg000:0x8a1b ==== */
@@ -671,9 +719,6 @@ extern int16 g_missionTimeLimit;       /* word_384C6 */
 extern int16 g_missionTick;            /* word_354C0 */
 extern int16 g_liveObjCount;           /* word_384FC */
 extern int16 g_enemyGroundRemaining;   /* word_38500 */
-struct TargetSlot { int16 state; int16 planeIndex; int16 viewIndex; int16 flags;
-                    int16 seedNoise; int16 pad[4]; };      /* 0x12 bytes */
-extern struct TargetSlot g_targetSlots[];                  /* @0x87B2 */
 void buildStoreName(int16 i);                              /* sub_14D03 */
 void formatMissionClock(uint16 time);                      /* sub_19DA3 */
 

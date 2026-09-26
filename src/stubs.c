@@ -308,7 +308,8 @@ void notifyViewObj(int16 idx) { }      /* sub_14C98: hwPortWrite view-target cmd
 int16 placeString(int16 idx) { return 0; }   /* sub_14D03: build target name */
 int16 g_enemyGroundRemaining;        /* word_38500 — live ground-target count */
 void hwPortWrite(int16 cmd) { }        /* sub_14CAC noop */
-void redrawTacMap(int16 x, int16 y) { }   /* sub_187EC */
+void far gfx_setFadeSteps(int16 n) { }    /* sub_2F15B */
+int16 *g_mapTerrainMode;                  /* word_3468E */
 void testWorldPosVisible(int16 x, int16 y, int16 z) { } /* sub_17E29: sets g_projClipFlag */
 void sub_19979(void) { } void sub_19E4F(void) { } void sub_1A0BD(void) { }
 void sub_1A300(void) { } void nullsub_3(void) { }
