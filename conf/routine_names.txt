@@ -106,3 +106,175 @@ routine_15  setupOverlaySlots # seg000:03b2  overlay slot-descriptor copy (asm)
 routine_14  getOverlayLoadSeg # seg000:02b4  DOS exec 4B03h overlay load/mem probe (asm)
 routine_27  restoreCbreakHandler # seg000:1ca6
 routine_33  setupDac          # seg000:1bb4  int10h AX=1012 DAC block set (asm)
+# --- classification pass: Code1 asm helpers ---
+routine_157 cosine            # seg000:1c1d  asm cos lookup: +0x4000 into sinInterp (stays asm)
+routine_245 sinInterp         # seg000:1c39  shared sin/cos table interp core (asm)
+routine_235 sineFar           # seg000:1c58  far shim -> sinInterpB (asm)
+routine_315 cosineFar         # seg000:1c5c  far shim -> cosineB (asm)
+routine_367 cosineB           # seg000:1c60  +0x4000 bias into sinInterpB (asm)
+routine_322 sinInterpB        # seg000:1c64  second sin-table interp core (asm)
+routine_31  getIntVector      # seg000:1cb7  ds:0 [si] -> bx=off,ax=seg fetch (asm)
+routine_73  gameLoopBody      # seg000:1cde  noreturn main game loop (asm)
+routine_75  readBiosTick      # seg000:1fb3  int1Ah AH=0 into tick globals (asm)
+routine_344 biosTickLo        # seg000:1fe2  int1Ah -> ax=low tick (asm)
+routine_72  initTimerState    # seg000:2073  cli-guarded timer state init (asm)
+routine_370 nullsub3          # seg000:a5c7  ret stub (asm)
+routine_78  nullsub4          # seg000:e6ae  ret stub (asm)
+routine_6   nullsub1          # seg000:0268  ret stub (asm)
+routine_5   nullsub2          # seg000:0269  ret stub (asm)
+routine_10  crtPad0           # seg000:0000  16 zero bytes before _main
+# --- classification pass: MSC 5.1 CRT/libc (IDA FLIRT + SLIBCE byte match) ---
+routine_4   __cinit           # seg000:e932  CRT init: dosver, env walk, setargv/envp
+routine_8   _exit             # seg000:e9f6
+routine_9   __exit            # seg000:ea0d
+routine_30  __ctermsub        # seg000:ea52
+routine_13  initterm          # seg000:ea7f  near init/term proc-table walker (asm)
+routine_12  inittermfar       # seg000:ea8e  far init/term proc-table walker (asm)
+routine_2   __FF_MSGBANNER    # seg000:eaa2
+routine_57  __chkstk          # seg000:eac8
+routine_29  __nullcheck       # seg000:eade
+routine_11  __NMSG_TEXT       # seg000:ecfc
+routine_3   __NMSG_WRITE      # seg000:ed27
+routine_54  __maperror        # seg000:edb2
+routine_76  dosmaperr         # seg000:edb8  sets _doserrno + errno from DOS err (asm)
+routine_69  _fclose           # seg000:ede6
+routine_65  _fopen            # seg000:eed2
+routine_67  _fread            # seg000:eefa
+routine_92  __filbuf          # seg000:f0e0
+routine_94  __freebuf         # seg000:f1a0
+routine_112 __getbuf          # seg000:f1ce
+routine_87  __openfile        # seg000:f23a
+routine_93  _fflush           # seg000:f332
+routine_86  __getstream       # seg000:f3a0
+routine_95  _close            # seg000:f3da
+routine_110 _open             # seg000:f474
+routine_191 __cXENIXtoDOSmode # seg000:f607
+routine_91  _read             # seg000:f618
+routine_113 _write            # seg000:f6f6
+routine_196 writeBlock        # seg000:f79c  _write inner int21h AH=40h block write (asm)
+routine_195 _stackavail       # seg000:f81e
+routine_114 __nfree           # seg000:f830  near-heap free (IDA unknown_libname_1)
+routine_194 __nmalloc         # seg000:f842  near-heap alloc (IDA unknown_libname_2)
+routine_286 __amalloc         # seg000:f88b  arena-based alloc (asm)
+routine_349 __amexpand        # seg000:f96e
+routine_348 __amlink          # seg000:f9a8
+routine_285 __amallocbrk      # seg000:f9ca
+routine_347 _brkctl           # seg000:f9ea
+routine_372 brkctlFindSeg     # seg000:fa58  _brkctl heap-segment table search (asm)
+routine_96  _strcat           # seg000:faae
+routine_42  _strcpy           # seg000:faee
+routine_127 _strlen           # seg000:fb20
+routine_97  _itoa             # seg000:fb3c
+routine_144 _kbhit            # seg000:fb58
+routine_89  _getch            # seg000:fb6c
+routine_28  _int86            # seg000:fb84
+routine_70  _movedata         # seg000:fc02
+routine_68  _segread          # seg000:fc20
+routine_192 _strupr           # seg000:fc44
+routine_90  _memcpy           # seg000:fc66
+routine_116 _abs              # seg000:fcf2
+routine_345 _srand            # seg000:fd08
+routine_244 _rand             # seg000:fd1a
+routine_98  _remove           # seg000:fd40  dos\\unlink.asm
+routine_145 __bios_keybrd     # seg000:fd4e
+routine_153 __aNldiv          # seg000:fd62
+routine_150 __aNlmul          # seg000:fdfe
+routine_63  __aNlshl          # seg000:fe32
+routine_151 __aNlshr          # seg000:fe3e
+routine_358 __aNNalshl        # seg000:fe4a  ptr-mode <<= wrapper (IDA unknown_libname_3)
+routine_359 __aNNalshr        # seg000:fe6a  ptr-mode >>= wrapper (IDA unknown_libname_4)
+routine_325 __aNuldiv         # seg000:fe8a
+routine_154 __aNulshr         # seg000:feec
+# --- classification pass: seg001 3D/clip pipeline (asm, f15 egseg1 twins) ---
+routine_373 installDivZeroHandler   # seg001:00b5  save+install int0 vector (asm)
+routine_375 installDivZeroVector    # seg001:00d9  restore saved int0 vector (asm)
+routine_291 drawFlatHorizon         # seg001:060e  flag set + call renderHorizonSky (asm)
+routine_355 storeObjTransformByOpcode # seg001:09d8  opcode&3 indexed transform store (asm)
+routine_293 transformAndCullObjectFar # seg001:09e9  arg->cx/bx/bp + transformAndCullObject (asm)
+routine_368 advanceModelPointerLod  # seg001:09fc  si=modelptr + skipDisplayListByLod (asm)
+routine_299 renderSortedListFar     # seg001:0a18  far shim -> renderSortedList (asm)
+routine_369 rotatePoint3dFar        # seg001:0b6c  reg args + rotatePoint3d (asm)
+routine_290 transformModelVerticesFar # seg001:0d7c  far shim -> transformModelVertices (asm)
+routine_385 transformVertexListThunk # seg001:116a  si=modelptr + projectModelEdges (asm)
+routine_125 projectModelEdgesFar    # seg001:12d2  4-arg shuffle -> projectModelEdges (asm)
+routine_387 transposeOrientationMatrix # seg001:153d  3x3 transpose (asm)
+routine_246 multiplyMatrix3x3Far    # seg001:155c  3-arg shuffle -> multiplyMatrix3x3 (asm)
+routine_386 drawModelDisplayList    # seg001:1700  si=modelptr + renderPrimitiveList (asm)
+routine_388 testVisibilityMask      # seg001:1b46  flag + lodsw & mask (asm)
+routine_238 clipLineFar             # seg001:1c4a  call clipLineCohenSutherland; retf (asm)
+routine_221 drawClipLineGlobal      # seg001:1c4e  reg saves + clipLineCohenSutherland (asm)
+routine_204 flushSpanDirtyRect      # seg001:1e28  reg-convention overlay call (asm)
+routine_203 resetScanlineSpans      # seg001:1e3e  far shim -> resetScanlineSpansImpl (asm)
+routine_205 clipAndRasterizeEdge    # seg001:1fc0  reg saves + clipAndRasterizeEdgeImpl (asm)
+# --- classification pass: seg002 gauges + joystick (asm, f15 egseg2 twins) ---
+routine_104 drawInstrumentGaugesFar # seg002:0006  call drawInstrumentGauges; retf (asm)
+routine_23  setupInstrumentLayoutFar # seg002:000a  call setupInstrumentLayout; retf (asm)
+routine_163 drawInstrumentGauges2Far # seg002:000e  call drawInstrumentGauges2; retf (asm)
+routine_36  setupInstrumentLayout   # seg002:0994  gauge layout globals init (asm)
+routine_251 drawInstrumentGauges2   # seg002:09a8  second instrument-panel renderer (asm)
+routine_162 initJoystickCalibration # seg002:0bde  calibrate center + axis extremes (asm)
+routine_250 copyJoySample           # seg002:0bec  copy axis read into calib slots (asm)
+routine_148 readCalibratedJoystick  # seg002:0bff  read both axes calibrated (asm)
+routine_242 readJoyAxis             # seg002:0c0e  axis-read worker (asm)
+routine_243 scaleJoyAxis            # seg002:0c54  axis delta scaling + clamp (asm)
+routine_26  _copyJoystickData       # seg002:0cc5  copy joy block to es:di (asm)
+routine_17  _restoreJoystickData    # seg002:0cd7  restore joy block from arg (asm)
+# --- classification pass: seg003 ---
+routine_50  restoreInt9Handler      # seg003:005e  cli; write int9 vector from CS-stored (asm)
+# --- classification pass: seg004 reserved BSS/overlay area (all zeros, not code) ---
+routine_34   bss4_01ba      # seg004:0x01ba  reserved zero fill (not code)
+routine_226  bss4_01bf      # seg004:0x01bf  reserved zero fill (not code)
+routine_231  bss4_01c4      # seg004:0x01c4  reserved zero fill (not code)
+routine_233  bss4_01c9      # seg004:0x01c9  reserved zero fill (not code)
+routine_232  bss4_01ce      # seg004:0x01ce  reserved zero fill (not code)
+routine_193  bss4_01d3      # seg004:0x01d3  reserved zero fill (not code)
+routine_239  bss4_01d8      # seg004:0x01d8  reserved zero fill (not code)
+routine_227  bss4_01f1      # seg004:0x01f1  reserved zero fill (not code)
+routine_19   bss4_01f6      # seg004:0x01f6  reserved zero fill (not code)
+routine_317  bss4_01fb      # seg004:0x01fb  reserved zero fill (not code)
+routine_320  bss4_0200      # seg004:0x0200  reserved zero fill (not code)
+routine_319  bss4_0205      # seg004:0x0205  reserved zero fill (not code)
+routine_316  bss4_020a      # seg004:0x020a  reserved zero fill (not code)
+routine_234  bss4_0214      # seg004:0x0214  reserved zero fill (not code)
+routine_300  bss4_0232      # seg004:0x0232  reserved zero fill (not code)
+routine_236  bss4_0237      # seg004:0x0237  reserved zero fill (not code)
+routine_220  bss4_023c      # seg004:0x023c  reserved zero fill (not code)
+routine_237  bss4_0241      # seg004:0x0241  reserved zero fill (not code)
+routine_56   bss4_0246      # seg004:0x0246  reserved zero fill (not code)
+routine_55   bss4_024b      # seg004:0x024b  reserved zero fill (not code)
+routine_229  bss4_0255      # seg004:0x0255  reserved zero fill (not code)
+routine_228  bss4_025a      # seg004:0x025a  reserved zero fill (not code)
+routine_202  bss4_025f      # seg004:0x025f  reserved zero fill (not code)
+routine_230  bss4_0264      # seg004:0x0264  reserved zero fill (not code)
+routine_121  bss4_0269      # seg004:0x0269  reserved zero fill (not code)
+routine_311  bss4_0273      # seg004:0x0273  reserved zero fill (not code)
+routine_318  bss4_0282      # seg004:0x0282  reserved zero fill (not code)
+routine_223  bss4_0287      # seg004:0x0287  reserved zero fill (not code)
+routine_39   bss4_028c      # seg004:0x028c  reserved zero fill (not code)
+routine_105  bss4_0296      # seg004:0x0296  reserved zero fill (not code)
+routine_126  bss4_029b      # seg004:0x029b  reserved zero fill (not code)
+routine_83   bss4_02b9      # seg004:0x02b9  reserved zero fill (not code)
+routine_84   bss4_02c3      # seg004:0x02c3  reserved zero fill (not code)
+routine_79   bss4_02d2      # seg004:0x02d2  reserved zero fill (not code)
+routine_81   bss4_02dc      # seg004:0x02dc  reserved zero fill (not code)
+routine_80   bss4_02e1      # seg004:0x02e1  reserved zero fill (not code)
+routine_22   bss4_02eb      # seg004:0x02eb  reserved zero fill (not code)
+routine_219  bss4_02f0      # seg004:0x02f0  reserved zero fill (not code)
+routine_37   bss4_02f5      # seg004:0x02f5  reserved zero fill (not code)
+routine_350  bss4_02ff      # seg004:0x02ff  reserved zero fill (not code)
+routine_189  bss4_030e      # seg004:0x030e  reserved zero fill (not code)
+routine_21   bss4_0313      # seg004:0x0313  reserved zero fill (not code)
+routine_120  bss4_0318      # seg004:0x0318  reserved zero fill (not code)
+routine_224  bss4_031d      # seg004:0x031d  reserved zero fill (not code)
+routine_225  bss4_0327      # seg004:0x0327  reserved zero fill (not code)
+routine_35   bss4_0331      # seg004:0x0331  reserved zero fill (not code)
+routine_32   bss4_0336      # seg004:0x0336  reserved zero fill (not code)
+routine_51   bss4_0345      # seg004:0x0345  reserved zero fill (not code)
+routine_20   bss4_0354      # seg004:0x0354  reserved zero fill (not code)
+routine_332  bss4_038b      # seg004:0x038b  reserved zero fill (not code)
+routine_45   bss4_03ae      # seg004:0x03ae  reserved zero fill (not code)
+routine_44   bss4_03b3      # seg004:0x03b3  reserved zero fill (not code)
+routine_240  bss4_03b8      # seg004:0x03b8  reserved zero fill (not code)
+routine_323  bss4_03c2      # seg004:0x03c2  reserved zero fill (not code)
+routine_252  bss4_03c7      # seg004:0x03c7  reserved zero fill (not code)
+routine_156  bss4_03cc      # seg004:0x03cc  reserved zero fill (not code)

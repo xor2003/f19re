@@ -153,6 +153,9 @@ ports verified against the original binary.
 
 ## Routines that are asm in the original (do NOT port)
 
+Every routine in the map is now named (zero `routine_*` left). The non-C
+groups below stay as the asm skeleton emits them:
+
 - File I/O cluster seg000:0xE1xx–0xE4xx (openFile/closeFile/picBlit/
   openBlitClosePic wrappers): hand-asm style (reg args, int21h, jmp error tail).
 - Pic-decode cluster seg000:0xE4F8+ (picBlit/decodePicRow/picReadDataAndMakeDict/
@@ -167,13 +170,39 @@ ports verified against the original binary.
   projectModelEdges, buildInverseRotationMatrix, multiplyMatrix3x3,
   transformAndCullObject, insertSortedObject, renderSortedList, processSceneObject,
   skipDisplayListByLod, renderHorizonSky, projectSceneObject, fillSpanRect,
-  clipLine*, clipPointInside, rasterizeEdgeSpan, etc.): register-convention asm —
-  args in bx/si/di/cx, no C prologue. These are in f15se2's egseg1.asm.
+  clipLine*, clipPointInside, rasterizeEdgeSpan, plus the *Far/*Thunk entry
+  shims transformAndCullObjectFar, advanceModelPointerLod, renderSortedListFar,
+  rotatePoint3dFar, transformModelVerticesFar, transformVertexListThunk,
+  projectModelEdgesFar, multiplyMatrix3x3Far, drawModelDisplayList,
+  clipLineFar, drawClipLineGlobal, resetScanlineSpans, clipAndRasterizeEdge,
+  flushSpanDirtyRect, storeObjTransformByOpcode, drawFlatHorizon,
+  testVisibilityMask, transposeOrientationMatrix, installDivZeroHandler,
+  installDivZeroVector): register-convention asm — args in bx/si/di/cx, no C
+  prologue. These are in f15se2's egseg1.asm.
   NOTE: some have `push bp`/`mov bp,sp` yet are still hand-asm (e.g.
   projectSceneObject repurposes bp as a scratch reg mid-body).
-- seg002 drawInstrumentGauges + helpers: register-convention asm.
-- seg003 setInt9Handler, seg000 installCBreakHandler: int21h/int9h handlers.
+- seg002 drawInstrumentGauges(2)(Far), setupInstrumentLayout(Far), and the
+  joystick cluster initJoystickCalibration/copyJoySample/
+  readCalibratedJoystick/readJoyAxis/scaleJoyAxis/_copyJoystickData/
+  _restoreJoystickData: register-convention asm (f15se2 egseg2.asm).
+- seg003 setInt9Handler, restoreInt9Handler, seg000 installCBreakHandler:
+  int21h/int9h handlers.
+- seg000 sine/cosine interp cluster (sine, cosine, sinInterp, sineFar,
+  cosineFar, cosineB, sinInterpB), getIntVector, gameLoopBody, readBiosTick,
+  biosTickLo, initTimerState, writeBlock, nullsub1-4, crtPad0.
+- MSC 5.1 CRT/libc tail seg000:0xe932+ — __cinit, _exit, __exit, __ctermsub,
+  initterm/inittermfar, __FF_MSGBANNER, __chkstk, __nullcheck, __NMSG_TEXT,
+  __NMSG_WRITE, __maperror, dosmaperr, _fclose, _fopen, _fread, __filbuf,
+  __freebuf, __getbuf, __openfile, _fflush, __getstream, _close, _open,
+  __cXENIXtoDOSmode, _read, _write, _stackavail, __nfree, __nmalloc,
+  __amalloc, __amexpand, __amlink, __amallocbrk, _brkctl, brkctlFindSeg,
+  _strcat, _strcpy, _strlen, _itoa, _kbhit, _getch, _int86, _movedata,
+  _segread, _strupr, _memcpy, _abs, _srand, _rand, _remove, __bios_keybrd,
+  __aNldiv, __aNlmul, __aNlshl, __aNlshr, __aNNalshl, __aNNalshr, __aNuldiv,
+  __aNulshr. Identified by IDA FLIRT + SLIBCE.LIB byte matching.
 - `start` (seg000:e880): DOS crt0.
+- seg004 (the ~49KB reserved overlay/BSS area): all zeros in the image —
+  the ~55 phantom `bss4_*` entries are map artifacts, not code.
 
 ## Verified C ports so far (all MATCH — 183)
 
