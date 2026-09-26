@@ -740,6 +740,34 @@ the compiled behavior is identical.
   (egcombat.c, egframe.c, egtacmap.c, ... — same split as f15se2, since the
   modules compile with different flag sets).
 
+### Identifying the non-ported tail (how every `routine_*` was named)
+
+Once all C was ported, ~120 `routine_*` remained. They were classified —
+not ported — by these methods:
+
+1. **IDA FLIRT names** — the lst already carries `__cinit`-style sig hits
+   for most of the CRT tail; harvest by scanning `proc` heads at routine
+   addresses (normalize case: lst addrs are uppercase).
+2. **SLIBCE.LIB byte matching** — where FLIRT is silent, parse the MSC 5.1
+   library directly: `.LIB` = 32-byte header (dict offset/count at +6/+10),
+   then OMF records of size `reclen+3` (4-byte pages, dict stored in the
+   LAST page); each module's LEDATA/FIXUPP gives text bytes + relocation
+   masks; each pubdef gives name+offset. Relocation-masked byte equality
+   against exe routine bytes identifies `_write`'s inner DOS writer,
+   `_brkctl`'s segment-table search, `__nfree`/`__nmalloc` (IDA's
+   `unknown_libname_1/2`), etc. FIXUPP fields are varints; a truncated
+   record must not abort the parse.
+3. **f15se2 twin matching** — for seg001/seg002 asm: same toolchain, same
+   cluster in `egseg1.asm`/`egseg2.asm`. Far-thunks are disambiguated by
+   their direct callee (`sub_2XXXX` linear addr → proc-head map), not by
+   mnemonic similarity (all thunks look alike). Spot-check any score<0.9
+   match against the f15 body.
+4. **All-zero regions are data** — seg004 (~49KB) is entirely zeros in the
+   image: its ~55 "routines" are map artifacts in reserved BSS/overlay
+   staging, renamed `bss4_*`, never ported.
+5. `crtPad0`: a 16-byte zero pad before `_main` (page-aligned init code
+   follows the pad — linker/section padding, not a routine).
+
 ## 7. Pitfalls
 
 - Don't port the register-convention asm clusters (seg001/seg002 graphics
