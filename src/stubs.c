@@ -236,6 +236,7 @@ char g_itoaScratch[24];
 struct { int8 name[8]; int16 lethality, dangerTier, flags; } g_samSpecs[16]; /* @0x4894 threat/weapon spec table (aNone) — 'Net ','SA-2',... 14-byte records */
 
 int16 g_inputDisabled, g_axisInputAccum[4], g_soundPriorityFloor, g_ejectState;
+int16 g_smokeTimer;                    /* word_34B0A — flag-0x20 duration counter */
 int8 g_commEventFlag;                  /* byte_38D18 */
 int16 g_frameRateScaling, g_frameSyncWait, g_timeAccelMode, g_bulletTrackCount;
 int16 g_threatDisplayTtl;

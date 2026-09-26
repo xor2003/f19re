@@ -318,6 +318,51 @@ compiled *without* `/Gs`.
   m: mov [v],ax` — is `v = cond ? expr : 0` (value-producing `?:`), not
   `if (cond) v=expr else v=0` (stores per arm).
 
+### Big dispatcher switches: the cold-label queue (keyDispatch, seg000:0xd4c6)
+
+`keyDispatch` (~0xA2B bytes, a 60-case scan-code dispatcher with a gated
+waypoint-panel sub-switch) exposes MSC's deferred-body mechanism in full:
+
+- The compare chain emits first, in tree order. **Only the first-declared
+  case body lands adjacent** to it (`jz short body`); every other case's
+  body is queued and emitted later, past the switch continuation, in
+  **declaration order**. Branch polarity in the chain follows placement:
+  adjacent → `jz L`, queued → `jnz skip; jmp L`.
+- A `case k: goto L;` stub emits NO body — the dispatch `jnz;jmp` jumps
+  straight to `L`, and `L` is queued by the goto. Labels that are only
+  `goto` targets emit in the cold zone in **first-reference order**
+  (which is declaration order of the cases that goto them).
+- **`case` labels can nest inside another case's body.** In the original,
+  `case 0x5032:` sits inside `case 0x5000`'s body, right after its
+  joystick gate: `case 0x5000: if (joy==0) goto done; case 0x5032: wp+=..`
+  — the gated case checks `commData->setupUseJoy` and falls into the same
+  work body the ungated keypad scancode dispatches to directly. This is
+  how gated/ungated pairs share a body with one `jnz` + fall-through.
+- The waypoint section is a `switch` on `scanCode` whose bodies are all
+  `goto` stubs into a **label farm at the tail of the switch's statement
+  list** (after `default:`). Emitted order = stub declaration order:
+  `[wpUp+wpRedraw, check5000+case 0x5032+wpDown, check4B00+case 0x4B34+
+  wpLeft, ..., tickAdd, tickSub]` — check+work stay contiguous because
+  the `case` anchors sit inside the same queued block.
+- `if (x != 0) {A...goto L;}` without an `else` may emit `jnz`-inverted
+  arms (else inline, then deferred). Writing the `else` explicitly
+  restores canonical `jz` + then-inline + else-forward.
+- `x = ++x & 3` emits `inc [x]; mov ax,[x]; and ax,3; mov [x],ax` — the
+  embedded pre-op defeats the `op [mem],imm` fold. To get the same
+  register round-trip WITHOUT an inc/dec, cast the lvalue's read to its
+  own type: `x = (int16)x & 3` → `mov ax,[x]; and ax,3; mov [x],ax`
+  (verified by isolated probe: every other no-op — `+0`, `|0`, `*1`,
+  parens, hex literal — still folds to `and word`).
+- `imul`/`inc` ordering inside a condition tracks expression order:
+  `scale*0x14 < ++ctr` emits `imul; inc; cmp`; `ctr++; scale*0x14 < ctr`
+  emits `inc; imul; cmp`.
+- For `call`-tail cleanup merging (`call; jmp shared-addsp`): the anchor
+  block is whichever `call`-tail's `add sp,N` gets emitted where the
+  shared continuation is wanted — an if/else that calls the same function
+  with different args (`if (m!=1) f(1); else f(0);`) produces a merged
+  `push ax; call` with `mov ax,K; jmp sharedPush` stubs, and its own
+  `add sp,N` then anchors the dedup'd cleanup for neighboring tails.
+
 ### Union members vs plain word lvalues
 
 `mov si,[bx+flags]; mov ax,si; test al,4 ... test ax,0x140` — the original
