@@ -768,6 +768,30 @@ not ported — by these methods:
 5. `crtPad0`: a 16-byte zero pad before `_main` (page-aligned init code
    follows the pad — linker/section padding, not a routine).
 
+### Regenerating the f15 cross-reference (`matched_routines.tsv`)
+
+`mzdup` does signature matching between the two binaries:
+
+```
+mzretools/build/mzdup sig/f15_egame.sig EGAME.EXE map/egame.map
+# -> map/egame.map.dup: `duplicate` flag + "# Routine X ... duplicate of
+#    routine Y ..., differs by N instructions" comment per match
+```
+
+249 f15 signatures (≥15 instructions, ≤10% distance) → 104 F19 matches
+(25% of the image's instructions — the shared engine). Routines under 15
+instructions are skipped, so `strcpyFromDot`↔`replaceExtension` (0x2A) came
+from the old run's comment. Extract to TSV by pairing each `duplicate` flag
+with its preceding comment, then annotate `f15_source` by grepping
+`f15se2-re/src/` for the twin name (`.asm` hit ⇒ asm on both sides, keep
+asm). Result: 59 dist-0 + 26 dist-1 signature-identical/near matches —
+independent confirmation of the seg001/seg002 asm naming.
+
+Beware: `sig/egame.f15.map` is **f15's own map**, not f15-names-in-F19 —
+joining by seg:offset across the two binaries misleads (e.g. the seg002
+far-thunks sit in swapped order: F19 layoutFar@0x0A/gaugesFar@0x0E vs f15
+gaugesFar@0x0A/layoutFar@0x0E).
+
 ## 7. Pitfalls
 
 - Don't port the register-convention asm clusters (seg001/seg002 graphics

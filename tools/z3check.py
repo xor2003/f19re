@@ -331,7 +331,13 @@ def main():
     ccat = os.path.join(OUT, base + '.cfuncs.json')
     oall_path = os.path.join(OUT, 'EGAME.ofuncs.json.all')
     oall = discover(REF_EXE, RMAP, oall_path) if not os.path.exists(oall_path) else json.load(open(oall_path))
-    call = discover(cand_exe, cand_map, ccat + '.all') if not os.path.exists(ccat + '.all') else json.load(open(ccat + '.all'))
+    # candidate catalog cache is invalidated when the test exe or its map is
+    # rebuilt (portcheck runs before every z3check in the sweep)
+    ccall_path = ccat + '.all'
+    stale = (not os.path.exists(ccall_path) or
+             os.path.getmtime(ccall_path) < os.path.getmtime(cand_exe) or
+             os.path.getmtime(ccall_path) < os.path.getmtime(cand_map))
+    call = discover(cand_exe, cand_map, ccall_path) if stale else json.load(open(ccall_path))
     filter_catalog(oall, names, ocat)
     filter_catalog(call, names, ccat)
 
