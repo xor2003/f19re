@@ -4,6 +4,13 @@ Goal: recover F19 (MicroProse, MSC 5.1) as C source for eventual merge into
 /home/xor/games/f15se2-re. Approach: byte-exact asm skeleton + incremental C
 ports verified against the original binary.
 
+Scope: EGAME.EXE (the flight sim proper, 364 routines) is fully classified —
+183 byte-exact C ports + 2 Z3-proven + ~179 asm/CRT (skeleton-reproduced).
+The satellite exes are mapped but not reconstructed: START.EXE (179 rtns),
+END.EXE (208), SU.EXE (68), 5 graphics drivers (~1 analyzed each) — ~460
+routines total, of which mzdup signature-matching already finds ~30-35%
+shared with EGAME/f15 (run `mzdup sig/egame.sig <EXE> map/<x>.map`).
+
 ## Layout
 
 - `lst/EGAME.EXE.lst` — IDA listing of the main exe (primary analysis source)
