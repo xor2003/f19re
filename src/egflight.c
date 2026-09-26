@@ -184,6 +184,30 @@ void drawAirspeedTape(void) {
     gfx_copyRect(*g_pageFront, 0, 0x96, *g_pageBack, 0, 0x96, 0x21, 0x32);
 }
 
+/* ==== seg000:0x3d23 ==== */
+extern int16 g_edgeQuad[];              /* word_32A09 — {prevX, curX, prevY, curY} */
+void far gfx_setObjAttr(int16 attr);    /* sub_2F0CF */
+void far beginEdgeGroup(void);          /* sub_21D2E */
+void far insertEdge(void);              /* sub_21EB0 */
+void far endEdgeGroup(void);            /* sub_21D18 */
+
+void insertOutlineEdges(int16 *p) {
+    while (*p != -1) {
+        gfx_setObjAttr(((const uint8 *)*p++)[0x9E8]);
+        beginEdgeGroup();
+        p += 2;
+        while (*p != -1) {
+            g_edgeQuad[0] = p[-2];
+            g_edgeQuad[2] = p[-1];
+            g_edgeQuad[1] = *p++;
+            g_edgeQuad[3] = *p++;
+            insertEdge();
+        }
+        endEdgeGroup();
+        p++;
+    }
+}
+
 /* ==== seg000:0x3d8f ==== */
 void FAR audio_engineDroneOff(void);
 void updateEngineSound(void);          /* sub_1DF1A */

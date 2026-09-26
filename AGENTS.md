@@ -80,6 +80,10 @@ ports verified against the original binary.
   CONT:` — the shared `goto CONT` tail forces a backward tail-merge and ARM
   emits after the continuation jump. Plain `if/else` or `?:` keep arms inline.
   Used in renderHudFrame (egtacmap.c); same pattern drives computeBearing.
+- `v = *p++` emits `add [p],2` EAGERLY then `mov ax,[bx]` reading the
+  stale cached pointer — not `mov` then `add`. Mixing `p[-k]` reads (bx
+  reloads) with `*p++` writes reproduces sliding-window decoders.
+  insertOutlineEdges.
 - Loop-body `if/else` whose then-arm is a `?:` statement: with the `?:` arm
   FIRST in source, MSC splits the ternary test into the bottom-placed loop
   dispatch and jumps into the arm mid-block. Writing the OTHER arm first
@@ -168,7 +172,7 @@ ports verified against the original binary.
 - seg003 setInt9Handler, seg000 installCBreakHandler: int21h/int9h handlers.
 - `start` (seg000:e880): DOS crt0.
 
-## Verified C ports so far (all MATCH — 168)
+## Verified C ports so far (all MATCH — 169)
 
 eg3dload.c(/Os):  load3DAll, load3D3, load3DT, load3DG, printError
                   strcpyFromDot, load15Flt3d3
@@ -194,6 +198,7 @@ egmath.c(/Os):    isqrt, matVecDotAxis, drawWorldObject, clampRange
 egflight.c(/Os):  applyRotationDelta, computeAttitudeAngles
                   rebuildOrientation, signedRatio16, valueToAngle
                   complementAngle, waitForKeyPress, drawAirspeedTape
+                  insertOutlineEdges
 egframe.c(/Os+/Oa):updateHudGauge, countermeasures, tickWeaponSlots
                   updateBulletsAndFire, updateTracerParticles
                   applyGravityFall, initFrameRandom, resetSimObjectLocks

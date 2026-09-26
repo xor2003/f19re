@@ -360,6 +360,11 @@ int16 dispatchKeyCmd(int16 key) { return 0; }   /* sub_1D4C6: key-command dispat
 int16 frameTick, g_nightMode, g_unusedFrameVal, g_missionTick; /* 343B6/33D8A/35450/354C0 */
 int16 g_wpPanelMode, g_wpSelectIdx;      /* word_37AB6 / word_33702 */
 void drawFuelCell(int16 amount, int16 color) { } /* sub_19D5E */
+void far gfx_setObjAttr(int16 a) { } /* sub_2F0CF */
+void far beginEdgeGroup(void) { }   /* sub_21D2E */
+void far insertEdge(void) { }       /* sub_21EB0 */
+void far endEdgeGroup(void) { }     /* sub_21D18 */
+int16 g_edgeQuad[4];                    /* word_32A09 */
 int16 g_tapeClipX;                     /* word_346D8 */
 int16 g_setupSlots[0x20];              /* @0x37622 */
 int16 g_replayCount;                   /* word_351C4 */
