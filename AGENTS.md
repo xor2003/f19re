@@ -172,7 +172,7 @@ ports verified against the original binary.
 - seg003 setInt9Handler, seg000 installCBreakHandler: int21h/int9h handlers.
 - `start` (seg000:e880): DOS crt0.
 
-## Verified C ports so far (all MATCH — 170)
+## Verified C ports so far (all MATCH — 171)
 
 eg3dload.c(/Os):  load3DAll, load3D3, load3DT, load3DG, printError
                   strcpyFromDot, load15Flt3d3
@@ -223,7 +223,7 @@ egtacmap.c(/Os+/Oa):projectWorldPoint, clearStatusPanel, renderHudFrame
                   restoreScopePanel, captureScopePanel, drawMissionObjectives,
                   drawThreatIndicator, drawTargetInfoPanel
                   drawLoadoutPanel, drawWeaponsPanel, drawAirTargetInfoPanel
-                  drawWaypointPanel
+                  drawWaypointPanel, updateTargetingHud
 egcombat.c(/Os+/Oa):updateThreatSites, fireGroundThreat
                   computeThreatRangeBearing, updateThreatAlert
                   updateObjects, fireAirThreat, spawnEnemyAircraft

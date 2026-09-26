@@ -239,6 +239,10 @@ int16 g_camEyeZ;
 int16 g_viewMode;
 int8  g_camExtFlag;
 int16 g_aimClipSave;
+int16 g_lockCooldown;
+int16 g_lockMark;
+int16 g_threatProxX;
+int16 g_threatProxY;
 int8  g_halfScaleRender;
 int16 g_curLod;
 void pascal shiftLongLeftInPlace(int16 c, int32 *p) { *p <<= c; }

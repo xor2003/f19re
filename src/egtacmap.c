@@ -290,7 +290,7 @@ void updatePanelMode(int16 mode) {
 }
 
 /* ==== seg000:0x8651 ==== */
-extern int16 g_scanDir;            /* word_38D1A (0/0x4000/0x8000/0xC000 heading) */
+extern int16 g_scanDir;            /* g_scanDir (0/0x4000/0x8000/0xC000 heading) */
 extern int16 g_curPanelMode;       /* word_385CE */
 extern char g_nameBuf[];           /* @0x65E6 */
 void sub_19979(void); void sub_19E4F(void); void sub_1A0BD(void);
@@ -1222,4 +1222,199 @@ void drawAirTargetInfoPanel(void) {
     drawWeaponRadarInfo(type, row);
     g_pageFront[1] = 2;
     g_pageBack[1] = 2;
+}
+
+/* ==== seg000:0xac4c ==== */
+extern int32 g_ViewX;              /* word_37CB8/37CBA */
+extern int32 g_ViewY;              /* word_382D4/382D6 */
+extern int16 g_targetBearing;      /* word_351DE */
+extern int16 g_targetRange;        /* word_351DA */
+extern int16 g_wreckX;             /* word_3837E */
+extern int16 g_wreckY;             /* word_38392 */
+extern int16 g_wreckAlt;           /* word_3845E */
+extern int16 g_wreckFallVel;       /* word_379B8 */
+extern int16 g_ejectState;         /* word_382D8 */
+extern int16 g_smokeParticleSlot;  /* word_34110 */
+extern int16 g_nearestThreatRange; /* word_354CE */
+extern int16 g_ourPitch;           /* word_33572 */
+extern int16 g_lockCooldown;       /* word_379B0 */
+extern int16 g_lockMark;           /* word_349B0 */
+extern int16 g_threatProxX;        /* word_354D8 */
+extern int16 g_threatProxY;        /* word_356DE */
+struct Particle { int16 posX, posY, alt, spin; };   /* stride 8 */
+extern struct Particle g_particles[];               /* @0x5260 */
+void computeAimProjection(int16 wx, int16 wy, int16 wz);  /* sub_1C793 */
+int16 bearingToStore(int16 idx);                 /* sub_1CA74 */
+int16 bearingToSimObject(int16 idx);             /* sub_1CA94 */
+int16 computeTargetBearing(int16 x, int16 y, int16 f);    /* sub_1CAB4 */
+void drawWorldObject(int16 shapeId, int32 worldX, int32 worldY, int16 altitude,
+                     int16 objYaw, int16 objPitch, int16 objRoll, int16 scaleShift);
+
+/* Per-frame targeting HUD pass (called from the main loop at seg000:0x4d1):
+ * refresh the ground/air lock candidates inside the frontal cone, then draw
+ * every smoke particle, sim object, projectile and the wreck through the
+ * 3D symbol pipeline; finish with the HUD targeting reticle. */
+void updateTargetingHud(void) {
+    int16 i, best, thresh, cur, highAlt, prox, zz;
+    int8 fl;
+
+    zz = 0;
+    if (g_viewMode == 0x8B) {
+        drawWorldObject(6, g_ViewX, 0x1000000L - g_ViewY, g_viewZ + 0x10,
+                        g_ourHead, g_ourPitch, g_ourRoll, 2);
+    }
+    if (g_lockCooldown != 0)
+        --g_lockCooldown;
+    if ((g_groundTargetLock & 0x80) &&
+        (g_curPanelMode == 0x13 || g_curPanelMode == 0x19) &&
+        g_lockCooldown == 0 &&
+        g_currentWeaponType != 1 &&
+        !(*(int8 *)&g_viewMode & 0x80)) {
+        best = 0xFFFF;
+        thresh = 0x64 << (6 - g_nightMode);
+        if (g_groundTargetLock != 0xFFFF) {
+            i = g_groundTargetLock - 0x80;
+            cur = bearingToStore(i) - 1;
+            if (abs(g_ourHead + g_scanDir - g_targetBearing) > 0x2000)
+                cur = 0;
+        } else
+            cur = 0;
+        for (i = 0; i < g_storeDefCount; i++) {
+            bearingToStore(i);
+            if ((abs(g_ourHead + g_scanDir - g_targetBearing) < 0x2000 ||
+                 (g_currentWeaponType == 0 && cur > 0)) &&
+                i + 0x80 != g_groundTargetLock &&
+                (fl = *(int8 *)&g_planeTable[i].flags,
+                 !(fl & 0x80) && thresh > g_targetRange) &&
+                cur < g_targetRange &&
+                (g_currentWeaponType == 2 || (fl & 1))) {
+                best = i;
+                thresh = g_targetRange;
+            }
+        }
+        if (best & 0x80) {
+            if (g_groundTargetLock == 0xFFFF)
+                g_lockCooldown = 4;
+            else
+                g_groundTargetLock = 0xFFFF;
+        } else {
+            g_groundTargetLock = best;
+            if (g_curPanelMode == 0x19)
+                g_lockMark = 1;
+        }
+    }
+    for (i = 0; i < 8; i++) {
+        if (g_particles[i].posX != 0) {
+            computeAimProjection(g_particles[i].posX, g_particles[i].posY,
+                                 g_particles[i].alt);
+            if (g_projDepth < 0 && g_projDepth > -0x100)
+                drawWorldObject((((int8)g_smokeParticleSlot - i) & 7) < 4 ? 3 : 0x11,
+                                (int32)(uint16)g_particles[i].posX << 5,
+                                (int32)(uint16)g_particles[i].posY << 5,
+                                g_particles[i].alt, 0, g_particles[i].spin, 0, 0);
+        }
+    }
+    thresh = 0x4B << (6 - g_nightMode);
+    highAlt = (g_hudVisible != 0 && (uint16)(g_nearestThreatRange + g_viewZ) > 0x5DC) ? 1 : 0;
+    if ((g_airTargetLock & 0x80) && g_airTargetLock != 0xFFFF) {
+        i = g_airTargetLock - 0x80;
+        cur = computeTargetBearing(g_simObjects[i].posX,
+                                   g_simObjects[i].posY, 1);
+        if (abs(g_ourHead + g_scanDir - g_targetBearing) > 0x2000)
+            cur = 0;
+    } else
+        cur = 0;
+    best = 0xFFFF;
+    for (i = 0; i < g_groundUnitCount; i++) {
+        if ((g_simObjects[i].flags.b[0] & 2) &&
+            bearingToSimObject(i) < 0x12C0) {
+            if (((g_airTargetLock & 0x80) || g_targetRange < 0x100) &&
+                thresh > g_targetRange && cur < g_targetRange &&
+                !(*(int8 *)&g_viewMode & 0x80) &&
+                !(g_simObjects[i].flags.b[0] & 0x20) &&
+                g_simObjects[i].speed != 0) {
+                computeTargetBearing(g_simObjects[i].posX,
+                                     g_simObjects[i].posY, 1);
+                if (abs(g_ourHead + g_scanDir - g_targetBearing) < 0x2000) {
+                    thresh = g_targetRange;
+                    best = i;
+                }
+            }
+            computeAimProjection(g_simObjects[i].posX, g_simObjects[i].posY,
+                                 g_simObjects[i].alt);
+            if (g_projDepth < 0) {
+                g_projDepth >>= highAlt;
+                if (g_projDepth > -0x20) {
+                    if (g_simObjects[i].alt < 999 && g_nightMode == 0) {
+                        prox = 0;
+                        if ((g_planeTable[g_closestThreatIndex].flags & 0x200) &&
+                            abs(g_simObjects[i].posX -
+                                g_planeTable[g_closestThreatIndex].mapX) <
+                                (g_threatProxX >> 5) &&
+                            abs(g_simObjects[i].posY -
+                                g_planeTable[g_closestThreatIndex].mapY) <
+                                (g_threatProxY >> 5))
+                            prox = 0x80;
+                        if (g_viewZ != 0x80 || prox == 0x80)
+                            drawWorldObject(5, g_simObjects[i].worldX,
+                                            g_simObjects[i].worldY, prox,
+                                            g_simObjects[i].heading.w, 0, 0,
+                                            2 - signOf(highAlt));
+                    }
+                    drawWorldObject(((int16 *)&g_objTypes[g_simObjects[i].spec].pad1A)
+                                    [g_projDepth > -0x10 ? 0 : 1],
+                                    g_simObjects[i].worldX, g_simObjects[i].worldY,
+                                    g_simObjects[i].alt, g_simObjects[i].heading.w,
+                                    g_simObjects[i].pitch, g_simObjects[i].bank.w,
+                                    2 - highAlt);
+                } else {
+                    setDrawColor(0xF);
+                    drawViewportLine(g_vprojXlo, g_vprojYlo, g_vprojXlo, g_vprojYlo);
+                }
+            }
+        }
+    }
+    if (best != 0xFFFF)
+        g_airTargetLock = best;
+    if (g_airTargetLock & 0x80)
+        g_airTargetLock = 0xFFFF;
+    for (i = 0; i < 0xC; i++) {
+        if (g_projectiles[i].ttl != 0) {
+            computeAimProjection(g_projectiles[i].mapX, g_projectiles[i].mapY,
+                                 g_projectiles[i].alt);
+            if (g_vprojXlo != -1) {
+                if (g_projDepth > -0x20)
+                    drawWorldObject(sams[g_projectiles[i].specIdx].modelId,
+                                    (int32)(uint16)g_projectiles[i].mapX << 5,
+                                    (int32)(uint16)g_projectiles[i].mapY << 5,
+                                    g_projectiles[i].alt,
+                                    g_projectiles[i].worldX,
+                                    g_projectiles[i].worldY,
+                                    g_projectiles[i].worldZ + 0x2000,
+                                    3 - signOf(highAlt));
+                else {
+                    if (i < 8)
+                        setDrawColor(0xC);
+                    else
+                        setDrawColor(0xD);
+                    drawViewportLine(g_vprojXlo, g_vprojYlo, g_vprojXlo, g_vprojYlo);
+                }
+            }
+        }
+    }
+    if (g_wreckAlt > 0) {
+        computeAimProjection(g_wreckX, g_wreckY, g_wreckAlt);
+        if (g_projDepth < 0 && g_projDepth > -0x100)
+            drawWorldObject(0xE, (int32)(uint16)g_wreckX << 5, (int32)(uint16)g_wreckY << 5,
+                            g_wreckAlt, 0, 0, 0, g_wreckFallVel > 0 ? 4 : 3);
+    }
+    if ((*(int8 *)&g_viewMode & 0x80) && g_viewMode != 0x8B &&
+        (g_viewZ != 0 || g_ejectState == 0)) {
+        drawWorldObject(6 + ((g_playerPlaneFlags & 1) == 0), g_ViewX,
+                        0x1000000L - g_ViewY, g_viewZ + 0x10,
+                        g_ourHead, g_ourPitch, g_ourRoll, 2);
+        if ((uint16)g_viewZ < 0x3E8 && g_nightMode == 0)
+            drawWorldObject(0x15, g_ViewX, 0x1000000L - g_ViewY, g_groundAltitude,
+                            g_ourHead, 0, 0, 2);
+    }
 }

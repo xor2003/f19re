@@ -234,6 +234,20 @@ compiled *without* `/Gs`.
 - Signed vs unsigned `>>` on a 32-bit leaf selects `__aNlshr` vs `__aNulshr`;
   a `(uint16)` operand anywhere in the chain flips the leaf to unsigned.
   Zero-extend a word into a *signed* long as `(int32)(uint16)x`.
+- `K - longVar` lowers as `sub ax,ax; mov dx,Khi; sub ax,[lo]; sbb dx,[hi]`
+  when K's high word is nonzero (`0x1000000L - v`), but `mov ax,K; cwd`
+  when K fits in 16 bits (`0x100 - v`). Check the original's expansion to
+  pick the constant.
+- `x << 5` on a 16-bit field needs `(int32)(uint16)f << 5` to get
+  `sub dx,dx` (zero-extend) before `__aNlshl`; a plain `(int32)f` emits
+  `cwd` (sign-extend).
+- Two-arm selects (`?:` or if/else) get scheduled into deferred blocks:
+  which arm merges with the shared tail vs sits in a jump-stub depends on
+  the *polarity* of the written condition, not the semantics. If the
+  original shows `jg →di0-stub` with the di=1 arm merged into a shared
+  call tail, write `cond ? 0 : 1` (jump-on-true to the 0 arm). If/else
+  statements whose arms are single calls (`setDrawColor(A)` vs
+  `setDrawColor(B)`) merge to one `push;call` tail — same layout rule.
 
 ### Union members vs plain word lvalues
 
