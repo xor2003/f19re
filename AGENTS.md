@@ -80,6 +80,12 @@ ports verified against the original binary.
   CONT:` — the shared `goto CONT` tail forces a backward tail-merge and ARM
   emits after the continuation jump. Plain `if/else` or `?:` keep arms inline.
   Used in renderHudFrame (egtacmap.c); same pattern drives computeBearing.
+- Loop-body `if/else` whose then-arm is a `?:` statement: with the `?:` arm
+  FIRST in source, MSC splits the ternary test into the bottom-placed loop
+  dispatch and jumps into the arm mid-block. Writing the OTHER arm first
+  (`if (i<=n) {else-code} else {?:-arm}`) keeps the `?:` self-contained at
+  the arm head AND lets an identical `?:` nested inside the first arm emit
+  as a separate deferred block ahead of it. drawWaypointPanel.
 - Early-exit `goto` chains (`if (x==0) goto TAIL; ...; if (y!=0) goto MID;`)
   reproduce MSC's function-chunk layout where a shared continuation label is
   reached from several jumps — nested `if`s give a different block topology.
@@ -162,7 +168,7 @@ ports verified against the original binary.
 - seg003 setInt9Handler, seg000 installCBreakHandler: int21h/int9h handlers.
 - `start` (seg000:e880): DOS crt0.
 
-## Verified C ports so far (all MATCH — 166)
+## Verified C ports so far (all MATCH — 167)
 
 eg3dload.c(/Os):  load3DAll, load3D3, load3DT, load3DG, printError
                   strcpyFromDot, load15Flt3d3
@@ -212,6 +218,7 @@ egtacmap.c(/Os+/Oa):projectWorldPoint, clearStatusPanel, renderHudFrame
                   restoreScopePanel, captureScopePanel, drawMissionObjectives,
                   drawThreatIndicator, drawTargetInfoPanel
                   drawLoadoutPanel, drawWeaponsPanel, drawAirTargetInfoPanel
+                  drawWaypointPanel
 egcombat.c(/Os+/Oa):updateThreatSites, fireGroundThreat
                   computeThreatRangeBearing, updateThreatAlert
                   updateObjects, fireAirThreat, spawnEnemyAircraft

@@ -837,6 +837,98 @@ void drawTacticalMap(int8 page) {
     }
 }
 
+/* ==== seg000:0x9979 ==== */
+extern int16 g_wpPanelMode;        /* word_37AB6 — 0=change marker, else select */
+extern int16 g_wpSelectIdx;        /* word_33702 — highlighted select-mode entry */
+extern int16 g_missionTick;        /* word_354C0 */
+extern int16 g_engineThrust;       /* word_33588 */
+extern int16 g_gunHits;            /* word_3844C */
+extern uint16 g_startRange;        /* word_36E22 */
+void drawFuelCell(int16 amount, int16 color);               /* sub_19D5E */
+void formatMissionClock(uint16 time);                       /* sub_19DA3 */
+
+void drawWaypointPanel(void) {
+    int16 clr, dist, f, burn[4], row, i, clk, sx, sy, ux, uy, o;
+
+    gfx_setFadeSteps(0x11);
+    if (g_wpPanelMode != 0)
+        drawPanelText(2, "Wybor Ukazat.", 1);
+    else
+        drawPanelText(2, "Smena Ukazat.", 4);
+    clk = g_missionTick;
+    drawPanelGridText(2, 7, 0, "Wrem", 0xF);
+    formatMissionClock(clk);
+    drawPanelGridText(2, 0xD, 0, g_nameBuf, 0xF);
+    row = 2;
+    for (i = 0; i < 4; i++) {
+        if (i <= waypointIndex) {
+            clr = 0;
+            ux = g_viewX_;
+            uy = g_viewY_;
+            if (g_wpPanelMode != 0 && i == waypointIndex)
+                clr = 0xF;
+            if (i == waypointIndex) {
+                if (g_wpPanelMode != 0)
+                    clr = 0xF;
+                else
+                    clr = (i & 1) ? 3 : 0xB;
+            }
+        } else {
+            clr = (i & 1) ? 3 : 0xB;
+            ux = waypoints[i * 2 - 2];
+            uy = waypoints[i * 2 - 1];
+        }
+        if (g_wpPanelMode == 0 && i == g_wpSelectIdx)
+            clr = 0xF;
+        strcpy(g_nameBuf, " Ukazatelx");
+        strcat(g_nameBuf, itoa(i + 1, g_itoaScratch, 10));
+        strcat(g_nameBuf, " Dist-");
+        dist = rangeApprox(ux - waypoints[i * 2], uy - waypoints[i * 2 + 1]);
+        strcat(g_nameBuf, itoa(dist >> 6, g_itoaScratch, 10));
+        strcat(g_nameBuf, " Km");
+        drawPanelGridText(2, 0, row++, g_nameBuf, clr);
+        o = dist / ((uint16)(g_startRange > 0x7D0 ? g_startRange : 0x2A30) >> 6);
+        burn[i] = ((g_weaponMask & 0x20 ? g_gunHits : 0) +
+                   g_engineThrust * g_engineThrust / 1000) * o * 5;
+        strcpy(g_nameBuf, "");
+        strcat(g_nameBuf, itoa(o >> 2, g_itoaScratch, 10));
+        strcat(g_nameBuf, " MIN.  WRM");
+        drawPanelGridText(2, 1, row, g_nameBuf, clr);
+        if (i >= waypointIndex)
+            clk += o * 8;
+        formatMissionClock(clk);
+        drawPanelGridText(2, 0xE, row++, g_nameBuf, clr);
+    }
+    drawFuelCell(10000, 0);
+    f = g_fuelRemaining;
+    for (i = 0; i < 4; i++) {
+        if (i >= waypointIndex) {
+            drawFuelCell(f, i == waypointIndex ? 0xF : (i & 1) ? 3 : 0xB);
+            f -= burn[i];
+        }
+    }
+    drawFuelCell(f, 2);
+    strcpy(g_nameBuf, "GOR  ");
+    strcat(g_nameBuf, itoa(g_fuelRemaining, g_itoaScratch, 10));
+    strcat(g_nameBuf, " fun.");
+    drawStringBothPages(g_nameBuf, 0xC4, 0xBC, 8);
+    gfx_setFadeSteps(g_viewParamsFar[0x1C] < 2 ? 0xC : 0x10);
+    if (g_mapMode == 0) {
+        restoreScopePanel();
+        sx = g_viewX_;
+        sy = g_viewY_;
+        setDrawColor(0xF);
+        for (i = waypointIndex; i < 4; i++) {
+            if (waypoints[i * 2] != 0) {
+                drawMapLine(sx, sy, waypoints[i * 2], waypoints[i * 2 + 1]);
+                sx = waypoints[i * 2];
+                sy = waypoints[i * 2 + 1];
+                setDrawColor(0xA);
+            }
+        }
+    }
+}
+
 /* ==== seg000:0x9e4f ==== */
 extern int16 g_curPanelMode;       /* word_385CE */
 extern int16 g_wpnSpriteX[];       /* @0x5968 — 4 weapon-icon source X */

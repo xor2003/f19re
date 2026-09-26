@@ -358,6 +358,8 @@ int16 g_threatSpec;                     /* word_351CA — spec of threat being p
 int16 g_northSouthSign;                 /* word_37484: theater N/S direction sign */
 int16 dispatchKeyCmd(int16 key) { return 0; }   /* sub_1D4C6: key-command dispatch */
 int16 frameTick, g_nightMode, g_unusedFrameVal, g_missionTick; /* 343B6/33D8A/35450/354C0 */
+int16 g_wpPanelMode, g_wpSelectIdx;      /* word_37AB6 / word_33702 */
+void drawFuelCell(int16 amount, int16 color) { } /* sub_19D5E */
 int16 g_setupSlots[0x20];              /* @0x37622 */
 int16 g_replayCount;                   /* word_351C4 */
 struct Projectile { int16 mapX, mapY, alt, speed, worldX, worldY, worldZ, ttl, specIdx, weaponIdx, targetLock, targetRef; };
