@@ -720,6 +720,12 @@ in the oracle:
 - SSA part boundaries still shift where the extra prologue load splits call
   blocks — those parts report `part_boundary_mismatch`/`candidate_ssa_missing`
   and are expected refusals, not diffs.
+- `call_target_unproven` refusals are harness artifacts: the callee isn't in
+  the module's test exe, so the candidate resolves to a stubs.c stub body
+  (≤20 bytes, `558bec`- or `33c0`-headed) while the oracle resolves to the
+  real routine. z3check reclassifies these as `call_target_stub` (benign)
+  only when the resolved candidate target matches that stub shape — a
+  refusal on a real, non-stub callee still counts as DIFFERS.
 
 Result: `spawnSamThreat` **17/17 compared parts proven** (5 boundary refusals);
 `drawWeaponRadarInfo` **18 proven, 1 part mis-paired** (oracle's merge-point

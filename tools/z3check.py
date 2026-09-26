@@ -432,8 +432,23 @@ def main():
             else:
                 e['other'].append(kinds)
         elif st == 'refused':
+            if res.get('reason') == 'call_target_unproven':
+                # harness artifact: the callee isn't in this module's test exe,
+                # so the candidate call resolves to a stubs.c stub body while
+                # the oracle resolves to the real routine. Benign only when the
+                # candidate target really is a tiny prologue-only stub.
+                sig = ((res.get('call_compare') or {}).get('candidate') or {}
+                       ).get('resolved') or {}
+                sz = int(sig.get('signature_size') or 0)
+                preview = str(sig.get('signature_preview') or '')
+                # stubs.c bodies come in two shapes: 558bec (prologue+call)
+                # and 33c0 (bare 'xor ax,ax' returning 0 then a call)
+                if sz <= 20 and preview.startswith(('558bec', '33c0')):
+                    e['other'].append({'call_target_stub'})
+                    continue
             e['other'].append({res.get('reason')})
-    benign_refusals = ({'part_boundary_mismatch'}, {'candidate_ssa_missing'})
+    benign_refusals = ({'part_boundary_mismatch'}, {'candidate_ssa_missing'},
+                       {'call_target_stub'})
     for fn in sorted(byf):
         e = byf[fn]
         if e['failed'] == 0 and e['refused'] == 0:
