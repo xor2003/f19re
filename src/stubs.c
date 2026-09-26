@@ -403,3 +403,17 @@ int16 g_acqRange;                      /* word_351CE */
 int16 g_samRange;                      /* word_33D00: SA-14 spec range factor (=16) */
 int16 g_samSpeed;                      /* word_33D02: SA-14 spec speed (>>6 = 14) */
 int16 g_acqAimY;                       /* word_351D0 */
+int16 g_initPhase;                    /* word_38388 — mission init phase 0/1/2 */
+int16 g_mapExtentX, g_mapExtentY;     /* word_36FEA / word_36FEC — theater map bounds */
+int16 g_autopilotAltitude;            /* word_33D84 */
+int16 g_fireCooldown;                 /* word_34B02 */
+int16 g_unusedEventHist2;             /* word_384CC — event-history shift stage 3 */
+int16 g_prevThreatIndex;              /* word_343C8 — previous g_closestThreatIndex */
+int16 g_isCampaignMission;            /* word_33D88 — gameData->isCampaignMission copy */
+int16 g_autoCrashDive;                /* word_354BE — low-altitude dive warning */
+int16 g_inLandingCorridor;            /* word_343CA — inside landing-proximity box */
+int16 g_landingTimer;                 /* word_343D2 — landing-progress counter */
+int16 g_targetLeadAngle;              /* word_385D0 — drift/lead angle accum */
+int16 g_frameRateAccum;               /* word_343CE — frame counter vs scaling*4 */
+int16 g_markerPosX, g_markerPosY;     /* word_373EA / word_37488 — saved tac marker pos */
+void far gfx_flipPage(int16 arg) { }  /* sub_2F17E */

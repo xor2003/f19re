@@ -269,6 +269,16 @@ compiled *without* `/Gs`.
   away; write `if (!bit) {nearChain} else {deferredArm}` — the inverted
   source condition puts the near chain on the `jz` target and the far arm
   on the fall-through `jmp` (`renderFrame`'s `&0x40` plane arm).
+- When the ORIGINAL shows a big arm deferred past the merge (`jcc →farArm`,
+  small arm inline), the source form decides which arm defers — not the
+  semantics. `if (a>K || b>L) {small} else {big}` emits `jg →small` on the
+  first disjunct and `jng →big-deferred` on the last (jump-on-false to the
+  deferred else). The equivalent `&&` form (`a<=K && b<=L ? big : small`)
+  keeps `big` inline and defers `small` instead — wrong layout. Check the
+  f15 twin's written polarity; `updateFrame` needed `||`/`>` form.
+- A select that STORES once at the merge — `compute ax; jmp m; sub ax,ax;
+  m: mov [v],ax` — is `v = cond ? expr : 0` (value-producing `?:`), not
+  `if (cond) v=expr else v=0` (stores per arm).
 
 ### Union members vs plain word lvalues
 
@@ -358,6 +368,29 @@ this — `a*b + m` and `m + a*b` emit identically. The decider is the leaf's
 added field/global is unsigned even when no `shr`/`sar`/`mul` ever touches it.
 (A bare local or global *scalar* uint16/int16 leaf folds either way — the
 divergence shows on indexed `[reg+ofs]` operands.)
+
+### Byte-level strength reduction on 16-bit ops
+
+- `w += 0xN00` (low byte zero) lowers to `add byte [w+1], N` — write the word
+  add, not a byte-field poke (`((int8*)&w)[1] += 1` emits `inc`, not `add`).
+- `x & 0xFFF` lowers to `and ah, 0xF` (high-byte mask), same trick.
+- `x << 8` lowers to `mov ah, byte ptr x; sub al, al` when the operand is
+  already in a byte-addressable form.
+
+### Expression-level CSE and operand order
+
+- A duplicated 16-bit subexpression inside one `&&` — e.g.
+  `(uint16)(a-b)*c >= K && (uint16)(a-b)*c <= L` — CSEs to a single `mul`
+  with the product parked in `di` (`mov di,ax; cmp di,K`), no store. A
+  `register` local gives `si` instead (wrong); an unnamed temp off a plain
+  local stores to `[bp-var]` (wrong). Repeat the expression verbatim.
+- `mul` operand order for 16×16: the *left* operand goes to `ax`
+  (`mov ax,[op1]; mul [op2]`); casts mark the casted operand composite and
+  can flip the choice — write the order that matches, drop unneeded casts.
+- `a = b = 0` emits `sub ax,ax; mov b,ax; mov a,ax` (rightmost first).
+- `-((uint32)(uint16)x - K)` emits the full 32-bit negation
+  `sub dx,dx; sub ax,K; sbb dx,dx; neg ax; adc dx,0; neg dx` — the unsigned
+  32-bit subtract form, NOT `cwd` sign-extension.
 
 ### 32-bit arithmetic
 

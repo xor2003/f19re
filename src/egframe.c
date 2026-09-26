@@ -26,9 +26,7 @@ extern int16 g_waterTargetId[];          /* @0x9510 */
 extern int16 g_planeCount;               /* @0x951E */
 extern int16 g_targetEntityCount;        /* @0x6666 */
 extern int16 g_planeScanCount;           /* @0x9C96 */
-extern int16 g_planeTable[];             /* @0x80C8 */
 extern int16 g_groundUnitCount;          /* @0x968E */
-extern int16 g_simObjects[];             /* @0x8870 */
 extern int8  g_shapeTargetCategory[0x64];/* @0x95F0 */
 extern int8  g_tileKillTally[0x64];      /* @0x9524 */
 extern int8  g_stringPool[0x2EE];        /* @0x9764 */
@@ -46,8 +44,447 @@ struct TargetSlot {
 };
 extern struct TargetSlot g_targetSlots[2];   /* @0x87B2 */
 
-struct MapTarget { int16 f[8]; };        /* sizeof = 0x10 */
-struct SimObject { int16 f[0x12]; };     /* sizeof = 0x24 */
+struct MapTarget {                 /* F19 layout, 16 bytes @0x80C8 */
+    int16 objType;                 /* +0 */
+    uint16 mapX;                   /* +2 */
+    int16  mapY;                   /* +4 */
+    int16  active;                 /* +6 */
+    int16  flags;                  /* +8 */
+    int16  alertLevel;             /* +A */
+    int16  threatTimer;            /* +C */
+    int16  symbol;                 /* +E */
+};
+struct SimObject {
+    int16 objType;      /* +0x00 */
+    uint16 posX;        /* +0x02 */
+    int16 posY;         /* +0x04 */
+    int16 alt;          /* +0x06 */
+    int32 worldX;       /* +0x08 */
+    int32 worldY;       /* +0x0C */
+    union { int16 w; uint8 b[2]; } heading; /* +0x10 */
+    int16 pitch;        /* +0x12 */
+    union { int16 w; uint8 b[2]; } bank;    /* +0x14 */
+    int16 spec;         /* +0x16 */
+    union { uint16 w; uint8 b[2]; } flags;  /* +0x18 */
+    int16 speed;        /* +0x1A */
+    int16 timer;        /* +0x1C */
+    int16 weaponType;   /* +0x1E */
+    int16 terrainColor; /* +0x20 */
+    int16 damage;       /* +0x22 */
+};                                    /* 36 bytes */
+
+/* ==== seg000:0x3dc2 ==== */
+extern int16 g_initPhase;                /* word_38388 */
+extern uint16 FAR *g_viewParamsFar;      /* dword_354D0 (game data; +0x38 = theater) */
+extern int16 g_mapExtentX, g_mapExtentY; /* word_36FEA / word_36FEC */
+extern int16 g_threatActiveTimer;        /* word_343B8 */
+extern int16 g_scopeSweepTimer;          /* word_343C0 */
+extern int16 g_airTargetLock;            /* word_343BA */
+extern int16 g_groundTargetLock;         /* word_343BC */
+extern int16 g_wpSelectIdx;              /* word_33702 */
+extern int16 waypointIndex;              /* word_33700 */
+extern int16 g_autopilotAltitude;        /* word_33D84 */
+extern int16 missileSpecIndex;           /* word_33D80 */
+extern int16 g_weaponMask;               /* word_33D64 */
+extern int16 g_playerPlaneFlags;         /* word_356DC */
+extern int16 g_fireCooldown;             /* word_34B02 */
+extern int8  g_halfScaleRender;          /* byte_330EA */
+extern int16 g_unusedEventHist2;         /* word_384CC */
+extern int16 g_unusedEventHist1;         /* word_3845C */
+extern int16 g_unusedEventHist0;         /* word_38390 */
+extern int16 g_closestThreatIndex;       /* word_385D2 */
+extern int16 g_threatRefZ, g_threatRefY, g_threatRefX; /* word_379C2/379BC/379B2 */
+extern int16 g_smokeSourceIdx;           /* word_343BE */
+extern int16 g_prevThreatIndex;          /* word_343C8 */
+extern int16 g_fuelRemaining;            /* word_33D66 */
+extern int16 g_gunHits;                  /* word_3844C */
+extern int16 g_currentWeaponType;        /* word_388C4 */
+extern uint16 g_frameTimingAccum;        /* word_32DD0 */
+extern int16 g_frameRateScaling;         /* word_33D92 */
+extern int16 g_mapZoomLevel;             /* word_346E4 */
+extern int16 g_radarScopeRange;          /* word_346E6 */
+extern int16 g_selStoreIdx;              /* word_37626 */
+extern int16 g_northSouthSign;           /* word_37484 */
+extern int16 g_isCampaignMission;        /* word_33D88 */
+extern int16 g_missionStatus;            /* word_33D86 */
+extern int16 g_detailLevel;              /* word_354BC */
+extern int16 g_groundAltitude;           /* word_3837A */
+extern int16 g_threatProxX, g_threatProxY; /* word_354D8 / word_356DE */
+extern int16 g_knots;                    /* word_373E8 */
+extern int16 g_autoCrashDive;            /* word_354BE */
+extern int16 g_inLandingCorridor;        /* word_343CA */
+extern int16 g_viewZ;                    /* word_33576 */
+extern int16 g_ejectState;               /* word_382D8 */
+extern int16 g_landingTimer;             /* word_343D2 */
+extern int8  g_savedPosVisible;          /* byte_35D3A */
+extern int16 g_altitude;                 /* word_33578 */
+extern int16 g_targetLeadAngle;          /* word_385D0 */
+extern int16 frameTick;                  /* word_343B6 */
+extern int16 g_missionTick;              /* word_354C0 */
+extern int16 g_missionTimeLimit;         /* word_384C6 */
+extern int8  g_gndTargetMark;            /* byte_384E0 */
+extern int16 g_enemyAlertFlag;           /* word_38502 */
+extern int16 g_frameSyncWait;            /* word_34AFE */
+extern uint16 g_timeAccelMode;           /* word_343D0 */
+extern int16 g_frameRateAccum;           /* word_343CE */
+extern int16 g_markerPosX, g_markerPosY; /* word_373EA / word_37488 */
+extern int16 g_nearestThreatRange;       /* word_354CE */
+extern int16 g_storeDefCount;            /* word_3838E */
+extern int16 g_ourHead;                  /* word_33570 */
+extern int32 g_worldX, g_worldY;         /* word_37CB8 / word_382D4 */
+extern int16 g_viewX_, g_viewY_;         /* word_3837C / word_3838C */
+extern int16 g_trackedEnemyIdx;          /* word_343B4 */
+struct CommData;
+extern struct CommData FAR *commData;    /* dword_38B10 */
+extern struct MapTarget g_planeTable[];  /* @0x80C8 */
+extern struct SimObject g_simObjects[];  /* @0x8870 */
+struct MissileSpec { int16 weaponIdx; int16 ammo; };
+extern struct MissileSpec missleSpec[];  /* @0x4F00 */
+
+void findWaypointFeatures(void);
+void initFrameRandom(void);
+void hwPortWrite(int16 cmd);
+void recordFrame(uint8 a, uint8 b);
+void initTacMapView(void);               /* sub_18751 */
+void drawStatusItem(int16 idx, int16 val); /* sub_19007 */
+void drawMissionObjectives(void);        /* sub_1A300 */
+void setupLodDistances(void);            /* sub_1DFB4 */
+void recalcTimeScale(void);
+int16 clampRange(int16 v, int16 lo, int16 hi);
+int16 plotMapObject(int16 x, int16 y, int16 color, int16 big);  /* sub_18B41 */
+int16 readMapPixelColor(int16 x, int16 y);/* sub_18BEA */
+void redrawTacMap(int16 x, int16 y);     /* sub_187EC */
+void updateThreatSites(void);
+void updateObjects(void);
+void updateThreatTargeting(void);
+void spawnSamThreat();                   /* sub_1585C */
+void tickWeaponSlots(void);
+void updateBulletsAndFire(void);
+void updateTracerParticles(void);
+void applyGravityFall(void);
+int16 rangeApprox(int16 dx, int16 dy);   /* sub_1D23B */
+void spawnEnemyAircraft(int16 slot, int16 objType); /* sub_16AD2 */
+int16 markTargetReached(int16 n);        /* sub_17AAF */
+void hudMessage(const char *s);          /* sub_192B1 */
+void makeSound(int16 id, int16 pri);     /* sub_1DEF2 */
+void far gfx_flipPage(int16 arg);        /* sub_2F17E */
+void far gfx_waitRetrace(void);          /* sub_2F183 */
+void far gfx_waitRetrace2(void);         /* sub_2F188 */
+void waitFrameSync(int16 ticks);         /* sub_104E2 */
+void commitCommSnapshot(int16 arg);
+void updateHudGauge(void);
+struct TileObject *findNearestTileObject(uint32 wx, uint32 wy);  /* sub_11092 */
+int16 shapeDataOffset(int16 shapeId);    /* sub_1D1C8 */
+void addTileEntry(struct TileObject *rec, int16 value, char tag); /* sub_112DC */
+struct TileObject;
+extern struct TileObject *g_nearestTileObj; /* word_35CE6 */
+int16 abs(int16 v);
+
+void updateFrame(void) {
+    int16 t2, pad;
+    uint16 v;
+    int16 i, obj;
+    uint16 FAR *fpw;
+
+    g_viewX_ = (int16)((g_worldX + 0x10) >> 5);
+    g_viewY_ = -((int16)((g_worldY + 0x10) >> 5) - 0x8000);
+
+    if (g_initPhase == 1) {
+        if (g_viewParamsFar[0x1C] == 0) {
+            g_mapExtentX = 0x6740;
+            g_mapExtentY = 0x60C0;
+        }
+        findWaypointFeatures();
+        g_threatActiveTimer = 0;
+        g_scopeSweepTimer = 1;
+        g_airTargetLock = g_groundTargetLock = -1;
+        g_fireCooldown = g_playerPlaneFlags = g_weaponMask = missileSpecIndex =
+            g_autopilotAltitude = waypointIndex = g_wpSelectIdx = 0;
+        g_closestThreatIndex = g_unusedEventHist0 = g_unusedEventHist1 =
+            g_unusedEventHist2 = (int8)(g_halfScaleRender = 0);
+        g_threatRefX = g_threatRefY = g_threatRefZ = 0;
+        g_prevThreatIndex = g_smokeSourceIdx = -1;
+        g_fuelRemaining = 10000;
+        g_gunHits = 2;
+        g_currentWeaponType = 0;
+        g_frameTimingAccum = 0xC;
+        g_frameRateScaling = 4;
+        recalcTimeScale();
+        g_mapZoomLevel = 1;
+        g_radarScopeRange = 1;
+        g_northSouthSign = (((int8 FAR *)g_viewParamsFar)[0x38] & 1) ? 1 : -1;
+        if ((g_planeTable[g_selStoreIdx].flags & 0x200) != 0) {
+            g_worldX -= (int32)(g_northSouthSign * 0x80);
+            *(int8 *)&g_playerPlaneFlags |= 8;
+        } else {
+            g_worldY -= (int32)(0x708 * g_northSouthSign);
+        }
+        initFrameRandom();
+        hwPortWrite(0xD6);
+        recordFrame(8, 0);
+        initTacMapView();
+        drawStatusItem(3, 0xA);
+        drawMissionObjectives();
+        g_isCampaignMission = g_viewParamsFar[0x1D];
+        g_missionStatus = g_viewParamsFar[0x1F];
+        g_detailLevel = ((uint16 FAR *)commData)[0x19];
+        setupLodDistances();
+        ((uint16 FAR *)commData)[0x13] = 1;
+        if (((int8 FAR *)g_viewParamsFar)[0x3C] & 2) {
+            ((int8 *)&g_playerPlaneFlags)[1] |= 0x10;
+        }
+        for (i = 0; i < 4; i++) {
+            fpw = (uint16 FAR *)commData + i;
+            missleSpec[i].weaponIdx = fpw[0x1C];
+            missleSpec[i].ammo = fpw[0x20];
+        }
+        g_initPhase = 2;
+        gfx_flipPage(1);
+        gfx_waitRetrace2();
+    }
+
+    v = clampRange(g_viewX_, 0x100, 0x7E00);
+    if (v != g_viewX_) {
+        g_viewX_ = v;
+        g_worldX = (int32)v << 5;
+    }
+    v = clampRange(g_viewY_, 0x200, 0x7D00);
+    if (v != g_viewY_) {
+        g_viewY_ = v;
+        g_worldY = (int32)(uint16)(0x8000 - g_viewY_) << 5;
+    }
+
+    plotMapObject(g_markerPosX, g_markerPosY, g_trackedEnemyIdx, 1);
+    g_trackedEnemyIdx = readMapPixelColor(g_viewX_, g_viewY_);
+    if (plotMapObject(g_viewX_, g_viewY_, 0xF, 1) != 0) {
+        redrawTacMap(g_viewX_, g_viewY_);
+    }
+    g_markerPosX = g_viewX_;
+    g_markerPosY = g_viewY_;
+
+    updateThreatSites();
+    updateObjects();
+    updateThreatTargeting();
+    spawnSamThreat();
+    tickWeaponSlots();
+    updateBulletsAndFire();
+    updateTracerParticles();
+    applyGravityFall();
+
+    if (g_threatActiveTimer != 0) {
+        g_threatActiveTimer--;
+    }
+
+    if ((*(int8 *)&frameTick & 7) == 0) {
+        g_prevThreatIndex = g_closestThreatIndex;
+        g_nearestThreatRange = 0x7FFF;
+        for (i = 0; i < g_storeDefCount; i++) {
+            if ((g_planeTable[i].flags & 0x201) != 0 &&
+                (g_planeTable[i].flags & 0x500) != 0) {
+                t2 = rangeApprox(g_viewX_ - g_planeTable[i].mapX,
+                                 g_viewY_ - g_planeTable[i].mapY);
+                if (t2 < g_nearestThreatRange) {
+                    g_nearestThreatRange = t2;
+                    g_closestThreatIndex = i;
+                }
+            }
+        }
+        if (g_prevThreatIndex != g_closestThreatIndex &&
+            (g_planeTable[g_closestThreatIndex].flags & 0x800) == 0) {
+            for (i = 1; i <= 2; i++) {
+                g_simObjects[g_groundUnitCount - i].flags.b[0] &= ~2;
+                g_simObjects[g_groundUnitCount - i].spec =
+                    (g_planeTable[g_closestThreatIndex].flags & 0x400) ? 8 : 0;
+                if (g_planeTable[g_closestThreatIndex].flags & 0x100) {
+                    g_simObjects[g_groundUnitCount - i].spec = 0x12;
+                }
+                g_simObjects[g_groundUnitCount - i].objType = g_closestThreatIndex;
+            }
+            for (i = 3; i <= 4; i++) {
+                obj = g_groundUnitCount - i;
+                g_simObjects[obj].flags.b[0] |= 2;
+                g_simObjects[obj].posX = g_planeTable[g_closestThreatIndex].mapX;
+                g_simObjects[obj].posY = g_planeTable[g_closestThreatIndex].mapY;
+                if ((g_planeTable[g_closestThreatIndex].flags & 0x200) != 0) {
+                    g_simObjects[obj].posX += g_northSouthSign * 5;
+                    g_simObjects[obj].posY += (i & 1) * g_northSouthSign * 0x10;
+                    g_simObjects[obj].alt = 0x84;
+                } else {
+                    g_simObjects[obj].posX += 10;
+                    g_simObjects[obj].posY += ((i + g_closestThreatIndex) & 3) * 0x10;
+                    g_simObjects[obj].alt = 4;
+                }
+                g_simObjects[obj].worldX = (int32)g_simObjects[obj].posX << 5;
+                g_simObjects[obj].worldY = (int32)(uint16)g_simObjects[obj].posY << 5;
+                g_simObjects[obj].heading.w = -randomRange(0x4000);
+                g_simObjects[obj].spec =
+                    (g_planeTable[g_closestThreatIndex].flags & 0x400) ? 8 : 0xB;
+                if (g_planeTable[g_closestThreatIndex].flags & 0x100) {
+                    g_simObjects[obj].spec = 9;
+                }
+            }
+        }
+        if ((*(int8 *)&frameTick & 0x7F) == 0) {
+            if ((g_planeTable[g_closestThreatIndex].flags & 0x800) == 0) {
+                obj = (*(int8 *)&frameTick & 0x80) ? g_groundUnitCount - 1
+                                                 : g_groundUnitCount - 2;
+                if ((g_simObjects[obj].flags.b[0] & 2) == 0) {
+                    spawnEnemyAircraft(obj, g_closestThreatIndex);
+                    g_simObjects[obj].flags.w = 0x207;
+                    g_simObjects[obj].alt = 0x3E8;
+                    g_simObjects[obj].speed = 0xFA;
+                    g_simObjects[obj].worldY += (int32)(g_northSouthSign * 0x3000);
+                }
+            }
+            g_unusedEventHist2 = g_unusedEventHist1;
+            g_unusedEventHist1 = g_unusedEventHist0;
+            g_unusedEventHist0 = 0;
+        }
+    }
+
+    if (g_nearestThreatRange < 0x200 || g_groundAltitude == g_viewZ) {
+        g_groundAltitude = 0;
+        g_threatProxX = 0xA0;
+        g_threatProxY = 0x800;
+        if ((g_planeTable[g_closestThreatIndex].flags & 0x800) != 0) {
+            g_threatProxY = 0x400;
+        }
+        if ((g_planeTable[g_closestThreatIndex].flags & 0x200) != 0) {
+            g_groundAltitude = 0x80;
+            g_threatProxX = 0x100;
+            g_threatProxY = 0x3C0;
+            if (g_viewZ == 0x80 && g_knots > 0x50) {
+                if ((uint16)(g_viewY_ - g_planeTable[g_closestThreatIndex].mapY) * g_northSouthSign >= 0x10 &&
+                    (uint16)(g_viewY_ - g_planeTable[g_closestThreatIndex].mapY) * g_northSouthSign <= 0x14 &&
+                    abs(g_ourHead - ((1 - g_northSouthSign) << 0xE)) < 0x2000) {
+                    g_autoCrashDive = 1;
+                    makeSound(0x16, 2);
+                }
+            }
+        }
+        if (g_viewParamsFar[0x20] == 1) {
+            g_threatProxX += 0x80;
+            g_threatProxY += 0x100;
+        }
+        if (abs(g_viewX_ - g_planeTable[g_closestThreatIndex].mapX) > (g_threatProxX >> 5) ||
+            abs(g_viewY_ - g_planeTable[g_closestThreatIndex].mapY) > (g_threatProxY >> 5)) {
+            g_groundAltitude = 0;
+            g_inLandingCorridor = 0;
+        } else {
+            g_inLandingCorridor = 1;
+            if (g_knots <= 1 && (*(int8 *)&frameTick & 0xF) == 0) {
+                for (i = 0; i < 2; i++) {
+                    if (g_targetSlots[i].planeIndex == g_closestThreatIndex &&
+                        g_targetSlots[i].state == 4 &&
+                        g_missionTick < g_missionTimeLimit) {
+                        markTargetReached(i);
+                        hudMessage("Gruz dostawlen");
+                        missleSpec[i].ammo = 0;
+                    }
+                }
+                if ((g_planeTable[g_closestThreatIndex].flags & 0x500) != 0 &&
+                    g_landingTimer != 0 &&
+                    (g_planeTable[g_closestThreatIndex].flags & 0x800) == 0) {
+                    if (g_landingTimer++ == 1) {
+                        hudMessage("Mqg. posadka");
+                    }
+                    if (0x10 / g_frameRateScaling < g_landingTimer) {
+                        commitCommSnapshot(0);
+                    }
+                }
+            }
+        }
+    } else {
+        g_inLandingCorridor = 0;
+    }
+
+    if (g_inLandingCorridor == 0) {
+        if (g_viewZ == 0) {
+            if ((g_viewParamsFar[0x20] != 0 || g_gunHits > 4 || g_fuelRemaining == 0) &&
+                g_ejectState == 0 && g_knots > 0x32) {
+                makeSound(2, 2);
+                gfx_waitRetrace();
+                waitFrameSync(0x78);
+                commitCommSnapshot(1);
+            }
+        } else {
+            g_landingTimer = 1;
+        }
+    }
+
+    if (g_savedPosVisible != 0) {
+        if (g_viewParamsFar[0x20] != 0) {
+            makeSound(2, 2);
+            gfx_waitRetrace();
+            waitFrameSync(0x78);
+            commitCommSnapshot(2);
+        } else {
+            g_altitude += 0x1F4;
+            g_autopilotAltitude = 0;
+        }
+    }
+
+    g_targetLeadAngle =
+        ((g_planeTable[g_closestThreatIndex].flags & 0x200) != 0 &&
+         g_nearestThreatRange < 0x500)
+            ? ((g_northSouthSign << 8) / g_frameRateScaling + g_targetLeadAngle) & 0xFFF
+            : 0;
+
+    frameTick++;
+    if (frameTick % g_frameRateScaling == 0) {
+        g_missionTick++;
+        for (i = 0; i < 2; i++) {
+            if ((*(int8 *)&g_targetSlots[i].flags & 0x20) != 0 &&
+                g_missionTick >= g_missionTimeLimit &&
+                g_groundAltitude != g_viewZ &&
+                !(*(int8 *)&g_planeTable[g_targetSlots[i].planeIndex].flags & 0x80)) {
+                g_nearestTileObj = findNearestTileObject(
+                    (uint32)(uint16)g_planeTable[g_targetSlots[i].planeIndex].mapX << 5,
+                    -((uint32)(uint16)g_planeTable[g_targetSlots[i].planeIndex].mapY - 0x8000) << 5);
+                if (g_nearestTileObj != 0) {
+                    addTileEntry(g_nearestTileObj,
+                                 shapeDataOffset(g_gndTargetMark + 0x100),
+                                 g_gndTargetMark + 0x100);
+                }
+                *(int8 *)&g_planeTable[g_targetSlots[i].planeIndex].flags |= 0x80;
+            }
+        }
+        if ((*(int8 *)&g_missionTick & 0x1F) == 0) {
+            recordFrame(9, 0);
+        }
+    }
+
+    if (++g_frameRateAccum >= (uint16)(g_frameRateScaling * 4)) {
+        g_frameTimingAccum -= (g_frameSyncWait * 2 - 1) * g_frameRateScaling * 2;
+        if (g_frameTimingAccum < 4) {
+            g_frameTimingAccum = 4;
+        }
+        v = clampRange((int16)((uint16)(0x3C0 * g_frameRateScaling) /
+                               (g_frameTimingAccum * g_timeAccelMode)), 1, 0xFF);
+        g_frameRateAccum = g_frameTimingAccum = 0;
+        if (abs(g_frameRateScaling * 4 - (int16)v) > 3) {
+            g_frameRateScaling = (int16)(v + 2) >> 2;
+            recalcTimeScale();
+        }
+        g_enemyAlertFlag = 0;
+        for (i = 3; i < g_targetEntityCount; i++) {
+            if (g_planeTable[i].alertLevel > 0xC0 &&
+                !(*(int8 *)&g_planeTable[i].flags & 0x80)) {
+                g_enemyAlertFlag++;
+                break;
+            }
+        }
+        for (i = 0; i < g_groundUnitCount; i++) {
+            if (g_simObjects[i].damage > 0xC0 &&
+                (g_simObjects[i].flags.b[0] & 2) != 0) {
+                g_enemyAlertFlag++;
+                break;
+            }
+        }
+    }
+
+    updateHudGauge();
+}
 
 /* ==== seg000:0x4769 ==== */
 extern int16 g_keyCode;                  /* word_384CE: pending keycode from _bios_keybrd */
@@ -267,7 +704,7 @@ extern int16 g_trackedEnemyIdx;        /* word_343B4 */
 void resetSimObjectLocks(void) {
     int16 i;
     for (i = 0; i < g_groundUnitCount; i++) {
-        ((struct SimObject *)g_simObjects)[i].f[0x10] = -1;
+        ((struct SimObject *)g_simObjects)[i].terrainColor = -1;
     }
     g_trackedEnemyIdx = -1;
 }
