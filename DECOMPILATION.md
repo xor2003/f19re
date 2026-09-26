@@ -692,6 +692,44 @@ the .lst — full portcheck cycles are for confirming, not exploring. And when
 mzdiff desyncs on a single inserted instruction, fall back to aligning the
 `.COD` against the `.lst` by hand — the rest of the stream may already match.
 
+## 5b. Semantic equivalence via Z3 (`tools/z3check.py`)
+
+For routines that cannot reach byte-exactness (`spawnSamThreat`,
+`drawWeaponRadarInfo` — each carries the one extra prologue `mov si,[bp+N]`
+described in §5), `portcheck`/mzdiff can never say MATCH. A second, semantic
+gate uses the Z3-backed SSA comparator in `~/vextest`:
+
+    python3 tools/z3check.py src/egcombat.c spawnSamThreat
+
+The driver: (1) builds the module test exe via `portcheck.py` machinery,
+(2) runs `discover`/`ssa`/`make-mapping`/`compare-ssa` against the oracle
+`EGAME.EXE` + `map/egame.map`, then (3) **normalizes linked-layout
+differences** in the candidate SSA before comparing — the test exe links only
+one module, so every global and string sits at a different data offset than
+in the oracle:
+
+- *named globals*: name → (candidate offset from the test exe's LINK map,
+  oracle offset from the `@0xXXXX` comment on its C declaration); a candidate
+  constant is rewritten to the oracle offset only when the same value does
+  **not** also appear as a real literal in that oracle function (a `0x800`
+  store was once corrupted by colliding with a global's candidate address).
+- *string literals*: candidate constant → NUL-terminated bytes in the test
+  exe's data segment must equal oracle bytes at the oracle offset; for
+  non-unique contents (`" km"` occurs 5×) a positional pass pairs same-named
+  SSA parts in entry order and remaps only when contents match.
+- SSA part boundaries still shift where the extra prologue load splits call
+  blocks — those parts report `part_boundary_mismatch`/`candidate_ssa_missing`
+  and are expected refusals, not diffs.
+
+Result: `spawnSamThreat` **17/17 compared parts proven** (5 boundary refusals);
+`drawWeaponRadarInfo` **18 proven, 1 part mis-paired** (oracle's merge-point
+`push ax` against the candidate's `" impul"` arm — contents agree), 2 refused.
+Verdict `PROVEN(modulo-layout)` means every compared part is equal and any
+failures are only `memory_expr_changed` — the layout-artifact class; confirm
+against `build/z3cmp/*.compare.json` details before trusting a nonzero count.
+`make verify` / `portcheck` remain the byte-exactness gate; z3check only says
+the compiled behavior is identical.
+
 ## 6. Naming / bookkeeping
 
 - `conf/routine_names.txt`: `routine_N name # seg:off description`. After

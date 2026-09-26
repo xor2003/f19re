@@ -246,15 +246,22 @@ egmain.c(/Os+/Oa):main, drawCockpit, runGameSession, gfxInit
 
 ## Verified semantically (NOT byte-exact)
 
+Both routines below are Z3-proven semantically equivalent via
+`tools/z3check.py` (see DECOMPILATION.md §5b): every comparable SSA part
+matches after data-segment/string-offset normalization; remaining refusals
+are `part_boundary_mismatch` artifacts of the extra prologue load.
+
 - `spawnSamThreat` (egcombat.c, seg000:0x585c): instruction-for-instruction
   identical to the original except one prologue `mov si,[bp+4]` — MSC 5.1
   emits a register-param init because `off`'s first store sits past the guard
   branches. Byte-exact is unreachable under MSC 5.1 (si-dedication needs a
   register var = extra home slot, or a param = the init load). See
-  DECOMPILATION.md §5.
+  DECOMPILATION.md §5. Z3: 17/17 compared parts proven.
 - `drawWeaponRadarInfo` (egui.c, seg000:0xab2d): identical except prologue
   `mov si,[bp+8]`. Same mechanism: `register int16 off` (param, phantom arg3)
   is the only way to commit `si = weaponIdx*14` for the `[si+base+fieldoff]`
   record reads — the name(addr)+flag(test)+lethality+dangerTier cluster shares
   `i*14` in `si`, recomputed once after `strcpy("Maks dalxn.")`. Plain indexing
   or `off` locals give `bx`/`sub sp,2` instead. Byte-exact unreachable.
+  Z3: 18 proven, 1 part mis-paired by the comparator (contents agree),
+  2 boundary refusals.
