@@ -318,7 +318,6 @@ int16 g_savedGfxOvl;                 /* word_38D28 — gfxOvlAddr saved by _main
 
 /* egmain.c callees — still asm/library */
 int16 getOverlayLoadSeg(int16 slot) { return 0; }     /* sub_102B4 */
-void  gfxInit(void) { }                               /* sub_1026A */
 void  setupOverlaySlots(uint16 addr) { }              /* sub_103B2 */
 void  installCBreakHandler(void) { }                  /* sub_11C83 */
 void  restoreCbreakHandler(void) { }                  /* sub_11CA6 */
@@ -468,3 +467,8 @@ void far applyViewScaleMode(void) {}            /* sub_2208E (seg002) */
 void far initJoystickCalibration(void) {}       /* sub_22C5E (seg002) */
 void far readCalibratedJoystick(void) {}        /* sub_22C7F (seg002) */
 void far audio_setEnginePitch(int16 a, int16 b) {} /* sub_2F23C (dseg stub) */
+uint8 far gfx_getModeFlag(void) { return 0; }       /* sub_2F1A6 */
+int16 far gfx_allocPage(int16 page) { return 0; }   /* sub_2F02A */
+void  far gfx_storeBufPtr(int16 ptr, int16 n) { }   /* sub_2F1A1 */
+void  setupDac(void) { }                            /* sub_11BB4 */
+uint8 g_dacSupported;                               /* byte_2EEE4 */

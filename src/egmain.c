@@ -67,6 +67,12 @@ void   moveDataFar(void);                       /* sub_14EF7 — ported in egfra
 void   waitFrameSync(int16 ticks);              /* sub_104E2 — ported in egrender.c */
 void   far setInt9Handler(void);                /* seg003:0x000e */
 void   far restoreInt9Handler(void);            /* seg003:0x005e */
+uint8  far gfx_getModeFlag(void);               /* sub_2F1A6 */
+int16  far gfx_allocPage(int16 page);           /* sub_2F02A */
+void   far gfx_storeBufPtr(int16 ptr, int16 n); /* sub_2F1A1 */
+void   setupDac(void);                          /* sub_11BB4 — int10h AX=1012 (asm) */
+
+extern uint8 g_dacSupported;                    /* byte_2EEE4 */
 
 /* ==== seg000:0x0010 ==== */
 int main(void) {
@@ -153,4 +159,15 @@ void runGameSession(void) {
     waitFrameSync(2);
     restoreTimerIrqHandler();
     audio_shutdown();
+}
+
+/* ==== seg000:0x026a ==== */
+void gfxInit(void) {
+    int16 page;
+
+    if ((g_dacSupported = gfx_getModeFlag()) != 0)
+        setupDac();
+    page = gfx_allocPage(1);
+    gfx_storeBufPtr(page, 1);
+    gfx_storeBufPtr(commData->gfxInitResult, 2);
 }
