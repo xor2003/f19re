@@ -114,6 +114,64 @@ void buildRangeString(int16 rangeRaw) {
     strcat(strBuf, " km");
 }
 
+/* ==== seg000:0xc793 ==== */
+extern int16 g_viewZ;             /* word_33576 */
+extern int8  g_camExtFlag;        /* byte_3836E — low byte of g_viewMode */
+extern int32 g_ViewX;             /* word_37CB8/37CBA */
+extern int32 g_ViewY;             /* word_382D4/382D6 */
+extern int32 g_camEyeX;           /* word_376DC/376DE */
+extern int32 g_camEyeY;           /* word_379B4/379B6 */
+extern int16 g_camEyeZ;           /* word_379BE */
+extern int16 g_projDepth;         /* word_384D0 */
+extern int16 g_aimClipSave;       /* word_351DC — raw X saved when off-screen */
+int32 matVecDotAxis(int16 axis, int16 x, int16 y, int16 z); /* sub_1C95F (egmath.c) */
+
+/* Project a world point through the view rotation and store the screen
+ * position of the aim marker: X into g_vprojXlo, Y into g_vprojYlo,
+ * depth into g_projDepth.  Marks g_vprojXlo = -1 when the point is
+ * behind the camera or off the frustum edge. */
+void computeAimProjection(int16 wx, int16 wy, int16 wz) {
+    int16 x, y, z;
+    int32 y0, y1, y2;
+
+    x = g_viewX_ - wx;
+    y = wy - g_viewY_;
+    z = (wz - g_viewZ) >> 5;
+    if (g_camExtFlag & 0x80) {
+        x -= (int16)((g_ViewX - g_camEyeX) >> 5);
+        y -= (int16)((g_ViewY - g_camEyeY) >> 5);
+        z -= (int16)(-((int32)(uint16)g_viewZ - (int32)g_camEyeZ) >> 5);
+    }
+    y0 = matVecDotAxis(0, x, y, z);
+    y1 = matVecDotAxis(1, x, y, z);
+    y2 = matVecDotAxis(2, x, y, z);
+    if (y2 < 0) {
+        if (g_halfScaleRender != 0) {
+            y0 >>= 1;
+            y1 >>= 1;
+        }
+        if (-y2 >= y0) {
+            if (y0 < y2) goto fail;
+            g_vprojXlo = (int16)((y0 << 8) / y2) + 0xA0;
+            g_vprojYlo = (int16)((y1 << 8) / y2);
+            g_vprojYlo -= g_vprojYlo >> 2;
+            g_vprojYlo += g_hudVisible ? (g_halfScaleRender ? 0x52 : 0x38) : 0x64;
+            g_projDepth = (int16)(y2 >> 3);
+            if (g_vprojXlo < 0 || g_vprojXlo > 0x13F) {
+                g_aimClipSave = g_vprojXlo;
+                g_vprojXlo = -1;
+            }
+            if (g_vprojYlo < 0 || g_vprojYlo > (g_hudVisible ? 0x70 : 0xC7)) {
+                g_aimClipSave = g_vprojXlo;
+                goto fail;
+            }
+            return;
+        }
+    }
+fail:
+    g_vprojXlo = -1;
+}
+
 /* ==== seg000:0xc9b2 ==== */
 struct StoreDef { int16 subIdx; uint16 coordX; uint16 coordY; int16 f6; int8 flags; int8 f9; int16 padA; int16 padC; int16 nameIdx; };
 struct SimObject { int16 f[0x12]; };

@@ -237,6 +237,8 @@ int16 flt15_buf1[16];
 int32 g_ViewX, g_ViewY, g_camEyeX, g_camEyeY;
 int16 g_camEyeZ;
 int16 g_viewMode;
+int8  g_camExtFlag;
+int16 g_aimClipSave;
 int8  g_halfScaleRender;
 int16 g_curLod;
 void pascal shiftLongLeftInPlace(int16 c, int32 *p) { *p <<= c; }

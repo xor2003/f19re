@@ -222,6 +222,18 @@ compiled *without* `/Gs`.
   tests into separate `if ... goto label` statements forces MSC to recompute
   `idx*stride` into `bx` at each gate. `updateObjects` needed the gun gates
   and the smoke guards as nested/`&&` conditions for exactly this reason.
+- Signed `int32` compares come in two expansions: `jg T / jge F` (jump on
+  strictly-greater to the *true* block first) vs `jge T / jge F` (jump on
+  greater-or-equal first). MSC picks per statement shape, not per condition:
+  a nested `if (A) { if (B) ... }` lowers the inner conjunct to `jge`-first,
+  while `if (x < y) goto fail` lowers to `jg $continuation` (i.e. `jg`-first)
+  because the *true* target of `x < y` is a real label. `computeAimProjection`
+  (seg000:0xc793) needed `if (-y2 >= y0) { if (y0 < y2) goto fail; ... }` —
+  the inner `<`-goto emits `jg` into the guarded body, matching the
+  original's `cmp dx,[hi]; jg ok; jge ...; cmp ax,[lo]; jnb ...` sequence.
+- Signed vs unsigned `>>` on a 32-bit leaf selects `__aNlshr` vs `__aNulshr`;
+  a `(uint16)` operand anywhere in the chain flips the leaf to unsigned.
+  Zero-extend a word into a *signed* long as `(int32)(uint16)x`.
 
 ### Union members vs plain word lvalues
 
@@ -398,6 +410,21 @@ built with — determined empirically, since flag choice is visible in codegen:
   addresses in the test exe; the instruction stream still matched.
 - **stray `nop`** — MSC aligns jump targets to even boundaries; pad placement
   depends on the routine's offset in the final exe.
+
+After the spec'd walk drains, `checkMissedRoutines` re-seeds every unvisited
+routine in the ref map, so a `--map` run effectively compares the whole map:
+each missed routine resolves its target via opcode-pattern search, and a
+false-positive match (e.g. `applyGravityFall` resolving inside
+`computeAttitudeAngles` when its true location was already claimed visited)
+reports a bogus MISMATCH. Verify the routine itself with a direct range diff:
+
+```sh
+mzretools/build/mzdiff EGAME.EXE:0xSTART-0xEND \
+    build/TEST.EXE:0xSTART-0xEND --nocall --loose
+```
+
+`map/egame.tgt` is the discovered-target-map cache mzdiff rewrites each run —
+gitignored; never commit it.
 
 Everything else must be byte-identical: same opcodes, same registers, same
 `[bp-N]` displacements, same operand order.
