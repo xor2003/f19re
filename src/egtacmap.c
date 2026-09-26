@@ -695,6 +695,148 @@ int16 getWeaponStat(int16 statIdx, int16 sel) {
     return g_statTab[statIdx][ g_classTab[g_storeDefs[sel].nameIdx & 0x7F] & 0xF ];
 }
 
+/* ==== seg000:0x92fa ==== */
+extern int16 g_projDepth;          /* word_384D0 */
+extern int16 g_vprojXlo, g_vprojYlo;   /* word_2FF24 / word_30108 */
+extern int16 g_airTargetLock;      /* word_343BA */
+extern int16 g_groundTargetLock;   /* word_343BC */
+extern int16 g_scopeSweepTimer;    /* word_343C0 */
+extern int16 g_threatLabelTarget;  /* word_38372 — >=0: g_planeTable idx, <0: ~g_simObjects idx */
+extern int16 g_scopeArcColor;      /* word_35452 */
+extern int16 g_groundUnitCount;    /* word_384FE */
+extern int16 g_detailLevel;        /* word_354BC */
+struct SimObject {
+    int16 objType;      /* +0x00 */
+    uint16 posX;        /* +0x02 */
+    int16 posY;         /* +0x04 */
+    int16 alt;          /* +0x06 */
+    int32 worldX;       /* +0x08 */
+    int32 worldY;       /* +0x0C */
+    union { int16 w; uint8 b[2]; } heading; /* +0x10 */
+    int16 pitch;        /* +0x12 */
+    union { int16 w; uint8 b[2]; } bank;    /* +0x14 */
+    int16 spec;         /* +0x16 */
+    union { uint16 w; uint8 b[2]; } flags;  /* +0x18 */
+    int16 speed;        /* +0x1A */
+    int16 timer;        /* +0x1C */
+    int16 weaponType;   /* +0x1E */
+    int16 terrainColor; /* +0x20 */
+    int16 damage;       /* +0x22 */
+};                                   /* 36 bytes */
+extern struct SimObject g_simObjects[];    /* @0x8870 */
+struct Projectile { int16 mapX, mapY, alt, speed, worldX, worldY, worldZ, ttl,
+                    specIdx, weaponIdx, targetLock, targetRef; };
+extern struct Projectile g_projectiles[];  /* @0x5422, stride 0x18 */
+struct MapEvent { int16 mapX, mapY, unused4, type, ttl, unusedA; };
+extern struct MapEvent mapEvents[];        /* @0x5230, stride 0x0C */
+void projectMapPoint(int16 mapX, int16 mapY);               /* sub_19810 */
+void drawMapMarkerBox(int16 cx, int16 cy, int16 color);     /* sub_1978C */
+void blitGaugeSprite(int16 srcCol, int16 srcRow, int16 destX, int16 destY); /* sub_198BC */
+
+void drawTacticalMap(int8 page) {
+    int16 startX, code, startY, altBand, altDiff, gridX, i, gridY, radius, gridLo, gridStep;
+
+    radius = g_radarScopeRange + 1;
+    setDrawColor(0);
+    if (page == 0)
+        fillSpanRect(g_pageFront, 0x27, 0x7B, 0x90, 0xC4);
+    else
+        fillSpanRect(g_pageBack, 0x27, 0x7B, 0x90, 0xC4);
+    setDrawColor(8);
+    gridStep = 1;
+    if (g_radarScopeRange < 2 && g_detailLevel != 0)
+        gridStep = (1 << (2 - (uint8)g_radarScopeRange)) + 1;
+    gridLo = 1 - gridStep;
+    gridX = g_viewX_ & 0xFC00;
+    gridY = g_viewY_ & 0xFC00;
+    for (i = gridLo; i <= gridStep; i++) {
+        projectMapPoint(i * 0x400 + gridX, gridY + 0x1400);
+        startX = g_vprojXlo;
+        startY = g_vprojYlo;
+        projectMapPoint(i * 0x400 + gridX, gridY - 0x1000);
+        drawClippedLineRegion(startX, startY, g_vprojXlo, g_vprojYlo, 0x28, 0x8F, 0x7C, 0xC3, 0);
+    }
+    for (i = gridLo; i <= gridStep; i++) {
+        projectMapPoint(gridX + 0x1400, i * 0x400 + gridY);
+        startX = g_vprojXlo;
+        startY = g_vprojYlo;
+        projectMapPoint(gridX - 0x1000, i * 0x400 + gridY);
+        drawClippedLineRegion(startX, startY, g_vprojXlo, g_vprojYlo, 0x28, 0x8F, 0x7C, 0xC3, 0);
+    }
+    for (i = 0; i < g_groundUnitCount; i++) {
+        if ((g_simObjects[i].flags.b[0] & 2) && g_simObjects[i].speed != 0) {
+            projectMapPoint(g_simObjects[i].posX, g_simObjects[i].posY);
+            if (g_projDepth != -1) {
+                if (g_currentWeaponType == 1 && i == g_airTargetLock)
+                    drawMapMarkerBox(g_vprojXlo, g_vprojYlo, 7);
+                if (g_scopeSweepTimer > 0 && i == -1 - g_threatLabelTarget)
+                    drawMapMarkerBox(g_vprojXlo, g_vprojYlo, g_scopeArcColor);
+                code = g_simObjects[i].heading.w - g_ourHead + 0x800;
+                altDiff = g_simObjects[i].alt - g_viewZ;
+                altBand = 0;
+                if (altDiff < -1000)
+                    altBand = 1;
+                if (altDiff > 1000)
+                    altBand = 2;
+                blitGaugeSprite((code >> 0xC) & 0xF, altBand, g_vprojXlo, g_vprojYlo);
+            }
+        }
+    }
+    for (i = 0; i < 0xC; i++) {
+        if (g_projectiles[i].ttl != 0) {
+            projectMapPoint(g_projectiles[i].mapX, g_projectiles[i].mapY);
+            if (g_projDepth != -1) {
+                setDrawColor(sams[g_projectiles[i].specIdx].weaponClass <= 0 ? 0xC : 0xE);
+                if (i >= 8)
+                    setDrawColor(0xF);
+                code = g_projectiles[i].worldX - g_ourHead;
+                drawScreenLineOnePage(g_vprojXlo, g_vprojYlo,
+                                      g_vprojXlo - sinMul(code, radius), cosMul(code, radius) + g_vprojYlo);
+            }
+        }
+    }
+    for (i = 0; i < g_storeDefCount; i++) {
+        if (!(g_planeTable[i].flags & 0x80)) {
+            projectMapPoint(g_planeTable[i].mapX, g_planeTable[i].mapY);
+            if (g_projDepth != -1) {
+                if (g_currentWeaponType == 2 && i == g_groundTargetLock)
+                    drawMapMarkerBox(g_vprojXlo, g_vprojYlo, 7);
+                if (g_scopeSweepTimer > 0 && i == g_threatLabelTarget)
+                    drawMapMarkerBox(g_vprojXlo, g_vprojYlo, g_scopeArcColor);
+                code = 5;
+                if (g_planeTable[i].flags & 0x201)
+                    code = ((-g_ourHead + 0x1000) >> 0xD & 3) + 8;
+                if (g_planeTable[i].active != 0)
+                    code = 1;
+                if (*(uint8 *)&g_planeTable[i].flags & 8)
+                    code = 7;
+                blitGaugeSprite(code, 3, g_vprojXlo, g_vprojYlo);
+            }
+        }
+    }
+    projectMapPoint(g_viewX_, g_viewY_);
+    if (g_projDepth != -1)
+        blitGaugeSprite(0, 3, g_vprojXlo, g_vprojYlo);
+    for (i = 0; i < 4; i++) {
+        if (mapEvents[i].ttl != 0) {
+            projectMapPoint(mapEvents[i].mapX, mapEvents[i].mapY);
+            if (g_projDepth != -1) {
+                switch (mapEvents[i].type) {
+                case 1:
+                    blitGaugeSprite(2, 3, g_vprojXlo, g_vprojYlo);
+                    break;
+                case 2:
+                    blitGaugeSprite(3, 3, g_vprojXlo, g_vprojYlo);
+                    break;
+                case 3:
+                    blitGaugeSprite(6, 3, g_vprojXlo, g_vprojYlo);
+                    break;
+                }
+            }
+        }
+    }
+}
+
 /* ==== seg000:0xa23f / 0xa26c / 0xa2c5 ==== */
 
 extern int16 *g_pageOffscreen;   /* word_34676 */
