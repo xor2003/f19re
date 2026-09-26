@@ -190,6 +190,12 @@ compiled *without* `/Gs`.
 - `sub_15689`-style routines show the other pattern: when the hot index is
   computed *before* the map check, si is already committed and the map row
   falls to `di` naturally.
+- **`if/else` arm order = which arm falls through.** `if (x >= 0) {A} else
+  {B}` emits `jl elseLbl` + A + `jmp end` + B (A in fallthrough position,
+  B after the taken branch). `if (x < 0) {B} else {A}` emits `jge elseLbl`
+  + B + `jmp end` + A — same semantics, opposite layout. Match the
+  original's block placement by picking the comparison sense, not by
+  `goto`s (`stepFlightModel`'s seeker `an =` block needed `>= 0`).
 
 ### Rotated loops: nested `if`s, not `continue`
 
@@ -360,10 +366,13 @@ the *word lvalue* only when the operand is a plain `int16` lvalue:
 ### Locals & the name hash
 
 - Local stack slots are assigned by **variable-name hash**, not declaration
-  order: `bucket = sum(name bytes) % 16`, buckets allocated ascending, same
-  bucket prepends (last declared gets the lower slot). Reusing f15's exact
-  identifier names is the easiest way to reproduce a frame; otherwise
-  brute-force names.
+  order: `bucket = sum(name bytes) % 16`, buckets allocated ascending;
+  within a bucket, declaration order maps first-declared to the bucket's
+  *deepest* slot and last-declared to its *shallowest*. Reusing f15's exact
+  identifier names is the easiest way to reproduce a frame; otherwise pick
+  names whose hash buckets land on the right offsets, then fix the order
+  inside each multi-var bucket by permuting the declarations
+  (`stepFlightModel`, seg000:0x215c — 25 slots).
 - Dead stores still get slots and still emit `mov [bp-var],const` — e.g.
   `spawnSamThreat`'s `specIdx = 0x21` is stored at `var_2` then never read.
 - **Scope controls slot order.** Vars at function-block scope are pooled at
@@ -495,6 +504,29 @@ placement to the original's instruction shape.
 
 Match the push order in the disasm to pin down operand order — the dividend
 is pushed *last* (top of stack) for `__aNldiv`.
+
+**`__aNlmul` operand order — the `x & x` "heavy rank" trick.** For
+`term32 * var32` the compiler is free to pick which operand is arg2
+(pushed/evaluated first): it prefers the operand that is *cheap* — a value
+already live in `ax` (e.g. a just-stored local) — and evaluates it first.
+The original often shows the complex term pushed first instead, with the
+variable *reloaded* (`mov ax,[bp-var]; cwd`) even though `ax` still held it.
+`(int32)(v & v)` solves this: it folds to a plain `mov ax,[v]` load but
+ranks the operand *heavy*, so MSC makes it arg1 — pushed last, evaluated
+after `ax` was clobbered by the term — exactly the original's emit
+(f15's `speedCalc & speedCalc`; F19 `stepFlightModel` `spdx & spdx`).
+An `int * int` with no 32-bit operand anywhere collapses to native
+`mul reg16`; the `(int32)` cast on the `&` operand is what keeps the mul in
+the long domain. For `((u16term) * (int32)(v & v)) >> K` the product comes
+out `uint32`-flavoured, giving `__aNulshr` where the original used it.
+
+**Nested `ldiv`.** `((int32)a - (int32)b) / 0x10 / g` emits
+`cwd`-extension of each sub operand + `sub ax,cx; sbb dx,bx` (the second
+operand's sign-extension kept in `bx:cx`), then `ldiv(diff, 0x10)` inside
+`ldiv(result, g)` — the outer divisor pushed first. A plain `int/int`
+division by 16 instead folds to the inline `abs`-shift idiom
+(`sub; xor ax,dx; sub ax,dx; sar 4; xor; sub`); when the original shows a
+real `call __aNldiv`, cast the operands to `int32`.
 
 ### Compiler flags are per-module
 

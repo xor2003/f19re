@@ -421,3 +421,22 @@ int16 g_targetLeadAngle;              /* word_385D0 — drift/lead angle accum *
 int16 g_frameRateAccum;               /* word_343CE — frame counter vs scaling*4 */
 int16 g_markerPosX, g_markerPosY;     /* word_373EA / word_37488 — saved tac marker pos */
 void far gfx_flipPage(int16 arg) { }  /* sub_2F17E */
+
+/* stepFlightModel (seg000:0x215c) */
+int16 g_thrust;                       /* word_37486 — smoothed throttle */
+int16 g_rollInput, g_pitchInput;      /* word_384C8 / word_38A0E — stick inputs */
+int16 g_gees;                         /* word_354BA — computed gees*16 */
+int16 g_stallSpeed;                   /* word_36DDC — stall speed ref */
+int16 g_liftForce;                    /* word_379BA — lift at current speed */
+int8  g_geeTable[0x100];              /* @0x4624 — roll->gee LUT */
+char  g_geeStrBuf[0x10];              /* @0x6640 — HUD gee string */
+int16 g_joyCalibTimer;                /* word_3358A — joy-calib debounce */
+int16 g_joySensitivity;               /* word_34B00 — setup sensitivity */
+uint8 g_joyRawX, g_joyRawY;           /* @0x3345E/0x3345F — driver raw axes */
+int8  g_highGeeFlag;                  /* byte_38B0A — g-meter needle flag */
+int8  g_exitStatus;                   /* byte_2EEE5 — app exit code */
+int16 g_yawMatrix[9], g_pitchMatrix[9], g_rollMatrix[9]; /* 0x46B8/0x46CA/0x46DC */
+void far applyViewScaleMode(void) {}            /* sub_2208E (seg002) */
+void far initJoystickCalibration(void) {}       /* sub_22C5E (seg002) */
+void far readCalibratedJoystick(void) {}        /* sub_22C7F (seg002) */
+void far audio_setEnginePitch(int16 a, int16 b) {} /* sub_2F23C (dseg stub) */

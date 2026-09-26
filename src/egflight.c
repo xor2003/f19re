@@ -2,6 +2,536 @@
    Verified byte-identical against EGAME.EXE via tools/portcheck.py. */
 #include "inttype.h"
 
+/* ==== seg000:0x215c ==== */
+extern int16 g_initPhase;             /* word_38388 */
+extern int16 g_keyCode;               /* word_384CE */
+extern int8  g_exitStatus;            /* byte_2EEE5 — app exit code */
+extern int8  g_halfScaleRender;       /* byte_330EA */
+extern int8  g_playerPlaneFlags;      /* byte_356DC */
+extern int8  g_weaponMask;            /* byte_33D64 */
+extern int8  g_highGeeFlag;           /* byte_38B0A */
+extern int16 g_joyCalibTimer;         /* word_3358A */
+extern int16 g_joySensitivity;        /* word_34B00 */
+extern uint8 joyAxes[];               /* @0x3345A */
+extern uint8 g_joyRawX, g_joyRawY;    /* @0x3345E/0x3345F */
+extern int16 g_rollInput;             /* word_384C8 */
+extern int16 g_pitchInput;            /* word_38A0E */
+extern int16 g_thrust;                /* word_37486 */
+extern int16 g_engineThrust;          /* word_33588 */
+extern int16 g_startRange;            /* word_36E22 */
+extern int16 g_knots;                 /* word_373E8 */
+extern int16 g_stallSpeed;            /* word_36DDC */
+extern int16 g_cornerSpeed;           /* word_38A10 */
+extern int16 g_liftForce;             /* word_379BA */
+extern int16 g_gees;                  /* word_354BA */
+extern int8  g_geeTable[];            /* @0x4624 — roll->gee LUT */
+extern char  g_geeStrBuf[];           /* @0x6640 */
+extern char  g_nameBuf[];             /* @0x65E6 */
+extern int16 g_ejectState;            /* word_382D8 */
+extern int16 g_inLandingCorridor;     /* word_343CA */
+extern int16 g_smokeSourceIdx;        /* word_343BE */
+extern int16 g_smokeParticleSlot;     /* word_34110 */
+extern int16 g_selGridX, g_selGridY;  /* word_36F3A/0x36F3C */
+extern int16 g_hitMapX, g_hitMapY, g_hitAlt; /* word_38378/0x38384/0x3838A */
+extern int16 g_hitEffectTimer;        /* word_35AE2 */
+extern int16 g_autopilotAltitude;     /* word_33D84 */
+extern int16 g_waypointBearing;       /* word_3836C */
+extern int16 g_missionTick;           /* word_354C0 */
+extern int16 g_gunHits;               /* word_3844C */
+extern int16 g_gunFiredFlag;          /* word_354C6 */
+extern int16 g_fuelRemaining;         /* word_33D66 */
+extern int16 g_aamSeekerX, g_aamSeekerY; /* word_38B0E/0x38B16 */
+extern int16 g_selStoreIdx;           /* word_37626 */
+extern int16 g_closestThreatIndex;    /* word_385D2 */
+extern int16 g_altitude;              /* word_33578 */
+extern int16 g_groundAltitude;        /* word_3837A */
+extern int16 g_climbRate;             /* word_38D1E */
+extern int16 g_rollPitchTrim;         /* word_354A6 */
+extern int16 g_autoCrashDive;         /* word_354BE */
+extern int32 g_worldX, g_worldY;      /* word_37CB8 / word_382D4 */
+extern int16 g_viewZ;                 /* word_33576 */
+extern int16 g_ourHead, g_ourPitch, g_ourRoll;
+extern int16 g_viewX_, g_viewY_;      /* word_3837C / word_3838C */
+extern int16 g_currentWeaponType;     /* word_388C4 */
+extern int16 g_airTargetLock;         /* word_343BA */
+extern int16 g_inputDisabled;         /* word_33D8C */
+extern int16 g_crashCamZ;             /* word_384F8 */
+extern int16 frameTick;               /* word_343B6 */
+extern int16 g_frameRateScaling;      /* word_33D92 */
+extern int16 g_hudVisible;            /* word_33D90 */
+extern int8  g_orientationDirty;      /* byte_33585 */
+extern int16 g_orientMatrix[];        /* 0x46A6 */
+extern int16 g_yawMatrix[];           /* 0x46B8 */
+extern int16 g_pitchMatrix[];         /* 0x46CA */
+extern int16 g_rollMatrix[];          /* 0x46DC */
+extern uint16 FAR *g_viewParamsFar;   /* dword_354D0 */
+extern int16 *g_pageFront;            /* word_34646 */
+extern int16 *g_pageBack;             /* word_3465E */
+extern int16 *g_pageOffscreen;        /* word_34676 */
+struct CommData { int8 pad72[0x72]; int16 setupUseJoy; int8 pad74[4]; int16 gfxModeNum; };
+extern struct CommData FAR *commData; /* dword_38B10 */
+struct ViewSnapshot { int32 worldX, worldY; int16 alt, heading, pitch, roll; };
+extern struct ViewSnapshot g_viewSnapshotRing[];   /* @0x7FB6 — 16 frames */
+struct SimObject { int16 objType; uint16 posX; int16 posY; int16 alt;
+                   int32 worldX, worldY;
+                   union { int16 w; uint8 b[2]; } heading;
+                   int16 pitch; union { int16 w; uint8 b[2]; } bank;
+                   int16 spec; union { uint16 w; uint8 b[2]; } flags;
+                   int16 speed, timer, weaponType, terrainColor, damage; };
+extern struct SimObject g_simObjects[];            /* @0x8870 */
+struct MapTarget { int16 objType; uint16 mapX; uint16 mapY; int16 active;
+                   int16 flags; int16 alertLevel; int16 threatTimer; int16 symbol; };
+extern struct MapTarget g_planeTable[];            /* @0x80C8 */
+struct Particle { int16 posX, posY, alt, spin; };
+extern struct Particle g_particles[];              /* @0x5260 */
+void far applyViewScaleMode(void);                 /* sub_2208E (seg002) */
+void far initJoystickCalibration(void);            /* sub_22C5E (seg002) */
+void far readCalibratedJoystick(void);             /* sub_22C7F (seg002) */
+void far audio_setEnginePitch(int16, int16);       /* sub_2F23C (dseg stub) */
+int16 fixedMulQ14(int16, int16);                   /* sub_11BC6 */
+int16 isqrt(int16);                                /* sub_13387 */
+int16 sine(int16);                                 /* sub_11C2D */
+int16 cosine(int16);                               /* sub_11C1D */
+int16 abs(int16);
+int16 kbhit(void);
+int16 _bios_keybrd(int16 cmd);
+char *itoa(int16 v, char *buf, int16 base);
+char *strcpy(char *, const char *);
+char *strcat(char *, const char *);
+void makeSound();                                  /* sub_1DEF2 — no proto */
+void commitCommSnapshot(int16);                    /* sub_14C3C */
+void waitFrameSync(int16);                         /* sub_104E2 */
+void setDrawColor(int16);                          /* sub_18F9C */
+void fillRectBoth(int16, int16, int16, int16);     /* sub_18FB2 */
+void drawStatusItem(int16, int16);                 /* sub_19007 */
+void blitSprite(int16, int16, int16, int16, int16, int16, int16); /* sub_19912 */
+int16 clampRange(int16, int16, int16);             /* sub_1D1FA */
+int16 clampValue(int16, int16, int16);             /* sub_1D223 */
+int16 rangeApprox(int16, int16);                   /* sub_1D23B */
+int16 sinMul(int16, int16);                        /* sub_1D3EC */
+int16 cosMul(int16, int16);                        /* sub_1D404 */
+int16 randomRange(int16);                          /* sub_1D46B */
+void far gfx_copyRect(int16, int16, int16, int16, int16, int16, int16, int16); /* sub_2F0FC */
+void rebuildOrientation(void);
+void applyRotationDelta(const int16 *, const int16 *);
+void computeAttitudeAngles(void);
+void drawAirspeedTape(void);
+void waitForKeyPress(void);
+
+void stepFlightModel(void) {
+    int16 p;        /* bp-0x02 */
+    int16 a;        /* bp-0x04 */
+    int16 b;        /* bp-0x06 */
+    int16 c;        /* bp-0x08 */
+    int16 d;        /* bp-0x0A */
+    int16 lastAlt;  /* bp-0x0C: altitude before this frame's update */
+    int16 v0;       /* bp-0x10: pitch-path temp */
+    int16 v;        /* bp-0x0E */
+    int16 yawAng;   /* bp-0x12: yaw rotation delta */
+    int16 yawIn;    /* bp-0x14: yaw lead term */
+    int16 z;        /* bp-0x1A */
+    int16 j;        /* bp-0x18 */
+    int16 vel2;     /* bp-0x16: clamped speed in engine units */
+    int16 k;        /* bp-0x1C: pitch rotation delta */
+    int16 l;        /* bp-0x20: turbulence amplitude */
+    int16 dx;       /* bp-0x1E: horizontal ground speed */
+    int16 m;        /* bp-0x24: roll rotation delta */
+    int16 al;       /* bp-0x22 */
+    int16 ei;       /* bp-0x2A */
+    int16 am;       /* bp-0x28 */
+    int16 n;        /* bp-0x26: heading error / delta */
+    int16 gh;       /* bp-0x32 */
+    int16 an;       /* bp-0x30: ring index */
+    int16 ej;       /* bp-0x2E */
+    int16 spdx;     /* bp-0x2C: speed calculator */
+
+    if (g_initPhase == 0) {
+        g_ourPitch =
+            g_ourRoll =
+                g_viewZ =
+                    g_altitude =
+                        g_startRange =
+                            g_engineThrust =
+                                g_thrust = 0;
+        g_ourHead = (((uint8 FAR *)g_viewParamsFar)[0x38] & 1) ? 0 : (int16)0x8000;
+        if (g_planeTable[g_selStoreIdx].flags & 0x200) {
+            g_ourHead += 0x400;
+        }
+        rebuildOrientation();
+        drawAirspeedTape();
+        g_initPhase = 1;
+    }
+    g_keyCode = 0;
+    if (kbhit() != 0) {
+        g_keyCode = _bios_keybrd(0);
+    }
+    while (kbhit() != 0) {
+        _bios_keybrd(0);
+    }
+    switch ((uint16)g_keyCode) {
+    case 0x0C2D:
+        g_engineThrust = clampRange(g_engineThrust - 0xA, 0, 0x64);
+        drawAirspeedTape();
+        break;
+    case 0x0D3D:
+        g_engineThrust = clampRange(((g_engineThrust < 0xA) ? 5 : 0xA) + g_engineThrust,
+                                    0, 0x64);
+        drawAirspeedTape();
+        break;
+    case 0x0D2B:
+        g_engineThrust = 0x64;
+        drawAirspeedTape();
+        break;
+    case 0x0C5F:
+        g_engineThrust = 0;
+        makeSound(0x10, 0);
+        drawAirspeedTape();
+        break;
+    case 0x0B30:
+        g_playerPlaneFlags ^= 8;
+        if (!(g_playerPlaneFlags & 8) && g_groundAltitude != 0 && g_engineThrust == 0x64) {
+            g_startRange = 0x546;
+            makeSound(0x1C, 2);
+        }
+        break;
+    case 0x2E63:
+        g_halfScaleRender = (g_halfScaleRender == 0);
+        applyViewScaleMode();
+        break;
+    case 0x1F00:
+        if (g_joyCalibTimer == 0) {
+            initJoystickCalibration();
+            g_joyCalibTimer = 0x28;
+        }
+        break;
+    case 0x1000:
+        commitCommSnapshot(1);
+        g_exitStatus = 0;
+        break;
+    case 0x3000:
+        if (g_hudVisible != 0) {
+            gfx_copyRect(*g_pageFront, 0, 0x6D, *g_pageOffscreen, 0, 0x6D, 0x140, 0x5B);
+        }
+        setDrawColor(0);
+        fillRectBoth(0, 0, 0x13F, 0xC7);
+        blitSprite(0, 0, 0x71, 0x41, 0xE, 7, 0);
+        waitForKeyPress();
+        if (g_hudVisible != 0) {
+            gfx_copyRect(*g_pageOffscreen, 0, 0x6D, *g_pageFront, 0, 0x6D, 0x140, 0x5B);
+            gfx_copyRect(*g_pageOffscreen, 0, 0x6D, *g_pageBack, 0, 0x6D, 0x140, 0x5B);
+            drawAirspeedTape();
+        }
+        break;
+    case 0x1900:
+        waitForKeyPress();
+        break;
+    }
+    if (g_joyCalibTimer != 0) {
+        g_joyCalibTimer--;
+    }
+    if (g_engineThrust != 0 && g_thrust == 0) {
+        makeSound(0xE, 2);
+    }
+    if (g_inputDisabled != 0) {
+        joyAxes[0] = 0;
+        joyAxes[1] = 0;
+    } else if (commData->setupUseJoy != 0) {
+        readCalibratedJoystick();
+    } else {
+        /* temp_si = g_joySensitivity + 1 */
+        joyAxes[0] = (uint8)(((int16)((uint8)g_joyRawX - 0x80) * (g_joySensitivity + 1)) / 3) - 0x80;
+        joyAxes[1] = (uint8)(((int16)((uint8)g_joyRawY - 0x80) * (g_joySensitivity + 1)) / 3) - 0x80;
+    }
+    g_rollInput = ((uint16)joyAxes[0] >> 4) - 8;
+    if (g_rollInput < 0) {
+        g_rollInput++;
+    }
+    g_pitchInput = ((uint16)joyAxes[1] >> 4) - 8;
+    if (g_pitchInput < 0) {
+        g_pitchInput++;
+    }
+    g_rollInput = -((abs(g_rollInput) + 2) * g_rollInput) * 2;
+    g_pitchInput *= 6;
+    if (g_pitchInput < 0) {
+        g_pitchInput /= 2;
+    }
+    if (g_groundAltitude == g_viewZ && g_pitchInput < 0 && g_ourPitch <= 0) {
+        g_pitchInput = 0;
+    }
+    if (g_rollInput != 0 || g_pitchInput != 0) {
+        g_autopilotAltitude = 0;
+    }
+    drawStatusItem(4, (g_autopilotAltitude != 0) ? 0xF : 0);
+    if (g_autopilotAltitude != 0) {
+        n = clampValue(g_waypointBearing - g_ourHead, -0x1400, 0x1400) << 1;
+        g_rollInput = -clampRange((n - g_ourRoll) >> 6, -0x18, 0x18);
+        v0 = clampValue(((g_autopilotAltitude - g_viewZ) << 4) - g_rollPitchTrim,
+                        -0x1400, 0xC00);
+        g_pitchInput = clampRange((v0 - g_ourPitch) >> 7, -8, 8);
+    }
+    if (g_viewParamsFar[0x20] != 0) {
+        l = (int16)(((int32)g_knots * (0x1F4 - g_viewZ)) >> 0xD);
+    } else {
+        l = 0;
+    }
+    if (!(g_playerPlaneFlags & 1)) {
+        l += clampRange((g_knots - 0xC8) >> 4, 0, 0x20);
+    }
+    if (g_playerPlaneFlags & 2) {
+        l >>= 1;
+    }
+    if (g_weaponMask & 4) {
+        l += clampRange(g_gunHits * 4, 0, 0x20);
+    }
+    if (l > 0 && (uint16)g_groundAltitude < (uint16)g_viewZ) {
+        g_rollInput += randomRange(l) - (l >> 1);
+        g_pitchInput += (randomRange(l) - (l >> 1)) >> 1;
+    }
+    if ((g_playerPlaneFlags & 1) && g_pitchInput <= 0 &&
+        (uint16)g_stallSpeed < (uint16)g_startRange &&
+        (uint16)g_viewParamsFar[0x20] < 2 && abs(g_ourRoll) < 0x3000 &&
+        g_gunFiredFlag == 0) {
+        v0 = ((((g_rollPitchTrim - g_ourPitch) >> 3) - g_viewZ) + 0xC8) >> 3;
+        if (v0 > 0) {
+            g_pitchInput = clampRange(v0, 0, 0x20);
+        }
+    }
+    if (g_ejectState != 0) {
+        g_rollInput = 0x40;
+        g_pitchInput = (abs(g_ourRoll) > 0x4000) ? 0x10 : -8;
+        g_crashCamZ += clampRange(-(++g_ejectState - 0x20),
+                                  -0x60 / g_frameRateScaling, 0x80 / g_frameRateScaling);
+        if (g_crashCamZ < 0) {
+            g_crashCamZ = 0;
+            if (!(g_missionTick & 7)) {
+                commitCommSnapshot(0);
+            }
+        }
+        if (g_viewZ == 0 && g_smokeSourceIdx == -1) {
+            g_smokeSourceIdx = 0;
+            g_selGridX = g_viewX_;
+            g_selGridY = g_viewY_;
+            g_hitMapX = g_viewX_;
+            g_hitMapY = g_viewY_;
+            g_hitAlt = 0;
+            g_hitEffectTimer = -8;
+            makeSound(2, 2);
+            g_startRange = g_engineThrust = 0;
+        }
+        if ((g_ejectState & 0xFFFC) == 0x10 && ((int8)frameTick & 3) == 1) {
+            g_smokeSourceIdx = -1;
+            an = ((uint16)frameTick >> 1) & 7;
+            g_particles[an].posX = g_viewX_;
+            g_particles[an].posY = g_viewY_;
+            g_particles[an].alt = g_viewZ;
+            g_particles[an].spin = randomRange(0x20) << 0xB;
+            g_smokeParticleSlot = an;
+            g_hitMapX = g_viewX_;
+            g_hitMapY = g_viewY_;
+            g_hitAlt = g_viewZ;
+            g_hitEffectTimer = -8;
+            makeSound(0, 2);
+            g_ourPitch = -0x4000;
+            g_orientationDirty = 1;
+        }
+    }
+    if ((g_weaponMask & 2) && g_engineThrust > -(g_gunHits * 4 - 0x64)) {
+        g_engineThrust = -(g_gunHits * 4 - 0x64);
+        if (g_engineThrust < 0) {
+            g_engineThrust = 0;
+        }
+        drawAirspeedTape();
+    }
+    g_thrust += ((g_engineThrust - g_thrust) / 4) / g_frameRateScaling;
+    if (g_engineThrust > g_thrust) {
+        g_thrust++;
+    }
+    if (g_engineThrust < g_thrust) {
+        g_thrust = g_engineThrust;
+    }
+    if ((uint16)frameTick % (uint16)(g_frameRateScaling << 1) == 0 &&
+        g_engineThrust != 0) {
+        g_fuelRemaining -= ((g_weaponMask & 0x20) ? g_gunHits : 0) +
+                           (g_engineThrust * g_engineThrust) / 0x3E8 + 2;
+    }
+    if (g_fuelRemaining <= 0) {
+        g_thrust = 0;
+        g_fuelRemaining = 0;
+    }
+    g_gees = (uint8)g_geeTable[(abs(g_ourRoll) >> 8) & 0x7F];
+    if ((uint16)g_groundAltitude < (uint16)g_viewZ) {
+        g_gees += g_pitchInput;
+    }
+    if (g_gees > 0x80) {
+        g_gees = 0x80;
+        g_pitchInput = clampRange(-((uint8)g_geeTable[(abs(g_ourRoll) >> 8) & 0x7F] - 0x80),
+                                  0, g_pitchInput);
+    }
+    strcpy(g_geeStrBuf, itoa(g_gees / 0x10, g_nameBuf, 10));
+    strcat(g_geeStrBuf, ".");
+    strcat(g_geeStrBuf, itoa((abs(g_gees) & 0xF) >> 1, g_nameBuf, 10));
+    strcat(g_geeStrBuf, "G");
+    spdx = (int16)(((int32)(g_thrust - sinMul(g_ourPitch, 0x78)) * 0x258) / 0x64);
+    g_cornerSpeed = 0x78;
+    spdx = ((((uint16)g_viewZ >> 7) + 0x400) * (int32)(spdx & spdx)) >> 10;
+    g_cornerSpeed = ((((uint16)g_altitude >> 6) + 0x400) * (int32)(g_cornerSpeed & g_cornerSpeed)) >> 10;
+    spdx = (int16)((-((g_fuelRemaining >> 9) - 0x64) * (int32)spdx) / 0x5A);
+    spdx = (int16)(((int32)spdx * (0x80 - g_gees)) >> 7);
+    g_cornerSpeed = (int16)(((int32)isqrt(g_gees * 4) * (int32)g_cornerSpeed) >> 3);
+    g_cornerSpeed = abs(g_cornerSpeed);
+    if (g_playerPlaneFlags & 2) {
+        g_cornerSpeed -= g_cornerSpeed >> 2;
+        spdx -= spdx >> 4;
+    }
+    if (!(g_playerPlaneFlags & 1)) {
+        spdx -= spdx >> 3;
+    }
+    g_stallSpeed = g_cornerSpeed * 0x1B;
+    vel2 = clampRange(spdx, 0, 0x383) * 0x1B;
+    g_startRange += ((int32)vel2 - (int32)g_startRange) / 0x10 / g_frameRateScaling;
+    g_liftForce = (int16)(((int32)g_stallSpeed * 0xC00) / (abs(g_startRange) + 1));
+    if ((uint16)g_liftForce > 0x2000) {
+        g_liftForce = 0x2000;
+    }
+    g_rollPitchTrim = cosMul(g_ourRoll, g_liftForce - 0x300);
+    if (g_playerPlaneFlags & 8) {
+        if (g_groundAltitude == g_viewZ) {
+            g_startRange -= ((uint16)(-(g_viewParamsFar[0x20] * 8 - 0x20)) * 0x1B) /
+                            (uint16)g_frameRateScaling;
+            if (g_groundAltitude != 0 && (uint16)g_startRange < 0x1B0) {
+                g_startRange = 0;
+            }
+        } else {
+            g_startRange -= ((uint16)g_startRange >> 4) / (uint16)g_frameRateScaling;
+        }
+    }
+    if ((uint16)g_startRange > 0xAFC8) {
+        g_startRange = 0;
+    }
+    dx = cosMul(g_ourPitch, g_startRange);
+    g_knots = (uint16)g_startRange / 0x1B;
+    audio_setEnginePitch(g_knots, g_thrust);
+    yawIn = (int16)(((int32)sinMul(g_ourRoll, g_gees << 4) << 7) /
+                    ((int16)((uint16)g_startRange >> 8) + 0x20));
+    yawIn = cosMul(g_ourPitch, yawIn);
+    if (g_groundAltitude == g_viewZ) {
+        yawIn = (-g_rollInput) << 6;
+        g_rollInput = 0;
+        if (g_knots < g_cornerSpeed) {
+            g_pitchInput = 0;
+        }
+    }
+    if (g_autoCrashDive != 0) {
+        g_pitchInput = -0x400 - g_ourPitch;
+        g_engineThrust = g_startRange = 0;
+    }
+    m = (int16)(((int32)g_rollInput << 7) / g_frameRateScaling);
+    if (m != 0) {
+        g_rollMatrix[0] = g_rollMatrix[4] = cosine(m);
+        g_rollMatrix[1] = sine(m);
+        g_rollMatrix[3] = -g_rollMatrix[1];
+        applyRotationDelta(g_orientMatrix, g_rollMatrix);
+    }
+    k = (g_pitchInput << 7) / g_frameRateScaling;
+    if (k != 0) {
+        g_pitchMatrix[4] = g_pitchMatrix[8] = cosine(k);
+        g_pitchMatrix[7] = sine(k);
+        g_pitchMatrix[5] = -g_pitchMatrix[7];
+        applyRotationDelta(g_orientMatrix, g_pitchMatrix);
+    }
+    yawAng = yawIn / g_frameRateScaling;
+    if (yawAng != 0) {
+        g_yawMatrix[0] = g_yawMatrix[8] = cosine(yawAng);
+        g_yawMatrix[2] = sine(yawAng);
+        g_yawMatrix[6] = -g_yawMatrix[2];
+        applyRotationDelta(g_yawMatrix, g_orientMatrix);
+    }
+    computeAttitudeAngles();
+    if ((uint16)g_stallSpeed > (uint16)g_startRange &&
+        (uint16)g_groundAltitude < (uint16)g_viewZ) {
+        g_ourPitch -= ((uint16)g_stallSpeed - (uint16)g_startRange) >>
+                      (((uint16)g_viewParamsFar[0x20] == 2 || g_gunHits > 8) ? 1 : 2);
+        g_orientationDirty = 1;
+        if (g_ourPitch < 0 || (uint16)g_viewZ < 0xC8) {
+            makeSound(0x14, 1);
+        }
+    }
+    if (g_groundAltitude == g_viewZ) {
+        if (g_ourRoll != 0) {
+            g_ourRoll = 0;
+            g_orientationDirty = 1;
+        }
+        if (g_ourPitch < 0 || (g_ourPitch > 0 && g_knots < g_cornerSpeed)) {
+            if (g_autoCrashDive == 0) {
+                g_ourPitch = 0;
+            }
+            g_orientationDirty = 1;
+        }
+    }
+    g_autoCrashDive = 0;
+    g_highGeeFlag = (abs(g_ourPitch) - abs(g_ourRoll) / 2 > 0x1000) ? 1 : 0;
+    if (g_orientationDirty != 0) {
+        rebuildOrientation();
+    }
+    lastAlt = g_altitude;
+    g_climbRate = fixedMulQ14((uint16)g_startRange >> 4,
+                              sine(g_ourPitch - g_rollPitchTrim));
+    g_altitude += g_climbRate / g_frameRateScaling;
+    g_worldX += (fixedMulQ14(dx, sine(g_ourHead)) / 0x10) / g_frameRateScaling;
+    g_worldY += (fixedMulQ14(dx, cosine(g_ourHead)) / 0x10) / g_frameRateScaling;
+    if ((uint16)g_altitude > 0xF230 || (uint16)g_groundAltitude > (uint16)g_altitude) {
+        g_altitude = g_groundAltitude;
+    }
+    if ((uint16)g_altitude > 0xEA60) {
+        g_altitude = 0xEA60;
+    }
+    if ((uint16)g_altitude < 0x2000) {
+        g_viewZ = g_altitude;
+    } else if ((uint16)g_altitude < 0x4000) {
+        g_viewZ = (((uint16)g_altitude - 0x2000) >> 1) + 0x2000;
+    } else {
+        g_viewZ = (((uint16)g_altitude - 0x4000) >> 2) + 0x3000;
+    }
+    if (g_groundAltitude == g_viewZ) {
+        if (lastAlt > g_groundAltitude && g_inLandingCorridor != 0) {
+            makeSound(0xC, 2);
+            if (((g_planeTable[g_closestThreatIndex].flags & 0x200) ? 0x100 : 0x80) <
+                    (uint16)g_viewParamsFar[0x20] * (uint16)-g_climbRate ||
+                (g_viewParamsFar[0x20] != 0 &&
+                 ((g_playerPlaneFlags & 1) ||
+                  ((0x18 / (uint16)g_viewParamsFar[0x20]) << 8) <
+                      (uint16)abs(g_ourRoll)))) {
+                makeSound(2);
+                waitFrameSync(0x3C);
+                commitCommSnapshot(5);
+            }
+        }
+        g_climbRate = 0;
+    }
+    an = frameTick & 0xF;
+    g_viewSnapshotRing[an].heading = g_ourHead;
+    g_viewSnapshotRing[an].pitch = g_ourPitch;
+    g_viewSnapshotRing[an].roll = g_ourRoll;
+    g_viewSnapshotRing[an].worldX = g_worldX;
+    g_viewSnapshotRing[an].worldY = g_worldY;
+    g_viewSnapshotRing[an].alt = g_viewZ;
+    if (g_currentWeaponType == 1) {
+        if (g_airTargetLock >= 0) {
+            an = clampRange((rangeApprox(g_viewX_ - g_simObjects[g_airTargetLock].posX,
+                                         g_viewY_ - g_simObjects[g_airTargetLock].posY) *
+                             g_frameRateScaling) >> 7,
+                            0, 0xC);
+        } else {
+            an = g_frameRateScaling - 1;
+        }
+        an = (frameTick - an) & 0xF;
+        n = g_ourHead - g_viewSnapshotRing[an].heading;
+        v0 = g_ourPitch - g_viewSnapshotRing[an].pitch;
+        g_aamSeekerX = cosMul(g_ourRoll, (-n) >> 2) + sinMul(g_ourRoll, v0 >> 2);
+        g_aamSeekerY = sinMul(g_ourRoll, n >> 2) + cosMul(g_ourRoll, v0 >> 1);
+    }
+}
+
 /* ==== seg000:0x304a ==== */
 extern int16 g_rotationCounter;        /* word_33580 */
 extern int8  g_orientationDirty;       /* byte_33585 */
@@ -185,22 +715,12 @@ extern int8  g_extraScaleShift;        /* byte_34AC4 */
 extern int16 g_viewClipBottom;         /* word_3358C */
 extern int16 g_camRotMatrix[];         /* 0x80B6 */
 extern uint16 FAR *g_viewParamsFar;    /* dword_354D0 */
-struct CommData { int8 pad78[0x78]; int16 gfxModeNum; };
 extern struct CommData FAR *commData;  /* dword_38B10 */
-struct ViewSnapshot { int32 worldX, worldY; int16 alt, heading, pitch, roll; };
 extern struct ViewSnapshot g_viewSnapshotRing[];   /* @0x7FB6 — 16 frames */
-struct SimObject { int16 objType; uint16 posX; int16 posY; int16 alt;
-                   int32 worldX, worldY;
-                   union { int16 w; uint8 b[2]; } heading;
-                   int16 pitch; union { int16 w; uint8 b[2]; } bank;
-                   int16 spec; union { uint16 w; uint8 b[2]; } flags;
-                   int16 speed, timer, weaponType, terrainColor, damage; };
 extern struct SimObject g_simObjects[];            /* @0x8870 */
 struct Projectile { int16 mapX, mapY, alt, speed, worldX, worldY, worldZ,
                     ttl, specIdx, weaponIdx, targetLock, targetRef; };
 extern struct Projectile g_projectiles[];          /* @0x5422 */
-struct MapTarget { int16 objType; uint16 mapX; uint16 mapY; int16 active;
-                   int16 flags; int16 alertLevel; int16 threatTimer; int16 symbol; };
 extern struct MapTarget g_planeTable[];            /* @0x80C8 */
 void far gfx_waitRetrace(void);                    /* sub_2F183 */
 void far gfx_waitRetrace2(void);                   /* sub_2F188 */
