@@ -837,6 +837,50 @@ void drawTacticalMap(int8 page) {
     }
 }
 
+/* ==== seg000:0x9e4f ==== */
+extern int16 g_curPanelMode;       /* word_385CE */
+extern int16 g_wpnSpriteX[];       /* @0x5968 — 4 weapon-icon source X */
+extern int16 g_wpnSpriteY[];       /* @0x5970 — 4 weapon-icon source Y */
+
+void drawLoadoutPanel(void) {
+    int16 gy, hi, type, sp, lx, ly, v, w, x, i, rx, k, tx, ty, tz;
+
+    if (g_curPanelMode != 0x15)
+        drawPanelText(2, "WOORUV ", 4);
+    for (v = 0; v < 4; v++) {
+        type = missleSpec[v].weaponIdx;
+        lx = (v & 1) * 0xD;
+        ly = (v & 2) * 3;
+        strcpy(g_nameBuf, "");
+        strcat(g_nameBuf, itoa(missleSpec[v].ammo, g_itoaScratch, 10));
+        strcat(g_nameBuf, " ");
+        strcat(g_nameBuf, missiles[type].shortName);
+        tx = lx + 1;
+        drawPanelGridText(2, tx, ly, g_nameBuf, v == missileSpecIndex ? 0xF : 7);
+        strcpy(g_nameBuf, missiles[type].longName);
+        drawPanelGridText(2, tx, ly + 1, g_nameBuf, v == missileSpecIndex ? 0xF : 7);
+        ty = lx * 4;
+        tz = ly * 6;
+        gfx_copyRect(*g_pageOffscreen, g_wpnSpriteX[v], g_wpnSpriteY[v],
+                     *g_pageFront, ty + 0xB0, tz + 0x88, 0x33, 0x17);
+        setDrawColor(0);
+        sp = missiles[type].weaponCategory;
+        x = missleSpec[v].ammo;
+        if (sp < 4) {
+            hi = -(x * 0x15 / sp - 0x15);
+            if (hi > 0)
+                fillSpanRect(*g_pageFront, ty + 0xB1, tz + 0x89, ty + 0xE1, tz + 0x88 + hi);
+        } else if (x < 4) {
+            for (w = 0; w < 4 - x; w++) {
+                rx = (w & 1) * 0x18 + lx * 4 + 0xB1;
+                gy = (w & 2) * 5 + ly * 6 + 0x89;
+                fillSpanRect(*g_pageFront, rx, gy, rx + 0x18, gy + 0xA);
+            }
+        }
+    }
+    gfx_copyRect(*g_pageFront, 0xB0, 0x7C, *g_pageBack, 0xB0, 0x7C, 0x68, 0x48);
+}
+
 /* ==== seg000:0xa0bd ==== */
 extern int16 g_weaponMask;         /* word_33D64 — armed-station bitmask */
 extern int16 g_curPanelMode;       /* word_385CE */

@@ -51,9 +51,13 @@ ports verified against the original binary.
   `push [gmem]` only under `/Oa`. Currently set on egtarget.c.
 - Stack probing (`__chkstk` prologue) = module compiled WITHOUT `/Gs`.
 - Local stack slots are assigned by variable-NAME hash, not decl order:
-  bucket = sum(name bytes) % 16, buckets allocated ascending, same-bucket
-  vars prepend (last-declared gets lower slot). Reusing f15se2's identifier
-  names — or brute-forcing names to hit buckets — reproduces the frame.
+  bucket = sum(UPPERCASED name bytes) % 16 (case-insensitive symbol hash),
+  buckets walked ascending into consecutive slots, same-bucket vars prepend
+  (last-declared gets lower slot). Verified against drawTacticalMap's
+  11-local frame: gridX/gridStep collide under lowercase-sum but land apart
+  under uppercase-fold. Compiler index temps (e.g. `arr[i]` scaled index)
+  get slots too — past the named-locals area. Reusing f15se2's identifier
+  names — or engineering names to hit buckets — reproduces the frame.
 - Far stream pointers: `p++; c=*p++` emits inc/bx/inc/es read pattern.
 - `x = -y + K` compiles to `neg ax; add ax,K` (use unary minus, not `K - y`).
   But a bare `x = -x` emits `mov ax,[x]; neg ax; mov [x],ax`; the original's
@@ -158,7 +162,7 @@ ports verified against the original binary.
 - seg003 setInt9Handler, seg000 installCBreakHandler: int21h/int9h handlers.
 - `start` (seg000:e880): DOS crt0.
 
-## Verified C ports so far (all MATCH — 165)
+## Verified C ports so far (all MATCH — 166)
 
 eg3dload.c(/Os):  load3DAll, load3D3, load3DT, load3DG, printError
                   strcpyFromDot, load15Flt3d3
@@ -207,7 +211,7 @@ egtacmap.c(/Os+/Oa):projectWorldPoint, clearStatusPanel, renderHudFrame
                   cacheScopePanel
                   restoreScopePanel, captureScopePanel, drawMissionObjectives,
                   drawThreatIndicator, drawTargetInfoPanel
-                  drawWeaponsPanel, drawAirTargetInfoPanel
+                  drawLoadoutPanel, drawWeaponsPanel, drawAirTargetInfoPanel
 egcombat.c(/Os+/Oa):updateThreatSites, fireGroundThreat
                   computeThreatRangeBearing, updateThreatAlert
                   updateObjects, fireAirThreat, spawnEnemyAircraft

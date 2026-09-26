@@ -338,6 +338,7 @@ int16 g_lastMissileSlot;               /* word_36E1E — last fired projectile s
 int16 computeLoftAngle(void) { return 0; }   /* sub_1CAF2 */
 int16 missleSpec[0x10];                /* @0x4F00 4B {weaponIdx,ammo} records */
 int16 missiles[0x140];                 /* @0x4F24 26B records */
+int16 g_wpnSpriteX[4], g_wpnSpriteY[4];    /* @0x5968/@0x5970 sprite src */
 int16 sams[0x80];                      /* @0x4C36 18B records */
 int16 g_keyCode;                        /* word_384CE: pending keycode */
 int16 g_threatScopeRange;               /* word_343B2: threat gauge level / scope range */
