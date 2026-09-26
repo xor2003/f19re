@@ -40,7 +40,7 @@ MODULE_FLAGS = {
     'eg3dview.c': ['/AS', '/Gs', '/Ot'],
     'egrender.c': ['/AS', '/Gs', '/Ot', '/Oa'],
     'egcombat.c': ['/AS', '/Gs', '/Os', '/Oa'],
-    'egflight.c': ['/AS', '/Gs', '/Os'],
+    'egflight.c': ['/AS', '/Gs', '/Os', '/Oa'],
     'egframe.c':  ['/AS', '/Gs', '/Os', '/Oa'],
     'egkeys.c':   ['/AS', '/Gs', '/Ot'],
     'egmath.c':   ['/AS', '/Gs', '/Os'],

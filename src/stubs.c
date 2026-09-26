@@ -11,6 +11,17 @@ int16 g_viewParamsBuf[16];
 int16 *g_viewParams = g_viewParamsBuf;
 int16 g_skyColorIndex;
 int8  g_renderPageToggle, g_timerTick;
+int32 g_viewTargetX, g_viewTargetY;
+int16 g_viewTargetAlt, g_viewTargetObj;
+int16 g_viewHeading, g_viewPitch, g_viewRoll;
+int16 g_crashCamX, g_crashCamY, g_crashCamZ;
+int16 g_viewClipBottom, g_camRotMatrix[9];
+int8  g_horizonGroundColor, g_savedPosVisible;
+struct ViewSnapshot { int32 worldX, worldY; int16 alt, heading, pitch, roll; };
+struct ViewSnapshot g_viewSnapshotRing[16];
+int16 g_rearViewShape[4], g_leftViewShape[4], g_rightViewShape[4], g_frontViewShape[4];
+void far gfx_waitRetrace(void) {}
+void far gfx_waitRetrace2(void) {}
 char colorLut[16];
 char g_colorPalettes[256];
 

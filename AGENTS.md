@@ -48,7 +48,10 @@ ports verified against the original binary.
   `/Os` or `/Ot`, check whether it was ever optimized at all.
 - `/Oa` (assume no aliasing): needed where a global stays cached in a register
   across a pointer store — e.g. drawTargetView emits `push bx` not
-  `push [gmem]` only under `/Oa`. Currently set on egtarget.c.
+  `push [gmem]` only under `/Oa`. Also dedicates `si`/`di` to expressions
+  reused as call args across calls (`0x18<<n` → `mov si,imm; shl si,cl`
+  reused via `push si`, vs per-call recompute without `/Oa`). Currently set
+  on egtarget.c, egcombat.c, egframe.c, egtacmap.c, egrender.c, egflight.c.
 - Stack probing (`__chkstk` prologue) = module compiled WITHOUT `/Gs`.
 - Local stack slots are assigned by variable-NAME hash, not decl order:
   bucket = sum(UPPERCASED name bytes) % 16 (case-insensitive symbol hash),
@@ -172,7 +175,7 @@ ports verified against the original binary.
 - seg003 setInt9Handler, seg000 installCBreakHandler: int21h/int9h handlers.
 - `start` (seg000:e880): DOS crt0.
 
-## Verified C ports so far (all MATCH — 174)
+## Verified C ports so far (all MATCH — 175)
 
 eg3dload.c(/Os):  load3DAll, load3D3, load3DT, load3DG, printError
                   strcpyFromDot, load15Flt3d3
@@ -196,10 +199,10 @@ egmath.c(/Os):    isqrt, matVecDotAxis, drawWorldObject, clampRange
                   clampValue, rangeApprox, computeBearing, sinMul, cosMul
                   signExtendByte, signOf, seedRng, randomRange
                   readAxisInput
-egflight.c(/Os):  applyRotationDelta, computeAttitudeAngles
+egflight.c(/Os+/Oa):applyRotationDelta, computeAttitudeAngles
                   rebuildOrientation, signedRatio16, valueToAngle
                   complementAngle, waitForKeyPress, drawAirspeedTape
-                  insertOutlineEdges
+                  insertOutlineEdges, renderFrame
 egframe.c(/Os+/Oa):updateHudGauge, countermeasures, tickWeaponSlots
                   updateBulletsAndFire, updateTracerParticles
                   applyGravityFall, initFrameRandom, resetSimObjectLocks

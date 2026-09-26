@@ -249,6 +249,27 @@ compiled *without* `/Gs`.
   statements whose arms are single calls (`setDrawColor(A)` vs
   `setDrawColor(B)`) merge to one `push;call` tail — same layout rule.
 
+### Small switches: cmp-ax chain + first-case shared tail
+
+- A `switch` with ~4 cases and no `default` lowers to `mov ax,[sel]` plus
+  sequential `cmp ax,imm` — NOT `cmp word [sel],imm` per test. An
+  `if (v==a) .. else if (v==b) ..` chain keeps reloading `[sel]`; only the
+  `switch` form caches it in `ax`.
+- When every arm ends in the *same* call (`case k: f(shape_k); break;`),
+  MSC tail-merges them into one `push ax; call` block. The **first-declared**
+  case stays inline and hosts the tail (`cmp last; jne merge` falls into
+  `mov ax,shape; push ax; call`); the remaining arms are deferred as
+  `mov ax,shape; jmp tail` stubs emitted in **declaration order**, while the
+  compares always emit in ascending case-value order. `renderFrame`
+  (seg000:0x33d9) needed declaration order `0x44, 0x41, 0x43, 0x42` to put
+  the front-shape arm inline with the tail and defer `rear,right,left` —
+  the original's stub order proves the source declaration order.
+- A multi-arm `if/else` can likewise get the "jump-on-true" layout
+  `jz trueArm; jmp falseArm` when the false arm is emitted deferred far
+  away; write `if (!bit) {nearChain} else {deferredArm}` — the inverted
+  source condition puts the near chain on the `jz` target and the far arm
+  on the fall-through `jmp` (`renderFrame`'s `&0x40` plane arm).
+
 ### Union members vs plain word lvalues
 
 `mov si,[bx+flags]; mov ax,si; test al,4 ... test ax,0x140` — the original
