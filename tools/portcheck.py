@@ -47,6 +47,7 @@ MODULE_FLAGS = {
     'egtacmap.c': ['/AS', '/Gs', '/Os', '/Oa'],
     'egtarget.c': ['/AS', '/Gs', '/Os', '/Oa'],
     'egui.c':     ['/AS', '/Gs', '/Os', '/Oa'],
+    'egmain.c':   ['/AS', '/Gs', '/Os', '/Oa'],
     'stparse.c':  ['/AS', '/Gs', '/Ot'],
 }
 DEFAULT_FLAGS = ['/AS', '/Gs', '/Ot']
@@ -152,7 +153,19 @@ def main():
     rsp = os.path.join(BUILD, 'portlink.rsp')
     # LINK 3.65 response files: one line per prompt, lines continue via
     # trailing '+' and no line may exceed ~126 chars.
-    objlines = '+\n'.join(linkobjs) + '+\nC:\\bin\\_STUB.OBJ+C:\\bin\\STUBS.OBJ,'
+    # _STUB.OBJ supplies the harness _main — skip it when a ported module
+    # defines a real main() (egmain.c) or LINK reports a dup symbol.
+    def is_defining_main(path):
+        try:
+            return re.search(r'\bmain\s*\(', open(path, errors='replace').read()) is not None
+        except OSError:
+            return False
+    has_main = any(is_defining_main(os.path.join(ROOT, 'src', m))
+                   for m in modules if m.lower() != '_stub.c')
+    objlines = '+\n'.join(linkobjs)
+    if not has_main:
+        objlines += '+\nC:\\bin\\_STUB.OBJ'
+    objlines += '+C:\\bin\\STUBS.OBJ,'
     with open(rsp, 'w') as f:
         f.write('/M %s\nE:\\%s.EXE,\nE:\\%s.MAP,\nC:\\lib\\%sLIBCE;\n'
                 % (objlines, base, base, model))

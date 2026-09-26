@@ -313,6 +313,33 @@ char  g_hudMessageBuf[64];
 /* renderHudFrame (seg000:0x7e74) */
 int8  g_hudDrawnFlag;                /* byte_330F5 */
 uint8 joyAxes[2];                    /* @0x3345A */
+uint8 hercFlag;                      /* byte_379C0 — setupMono copy for render loops */
+int16 g_savedGfxOvl;                 /* word_38D28 — gfxOvlAddr saved by _main */
+
+/* egmain.c callees — still asm/library */
+int16 getOverlayLoadSeg(int16 slot) { return 0; }     /* sub_102B4 */
+void  gfxInit(void) { }                               /* sub_1026A */
+void  setupOverlaySlots(uint16 addr) { }              /* sub_103B2 */
+void  installCBreakHandler(void) { }                  /* sub_11C83 */
+void  restoreCbreakHandler(void) { }                  /* sub_11CA6 */
+void  far gfx_initOverlay(void) { }                   /* sub_2F066 */
+void  far gfx_setMonoFlag(int16 mono) { }             /* sub_2F1C4 */
+void  far setupInstrumentLayoutFar(void) { }          /* sub_2208A */
+void  far copyJoystickData(uint8 far *data) { }       /* sub_22D57 */
+int16 far restoreJoystickData(uint8 far *data) { return 0; } /* sub_22D45 */
+int16 far gfx_getModecode(void) { return 0; }         /* sub_2F165 */
+void  openBlitClosePic(int16 picId, int16 p) { }      /* sub_1E40A */
+void  initMissionStrings(void) { }                    /* sub_10446 */
+void  far audio_shutdown(void) { }                    /* sub_2F223 */
+void  far audio_setup(void) { }                       /* sub_2F21E */
+void  setTimerIrqHandler(void) { }                    /* sub_11D12 */
+void  restoreTimerIrqHandler(void) { }                /* sub_11D59 */
+void  runGameLoop(void) { }                           /* sub_11CD2 */
+void  far setInt9Handler(void) { }                    /* seg003:0x000e */
+void  far restoreInt9Handler(void) { }                /* seg003:0x005e */
+uint8 far *g_floppyMotorPtr;                          /* dword_354C2 */
+char  *regnName = (char *)"regn.xxx";                 /* word_2EEE8 */
+char  *scenarioPlh[8];                                /* @0x7A */
 int16 g_cornerSpeed;                 /* word_38A10 — maneuvering-speed ref */
 int16 g_knots;                       /* word_373E8 — airspeed, knots */
 int16 g_climbRate;                   /* word_38D1E — vertical speed */

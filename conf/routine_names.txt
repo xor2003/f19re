@@ -94,3 +94,14 @@ routine_218 drawClippedLineRegion
 routine_268 destroySimObject  # seg000:7800  mark sim object destroyed: kill count, wreck pos, event, sound
 routine_270 destroyGroundTarget # seg000:790e  mark ground target destroyed: events, symbol, smoke, sound
 routine_333 fireMissile # seg000:7ba0  fire selected missile: ammo, projectile slot fill, lock, sound
+routine_7   main             # seg000:0010  program entry: comm-block bind, gfx/ovl init, session
+routine_24  drawCockpit       # seg000:0170  cockpit pic blit + regn name setup
+routine_25  runGameSession    # seg000:01fc  IRQ/int9 install, game loop, restore
+routine_43  initMissionStrings # seg000:0446  trampoline -> sub_10ABE regn loader
+routine_46  setTimerIrqHandler # seg000:1d12  int21h AH=35/25 IRQ vector install (asm)
+routine_53  restoreTimerIrqHandler # seg000:1d59 (asm)
+routine_48  runGameLoop       # seg000:1cd2  register-save shim -> sub_11CDE
+routine_18  gfxInit           # seg000:026a  gfx page/buffer alloc
+routine_15  setupOverlaySlots # seg000:03b2  overlay slot-descriptor copy (asm)
+routine_14  getOverlayLoadSeg # seg000:02b4  DOS exec 4B03h overlay load/mem probe (asm)
+routine_27  restoreCbreakHandler # seg000:1ca6

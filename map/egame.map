@@ -26,15 +26,15 @@ Data1 DATA 1ee7
 # duplicate - routine is a duplicate of another
 #
 routine_10: Code1 NEAR 0000-000f R0000-000f
-routine_7: Code1 NEAR 0010-016f R0010-016f
-routine_24: Code1 NEAR 0170-01fb R0170-01fb
-routine_25: Code1 NEAR 01fc-0267 R01fc-0267
+main: Code1 NEAR 0010-016f R0010-016f
+drawCockpit: Code1 NEAR 0170-01fb R0170-01fb
+runGameSession: Code1 NEAR 01fc-0267 R01fc-0267
 routine_6: Code1 NEAR 0268-0268 R0268-0268
 routine_5: Code1 NEAR 0269-0269 R0269-0269
-routine_18: Code1 NEAR 026a-02b1 R026a-02b1
-routine_14: Code1 NEAR 02b4-03b1 R02b4-02c6 U02c7-02cb R02cc-03b1
-routine_15: Code1 NEAR 03b2-040a R03b2-03c4 U03c5-03c9 R03ca-040a
-routine_43: Code1 NEAR 0446-0449 R0446-0449
+gfxInit: Code1 NEAR 026a-02b1 R026a-02b1
+getOverlayLoadSeg: Code1 NEAR 02b4-03b1 R02b4-02c6 U02c7-02cb R02cc-03b1
+setupOverlaySlots: Code1 NEAR 03b2-040a R03b2-03c4 U03c5-03c9 R03ca-040a
+initMissionStrings: Code1 NEAR 0446-0449 R0446-0449
 render3DView: Code1 NEAR 044a-04e1 R044a-04e1
 waitFrameSync: Code1 NEAR 04e2-0503 R04e2-0503
 # Routine routine_117 0000:0504-0000:0521[00001e] is a potential duplicate of routine loadColorPalette 0000:229a-0000:22b7[00001e], differs by 0 instructions
@@ -94,12 +94,12 @@ routine_322: Code1 NEAR 1c64-1c82 R1c64-1c82
 # Routine routine_16 0000:1c83-0000:1ca5[000023] is a potential duplicate of routine installCBreakHandler 0000:2fac-0000:2fce[000023], differs by 0 instructions
 # Routine routine_16 0000:1c83-0000:1ca5[000023] is a potential duplicate of routine installCBreakHandler 0000:1240-0000:1262[000023], differs by 0 instructions
 installCBreakHandler: Code1 NEAR 1c83-1ca5 R1c83-1ca5 duplicate
-routine_27: Code1 NEAR 1ca6-1cb6 R1ca6-1cb6
+restoreCbreakHandler: Code1 NEAR 1ca6-1cb6 R1ca6-1cb6
 routine_31: Code1 NEAR 1cb7-1cc2 R1cb7-1cc2
-routine_48: Code1 NEAR 1cd2-1cdd R1cd2-1cdd
+runGameLoop: Code1 NEAR 1cd2-1cdd R1cd2-1cdd
 routine_73: Code1 NEAR 1cde-1d0d R1cde-1d0d
-routine_46: Code1 NEAR 1d12-1d58 R1d12-1d58
-routine_53: Code1 NEAR 1d59-1d8a R1d59-1d8a
+setTimerIrqHandler: Code1 NEAR 1d12-1d58 R1d12-1d58
+restoreTimerIrqHandler: Code1 NEAR 1d59-1d8a R1d59-1d8a
 routine_75: Code1 NEAR 1fb3-1fe1 R1fb3-1fe1
 routine_344: Code1 NEAR 1fe2-1fe8 R1fe2-1fe8
 routine_72: Code1 NEAR 2073-208b R2073-208b
