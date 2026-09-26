@@ -91,6 +91,13 @@ uint16 matrix3dt[5][32];
 struct TileSceneObject *g_curTileEntry;
 const uint16 buf3d3[1] = {0};
 char far g_world3dData[1];
+struct Proj3d { int32 x, y; int16 w; int32 z; };
+struct Proj3d g_proj3d;
+int16 g_objLocalX, g_objLocalY;
+int16 g_objColorBase;
+int16 g_lodObjectCount[5];
+const int16 g_dirGridOffsets[72];
+int16 far transformAndCullObjectFar(int16 a, int16 b, int16 c) { return 0; }
 
 int16 g_viewCenterY2;
 

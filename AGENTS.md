@@ -172,7 +172,7 @@ ports verified against the original binary.
 - seg003 setInt9Handler, seg000 installCBreakHandler: int21h/int9h handlers.
 - `start` (seg000:e880): DOS crt0.
 
-## Verified C ports so far (all MATCH — 171)
+## Verified C ports so far (all MATCH — 172)
 
 eg3dload.c(/Os):  load3DAll, load3D3, load3DT, load3DG, printError
                   strcpyFromDot, load15Flt3d3
@@ -188,7 +188,7 @@ eg3dmap.c(/Ot):   scaleCoordToLod, process3dg, findNearestTileObject
                   addTileEntry, lookupTileEntry, drawNearestTileObject
                   drawMapTiles, computeTileBounds, worldToTileIndex
                   drawMapTileObject, buildVertexSignMask
-                  projectModelVertices, aspectScaleY
+                  projectModelVertices, aspectScaleY, projectObjects
 eg3dview.c(/Ot):  renderMapTerrain, setup3DTransform, rasterize3DWorld
                   setupViewport, setViewRotation, setViewPosition
 egmath.c(/Os):    isqrt, matVecDotAxis, drawWorldObject, clampRange

@@ -361,6 +361,128 @@ void drawNearestTileObject(uint32 coord1, uint32 coord2, uint32 coord3) {
     }
 }
 
+/* ==== seg000:0x0522 ==== */
+#pragma pack(1)
+struct Proj3d {
+    int32 x;         /* word_38D20 */
+    int32 y;         /* word_38D24 */
+    int16 w;         /* word_38D28 — written by _main, not read here */
+    int32 z;         /* word_38D2A */
+};
+#pragma pack()
+extern struct Proj3d g_proj3d;
+extern int16 g_objLocalX, g_objLocalY;    /* word_351B0/…1B2 — view-space corner origin */
+extern int16 g_objColorBase;              /* word_2F464 */
+extern const int16 g_lodObjectCount[];    /* word table @0x5EA — per-lod object masks */
+extern const int16 g_dirGridOffsets[];    /* int16 table @0x43C — 8 dirSectors × 9 offsets */
+extern int16 g_detailLevel;               /* word_354BC */
+extern void setViewPosition(int16, int16, int16);   /* sub_11B56 (eg3dview) */
+int16 far transformAndCullObjectFar(int16, int16, int16); /* sub_208D9 (seg001:0x9e9) */
+int16 FAR projectSceneObject(uint8 FAR *model, int16 yaw, int16 pitch, int16 roll,
+                             int16 relX, int16 relY, int16 flag);   /* sub_20716 */
+
+void projectObjects(int16 heading, int16 rangeGate, int32 worldX, int32 worldY, int32 worldZ) {
+    int16 gridX, gridY, dirSector, fracX, subIdx, fracY, sampleIdx, tmp0, tileX, tileY, tmp1, cell;
+    int32 scaled;
+
+    g_proj3d.x = worldX;
+    g_proj3d.y = worldY;
+    g_proj3d.z = worldZ;
+    worldX = g_proj3d.x;
+    worldY = g_proj3d.y;
+    worldZ = g_proj3d.z;
+    dirSector = (uint16)(-heading + 0x1000) >> 13;
+    g_curLod = (g_detailLevel != 0) ? 4 : 3;
+    goto outer_test;
+    do {
+        g_curLod--;
+    outer_test:
+        if (g_curLod < 1) {
+            return;
+        }
+        if (g_lodObjectCount[g_curLod] == 0) {
+            continue;
+        }
+        scaled = scaleCoordToLod(g_curLod, worldX);
+        tileX = (uint32)scaled >> 12;
+        fracX = (int16)scaled & 0xfff;
+        scaled = scaleCoordToLod(g_curLod, worldY);
+        tileY = (uint32)scaled >> 12;
+        fracY = (int16)scaled & 0xfff;
+        scaled = scaleCoordToLod(g_curLod, worldZ);
+        if ((uint32)scaled < 0x7FFFUL) {
+            g_tileWorldSize = (int16)(((uint32)scaled < 2UL) ? 2UL : (uint32)scaled);
+            for (sampleIdx = 0;; sampleIdx++) {
+                if (g_curLod == 4 && g_detailLevel >= 2) {
+                    if (sampleIdx == 15) {
+                        break;
+                    }
+                    gridX = *(const int16 *)((const char *)g_dirGridOffsets + sampleIdx * 2 + (uint16)18 * (uint16)dirSector);
+                    gridY = *(const int16 *)((const char *)g_dirGridOffsets + sampleIdx * 2 + (uint16)18 * (uint16)((dirSector + 2) & 7));
+                    g_objLocalX = fracX - (gridX << 12) - 0x800;
+                    g_objLocalY = fracY - (gridY << 12) - 0x800;
+                    g_objRenderMode = 7;
+                    if (transformAndCullObjectFar(-g_objLocalX, -g_objLocalY, -g_tileWorldSize) != 0) {
+                        goto next_iter;
+                    }
+                } else {
+                    if (sampleIdx == 9) {
+                        break;
+                    }
+                    if (g_curLod != 4 && g_detailLevel < 2 && sampleIdx < 4) {
+                        goto next_iter;
+                    }
+                    if (rangeGate < (int16)0xd555) {
+                        gridX = g_neighborSampling.gridX[sampleIdx];
+                        gridY = g_neighborSampling.gridY[sampleIdx];
+                    } else {
+                        gridX = *(const int16 *)((const char *)g_dirGridOffsets + sampleIdx * 2 + (uint16)18 * (uint16)dirSector);
+                        gridY = *(const int16 *)((const char *)g_dirGridOffsets + sampleIdx * 2 + (uint16)18 * (uint16)((dirSector + 2) & 7));
+                    }
+                    g_objLocalX = fracX - (gridX << 12) - 0x800;
+                    g_objLocalY = fracY - (gridY << 12) - 0x800;
+                }
+                setViewPosition(g_objLocalX, g_objLocalY, g_tileWorldSize);
+                cell = process3dg(g_curLod, tileX + gridX, tileY + gridY);
+                if (cell == -1) {
+                    goto next_iter;
+                }
+                if (sampleIdx >= 4 || g_detailLevel >= 2) {
+                    g_objColorBase = (g_detailLevel >= 2) ? 0 : ((uint8)g_curLod << 8);
+                    g_curTileEntry = matrix3dt_2[g_curLod][cell];
+                    for (subIdx = 0; matrix3dt[g_curLod][cell] > subIdx; subIdx++) {
+                        if (g_curTileEntry->shape & 0x80) {
+                            g_modelStreamPtr = (char FAR *)(g_world3dData + lookupTileEntry(g_curLod, subIdx, tileX + gridX, tileY + gridY));
+                            if (g_modelStreamPtr == (char FAR *)g_world3dData) {
+                                g_modelStreamPtr = (char FAR *)(g_world3dData + buf3d3[g_curTileEntry->shape & 0x7f]);
+                            }
+                        } else {
+                            g_modelStreamPtr = (char FAR *)(g_world3dData + buf3d3[g_curTileEntry->shape]);
+                        }
+                        projectSceneObject(g_modelStreamPtr, 0, 0, 0,
+                                           g_curTileEntry->x,
+                                           g_curTileEntry->y,
+                                           g_curTileEntry->z);
+                        g_curTileEntry++;
+                        g_objColorBase++;
+                    }
+                } else {
+                    if (g_curLod == 4) {
+                        g_curTileEntry = matrix3dt_2[g_curLod][cell];
+                        g_modelStreamPtr = (char FAR *)(g_world3dData + buf3d3[g_curTileEntry->shape]);
+                        g_objColorBase = 0x400;
+                        projectSceneObject(g_modelStreamPtr, 0, 0, 0,
+                                           g_curTileEntry->x,
+                                           g_curTileEntry->y,
+                                           g_curTileEntry->z);
+                    }
+                }
+            next_iter:;
+            }
+        }
+    } while (1);
+}
+
 /* ==== seg000:0x918 ==== */
 uint32 scaleCoordToLod(int16 level, uint32 coord) {
     switch (level) {
