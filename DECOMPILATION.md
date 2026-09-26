@@ -414,6 +414,15 @@ built with — determined empirically, since flag choice is visible in codegen:
   `g_projectiles[slot].field` because it must assume the store may alias the
   index computation. If a routine keeps an index in si across a global store,
   that module was compiled `/Oa`.
+- `/Oa` also caches a global **pointer variable** across consecutive stores
+  through it: `render3DView` loads `g_viewParams` into `bx` once for four
+  `g_viewParams[i] = ...` stores (reloading only after each call). Without
+  `/Oa`, every store could alias the pointer variable itself, so MSC reloads
+  `bx` per store. No source-level workaround exists — a local pointer copy
+  would sit in si/di or `[bp-x]`, never `bx` (bx is scratch, never a register
+  var). When one reconstructed file needs `/Oa` but a sibling breaks under it
+  (`setupViewport` gains a `push si`), the routines came from different
+  original modules — split the file (`egrender.c` = `/Ot /Oa`).
 - `/Gs` (no stack checking) vs `__chkstk` prologue.
 
 ### mzdiff tolerances

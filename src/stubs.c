@@ -7,6 +7,10 @@
 int16 g_mapX, g_mapY;
 int16 g_clipMinX, g_clipMinY, g_clipMaxX, g_clipMaxY;
 int16 g_drawColor, g_vtxX, g_vtxY;
+int16 g_viewParamsBuf[16];
+int16 *g_viewParams = g_viewParamsBuf;
+int16 g_skyColorIndex;
+int8  g_renderPageToggle, g_timerTick;
 char colorLut[16];
 char g_colorPalettes[256];
 
@@ -98,6 +102,7 @@ int16 g_objColorBase;
 int16 g_lodObjectCount[5];
 const int16 g_dirGridOffsets[72];
 int16 far transformAndCullObjectFar(int16 a, int16 b, int16 c) { return 0; }
+void drawHudWorldOverlay(void) {}
 
 int16 g_viewCenterY2;
 
