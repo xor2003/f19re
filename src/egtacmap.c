@@ -947,3 +947,47 @@ void drawThreatIndicator(void) {
     g_vprojYlo = clampRange(g_vprojYlo, -0x10, 0x10) + 0x38;
     drawScreenLineOnePage(0x8C, g_vprojYlo, 0xB4, g_vprojYlo);
 }
+
+/* ==== seg000:0xa731 ==== */
+extern int16 g_ourRoll;            /* word_33574 */
+extern int16 g_extViewPitch;       /* word_354AE */
+extern int16 g_camSavedHead;       /* word_38382 */
+extern int16 g_camSavedRoll;       /* word_354D4 */
+void drawTargetView(int16 shapeId, int16 worldX, int16 worldY, int16 altitude,
+                    int16 objYaw, int16 objPitch, int16 objRoll, int16 mode, int16 shift); /* sub_1CB42 */
+void drawWeaponRadarInfo(int16 weaponIdx, int16 row);       /* sub_1AB2D */
+
+void drawTargetInfoPanel(void) {
+    int16 specIdx, row;
+
+    if ((uint8)g_groundTargetLock & 0x80)
+        return;
+    if (g_hudVisible == 0)
+        return;
+    g_pageFront[1] = 4;
+    g_pageBack[1] = 4;
+    drawPanelText(2, " DANNYE  ", 1);
+    loadColorPalette(0);
+    g_camSavedHead = g_ourHead;
+    g_camSavedRoll = g_ourRoll;
+    g_ourHead = g_ourRoll = 0;
+    g_extViewPitch = 0xFF40;
+    drawTargetView(g_planeTable[g_groundTargetLock].symbol, g_viewX_, g_viewY_ - 0xC0,
+                   g_viewZ, 0x1000, 0x400, 0, 2, 0);
+    g_ourHead = g_camSavedHead;
+    g_ourRoll = g_camSavedRoll;
+    gfx_copyRect(g_drawPage, 0xB0, 0x7C, 1 - g_drawPage, 0xB0, 0x7C, 0x68, 0x48);
+    row = 6;
+    buildStoreName(g_groundTargetLock);
+    drawPanelGridText(2, 1, row++, g_nameBuf, 0xF);
+    specIdx = g_planeTable[g_groundTargetLock].active;
+    if (specIdx != 0) {
+        strcpy(g_nameBuf, "Dalxn. raket - ");
+        strcat(g_nameBuf, itoa(sams[specIdx].lockRange, g_itoaScratch, 10));
+        strcat(g_nameBuf, " km");
+        drawPanelGridText(2, 1, row++, g_nameBuf, 0xF);
+        drawWeaponRadarInfo(specIdx, row);
+    }
+    g_pageFront[1] = 2;
+    g_pageBack[1] = 2;
+}

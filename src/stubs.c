@@ -145,7 +145,7 @@ int8 g_orientationDirty;
 int16 g_orientMatrix[9], g_matrixScratch[9];
 void far multiplyMatrix3x3Far(const int16 *a, const int16 *b, int16 *c) {}
 
-int16 g_ourPitch, g_ourHead, g_ourRoll;
+int16 g_ourPitch, g_ourHead, g_ourRoll, g_camSavedHead, g_camSavedRoll;
 int8 g_rollWasNonzero;
 int16 cosine(int16 a) { return a; }
 
