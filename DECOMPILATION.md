@@ -191,6 +191,38 @@ compiled *without* `/Gs`.
   computed *before* the map check, si is already committed and the map row
   falls to `di` naturally.
 
+### Rotated loops: nested `if`s, not `continue`
+
+- A `for` loop whose body is a chain of `if (x) continue;` statements emits
+  the loop condition/stride math in a different order than the original's:
+  MSC places the continue-guards inline and the back-edge lands on the
+  increment, while the original often shows a *rotated* layout — the
+  back-edge label preloads a constant (e.g. `mov ax,0xC` record stride)
+  before falling into the loop head.
+- The fix is the f15-twin shape: `for (i...) { if (rec.x != 0) { ...big
+  nested body... } }` — a single positive `if` wrapping the whole body.
+  MSC then emits the stride multiply at the loop head and the shared
+  tail (`idx < count ? A : B` → `push ax; call`) after it, matching the
+  original's block order exactly. `drawHudWorldOverlay`'s bullet-track
+  loop needed this; with `continue` the walk diverged at the loop head.
+
+### Shared conditional tails for identical arms
+
+- When two `if`/`else` branches each end with `if (cond) v = 1;` and both
+  conditions have the *same* emitted branch sense (two unsigned `>`-form
+  tests), MSC 5.1 may merge the two conditional jumps into ONE shared
+  `jcc` reached by an unconditional `jmp` from the first arm — the flags
+  set by each arm's own `cmp` are consumed by the shared jump. Emitted
+  order: `[then cmp] jmp sharedJcc; [else cmp] sharedJcc: jcc merge; flag`.
+- The original more often keeps per-arm branches plus a shared *flag
+  block*: `jbe→merge; jmp→flag` in one arm, `jnb→merge`+fallthrough in
+  the other. To get that layout the two conditions must emit DIFFERENT
+  branch senses (e.g. `jbe` vs `jnb`) — MSC then cannot merge them and
+  each arm gets its own conditional + a `jmp`/fallthrough into the
+  common `v = 1` block. Different senses fall out of the natural
+  polarity of each test once the globals' declared signedness is right
+  (see below), not from `goto` gymnastics — plain `if`s suffice.
+
 ### `/Oa` enables cross-call register CSE (no home slot)
 
 - When the original holds a *computed value* in `si`/`di` across a `call far`
@@ -388,6 +420,15 @@ divergence shows on indexed `[reg+ofs]` operands.)
   (`mov ax,[op1]; mul [op2]`); casts mark the casted operand composite and
   can flip the choice — write the order that matches, drop unneeded casts.
 - `a = b = 0` emits `sub ax,ax; mov b,ax; mov a,ax` (rightmost first).
+- For an unsigned compare between two memory globals, the *right* operand
+  loads into `ax`: `if (a >= b) goto L` emits `mov ax,[b]; cmp [a],ax;
+  jnb L`. This only holds when both globals are *declared* `uint16`;
+  casting `int16` decls with `(uint16)` at the site does not flip the
+  eval order — MSC still picks its own order (`mov ax,[a]; cmp [b],ax;
+  jbe`) no matter how the operands are written. Declared signedness, not
+  casts, steers compare emission — same lesson as the
+  `bearingToStore(...) < (g_viewZ>>5)*5` site where `g_viewZ` needed a
+  `uint16` decl to get `cmp bx,ax; jnb`.
 - `-((uint32)(uint16)x - K)` emits the full 32-bit negation
   `sub dx,dx; sub ax,K; sbb dx,dx; neg ax; adc dx,0; neg dx` — the unsigned
   32-bit subtract form, NOT `cwd` sign-extension.
@@ -487,6 +528,14 @@ built with — determined empirically, since flag choice is visible in codegen:
   addresses in the test exe; the instruction stream still matched.
 - **stray `nop`** — MSC aligns jump targets to even boundaries; pad placement
   depends on the routine's offset in the final exe.
+
+- **16-bit wraparound aliases** — an absolute `[0x87B4]` and an indexed
+  `[si-0x784C]` encode the same data address mod 64K (0x87B4 ≡ -0x784C).
+  `OffsetMap::dataMatch()` canonicalizes both sides `& 0xffff` before
+  keying the offset map (patched in `mzretools/src/analysis.cpp`), or the
+  two encodings bind as distinct keys and collide on the shared target
+  offset. `drawHudWorldOverlay` uses both forms for `g_targetSlots`
+  fields within one routine.
 
 After the spec'd walk drains, `checkMissedRoutines` re-seeds every unvisited
 routine in the ref map, so a `--map` run effectively compares the whole map:

@@ -175,7 +175,7 @@ ports verified against the original binary.
 - seg003 setInt9Handler, seg000 installCBreakHandler: int21h/int9h handlers.
 - `start` (seg000:e880): DOS crt0.
 
-## Verified C ports so far (all MATCH — 176)
+## Verified C ports so far (all MATCH — 177)
 
 eg3dload.c(/Os):  load3DAll, load3D3, load3DT, load3DG, printError
                   strcpyFromDot, load15Flt3d3
@@ -234,11 +234,11 @@ egcombat.c(/Os+/Oa):updateThreatSites, fireGroundThreat
                   updateThreatTargeting, samCanAcquireTarget
                   destroySimObject, destroyGroundTarget, markTargetReached
                   bombTarget, fireMissile
-egtarget.c(/Os+/Oa):drawTargetBox, drawLockReticle, drawTargetLabel
-                  buildRangeString, findStoreAtGrid, bearingToStore
-                  bearingToSimObject, computeTargetBearing, hudPitchScale
-                  getStoreMapCode, isTargetOverWater, drawTargetView
-                  shapeDataOffset, computeAimProjection
+egtarget.c(/Os+/Oa):drawHudWorldOverlay, drawTargetBox, drawLockReticle,
+                  drawTargetLabel, buildRangeString, findStoreAtGrid,
+                  bearingToStore, bearingToSimObject, computeTargetBearing,
+                  hudPitchScale, getStoreMapCode, isTargetOverWater,
+                  drawTargetView, shapeDataOffset, computeAimProjection
 egkeys.c(/Ot):    makeSound, updateEngineSound, recalcTimeScale
                   setupLodDistances, exitTimeAccel, copyStoreToWaypoint
 

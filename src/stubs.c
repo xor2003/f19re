@@ -113,7 +113,6 @@ int16 g_objColorBase;
 int16 g_lodObjectCount[5];
 const int16 g_dirGridOffsets[72];
 int16 far transformAndCullObjectFar(int16 a, int16 b, int16 c) { return 0; }
-void drawHudWorldOverlay(void) {}
 
 int16 g_viewCenterY2;
 
@@ -252,6 +251,11 @@ int16 g_activeThreatCount;                /* word_351CC */
 int16 g_closestThreatIndex;               /* word_385D2 */
 int16 g_hitMapX, g_hitMapY, g_hitAlt;     /* word_38378/38384/3838A */
 int16 g_hitEffectTimer;                   /* word_35AE2 */
+int16 g_prevKillMarker;                   /* word_351E0 */
+int16 g_aamLeadDist;                      /* word_351E2 */
+int16 g_axisInput1;                       /* word_351E4 */
+int16 g_lgbCount;                         /* word_349AC */
+int16 g_lgbTimer;                         /* word_349AE */
 
 
 uint8 g_aircraftModels[4];

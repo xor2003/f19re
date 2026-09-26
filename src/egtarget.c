@@ -25,13 +25,556 @@ extern int16 g_vprojXlo;            /* word_2FF24 */
 extern int16 g_vprojYlo;            /* word_30108 */
 
 struct MapTarget {                 /* F19 layout, 16 bytes */
-    int16 active;                  /* +0 */
-    int16 field02;
-    int16 alertLevel;              /* +4 */
-    int16 nameIndex;               /* +6 */
-    int16 pad[4];
+    int16 objType;                 /* +0 */
+    uint16 mapX;                   /* +2 */
+    uint16 mapY;                   /* +4 */
+    int16 nameIndex;               /* +6 (egcombat calls this "active") */
+    int16 flags;                   /* +8 */
+    int16 alertLevel;              /* +A */
+    int16 threatTimer;             /* +C */
+    int16 symbol;                  /* +E */
 };
 extern struct { int16 lead[3]; struct MapTarget planes[74]; } g_planeTable;
+
+/* ==== seg000:0xb2ca ==== */
+int16 isqrt(int16 value);                                /* sub_13387 */
+void computeAimProjection(int16 wx, int16 wy, int16 wz); /* sub_1C793 */
+void drawViewportLine(int16 x1, int16 y1, int16 x2, int16 y2); /* sub_18D9A */
+void drawHudViewLine(int16 x1, int16 y1, int16 x2, int16 y2);  /* sub_18F38 */
+void drawTargetBox(int16 x, int16 y, int16 size, int16 a);     /* sub_1C4FC */
+void drawLockReticle(void);                              /* sub_1C60C */
+void drawTargetLabel(const char *text, int16 color, int16 size); /* sub_1C681 */
+void buildRangeString(int16 rangeRaw);                   /* sub_1C719 */
+int16 findStoreAtGrid(int16 gridX, int16 gridY);         /* sub_1C9B2 */
+int16 bearingToStore(int16 i);                           /* sub_1CA74 */
+int16 hudPitchScale(void);                               /* sub_1CAF2 */
+int16 getStoreMapCode(int16 idx);                        /* sub_1CB1A */
+void drawTargetView(int16 shapeId, int16 worldX, int16 worldY,
+                    int16 altitude, int16 objYaw, int16 objPitch,
+                    int16 objRoll, int16 mode, int16 shift);     /* sub_1CDDE */
+int16 clampRange(int16 v, int16 lo, int16 hi);           /* sub_1D1FA */
+int16 rangeApprox(int16 dx, int16 dy);                   /* sub_1D23B */
+int16 sinMul(int16 angle, int16 mult);                   /* sub_1D3EC */
+int16 cosMul(int16 angle, int16 mult);                   /* sub_1D404 */
+int16 signOf(int16 value);                               /* sub_1D436 */
+int16 randomRange(int16 range);                          /* sub_1D46B */
+int16 readAxisInput(int16 axis);                         /* sub_1D484 */
+void makeSound(int16 a, int16 b);                        /* sub_1DEF2 */
+void destroySimObject(int16 idx);                        /* sub_17800 */
+void destroyGroundTarget(int16 planeIdx);                /* sub_1790E */
+int16 markTargetReached(int16 n);                        /* sub_17AAF */
+void bombTarget(void);                                   /* sub_17B46 */
+void hudMessage(const char *s);                          /* sub_192B1 */
+int16 getWeaponStat(int16 statIdx, int16 target);        /* sub_192CD */
+void blitSprite(int16 destX, int16 destY, int16 srcX, int16 srcY,
+                int16 width, int16 height, int16 transparent);   /* sub_19912 */
+void drawTargetInfoPanel(void);                          /* sub_1A731 */
+void loadColorPalette(int16 idx);                        /* sub_10504 */
+void buildStoreName(int16 i);                            /* sub_14D03 */
+void recordFrame(uint8 a, uint8 b);                      /* sub_14CAF */
+void far gfx_copyRect(int16 src, int16 sx, int16 sy, int16 dst,
+                      int16 dx, int16 dy, int16 w, int16 h);     /* sub_2F0FC */
+void FAR fillSpanRect(int16 *params, int16 x0, int16 y0, int16 x1, int16 y1); /* sub_21A58 */
+void fillPanelBox(int16 panelId, int16 color);           /* sub_190E8 */
+void drawFullscreenLine(int16 x1, int16 y1, int16 x2, int16 y2); /* sub_18D71 */
+
+extern int16 g_prevKillMarker;        /* word_351E0 */
+extern int16 g_targetInHudFlag;       /* word_358E0 */
+extern int16 g_frameRateScaling;      /* word_33D92 */
+extern int16 g_bulletTrackCount;      /* word_373EC */
+extern int16 g_groundUnitCount;       /* word_384FE */
+extern int16 g_missionStatus;         /* word_33D86 */
+extern int16 g_hitMapX;               /* word_38378 */
+extern int16 g_hitMapY;               /* word_38384 */
+extern int16 g_hitAlt;                /* word_3838A */
+extern int16 g_hitEffectTimer;        /* word_35AE2 */
+extern int16 g_lockedTargetKilled;    /* word_35AE4 */
+extern int16 g_viewMode;              /* word_3836E */
+extern int16 g_lockMark;              /* word_349B0 */
+extern int16 g_nightMode;             /* word_33D8A */
+extern int16 g_targetLock;            /* word_351D8 */
+extern int16 g_currentWeaponType;     /* word_388C4 */
+extern int16 g_groundTargetLock;      /* word_343BC */
+extern int16 g_airTargetLock;         /* word_343BA */
+extern int16 g_smokeSourceIdx;        /* word_343BE */
+extern int16 g_scopeSweepTimer;       /* word_343C0 */
+extern int16 g_threatLabelTarget;     /* word_38372 */
+extern int16 g_playerPlaneFlags;      /* word_356DC */
+extern int16 g_curPanelMode;          /* word_385CE */
+extern uint16 g_knots;                /* word_373E8 */
+extern int16 g_flightPathMarkerY;     /* word_384C4 */
+extern int16 g_missionTimeLimit;      /* word_384C6 */
+extern int16 g_missionTick;           /* word_354C0 */
+extern int16 g_difficultyTier;        /* word_33D88 */
+extern int16 missileSpecIndex;        /* word_33D80 */
+extern int16 g_lgbTimer;              /* word_349AE */
+extern int16 g_lgbCount;              /* word_349AC */
+extern int16 g_axisInput1;            /* word_351E4 */
+extern int16 g_aamLeadDist;           /* word_351E2 */
+extern int16 g_ourHead;               /* word_33570 */
+extern int16 g_ourPitch;              /* word_33572 */
+extern int16 g_ourRoll;               /* word_33574 */
+extern uint16 g_viewZ;                /* word_33576 */
+extern int16 *g_pageFront;            /* word_34646 */
+extern int16 *g_pageBack;             /* word_3465E */
+extern int16 frameTick;               /* word_343B6 */
+extern int16 g_detailLevel;           /* word_354BC */
+extern int16 g_extViewPitch;          /* word_354AE */
+extern int16 g_projDepth;             /* word_384D0 */
+extern int16 g_hudVisible;            /* word_33D90 */
+extern int8  g_drawPage;              /* byte_388CA */
+extern char *g_nameTab[];             /* @0x9696 */
+extern int8 g_mapCellFlags[];         /* @0x861A */
+
+struct BulletTrack { int16 posX, posY, alt, velX, velY, velZ; };
+extern struct BulletTrack bulletTracks[];                 /* @0x9BA6 */
+struct SimObject {
+    int16 objType;      /* +0x00 */
+    uint16 posX;        /* +0x02 */
+    int16 posY;         /* +0x04 */
+    int16 alt;          /* +0x06 */
+    int32 worldX;       /* +0x08 */
+    int32 worldY;       /* +0x0C */
+    union { int16 w; uint8 b[2]; } heading; /* +0x10 */
+    int16 pitch;        /* +0x12 */
+    union { int16 w; uint8 b[2]; } bank;    /* +0x14 */
+    int16 spec;         /* +0x16 */
+    union { uint16 w; uint8 b[2]; } flags;  /* +0x18 */
+    int16 speed;        /* +0x1A */
+    int16 timer;        /* +0x1C */
+    int16 weaponType;   /* +0x1E */
+    int16 terrainColor; /* +0x20 */
+    int16 damage;       /* +0x22 */
+};
+extern struct SimObject g_simObjects[];                   /* @0x8870 */
+struct ObjType { char name[0x12]; int16 maxSpeed; int16 range; int16 maneuverability;
+                 int16 modelId; int16 pad1A, pad1C; int16 kills; };
+extern struct ObjType g_objTypes[];                       /* @0x49D6 */
+struct MissileSpec { int16 weaponIdx; int16 ammo; };
+extern struct MissileSpec missleSpec[];                   /* @0x4F00 */
+struct Missile { char shortName[10]; char longName[12]; int16 specIndex; int16 weaponCategory; };
+extern struct Missile missiles[];                         /* @0x4F24 */
+struct Sam { char name[8]; int16 lockRange, maxSpeed, weaponClass, turnRate, modelId; };
+extern struct Sam sams[];                                 /* @0x4C36 */
+struct TargetSlot { int16 state, planeIndex, viewIndex, flags, seedNoise, pad[4]; };
+extern struct TargetSlot g_targetSlots[];                 /* @0x87B2 */
+struct TileObject { int16 id; int16 dist; int32 x; int32 y; int16 entry;
+                    uint8 lod, subIndex, tileX, tileY; int16 shapeOff; };
+extern struct TileObject *g_nearestTileObj;               /* word_35CE6 */
+
+/* HUD world overlay: tracer-bullet tracks, ground hit effects, weapon
+ * lock corridors, threat labels, target camera view and reticles.
+ * Called once per frame from render3DView. */
+void drawHudWorldOverlay(void) {
+    int16 p, prevDepth, lockFlag, wpEntry, z, tmpi, hitFlag;
+    int16 specD, padz, pitchw, loftDistf, pad3w, specd, pad4x;
+    int16 idxj, objIdxo, radiusg, pointXc, pointYb, wpIdxc, distk;
+    int16 prevXj, gunRadiusa, compatk, prevYi;
+
+    g_prevKillMarker = g_targetInHudFlag;
+    g_targetInHudFlag = 0;
+    gunRadiusa = 0x17a / isqrt(g_frameRateScaling * 4 + 8);
+
+    for (idxj = 0; idxj < g_bulletTrackCount + 4; idxj++) {
+        if (bulletTracks[idxj].posX != 0) {
+            computeAimProjection(bulletTracks[idxj].posX, bulletTracks[idxj].posY,
+                                 bulletTracks[idxj].alt);
+            prevXj = g_vprojXlo;
+            prevYi = g_vprojYlo;
+            prevDepth = g_projDepth;
+            computeAimProjection((bulletTracks[idxj].velX >> 1) + bulletTracks[idxj].posX,
+                                 (bulletTracks[idxj].velY >> 1) + bulletTracks[idxj].posY,
+                                 (bulletTracks[idxj].velZ >> 1) + bulletTracks[idxj].alt);
+            if (g_vprojXlo != -1) {
+                if (prevXj != -1) {
+                    distk = ((frameTick >> 1) - idxj) & 7;
+                    setDrawColor(idxj < g_bulletTrackCount ? 0x0d : 0x0c);
+                    drawViewportLine(g_vprojXlo, g_vprojYlo, prevXj, prevYi);
+                    hitFlag = 0;
+                    if (idxj < g_bulletTrackCount) {
+                        for (objIdxo = 0; objIdxo < g_groundUnitCount; objIdxo++) {
+                            if ((g_simObjects[objIdxo].flags.b[0] & 2) != 0) {
+                                distk = (abs(bulletTracks[idxj].alt -
+                                             g_simObjects[objIdxo].alt) >> 5) +
+                                        abs(bulletTracks[idxj].posX -
+                                            g_simObjects[objIdxo].posX) +
+                                        abs(bulletTracks[idxj].posY -
+                                            g_simObjects[objIdxo].posY);
+                                distk = abs(distk);
+                                if (gunRadiusa / (g_missionStatus + 1) > distk) {
+                                    hitFlag = 1;
+                                    g_simObjects[objIdxo].flags.b[0] |= 0x10;
+                                    destroySimObject(objIdxo);
+                                    strcat(strBuf, " sbit");
+                                    hudMessage(strBuf);
+                                    g_hitEffectTimer = 8;
+                                }
+                            }
+                        }
+                    } else {
+                        distk = (abs(bulletTracks[idxj].alt - g_viewZ) >> 5) +
+                                abs(bulletTracks[idxj].posX - g_viewX_) +
+                                abs(bulletTracks[idxj].posY - g_viewY_);
+                        distk = abs(distk);
+                        if (distk < 0x20) {
+                            hitFlag = 1;
+                            hudMessage("Hit by gunfire");
+                            if (0x20 / (4 - g_missionStatus) > distk) {
+                                bombTarget();
+                            }
+                        }
+                    }
+                    if (hitFlag != 0) {
+                        g_hitMapX = bulletTracks[idxj].posX;
+                        g_hitMapY = bulletTracks[idxj].posY;
+                        g_hitAlt = bulletTracks[idxj].alt;
+                        g_hitEffectTimer = -1;
+                        bulletTracks[idxj].posX = 0;
+                    }
+                    if (bulletTracks[idxj].alt < 0) {
+                        if (g_hitEffectTimer <= 0) {
+                            g_hitMapX = bulletTracks[idxj].posX;
+                            g_hitMapY = bulletTracks[idxj].posY;
+                            g_hitAlt = bulletTracks[idxj].alt;
+                            g_hitEffectTimer = -1;
+                        }
+                        bulletTracks[idxj].posX = 0;
+                        wpEntry = findStoreAtGrid(g_hitMapX, g_hitMapY);
+                        if (wpEntry != -1 && !(g_planeTable.planes[wpEntry].flags & 0x80)) {
+                            pointXc = (int16)(g_nearestTileObj->x >> 5);
+                            pointYb = -((int16)(g_nearestTileObj->y >> 5) - 0x8000);
+                            if ((getWeaponStat(0x12, wpEntry) * 6) / (g_missionStatus + 2) >
+                                rangeApprox(g_hitMapX - pointXc, g_hitMapY - pointYb)) {
+                                destroyGroundTarget(wpEntry);
+                                strcat(strBuf, " - celx uni~tovena");
+                                hudMessage(strBuf);
+                                g_hitEffectTimer = 8;
+                                g_hitAlt = 0;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+    if (g_hitEffectTimer != 0) {
+        computeAimProjection(g_hitMapX, g_hitMapY, g_hitAlt);
+        if (g_vprojXlo != -1) {
+            radiusg = abs(0x100 / g_projDepth);
+            for (idxj = 0; idxj < 8; idxj++) {
+                setDrawColor(randomRange(4) + 0x0c);
+                if (g_hitAlt > 0) {
+                    drawViewportLine(g_vprojXlo, g_vprojYlo,
+                                     randomRange(radiusg << 1) - radiusg + g_vprojXlo,
+                                     randomRange(radiusg << 1) - radiusg + g_vprojYlo);
+                } else {
+                    tmpi = randomRange(0x6000) - 0x3000;
+                    if (g_hudVisible != 0) {
+                        tmpi -= g_ourRoll;
+                    }
+                    prevDepth = randomRange(radiusg);
+                    prevXj = sinMul(tmpi, prevDepth) + g_vprojXlo;
+                    prevYi = g_vprojYlo - cosMul(tmpi, prevDepth);
+                    drawViewportLine(g_vprojXlo, g_vprojYlo, prevXj, prevYi);
+                }
+            }
+        }
+        g_hitEffectTimer -= signOf(g_hitEffectTimer);
+    } else {
+        g_lockedTargetKilled = 0;
+    }
+    if (g_hudVisible == 0) {
+        return;
+    }
+    if (g_lockMark != 0) {
+        drawTargetInfoPanel();
+        g_lockMark = 0;
+    }
+    loadColorPalette(g_nightMode != 0 ? 2 : g_nightMode);
+    setDrawColor(0xf);
+    drawFullscreenLine(0x13f, 0xc7, 0x13f, 0xc7);
+    g_targetLock = 0;
+    if (g_currentWeaponType == 2 && g_viewMode == 0 && g_groundTargetLock >= 0) {
+        computeAimProjection(g_planeTable.planes[g_groundTargetLock].mapX,
+                             g_planeTable.planes[g_groundTargetLock].mapY, 0);
+        specd = missiles[missleSpec[missileSpecIndex].weaponIdx].specIndex;
+        if (specd == 0x1c &&
+            bearingToStore(g_groundTargetLock) < (g_viewZ >> 5) * 5 &&
+            g_projDepth < 0) {
+            g_targetLock = 1;
+        }
+        if (g_vprojXlo != -1) {
+            setDrawColor(0xf);
+            lockFlag = 0;
+            compatk = getWeaponStat(missleSpec[missileSpecIndex].weaponIdx, g_groundTargetLock);
+            if (compatk != 0) {
+                if (missleSpec[missileSpecIndex].ammo != 0 &&
+                    (rangeApprox(g_vprojXlo - 0xa0, g_vprojYlo - 0x38) < 0x30 || g_targetLock != 0) &&
+                    -g_projDepth / 7 < sams[specd].lockRange &&
+                    sams[specd].weaponClass != 7 &&
+                    (sams[specd].weaponClass != 0x1c || g_targetLock != 0)) {
+                    g_targetLock = 1;
+                    lockFlag = 1;
+                    if (sams[specd].lockRange > (-g_projDepth >> 1 >> 1)) {
+                        setDrawColor(0xc);
+                    }
+                }
+            } else {
+                if (specd != -1) {
+                    setDrawColor(g_nightMode != 0 ? 6 : 0);
+                }
+                g_targetLock = 0;
+            }
+            drawTargetBox(g_vprojXlo, g_vprojYlo, compatk != 0 ? compatk + 5 : 9, lockFlag);
+        }
+    }
+    if (g_scopeSweepTimer > 0 && g_threatLabelTarget >= 0) {
+        computeAimProjection(g_planeTable.planes[g_threatLabelTarget].mapX,
+                             g_planeTable.planes[g_threatLabelTarget].mapY, 0);
+        drawTargetLabel(g_nameTab[g_planeTable.planes[g_threatLabelTarget].objType],
+                        g_scopeArcColor, g_frameRateScaling - g_scopeSweepTimer);
+    }
+    g_playerPlaneFlags &= ~0x200;
+    g_pageFront[1] = 4;
+    g_pageBack[1] = 4;
+    if (g_curPanelMode == 0x13 && (g_currentWeaponType == 2 || g_currentWeaponType == 0)) {
+        if ((g_playerPlaneFlags & 0x100) != 0) {
+            pitchw = g_ourPitch;
+            wpEntry = -1;
+            if (pitchw < 0) {
+                pointXc = cosMul(pitchw, g_viewZ) / (sinMul(-pitchw, 0x20) + 1);
+            } else {
+                pointXc = 0x280;
+            }
+            pointYb = g_viewY_ - cosMul(g_ourHead, pointXc);
+            pointXc = sinMul(g_ourHead, pointXc) + g_viewX_;
+            wpEntry = findStoreAtGrid(pointXc, pointYb);
+            if (wpEntry != -1) {
+                g_groundTargetLock = wpEntry;
+                if (g_smokeSourceIdx == 0) {
+                    g_smokeSourceIdx = -1;
+                }
+                g_playerPlaneFlags &= ~0x100;
+            }
+        }
+        if (g_lgbTimer != 0) {
+            --g_lgbTimer;
+        }
+        if (g_groundTargetLock != -1) {
+            wpIdxc = g_groundTargetLock & 0x7f;
+            if (missiles[missleSpec[missileSpecIndex].weaponIdx].specIndex == -1 &&
+                (g_playerPlaneFlags & 4) != 0) {
+                g_playerPlaneFlags |= 0x200;
+                g_targetInHudFlag = 1;
+                if (g_lgbTimer == 0 && g_drawPage != 0 &&
+                    (readAxisInput(1) != 0 || g_axisInput1 != 0)) {
+                    g_lgbTimer = 4;
+                    setDrawColor(0);
+                    fillSpanRect(g_pageBack, 0xb0, 0x7c, 0x118, 0xc4);
+                    strcpy(strBuf, "Kadr ");
+                    strcat(strBuf, itoa(++g_lgbCount, g_itoaScratch, 10));
+                    drawStringActivePage(strBuf, 0xd8, 0x9c, 0xf);
+                    makeSound(0x1e, 2);
+                }
+                if (g_lgbTimer == 0) {
+                    g_extViewPitch = g_ourPitch - 0x6ef;
+                    drawTargetView(getStoreMapCode(wpIdxc),
+                                   g_planeTable.planes[wpIdxc].mapX,
+                                   g_planeTable.planes[wpIdxc].mapY, 0, 0, 0, 0, 3, 0);
+                }
+                if (g_lgbTimer == 3) {
+                    gfx_copyRect(g_pageFront[0], 0xb0, 0x7c, g_pageBack[0], 0xb0, 0x7c, 0x68, 0x48);
+                    for (idxj = 0; idxj < 2; idxj++) {
+                        if (g_targetSlots[idxj].state == 1 &&
+                            g_targetSlots[idxj].planeIndex == wpIdxc &&
+                            !(g_planeTable.planes[wpIdxc].flags & 0x80)) {
+                            loftDistf = bearingToStore(wpIdxc);
+                            if ((abs(g_targetBearing - g_ourHead) >> 4) +
+                                (abs(computeBearing(-(g_viewZ >> 5), loftDistf) - g_ourPitch + 0x6ef) >> 4) +
+                                loftDistf <
+                                -(g_missionStatus * 2 - 8) << 6) {
+                                hudMessage("Celx sfotografirow.");
+                                if ((g_playerPlaneFlags & (0x4000 >> idxj)) == 0) {
+                                    markTargetReached(idxj);
+                                    recordFrame((idxj != 0 ? 0x40 : 0x80) + 10, wpIdxc);
+                                }
+                            }
+                        }
+                    }
+                }
+            } else {
+                drawTargetView(getStoreMapCode(wpIdxc),
+                               g_planeTable.planes[wpIdxc].mapX,
+                               g_planeTable.planes[wpIdxc].mapY, 0, 0, 0, 0, 1, -1);
+                drawLockReticle();
+                buildRangeString(bearingToStore(wpIdxc));
+                drawStringActivePage(strBuf, 0xbc, 0xbc, 0xf);
+                buildStoreName(wpIdxc);
+                drawStringActivePage(strBuf, -((int16)strlen(strBuf) * 2 - 0xe4), 0x82, 0xf);
+                if (g_currentWeaponType == 0) {
+                    computeAimProjection(g_planeTable.planes[g_groundTargetLock].mapX,
+                                         g_planeTable.planes[g_groundTargetLock].mapY, 0);
+                    setDrawColor(0xf);
+                    drawTargetBox(g_vprojXlo, g_vprojYlo, 8, 0);
+                } else if (g_targetSlots[0].planeIndex == g_groundTargetLock &&
+                           g_targetSlots[0].state < 5) {
+                    drawStringActivePage("Osnownaq celx", 0xc8, 0x88, 0xf);
+                } else if (g_targetSlots[1].planeIndex == g_groundTargetLock) {
+                    drawStringActivePage("Wtori~naq celx", 0xc4, 0x88, 0xf);
+                } else if (!(frameTick & 1) &&
+                           ((g_difficultyTier < 2 &&
+                             (g_shapeTargetCategory[g_planeTable.planes[wpIdxc].symbol & 0x7f] & 0xc0) != 0) ||
+                            (g_planeTable.planes[wpIdxc].flags & 0x500) != 0 ||
+                            (g_mapCellFlags[(g_planeTable.planes[wpIdxc].mapX >> 0xb) +
+                                            ((g_planeTable.planes[wpIdxc].mapY >> 0xb) << 4)] & 1) != 0)) {
+                    drawStringActivePage("Gravd. ili druvest.", 0xbc, 0x88, 0xf);
+                }
+            }
+        }
+    }
+    g_axisInput1 = readAxisInput(1);
+    if (g_currentWeaponType == 1 && g_viewMode == 0 && !(g_airTargetLock & 0x80)) {
+        computeAimProjection(g_simObjects[g_airTargetLock].posX,
+                             g_simObjects[g_airTargetLock].posY,
+                             g_simObjects[g_airTargetLock].alt);
+        if (g_vprojXlo != -1) {
+            setDrawColor(g_nightMode != 0 ? 6 : 0);
+            lockFlag = 0;
+            specd = missiles[missleSpec[missileSpecIndex].weaponIdx].specIndex;
+            if (missleSpec[missileSpecIndex].ammo != 0 && sams[specd].weaponClass == 7) {
+                setDrawColor(0xf);
+                if (rangeApprox(g_vprojXlo - 0xa0, g_vprojYlo - 0x38) < 0x30 &&
+                    (-g_projDepth >> 3) < sams[specd].lockRange) {
+                    g_targetLock = 1;
+                    lockFlag = 1;
+                    if (((-g_projDepth) >> 1 >> 1) < sams[specd].lockRange) {
+                        setDrawColor(0xc);
+                    }
+                }
+            }
+            drawTargetBox(g_vprojXlo, g_vprojYlo, 9, lockFlag);
+        }
+    }
+    if (g_curPanelMode == 0x13 && g_currentWeaponType == 1 && g_airTargetLock != -1) {
+        wpIdxc = g_airTargetLock & 0x7f;
+        drawTargetView(g_objTypes[g_simObjects[wpIdxc].spec].pad1A,
+                       g_simObjects[wpIdxc].posX, g_simObjects[wpIdxc].posY,
+                       g_simObjects[wpIdxc].alt, g_simObjects[wpIdxc].heading.w,
+                       g_simObjects[wpIdxc].pitch, g_simObjects[wpIdxc].bank.w, 1, 1);
+        drawLockReticle();
+        buildRangeString(rangeApprox(g_viewX_ - g_simObjects[wpIdxc].posX,
+                                     g_viewY_ - g_simObjects[wpIdxc].posY));
+        drawStringActivePage(strBuf, 0xbc, 0xbc, 0xf);
+        idxj = g_simObjects[wpIdxc].spec;
+        strcpy(strBuf, g_objTypes[idxj].name);
+        strcat(strBuf, g_objTypes[idxj].name + 7);
+        drawStringActivePage(strBuf, 0xc8, 0x82, 0xf);
+        if (wpIdxc == 0 && g_targetSlots[0].state >= 5) {
+            drawStringActivePage("Osnownaq celx", 0xc8, 0x88, 0xf);
+        }
+        if (g_detailLevel != 0) {
+            if ((frameTick & 1) != 0) {
+                g_aamLeadDist = (int16)(((uint32)(uint16)(0x8000 - g_simObjects[wpIdxc].pitch) *
+                                       (int32)g_simObjects[wpIdxc].speed) >> 15);
+                g_aamLeadDist -= abs(sinMul(g_simObjects[wpIdxc].bank.w, g_aamLeadDist)) >> 1;
+            }
+            strcpy(strBuf, "SKOR  ");
+            strcat(strBuf, itoa(g_aamLeadDist, g_itoaScratch, 10));
+            strcat(strBuf, " KM^");
+            drawStringActivePage(strBuf, 0xc7, 0xb6, 0xf);
+        }
+    }
+    g_pageFront[1] = 2;
+    g_pageBack[1] = 2;
+    if (g_scopeSweepTimer > 0 && g_threatLabelTarget < 0) {
+        idxj = -1 - g_threatLabelTarget;
+        computeAimProjection(g_simObjects[idxj].posX, g_simObjects[idxj].posY,
+                             g_simObjects[idxj].alt);
+        drawTargetLabel(g_objTypes[g_simObjects[idxj].spec].name,
+                        g_scopeArcColor, g_frameRateScaling - g_scopeSweepTimer);
+    }
+    if (g_currentWeaponType == 2 && g_viewMode == 0) {
+        specD = missiles[missleSpec[missileSpecIndex].weaponIdx].specIndex;
+        if (specD == 0x1e && abs(g_ourRoll) < 0x2000) {
+            tmpi = hudPitchScale();
+            loftDistf = cosMul(tmpi, g_viewZ) / (sinMul(-tmpi, 0x20) + 1);
+            pointXc = sinMul(g_ourHead, loftDistf) + g_viewX_;
+            pointYb = g_viewY_ - cosMul(g_ourHead, loftDistf);
+            computeAimProjection(pointXc, pointYb, 0);
+            if (g_vprojXlo == -1) {
+                g_vprojXlo = (sinMul(g_ourRoll, 0x6c - g_flightPathMarkerY) << 2) / 3 + 0xa0;
+                g_vprojYlo = 0x6c;
+            } else {
+                setDrawColor(0xc);
+                drawTargetBox(g_vprojXlo, g_vprojYlo, 5, 1);
+            }
+            setDrawColor(0xf);
+            drawHudViewLine(0xa0, g_flightPathMarkerY, g_vprojXlo, g_vprojYlo);
+        }
+        if ((specD == 0x1e || specD == 0x1d) && g_groundTargetLock >= 0) {
+            computeAimProjection(g_planeTable.planes[g_groundTargetLock].mapX + sinMul(g_ourHead, 0x80),
+                                 g_planeTable.planes[g_groundTargetLock].mapY - cosMul(g_ourHead, 0x80),
+                                 g_viewZ);
+            if (g_vprojXlo != -1) {
+                p = 0;
+                if (specD == 0x1e) {
+                    g_projDepth = clampRange(rangeApprox(pointXc - g_planeTable.planes[g_groundTargetLock].mapX,
+                                                         pointYb - g_planeTable.planes[g_groundTargetLock].mapY) >> 3,
+                                             0, 0x40);
+                    if ((uint16)-(g_knots * 2 - 0xbb8) > (uint16)g_viewZ) {
+                        p = 1;
+                    }
+                } else {
+                    g_projDepth = clampRange(bearingToStore(g_groundTargetLock) >> 3, 0, 0x40);
+                    if (g_viewZ < g_knots) {
+                        p = 1;
+                    }
+                }
+                if (p == 0 || (frameTick & 1) != 0) {
+                    setDrawColor(0xc);
+                    drawViewportLine(0x9f - g_projDepth, 0x21, 0x9f - g_projDepth, 0x1e);
+                    drawViewportLine(g_projDepth + 0xa0, 0x21, g_projDepth + 0xa0, 0x1e);
+                    drawViewportLine(0x9f - g_projDepth, 0x1e, g_projDepth + 0xa0, 0x1e);
+                }
+                setDrawColor(0xf);
+                drawHudViewLine(g_vprojXlo - 4, g_vprojYlo, g_vprojXlo, g_vprojYlo - 4);
+                drawHudViewLine(g_vprojXlo, g_vprojYlo - 4, g_vprojXlo + 4, g_vprojYlo);
+                drawHudViewLine(g_vprojXlo + 4, g_vprojYlo, g_vprojXlo, g_vprojYlo + 4);
+                drawHudViewLine(g_vprojXlo, g_vprojYlo + 4, g_vprojXlo - 4, g_vprojYlo);
+            }
+        }
+    }
+    idxj = 0;
+    do {
+        if ((g_targetSlots[idxj].flags & 0x10) != 0 && g_missionTick < g_missionTimeLimit) {
+            objIdxo = g_targetSlots[idxj].planeIndex;
+            if (bearingToStore(objIdxo) < 0xc80) {
+                computeAimProjection(g_planeTable.planes[objIdxo].mapX,
+                                     g_planeTable.planes[objIdxo].mapY, 0);
+                g_scopeArcColor = 10;
+                drawTargetLabel("Radiomaqk", 10, frameTick % g_frameRateScaling);
+                if (frameTick % (g_frameRateScaling << 3) == 0) {
+                    strcpy(strBuf, "Radiomaqk po kursu ");
+                    strcat(strBuf, itoa((uint16)computeBearing(g_planeTable.planes[objIdxo].mapX - g_viewX_,
+                                                               g_viewY_ - g_planeTable.planes[objIdxo].mapY) / 0xb6,
+                                        g_itoaScratch, 10));
+                    hudMessage(strBuf);
+                    if (g_vprojXlo != -1 && g_projDepth > -0x10 && missleSpec[0].ammo != 0) {
+                        hudMessage("Sbrasywajte gruz");
+                    }
+                }
+            }
+        }
+        idxj++;
+    } while (idxj < 2);
+    if (g_hitEffectTimer != 0 && g_curPanelMode == 0x13 &&
+        g_lockedTargetKilled != 0 && g_targetInHudFlag != 0) {
+        blitSprite(0xd4, 0x90, (abs(g_hitEffectTimer) - 8) * -0x20, 0x48, 0x20, 0x20, 0);
+    }
+    if (g_curPanelMode == 0x13 && g_prevKillMarker != 0 && g_targetInHudFlag == 0) {
+        fillPanelBox(2, 3);
+    }
+}
 
 /* ==== seg000:0xc4fc ==== */
 void drawHudViewLine(int16 x1, int16 y1, int16 x2, int16 y2); /* sub_18F38 */
@@ -115,7 +658,6 @@ void buildRangeString(int16 rangeRaw) {
 }
 
 /* ==== seg000:0xc793 ==== */
-extern int16 g_viewZ;             /* word_33576 */
 extern int8  g_camExtFlag;        /* byte_3836E — low byte of g_viewMode */
 extern int32 g_ViewX;             /* word_37CB8/37CBA */
 extern int32 g_ViewY;             /* word_382D4/382D6 */
@@ -174,21 +716,6 @@ fail:
 
 /* ==== seg000:0xc9b2 ==== */
 struct StoreDef { int16 subIdx; uint16 coordX; uint16 coordY; int16 f6; int8 flags; int8 f9; int16 padA; int16 padC; int16 nameIdx; };
-struct SimObject { int16 f[0x12]; };
-struct TileObject {
-    int16 id;                      /* +0x00 */
-    int16 dist;                    /* +0x02 */
-    int32 x;                       /* +0x04 */
-    int32 y;                       /* +0x08 */
-    int16 entry;                   /* +0x0C */
-    uint8 lod;                     /* +0x0E */
-    uint8 subIndex;                /* +0x0F */
-    uint8 tileX;                   /* +0x10 */
-    uint8 tileY;                   /* +0x11 */
-    int16 shapeOff;                /* +0x12 */
-    uint8 flag;                    /* +0x14 */
-    uint8 pad15;                   /* +0x15 */
-};
 extern struct StoreDef g_storeDefs[];   /* @0x80C8 */
 extern struct SimObject g_simObjects[]; /* @0x8870 */
 extern struct TileObject *g_nearestTileObj;  /* word_35CE6 */
@@ -233,7 +760,7 @@ int16 bearingToStore(int16 i) {
 
 /* ==== seg000:0xca94 ==== */
 int16 bearingToSimObject(int16 i) {
-    return computeTargetBearing(g_simObjects[i].f[1], g_simObjects[i].f[2], 0);
+    return computeTargetBearing(g_simObjects[i].posX, g_simObjects[i].posY, 0);
 }
 
 /* ==== seg000:0xcab4 ==== */
@@ -250,7 +777,6 @@ int16 computeTargetBearing(int16 targetX, int16 targetY, int16 wantBearing) {
 
 /* ==== seg000:0xcaf2 ==== */
 extern int16 g_ourPitch;                /* word_33572 */
-extern int16 g_viewZ;                   /* word_33576 */
 int16 abs(int16);
 int16 hudPitchScale(void) {
     return (int16)(((int32)(0x4000 - abs(g_ourPitch)) << 12) / (uint32)(uint16)(g_viewZ + 0x1000) - 0x4000);
@@ -312,7 +838,6 @@ extern uint8 colorLut[];              /* byte_2F85B base-3 */
 extern char  strBuf[];                /* 0x65E6 */
 extern char  g_itoaScratch[];         /* 0x9678 */
 
-extern int16 g_viewZ;
 int16 cosMul(int16, int16);                    /* sub_1D404 */
 int16 sinMul(int16, int16);                    /* sub_1D3EC */
 void FAR fillSpanRect(int16 *params, int16 x0, int16 y0, int16 x1, int16 y1); /* sub_21A58 */
