@@ -144,6 +144,46 @@ void rebuildOrientation() {
     g_rotationCounter = 0;
 }
 
+/* ==== seg000:0x3bfb ==== */
+extern int16 g_hudVisible;             /* word_33D90 */
+extern int16 g_engineThrust;           /* word_33588 */
+extern int16 *g_pageFront;             /* word_34646 */
+extern int16 *g_pageOffscreen;         /* word_34676 */
+extern int16 *g_pageBack;              /* word_3465E */
+extern int8  g_drawPage;               /* byte_388CA */
+extern int16 g_tapeClipX;              /* word_346D8 */
+void setDrawColor(int16 color);                      /* sub_18F9C */
+void drawFullscreenLine(int16 x1, int16 y1, int16 x2, int16 y2); /* sub_18D71 */
+void blitSprite(int16 dx, int16 dy, int16 sx, int16 sy, int16 w, int16 h, int16 t); /* sub_19912 */
+void far gfx_copyRect(int16 src, int16 sx, int16 sy, int16 dst,
+                      int16 dx, int16 dy, int16 w, int16 h);      /* sub_2F0FC */
+
+void drawAirspeedTape(void) {
+    int16 rung, i, savedPage;
+
+    if (g_hudVisible == 0)
+        return;
+    gfx_copyRect(*g_pageOffscreen, 0, 0x96, *g_pageFront, 0, 0x96, 0x21, 0x32);
+    rung = g_engineThrust / 5;
+    for (i = -3; i < 3; i++) {
+        register int16 sx, sy;
+        setDrawColor(7);
+        sx = rung + i;
+        sy = 0xBA - rung;
+        drawFullscreenLine(sx, sy, i + 0x15, 0xA5);
+        setDrawColor(i == -3 ? 4 : 0xC);
+        drawFullscreenLine(i, 0xBA, sx, sy);
+    }
+    rung = g_engineThrust / 5 - 0xB;
+    g_tapeClipX = 0xC7;
+    savedPage = g_drawPage;
+    g_drawPage = 0;
+    blitSprite(rung, 0xA0 - rung, 0x86, 0x24, 0x18, 0x10, 1);
+    g_drawPage = savedPage;
+    g_tapeClipX = 0x6D;
+    gfx_copyRect(*g_pageFront, 0, 0x96, *g_pageBack, 0, 0x96, 0x21, 0x32);
+}
+
 /* ==== seg000:0x3d8f ==== */
 void FAR audio_engineDroneOff(void);
 void updateEngineSound(void);          /* sub_1DF1A */
