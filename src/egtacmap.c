@@ -837,6 +837,51 @@ void drawTacticalMap(int8 page) {
     }
 }
 
+/* ==== seg000:0xa0bd ==== */
+extern int16 g_weaponMask;         /* word_33D64 — armed-station bitmask */
+extern int16 g_curPanelMode;       /* word_385CE */
+extern int16 g_chaffCount;         /* word_33D6C */
+extern int16 g_rocketCount;        /* word_33D6A */
+struct CellRect { int16 x1, y1, x2, y2; };
+extern struct CellRect g_weaponCells[];   /* @0x5768, 7 entries */
+void FAR gfx_drawStatusBox(int16 *page, int16 x1, int16 y1, int16 x2, int16 y2, int16 old, int16 val); /* sub_2F0F7 */
+void blitSprite(int16 destX, int16 destY, int16 srcX, int16 srcY, int16 width, int16 height, int16 transparent); /* sub_19912 */
+
+void drawWeaponsPanel(void) {
+    int16 i, old, val;
+    int16 *pageCur, *pageOther;
+
+    if (g_curPanelMode != 0x16) {
+        drawPanelText(2, "POWREV", 0);
+        blitSprite(0xB0, 0x7C, 0xD8, 0, 0x68, 0x48, 0);
+    }
+    if (g_drawPage != 0) {
+        pageCur = g_pageBack;
+        pageOther = g_pageFront;
+    } else {
+        pageCur = g_pageFront;
+        pageOther = g_pageBack;
+    }
+    for (i = 0; i < 7; i++) {
+        if (g_weaponMask & (1 << i)) {
+            old = 2;
+            val = 0xC;
+        } else {
+            old = 0xC;
+            val = 2;
+        }
+        gfx_drawStatusBox(pageCur, g_weaponCells[i].x1 + 0xB0, g_weaponCells[i].y1 + 0x7C,
+                          g_weaponCells[i].x2 + 0xB0, g_weaponCells[i].y2 + 0x7C, old, val);
+    }
+    strcpy(g_nameBuf, "FOLXGI ");
+    strcat(g_nameBuf, itoa(g_chaffCount, g_itoaScratch, 10));
+    drawPanelGridText(2, 0xF, 10, g_nameBuf, 0xF);
+    strcpy(g_nameBuf, "RAKET ");
+    strcat(g_nameBuf, itoa(g_rocketCount, g_itoaScratch, 10));
+    drawPanelGridText(2, 0xF, 0xB, g_nameBuf, 0xF);
+    gfx_copyRect(*pageCur, 0xB0, 0x7C, *pageOther, 0xB0, 0x7C, 0x68, 0x48);
+}
+
 /* ==== seg000:0xa23f / 0xa26c / 0xa2c5 ==== */
 
 extern int16 *g_pageOffscreen;   /* word_34676 */
