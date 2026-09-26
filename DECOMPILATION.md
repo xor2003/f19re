@@ -249,6 +249,15 @@ compiled *without* `/Gs`.
   coord locals at all: just `int16 clipH, clipW` plus the repeated
   expressions. Adding `/Oa` to a module is safe only after re-verifying every
   sibling (here `egui.c` moved `/Os`→`/Os /Oa`; all siblings still matched).
+- `/Oa` also controls **far-pointer liveness across control-flow joins**:
+  `main` (seg000:0x10) keeps `es:bx = commData` live from the `cmp
+  es:[bx+78h]` guard, through the `jnz` skip edge, AND through the taken
+  branch's post-call `les bx` reload — the two edges carry the *same* far
+  value, so at the join MSC emits `push es:[bx+1Ah]` with no reload. Without
+  `/Oa` the callee is assumed able to clobber the global `commData` pointer
+  variable, the two edges can't be proven equal, and MSC inserts an extra
+  `les bx` at the join label. If the original skips a `les` where control
+  flow merges, try `/Oa` before restructuring.
 - Related bool lowering: a `uint8` comparison against `0`/`1` that feeds an
   argument lowers to `sbb ax,ax; neg|inc ax` only when written as `x == 0` /
   `x != 0` — `x < 1`/`x >= 1` produce a `jnb`/`jae` branch instead. And the
