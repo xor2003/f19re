@@ -49,12 +49,26 @@ MODULE_FLAGS = {
     'egui.c':     ['/AS', '/Gs', '/Os', '/Oa'],
     'egmain.c':   ['/AS', '/Gs', '/Os', '/Oa'],
     'stparse.c':  ['/AS', '/Gs', '/Ot'],
+    # English satellite modules (src_end/, src_start/, src_su/): flag sets
+    # are per-module as discovered; END's enworld shows the telltale no-/Gs
+    # /Od prologue `mov ax,0; call __chkstk; push di; push si`
+    'enbrief.c':  ['/AS', '/Gs', '/Os'],
+    'enworld.c':  ['/AS', '/Od'],
+    'stalloc.c':  ['/AS', '/Gs', '/Os'],
+    # exe-prefixed keys disambiguate same-basename modules across srcdirs.
+    # Both EN satellites' my_itoa use `for (k=5; k>0 && num[k]==0; k--)` which
+    # emits a stray nop pad under /Ot but is byte-exact under /Os.
+    'start/textfmt.c': ['/AS', '/Gs', '/Os'],
+    'end/textfmt.c':   ['/AS', '/Gs', '/Os'],
 }
 DEFAULT_FLAGS = ['/AS', '/Gs', '/Ot']
 
 
-def module_flags(mod):
-    return MODULE_FLAGS.get(os.path.basename(mod).lower(), DEFAULT_FLAGS)
+def module_flags(mod, exe=''):
+    base = os.path.basename(mod).lower()
+    return (MODULE_FLAGS.get(exe + '/' + base)
+            or MODULE_FLAGS.get(base)
+            or DEFAULT_FLAGS)
 
 
 def load_image(path):
@@ -125,9 +139,12 @@ def main():
         print(__doc__)
         sys.exit(1)
     src, names = args[0], args[1:]
+    exename = os.path.splitext(os.path.basename(exe))[0].lower()
+    if exename.endswith('_en'):
+        exename = exename[:-3]
     # explicit flags override; otherwise the module's recorded set is used
     if not flags:
-        flags = module_flags(src)
+        flags = module_flags(src, exename)
 
     base = os.path.splitext(os.path.basename(src))[0].upper()[:8]
     srcdos = 'D:\\' + os.path.basename(src).upper()
@@ -148,10 +165,14 @@ def main():
     modules = [os.path.basename(p) for p in picked
                if os.path.basename(p).lower() not in ('stubs.c', '_stub.c')]
     modpath = {os.path.basename(p): p for p in picked}
+    # satellite builds define EXE_<NAME> so base modules can suppress routines
+    # that the satellite tree re-ports (e.g. egmath.c's rangeApprox vs
+    # src_start's), and stubs.c can drop same-named fallback defs.
+    exedef = ['/DEXE_' + exename.upper()]
     linkobjs = []
     for mod in sorted(modules):
         modbase = os.path.splitext(mod)[0].upper()[:8]
-        modflags = flags if mod == os.path.basename(src) else module_flags(mod)
+        modflags = exedef + (flags if mod == os.path.basename(src) else module_flags(mod, exename))
         # override modules live in srcdir (mounted F:), base ones on D:
         dosdir = 'F' if os.path.dirname(os.path.abspath(modpath[mod])) == os.path.abspath(srcdir) else 'D'
         # cl drops the obj into its own directory (C:\bin) under kvikdos
@@ -170,7 +191,7 @@ def main():
     stubs_src = os.path.join(ROOT, 'src', 'stubs.c')
     if os.path.exists(stubs_src):
         # kvikdos writes DOS mtimes — always rebuild (cheap)
-        kvikdos(['C:\\bin\\CL.EXE', '/AS', '/c', 'D:\\STUBS.C'])
+        kvikdos(['C:\\bin\\CL.EXE', '/AS'] + exedef + ['/c', 'D:\\STUBS.C'])
 
     model = 'S'
     for f in flags:
@@ -255,24 +276,38 @@ def main():
             lines = r.stdout.splitlines()
             errors = 0
             allowed = 0
+            unresolved = 0
             prev_conflict = False
             in_target = True
             for ln in lines:
                 cm = re.match(r'--- Comparing .*?routine [0-9a-f]+:[0-9a-f]+-[0-9a-f]+:[0-9a-f]+\[\w+\]: (\S+)', ln)
                 if cm:
                     in_target = cm.group(1) == name
-                if 'ERROR:' in ln:
-                    if not in_target:
-                        continue
+                    prev_conflict = False
+                    continue
+                if not in_target:
+                    continue
+                if ' != ' in ln:
+                    # INS_MATCH_MISMATCH: real opcode/operand disagreement
                     errors += 1
-                    # tolerated: data-offset remap conflicts, and stray 'nop'
+                elif 'ERROR:' in ln:
+                    errors += 1
+                    # tolerated: data-offset remap conflicts, stray 'nop'
                     # pads (MSC aligns jump targets to even; pad placement
-                    # depends on the function's offset in the final exe)
+                    # depends on the function's offset in the final exe), and
+                    # code-location lookups that fail only because the test
+                    # exe has no equivalent routine for an original thunk
+                    # (under --nocall the callee isn't verified anyway)
                     if prev_conflict or 'nop' in ln:
                         allowed += 1
-                prev_conflict = ('data segment offset mapping conflict' in ln)
+                    elif 'Unable to find a match for location' in ln:
+                        allowed += 1
+                        unresolved += 1
+                prev_conflict = ('offset mapping' in ln and 'collid' in ln)
             if errors == allowed:
                 ok = True
+                if unresolved:
+                    print(f'  note: {unresolved} unmapped call target(s) tolerated')
         print(f'{name}: {"MATCH" if ok else "MISMATCH"}'
               f'  ({os.path.basename(src)} @0x{tgt:x} vs ref 0x{ext[0]:x}-0x{ext[1]:x})')
         if not ok:

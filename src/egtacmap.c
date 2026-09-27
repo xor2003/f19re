@@ -528,10 +528,12 @@ TEST:
     }
 }
 
+#ifndef EXE_START /* src_start/stmap.c ports its own drawMapLine */
 /* ==== seg000:0x8d2a ==== */
 void drawMapLine(int16 x1, int16 y1, int16 x2, int16 y2) {
     drawClippedLineRegion(mapXToScreen(x1), mapYToScreen(y1), mapXToScreen(x2), mapYToScreen(y2), g_scopeClipLeft, g_scopeClipRight, g_scopeClipTop, g_scopeClipBottom, 1);
 }
+#endif
 
 /* ==== seg000:0x8d71 ==== */
 void drawFullscreenLine(int16 x1, int16 y1, int16 x2, int16 y2) {

@@ -686,6 +686,12 @@ bool Analyzer::compareCode(const Executable &ref, Executable &tgt) {
         // get next location for linear scan and comparison of instructions from the front of the queue,
         // to visit functions in the same order in which they were first encountered
         const Destination compare = scanQueue.nextPoint();
+        // --nocall: single-routine comparison — once the seed entrypoint has
+        // been compared, skip remaining queued locations; their callees may
+        // legitimately be absent from the target executable (e.g. thunks in
+        // the reference that the candidate build does not contain)
+        if (options.noCall && compare.address != ref.entrypoint()
+            && scanQueue.getRoutineIdx(ref.entrypoint().toLinear()) == VISITED_ID) break;
         verbose("New comparison location "s + compare.address.toString() + ", queue size = " + to_string(scanQueue.size()));
         // when entering a routine, forget all the current stack offset mappings
         if (compare.isCall) {

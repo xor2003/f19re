@@ -74,7 +74,7 @@ int16 g_clipMaxX, g_clipMaxY;
 int16 gfx_clipWindow(int16 a, int16 b) { return 0; }
 void gfx_setOrigin(int16 a) {}
 void gfx_restoreVp(void) {}
-void drawClippedLine(void) {}
+/* drawClippedLine: real port now lives in src_end/enbrief.c */
 
 void gfx_nop23(void) {}
 
@@ -473,3 +473,24 @@ int16 far gfx_allocPage(int16 page) { return 0; }   /* sub_2F02A */
 void  far gfx_storeBufPtr(int16 ptr, int16 n) { }   /* sub_2F1A1 */
 void  setupDac(void) { }                            /* sub_11BB4 */
 uint8 g_dacSupported;                               /* byte_2EEE4 */
+
+/* ---- satellite (SU/START/END) shared extern stubs ---- */
+#ifndef EXE_START /* src_start/cleanup.c provides the real port */
+void  cleanup(void) { }
+#endif
+#ifdef EXE_START /* START-only callees (real defs live in the skeleton asm) */
+void  intDispatch(int16 n, uint8 *a, uint8 *b) { }
+void  far misc_clearKeyFlags(void) { }
+void  drawClippedLineEx(int16 a, int16 b, int16 c, int16 d, int16 e, int16 f, int16 g, int16 h, int16 i) { }
+#endif
+void  dos_printstring(const char *s) { }
+uint16 dos_alloc(uint16 size) { return 0; }
+int16 dos_free(uint16 segment) { return 0; }
+void  far gfx_setOvlVal1(int16 v) { }
+void  far gfx_switchColor(int16 *p, int16 a, int16 b, int16 c, int16 d, int16 e, int16 f) { }
+void  drawLineWrapper(void) { }
+int16 mapToScreenX(int16 v) { return v; }
+int16 mapToScreenY(int16 v) { return v; }
+void  drawMapPixel(int16 x, int16 y, int16 c) { }
+void  mystrcpy(char *d, const char *s) { }
+void  loadWorldData(void *d, int16 s) { }

@@ -17,13 +17,52 @@ setInt9Handler fillSpanRect projectSceneObject). Port EN routines with
 `python3 tools/portcheck.py src_en/<mod>.c <name> --srcdir src_en
 --exe /home/xor/games/f19/F19/EGAME.EXE --map map/egame_en.map`.
 The EN install at /home/xor/games/f19/F19 is now authoritative (differs
-substantially from RU): SU.EXE (101 rtns, map/su_en.map — 24 egame sig
-matches), END.EXE (180, map/end_en.map — 27), START.EXE (251,
-map/start_en.map — 41). Maps and lst/<x>_en_ada.lst come from ~/vextest
-ada.py runs; RU-era maps kept as map/{su,start,end}.map (different
-binaries). mzdup over the EN binaries needed mzretools decoder hardening:
-286/x87 opcodes and never-throw semantics for unimplemented bytes (data
-inside routine extents would desync the instruction stream otherwise).
+substantially from RU — the repo-root START/END/SU.EXE are the RU
+binaries, do NOT verify satellite ports against them): SU.EXE (101 rtns,
+map/su_en.map — 24 egame sig matches), END.EXE (180, map/end_en.map — 27),
+START.EXE (251, map/start_en.map — 41). Maps and lst/<x>_en_ada.lst come
+from ~/vextest ada.py runs; RU-era maps kept as map/{su,start,end}.map
+(different binaries). mzdup over the EN binaries needed mzretools decoder
+hardening: 286/x87 opcodes and never-throw semantics for unimplemented
+bytes (data inside routine extents would desync the instruction stream
+otherwise).
+EN satellite C ports (all verified vs $(F19EN)/<X>.EXE + map/<x>_en.map
+via `portcheck.py --exe /home/xor/games/f19/F19/<X>.EXE --map
+map/<x>_en.map --srcdir src_<x>`):
+
+- src_end/ — 12 MATCH: allocBuffer freeBuffer (stalloc.c) blinkWidget
+  plotMapPoint drawClippedLine drawClippedLineEx drawFlightLine
+  formatFlightTime (enbrief.c) drawStringAt (drawstr.c) my_ltoa my_itoa
+  (textfmt.c) readWorldData (enworld.c). Flags: enbrief/stalloc /Gs /Os,
+  enworld /Od (unconditional chkstk+push di,si prologue), textfmt /Os.
+  Left as skeleton: dos_alloc/dos_free/openFile/closeFile/fileClose/
+  createFile family (int21h hand-asm), pic-decode cluster (decodePic
+  showPicFile doPicDecode picMakeDict picReadDataAndMakeDict
+  dictionaryLookup picBlit openBlitClosePic — bp-repurposing asm),
+  setTimerIrqHandler/installCBreakHandler (int21h vectors), clearRect
+  (rep stosw), clipAndDrawLine/calibrateTimerSpeed/readJoyAxis (hw asm),
+  strcoll/gety/move_ovlcur + all CRT.
+- src_start/ — 11 MATCH: allocBuffer (stalloc.c) cleanup (cleanup.c)
+  drawStringAt (drawstr.c) my_ltoa my_itoa (textfmt.c) rangeApprox
+  memAppend positionUnit (stgen.c — F19 FlightUnit/WorldObject/PlaneEntry
+  field offsets decoded from disasm, differ from f15se2's) loadHallfame
+  (stpilot.c — opens "Roster.Fil") drawMapLine (stmap.c) process3dg
+  (eg3dmap.c — START variant: no lod-4 bias, returns -1 on bounds-fail,
+  case4 row<<2). Left as skeleton: dos_alloc doFcbSearch (int21h),
+  decodePic/showPicFile/openBlitClosePic + pic cluster, clearRect/
+  clearDirtyRects (rep stosw), clipLineCohenSutherland (vector-table asm),
+  readJoyAxis/routine_71/routine_100 (in/out + cli), time/abs/getche/
+  strcoll/strncmp/strncpy (CRT), installCBreakHandler.
+- SU.EXE — 0 C-portable: every signature match is int21h file-IO or CRT
+  asm (createFile/openFile/closeFile/readFile1/setTimerIrqHandler are the
+  hand-asm DS=SS family). Skeleton stays.
+portcheck satellite notes: modules compile with /DEXE_<EXENAME> so base
+src/ can suppress colliding defs (egmath.c rangeApprox, egtacmap.c
+drawMapLine, stubs.c cleanup are all `#ifndef EXE_START`-guarded) and
+stubs.c gains EXE_START-only shims (intDispatch, misc_clearKeyFlags,
+drawClippedLineEx). MODULE_FLAGS accepts `'<exe>/<file>'` keys —
+start/textfmt.c and end/textfmt.c need /Os (their my_itoa uses
+`for (k=5; k>0 && num[k]==0; k--)`; under /Ot a stray nop pad appears).
 Current satellite focus is the English F19 drivers only:
 MGRAPHIC.EXE (82 rtns, map/mgraphic_en.map — all 84 ABI slots named from
 f15 slot.h, handlers ~94% byte-identical to f15's driver) and ASOUND.EXE

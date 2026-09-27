@@ -658,6 +658,23 @@ built with — determined empirically, since flag choice is visible in codegen:
   (`setupViewport` gains a `push si`), the routines came from different
   original modules — split the file (`egrender.c` = `/Ot /Oa`).
 - `/Gs` (no stack checking) vs `__chkstk` prologue.
+- `/Od` (no optimization): unconditional `mov ax,N; call __chkstk; push di;
+  push si` prologue even for routines with no locals/register vars — END's
+  `enworld.c` is `/Od` (`readWorldData` probes 0 bytes yet saves si/di).
+- Satellites can share basenames with different flag needs — `MODULE_FLAGS`
+  accepts `'<exe>/<file>'` keys (`start/textfmt.c`, `end/textfmt.c` are
+  `/Os`; EN `my_itoa` has a `for (k=5; k>0 && num[k]==0; k--)` scan loop
+  that gains a stray `nop` pad under `/Ot`).
+- Near→far pointer promotion via a named `far` local emits the canonical
+  `mov [bp-4],off; mov [bp-2],ds` pair — START's `memAppend` does
+  `farptr = ptr; movedata(FP_SEG(farptr), FP_OFF(farptr), ..., len)` where
+  the first `push ds` argument is `FP_SEG(farptr)`.
+- `uint16` field type vs `(uint32)` cast on an `int16`: only the former
+  emits `sub dx,dx` (zero-extension). `(uint32)(int16)x` still sign-extends
+  via `cwd` — START's `positionUnit` declares `x`,`y` `uint16` for this.
+- Beware which binary is the reference: the repo-root satellite exes are
+  the RU builds — EN verification needs `--exe $(F19EN)/<X>.EXE --map
+  map/<x>_en.map` (a `--exe` path is used verbatim).
 
 ### mzdiff tolerances
 

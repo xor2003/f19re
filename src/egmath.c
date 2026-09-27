@@ -61,6 +61,7 @@ int16 computeBearing(int16 deltaX, int16 deltaY) {
     return result;
 }
 
+#ifndef EXE_START /* START.EXE has its own port in src_start/ */
 /* ==== seg000:0xd23b ==== */
 int16 rangeApprox(int16 deltaX, int16 deltaY) {
     int32 dist;
@@ -74,6 +75,7 @@ int16 rangeApprox(int16 deltaX, int16 deltaY) {
         dist = XYDIST_MAX;
     return (int16)dist;
 }
+#endif
 
 /* ==== seg000:0xd1fa ==== */
 int16 clampRange(int16 value, int16 minVal, int16 maxVal) {
