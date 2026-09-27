@@ -25,7 +25,9 @@ void far gfx_waitRetrace2(void) {}
 char colorLut[16];
 char g_colorPalettes[256];
 
+#ifndef EXE_START /* src_start/stutil.c provides START's 5-arg drawLine */
 void drawLine(int16 a, int16 b, int16 c, int16 d) {}
+#endif
 int16 openFile(const char *p, int16 m) { return 0; }
 void picBlit(int16 h, int16 p, int16 m) {}
 int16 closeFile(int16 h) { return 0; }
@@ -298,7 +300,9 @@ FILE *fileHandle;
 
 int16 g_rngSeed;
 int16 g_unusedLoadDoneFlag;
+#ifndef EXE_START /* src_start/stutil.c provides the real definition */
 int16 getTimeOfDay(void) { return 0; }
+#endif
 int16 g_trackedEnemyIdx;
 int16 g_gunAmmo;
 int16 g_fuelRemaining;
@@ -482,6 +486,83 @@ void  cleanup(void) { }
 void  intDispatch(int16 n, uint8 *a, uint8 *b) { }
 void  far misc_clearKeyFlags(void) { }
 void  drawClippedLineEx(int16 a, int16 b, int16 c, int16 d, int16 e, int16 f, int16 g, int16 h, int16 i) { }
+/* stutil.c deps: driver-slot far calls + skeleton routines + globals */
+int16 far misc_jump_5a_keybuf(void) { return 0; }
+int16 far misc_jump_5b_getkey(void) { return 0; }
+int16 far misc_jump_5d_readJoy(int16 a) { return 0; }
+void  far misc_jump_5e_clearKeyFlags(void) { }
+void  far gfx_resetBlitOffset2(void) { }
+int16 far gfx_setFont(uint16 a, uint16 b) { return 0; }
+void  far audio_jump_6b(void) { }
+void  sub_151E8(int16 a, int16 b, int16 c, int16 d) { }
+void  sub_141A3(void) { }
+void  sub_18B7E(int16 a, int16 b, int16 c, int16 d) { }
+void  sub_146E3(void) { }
+void  sub_1DCAC(int16 a) { }
+#ifndef EXE_START
+char *formatGridRef(int16 a, int16 b, int16 c) { return 0; }
+#endif
+uint8 g_cntA, g_cntB, g_cntC, g_cntD;
+uint8 cbreakHit;
+struct GameData far *gameData;
+/* stutil.c initGraphics/drawLine + stgrid.c deps */
+void  far gfx_setPageN(uint16 a) { }
+void  far gfx_setMode13(int16 a) { }
+void  sub_140A3(void) { }
+void  sub_151D4(void *d, int8 v, int16 n) { }
+uint16 far *gfxModeSetPtr;
+int16 g_gfxModeNum;
+int16 g_lineX0, g_lineX1, g_lineY0, g_lineY1;
+uint8 g_flagTable2CFE[16];
+char *regnPlhPtr;
+uint16 gridSignature;
+int16 gridValidFlag;
+uint8 gridBuf1[0x10];
+uint8 gridBuf2[0x100];
+uint8 gridBuf3[0x200];
+uint8 gridBuf4[0x200];
+uint8 gridBuf5[0x200];
+int16 gridLevelSize[8];
+int16 *nearestTerrainResult;
+int16 readItemSize;
+int16 *findNearestTerrain(int32 wx, int32 wy) { return 0; }
+void  drawModelPoint(int16 a, int16 b, int16 c, int16 d, int16 e) { }
+void  setViewPosition(int32 a, int32 b, int32 c) { }
+/* stgen.c parseWorld/exportWorldToComm globals */
+int16 groundUnitCount;
+int16 worldObjectCount;
+int16 flightUnitCount;
+uint8 wldReadBuf1[8];
+uint8 wldReadBuf7[0x64];
+uint8 wldReadBuf8[0x64];
+uint8 objectTypeTable[0x64];
+uint8 terrainGrid[0x100];
+int8  wldReadBuf11[0x2ee];
+int16 wldOffsets[0x64];
+int16 missionDistAccum;
+int16 escortMissionFlag;
+int16 missionMidX[4];
+uint8 targets[0x24];
+int8  bufCoordStr[8];
+/* stparse.c globals */
+int16 terrainDirtyFlag;
+int16 terrainSignature;
+uint16 terrainBuf1[5];
+struct TerrainPtrTable { uint8 *entries[32]; };
+struct TerrainPtrTable terrainTileCounts[5];
+struct TerrainPtrTable terrainTilePtrs[5];
+uint8 terrainTileBlock[0x2860];
+/* stgen.c missionGenerate globals */
+int16 difficultySaved, theaterSaved, flag4Saved;
+char *plhFiles[4] = {"lb.xxx","pg.xxx","nc.xxx","ce.xxx"};
+void  runGenerator(void) { }
+/* stpinp.c saveHallfame globals + callees */
+int16 *uiPage;
+char  scrStrBuf[0x80];
+int16 savedPage;
+int16 doFcbSearch(void) { return 0; }
+void  sub_14089(int16 n) { }
+int16 far gfx_blitToCurrent(int16 p) { return 0; }
 #endif
 void  dos_printstring(const char *s) { }
 uint16 dos_alloc(uint16 size) { return 0; }
@@ -492,5 +573,7 @@ void  drawLineWrapper(void) { }
 int16 mapToScreenX(int16 v) { return v; }
 int16 mapToScreenY(int16 v) { return v; }
 void  drawMapPixel(int16 x, int16 y, int16 c) { }
+#ifndef EXE_START /* src_start/stutil.c provides the real port */
 void  mystrcpy(char *d, const char *s) { }
+#endif
 void  loadWorldData(void *d, int16 s) { }

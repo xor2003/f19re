@@ -16,3 +16,13 @@ uint16 allocBuffer(int16 size) {
     }
     return segment;
 }
+
+extern int16 dos_free(uint16 segment);   /* asm helper (int 21/49) */
+
+void freeBuffer(uint16 segment) {
+    if (dos_free(segment) != 0) {
+        cleanup();
+        dos_printstring("...dealloc error...$");
+        exit(0);
+    }
+}

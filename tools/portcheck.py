@@ -59,6 +59,16 @@ MODULE_FLAGS = {
     # Both EN satellites' my_itoa use `for (k=5; k>0 && num[k]==0; k--)` which
     # emits a stray nop pad under /Ot but is byte-exact under /Os.
     'start/textfmt.c': ['/AS', '/Gs', '/Os'],
+    'start/stutil.c':  ['/AS', '/Gs', '/Os'],
+    # EN stparse: /Oals — /Oa+/Ol materialize the strength-reduction walker
+    # temps (sub sp,0x14 not 0xa); /Os suppresses the stray branch pad nop.
+    'start/stparse.c': ['/AS', '/Gs', '/Oals'],
+    # EN saveHallfame: /Os keeps the write-protect warning path on the shared
+    # epilogue tail; /Ot inlines it and diverges.
+    'start/stpinp.c':  ['/AS', '/Gs', '/Os'],
+    # stgrid parseGrid/replaceExtension need /Os (stray relax-pad nop under /Ot);
+    # lookupGridCell needed /Ot and lives in stterr.c (default flags).
+    'start/stgrid.c':  ['/AS', '/Gs', '/Os'],
     'end/textfmt.c':   ['/AS', '/Gs', '/Os'],
 }
 DEFAULT_FLAGS = ['/AS', '/Gs', '/Ot']
@@ -158,8 +168,13 @@ def main():
     if os.path.abspath(srcdir) != os.path.join(ROOT, 'src'):
         over = {os.path.basename(p).lower(): p
                 for p in glob.glob(os.path.join(srcdir, '*.c'))}
-        picked = [over.pop(os.path.basename(p).lower(), p) for p in baseglob]
-        picked += over.values()
+        if os.path.basename(os.path.abspath(srcdir)) in ('src_start', 'src_end', 'src_su'):
+            # satellites link standalone: base src/*.c modules only exist to
+            # satisfy EGAME's cross-refs and push the test exe over 64K _TEXT.
+            picked = list(over.values())
+        else:
+            picked = [over.pop(os.path.basename(p).lower(), p) for p in baseglob]
+            picked += over.values()
     else:
         picked = baseglob
     modules = [os.path.basename(p) for p in picked

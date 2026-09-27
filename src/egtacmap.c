@@ -654,6 +654,7 @@ void drawStringActivePage(const char *text, int16 screenX, int16 screenY, int16 
 }
 
 /* ==== seg000:0x9219 ==== */
+#ifndef EXE_START /* src_start/stutil.c provides START's 1-arg variant */
 void drawStringCentered(int16 *strStruct, const char *text, int16 screenX, int16 screenY, int16 color) {
     strStruct[6] = 0;
     strStruct[4] = screenX;
@@ -661,6 +662,7 @@ void drawStringCentered(int16 *strStruct, const char *text, int16 screenX, int16
     strStruct[2] = color;
     gfx_drawString(strStruct, strupr((char *)text), strlen(text));
 }
+#endif
 
 /* ==== seg000:0x9257 ==== */
 void drawNumber(int16 value, int16 x, int16 y, int16 color) {

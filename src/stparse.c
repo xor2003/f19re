@@ -2,6 +2,7 @@
 #include <string.h>
 #include "inttype.h"
 
+#ifndef EXE_START /* src_start/stgrid.c provides START's variant */
 void replaceExtension(char *path, const char *source) {
     char ch;
     for (; (ch = *path) != '.';) {
@@ -10,5 +11,4 @@ void replaceExtension(char *path, const char *source) {
     }
     strcpy(path, source);
 }
-
-
+#endif
