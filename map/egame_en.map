@@ -1,0 +1,1651 @@
+#
+# Size of the executable's load module covered by the map
+#
+Size 252b0
+#
+# Discovered segments, one per line, syntax is "SegmentName Type(CODE/DATA/STACK) Address [default]"
+# The default data segment is assumed to be used by all routines which don't have data segment overrides.
+# If no default segment is specified, the first one will be used as default.
+#
+Code1 CODE 0000
+Code4 CODE 0fd8
+Code2 CODE 11f1
+Code3 CODE 12bf
+Data1 DATA 1ecf default
+#
+# Discovered routines, one per line, syntax is "RoutineName: Segment Type(NEAR/FAR) Extents[DS] [R/U]Block1[DS] [R/U]Block2[DS]... [annotation1] [annotation2]..."
+# The routine extents is the largest continuous block of instructions attributed to this routine and originating
+# at the location determined to be the routine's entrypoint.
+# Blocks are offset ranges relative to the segment that the routine belongs to, specifying address as belonging to the routine.
+# Blocks starting with R contain code that was determined reachable, U were unreachable but still likely belong to the routine.
+# The routine blocks may cover a greater area than the extents if the routine has disconected chunks it jumps into.
+# The extents block and/or the individual routine blocks can have an optional data segment override which is the name
+# of the data segment assumed to be selected within that block.# Possible annotation types:
+# ignore - ignore this routine in processing (comparison, signature extraction etc.)
+# complete - this routine was completely reconstructed into C, only influences stat display when printing map
+# external - is part of an external library (e.g. libc), ignore in comparison, don't count as uncompleted in stats
+# detached - routine has no callers, looks useless, don't count as uncompleted in stats
+# assembly - routine was written in assembly, don't include in comparisons by default
+# duplicate - routine is a duplicate of another
+#
+routine_10: Code1 NEAR 0000-000f R0000-000f
+# Routine routine_7 0000:0010-0000:015d[00014e] is a potential duplicate of routine main 0000:0010-0000:016f[000160], differs by 6 instructions
+main: Code1 NEAR 0010-015d R0010-015d duplicate
+# Routine routine_23 0000:015e-0000:01e9[00008c] is a potential duplicate of routine drawCockpit 0000:0170-0000:01fb[00008c], differs by 0 instructions
+drawCockpit: Code1 NEAR 015e-01e9 R015e-01e9 duplicate
+# Routine routine_24 0000:01ea-0000:0255[00006c] is a potential duplicate of routine runGameSession 0000:01fc-0000:0267[00006c], differs by 0 instructions
+runGameSession: Code1 NEAR 01ea-0255 R01ea-0255 duplicate
+routine_6: Code1 NEAR 0256-0256 R0256-0256
+routine_5: Code1 NEAR 0257-0257 R0257-0257
+# Routine routine_17 0000:0258-0000:029f[000048] is a potential duplicate of routine gfxInit 0000:026a-0000:02b1[000048], differs by 0 instructions
+gfxInit: Code1 NEAR 0258-029f R0258-029f duplicate
+routine_14: Code1 NEAR 03a0-03f8 R03a0-03b2 U03b3-03b7 R03b8-03f8
+routine_42: Code1 NEAR 0434-0437 R0434-0437
+# Routine routine_117 0000:0438-0000:04cf[000098] is a potential duplicate of routine render3DView 0000:044a-0000:04e1[000098], differs by 0 instructions
+render3DView: Code1 NEAR 0438-04cf R0438-04cf duplicate
+routine_51: Code1 NEAR 04d0-04f1 R04d0-04f1
+# Routine routine_116 0000:04f2-0000:050f[00001e] is a potential duplicate of routine loadColorPalette 0000:0504-0000:0521[00001e], differs by 0 instructions
+loadColorPalette: Code1 NEAR 04f2-050f R04f2-050f duplicate
+# Routine routine_197 0000:0510-0000:0904[0003f5] is a potential duplicate of routine projectObjects 0000:0522-0000:0916[0003f5], differs by 0 instructions
+projectObjects: Code1 NEAR 0510-0904 R0510-0904 duplicate
+# Routine routine_275 0000:0906-0000:0987[000082] is a potential duplicate of routine scaleCoordToLod 0000:0918-0000:0999[000082], differs by 0 instructions
+scaleCoordToLod: Code1 NEAR 0906-0987 R0906-0987 duplicate
+# Routine routine_276 0000:0988-0000:0aaa[000123] is a potential duplicate of routine process3dg 0000:099a-0000:0abc[000123], differs by 0 instructions
+process3dg: Code1 NEAR 0988-0aaa R0988-0aaa duplicate
+routine_70: Code1 NEAR 0aac-0ac9 R0aac-0ac9
+# Routine routine_98 0000:0aca-0000:0e07[00033e] is a potential duplicate of routine load3D3 0000:0adc-0000:0e19[00033e], differs by 0 instructions
+load3D3: Code1 NEAR 0aca-0e07 R0aca-0e07 duplicate
+# Routine routine_99 0000:0e08-0000:0f68[000161] is a potential duplicate of routine load3DT 0000:0e1a-0000:0f7a[000161], differs by 0 instructions
+load3DT: Code1 NEAR 0e08-0f68 R0e08-0f68 duplicate
+# Routine routine_97 0000:0f6a-0000:1038[0000cf] is a potential duplicate of routine load3DG 0000:0f7c-0000:104a[0000cf], differs by 0 instructions
+load3DG: Code1 NEAR 0f6a-1038 R0f6a-1038 duplicate
+routine_65: Code1 NEAR 103a-1055 R103a-1055
+# Routine routine_63 0000:1056-0000:107f[00002a] is a potential duplicate of routine strcpyFromDot 0000:1068-0000:1091[00002a], differs by 0 instructions
+strcpyFromDot: Code1 NEAR 1056-107f R1056-107f duplicate
+# Routine routine_177 0000:1080-0000:12c0[000241] is a potential duplicate of routine findNearestTileObject 0000:1092-0000:12db[00024a], differs by 0 instructions
+findNearestTileObject: Code1 NEAR 1080-12c9 R1080-12c0 U12c1-12c1 R12c2-12c9 duplicate
+# Routine routine_179 0000:12ca-0000:130a[000041] is a potential duplicate of routine addTileEntry 0000:12dc-0000:131c[000041], differs by 0 instructions
+addTileEntry: Code1 NEAR 12ca-130a R12ca-130a duplicate
+# Routine routine_277 0000:130c-0000:135e[000053] is a potential duplicate of routine lookupTileEntry 0000:131e-0000:1370[000053], differs by 0 instructions
+lookupTileEntry: Code1 NEAR 130c-135e R130c-135e duplicate
+# Routine routine_328 0000:1360-0000:1503[0001a4] is a potential duplicate of routine drawNearestTileObject 0000:1372-0000:1515[0001a4], differs by 0 instructions
+drawNearestTileObject: Code1 NEAR 1360-1503 R1360-1503 duplicate
+# Routine routine_207 0000:1504-0000:1550[00004d] is a potential duplicate of routine renderMapTerrain 0000:1516-0000:1562[00004d], differs by 0 instructions
+renderMapTerrain: Code1 NEAR 1504-1550 R1504-1550 duplicate
+# Routine routine_313 0000:1552-0000:16dd[00018c] is a potential duplicate of routine drawMapTiles 0000:1564-0000:16ef[00018c], differs by 0 instructions
+drawMapTiles: Code1 NEAR 1552-16dd R1552-16dd duplicate
+# Routine routine_363 0000:16de-0000:1738[00005b] is a potential duplicate of routine computeTileBounds 0000:16f0-0000:174a[00005b], differs by 0 instructions
+computeTileBounds: Code1 NEAR 16de-1738 R16de-1738 duplicate
+# Routine routine_379 0000:173a-0000:1776[00003d] is a potential duplicate of routine worldToTileIndex 0000:174c-0000:1788[00003d], differs by 0 instructions
+worldToTileIndex: Code1 NEAR 173a-1776 R173a-1776 duplicate
+# Routine routine_364 0000:1778-0000:17ca[000053] is a potential duplicate of routine drawMapTileObject 0000:178a-0000:1801[000078], differs by 0 instructions
+drawMapTileObject: Code1 NEAR 1778-17ef R1778-17ca U17cb-17cb R17cc-17ef duplicate
+# Routine routine_380 0000:17f0-0000:1833[000044] is a potential duplicate of routine drawModelPoint 0000:1802-0000:1845[000044], differs by 0 instructions
+drawModelPoint: Code1 NEAR 17f0-1833 R17f0-1833 duplicate
+# Routine routine_381 0000:1834-0000:18bb[000088] is a potential duplicate of routine buildVertexSignMask 0000:1846-0000:18cd[000088], differs by 0 instructions
+buildVertexSignMask: Code1 NEAR 1834-18bb R1834-18bb duplicate
+# Routine routine_382 0000:18bc-0000:19c6[00010b] is a potential duplicate of routine projectModelVertices 0000:18ce-0000:19d8[00010b], differs by 0 instructions
+projectModelVertices: Code1 NEAR 18bc-19c6 R18bc-19c6 duplicate
+routine_391: Code1 NEAR 19c8-19d7 R19c8-19d7
+# Routine routine_196 0000:19d8-0000:1a50[000079] is a potential duplicate of routine setup3DTransform 0000:19ea-0000:1a62[000079], differs by 0 instructions
+setup3DTransform: Code1 NEAR 19d8-1a50 R19d8-1a50 duplicate
+routine_199: Code1 NEAR 1a52-1a66 R1a52-1a66
+# Routine routine_286 0000:1a68-0000:1b1f[0000b8] is a potential duplicate of routine setupViewport 0000:1a7a-0000:1b31[0000b8], differs by 0 instructions
+setupViewport: Code1 NEAR 1a68-1b1f R1a68-1b1f duplicate
+# Routine routine_287 0000:1b20-0000:1b42[000023] is a potential duplicate of routine setViewRotation 0000:1b32-0000:1b54[000023], differs by 0 instructions
+setViewRotation: Code1 NEAR 1b20-1b42 R1b20-1b42 duplicate
+routine_288: Code1 NEAR 1b44-1b5a R1b44-1b5a
+routine_32: Code1 NEAR 1ba2-1bb3 R1ba2-1bb3
+routine_160: Code1 NEAR 1bb4-1bc9 R1bb4-1bc9
+routine_156: Code1 NEAR 1c0b-1c1a R1c0b-1c1a
+routine_157: Code1 NEAR 1c1b-1c26 R1c1b-1c26
+routine_244: Code1 NEAR 1c27-1c45 R1c27-1c45
+routine_234: Code1 FAR 1c46-1c49 R1c46-1c49
+routine_314: Code1 FAR 1c4a-1c4d R1c4a-1c4d
+routine_365: Code1 NEAR 1c4e-1c51 R1c4e-1c51
+routine_321: Code1 NEAR 1c52-1c70 R1c52-1c70
+routine_47: Code1 NEAR 1c71-1c7c R1c71-1c7c
+routine_72: Code1 NEAR 1c7d-1cac R1c7d-1cac
+# Routine routine_15 0000:1d3c-0000:1d5e[000023] is a potential duplicate of routine installCBreakHandler 0000:1c83-0000:1ca5[000023], differs by 0 instructions
+installCBreakHandler: Code1 NEAR 1d3c-1d5e R1d3c-1d5e duplicate
+routine_26: Code1 NEAR 1d5f-1d6f R1d5f-1d6f
+routine_30: Code1 NEAR 1d70-1d7b R1d70-1d7b
+routine_45: Code1 NEAR 1d8c-1dc9 R1d8c-1dc9
+routine_52: Code1 NEAR 1dca-1dea R1dca-1dea
+routine_71: Code1 NEAR 1ee6-1f7a R1ee6-1f7a
+routine_100: Code1 NEAR 1f7b-1fa9 R1f7b-1fa9
+routine_342: Code1 NEAR 1faa-1fb0 R1faa-1fb0
+# Routine routine_105 0000:1fb2-0000:2ebe[000f0d] is a potential duplicate of routine stepFlightModel 0000:215c-0000:3049[000eee], differs by 18 instructions
+stepFlightModel: Code1 NEAR 1fb2-2ebe R1fb2-2ebe duplicate
+# Routine routine_158 0000:2ebf-0000:2ef9[00003b] is a potential duplicate of routine applyRotationDelta 0000:304a-0000:3084[00003b], differs by 0 instructions
+applyRotationDelta: Code1 NEAR 2ebf-2ef9 R2ebf-2ef9 duplicate
+# Routine routine_159 0000:2efa-0000:30c7[0001ce] is a potential duplicate of routine computeAttitudeAngles 0000:3085-0000:3252[0001ce], differs by 0 instructions
+computeAttitudeAngles: Code1 NEAR 2efa-30c7 R2efa-30c7 duplicate
+routine_142: Code1 NEAR 30c8-30eb R30c8-30eb
+# Routine routine_247 0000:30ec-0000:3165[00007a] is a potential duplicate of routine signedRatio16 0000:3277-0000:32f0[00007a], differs by 0 instructions
+signedRatio16: Code1 NEAR 30ec-3165 R30ec-3165 duplicate
+# Routine routine_246 0000:3166-0000:31e8[000083] is a potential duplicate of routine valueToAngle 0000:32f1-0000:3373[000083], differs by 0 instructions
+valueToAngle: Code1 NEAR 3166-31e8 R3166-31e8 duplicate
+routine_248: Code1 NEAR 31e9-31fb R31e9-31fb
+# Routine routine_154 0000:31fc-0000:324d[000052] is a potential duplicate of routine isqrt 0000:3387-0000:33d8[000052], differs by 0 instructions
+isqrt: Code1 NEAR 31fc-324d R31fc-324d duplicate
+# Routine routine_101 0000:324e-0000:3381[000134] is a potential duplicate of routine renderFrame 0000:33d9-0000:3bfa[000822], differs by 0 instructions
+renderFrame: Code1 NEAR 324e-3a6f R324e-3381 U3382-37b1 R37b2-37c1 U37c2-37d1 R37d2-3a6f duplicate
+# Routine routine_121 0000:3a70-0000:3b97[000128] is a potential duplicate of routine drawAirspeedTape 0000:3bfb-0000:3d22[000128], differs by 0 instructions
+drawAirspeedTape: Code1 NEAR 3a70-3b97 R3a70-3b97 duplicate
+# Routine routine_118 0000:3b98-0000:3c03[00006c] is a potential duplicate of routine insertOutlineEdges 0000:3d23-0000:3d8e[00006c], differs by 0 instructions
+insertOutlineEdges: Code1 NEAR 3b98-3c03 R3b98-3c03 duplicate
+# Routine routine_163 0000:3c04-0000:3c36[000033] is a potential duplicate of routine waitForKeyPress 0000:3d8f-0000:3dc1[000033], differs by 0 instructions
+waitForKeyPress: Code1 NEAR 3c04-3c36 R3c04-3c36 duplicate
+# Routine routine_106 0000:3c38-0000:4606[0009cf] is a potential duplicate of routine updateFrame 0000:3dc2-0000:4768[0009a7], differs by 40 instructions
+updateFrame: Code1 NEAR 3c38-4606 R3c38-4606 duplicate
+# Routine routine_174 0000:4607-0000:468e[000088] is a potential duplicate of routine updateHudGauge 0000:4769-0000:47f0[000088], differs by 0 instructions
+updateHudGauge: Code1 NEAR 4607-468e R4607-468e duplicate
+# Routine routine_341 0000:468f-0000:47a2[000114] is a potential duplicate of routine countermeasures 0000:47f1-0000:4904[000114], differs by 0 instructions
+countermeasures: Code1 NEAR 468f-47a2 R468f-47a2 duplicate
+# Routine routine_170 0000:47a3-0000:47f3[000051] is a potential duplicate of routine tickWeaponSlots 0000:4905-0000:4955[000051], differs by 0 instructions
+tickWeaponSlots: Code1 NEAR 47a3-47f3 R47a3-47f3 duplicate
+# Routine routine_171 0000:47f4-0000:4945[000152] is a potential duplicate of routine updateBulletsAndFire 0000:4956-0000:4aa7[000152], differs by 0 instructions
+updateBulletsAndFire: Code1 NEAR 47f4-4945 R47f4-4945 duplicate
+# Routine routine_172 0000:4946-0000:49d5[000090] is a potential duplicate of routine updateTracerParticles 0000:4aa8-0000:4b37[000090], differs by 0 instructions
+updateTracerParticles: Code1 NEAR 4946-49d5 R4946-49d5 duplicate
+routine_173: Code1 NEAR 49d6-49f0 R49d6-49f0
+# Routine routine_183 0000:49f1-0000:4a65[000075] is a potential duplicate of routine initFrameRandom 0000:4b53-0000:4bc7[000075], differs by 0 instructions
+initFrameRandom: Code1 NEAR 49f1-4a65 R49f1-4a65 duplicate
+# Routine routine_210 0000:4a66-0000:4a95[000030] is a potential duplicate of routine resetSimObjectLocks 0000:4bc8-0000:4bf7[000030], differs by 0 instructions
+resetSimObjectLocks: Code1 NEAR 4a66-4a95 R4a66-4a95 duplicate
+# Routine routine_335 0000:4a96-0000:4acc[000037] is a potential duplicate of routine initWeaponLoadout 0000:4c05-0000:4c3b[000037], differs by 0 instructions
+initWeaponLoadout: Code1 NEAR 4a96-4acc R4a96-4acc duplicate
+# Routine routine_145 0000:4acd-0000:4b28[00005c] is a potential duplicate of routine commitCommSnapshot 0000:4c3c-0000:4c97[00005c], differs by 0 instructions
+commitCommSnapshot: Code1 NEAR 4acd-4b28 R4acd-4b28 duplicate
+routine_261: Code1 NEAR 4b29-4b3c R4b29-4b3c
+routine_184: Code1 NEAR 4b3d-4b3f R4b3d-4b3f
+# Routine routine_176 0000:4b40-0000:4b93[000054] is a potential duplicate of routine recordFrame 0000:4caf-0000:4d02[000054], differs by 0 instructions
+recordFrame: Code1 NEAR 4b40-4b93 R4b40-4b93 duplicate
+# Routine routine_263 0000:4b94-0000:4c07[000074] is a potential duplicate of routine buildStoreName 0000:4d03-0000:4d76[000074], differs by 0 instructions
+buildStoreName: Code1 NEAR 4b94-4c07 R4b94-4c07 duplicate
+# Routine routine_39 0000:4c08-0000:4c99[000092] is a potential duplicate of routine initStoreData 0000:4d77-0000:4e08[000092], differs by 0 instructions
+initStoreData: Code1 NEAR 4c08-4c99 R4c08-4c99 duplicate
+# Routine routine_182 0000:4c9a-0000:4d87[0000ee] is a potential duplicate of routine findWaypointFeatures 0000:4e09-0000:4ef6[0000ee], differs by 0 instructions
+findWaypointFeatures: Code1 NEAR 4c9a-4d87 R4c9a-4d87 duplicate
+routine_48: Code1 NEAR 4d88-4da8 R4d88-4da8
+# Routine routine_61 0000:4da9-0000:4e91[0000e9] is a potential duplicate of routine moveStuff 0000:4f18-0000:5000[0000e9], differs by 0 instructions
+moveStuff: Code1 NEAR 4da9-4e91 R4da9-4e91 duplicate
+# Routine routine_73 0000:4e92-0000:4ed5[000044] is a potential duplicate of routine moveNearFar 0000:5001-0000:5044[000044], differs by 0 instructions
+moveNearFar: Code1 NEAR 4e92-4ed5 R4e92-4ed5 duplicate
+routine_60: Code1 NEAR 4ed6-4ee9 R4ed6-4ee9
+# Routine routine_166 0000:4eea-0000:51a0[0002b7] is a potential duplicate of routine updateThreatSites 0000:505a-0000:5310[0002b7], differs by 0 instructions
+updateThreatSites: Code1 NEAR 4eea-51a0 R4eea-51a0 duplicate
+# Routine routine_256 0000:51a1-0000:5518[000378] is a potential duplicate of routine fireGroundThreat 0000:5311-0000:5688[000378], differs by 0 instructions
+fireGroundThreat: Code1 NEAR 51a1-5518 R51a1-5518 duplicate
+# Routine routine_325 0000:5519-0000:566a[000152] is a potential duplicate of routine computeThreatRangeBearing 0000:5689-0000:57da[000152], differs by 0 instructions
+computeThreatRangeBearing: Code1 NEAR 5519-566a R5519-566a duplicate
+# Routine routine_271 0000:566b-0000:56eb[000081] is a potential duplicate of routine updateThreatAlert 0000:57db-0000:585b[000081], differs by 0 instructions
+updateThreatAlert: Code1 NEAR 566b-56eb R566b-56eb duplicate
+# Routine routine_169 0000:56ec-0000:5832[000147] is a potential duplicate of routine spawnSamThreat 0000:585c-0000:59a2[000147], differs by 0 instructions
+spawnSamThreat: Code1 NEAR 56ec-5832 R56ec-5832 duplicate
+# Routine routine_167 0000:5834-0000:65cb[000d98] is a potential duplicate of routine updateObjects 0000:59a4-0000:673c[000d99], differs by 1 instructions
+updateObjects: Code1 NEAR 5834-65cb R5834-65cb duplicate
+# Routine routine_264 0000:65cc-0000:6960[000395] is a potential duplicate of routine fireAirThreat 0000:673d-0000:6ad1[000395], differs by 0 instructions
+fireAirThreat: Code1 NEAR 65cc-6960 R65cc-6960 duplicate
+# Routine routine_181 0000:6961-0000:6af3[000193] is a potential duplicate of routine spawnEnemyAircraft 0000:6ad2-0000:6c64[000193], differs by 0 instructions
+spawnEnemyAircraft: Code1 NEAR 6961-6af3 R6961-6af3 duplicate
+# Routine routine_168 0000:6af4-0000:760b[000b18] is a potential duplicate of routine updateThreatTargeting 0000:6c66-0000:7756[000af1], differs by 20 instructions
+updateThreatTargeting: Code1 NEAR 6af4-760b R6af4-760b duplicate
+# Routine routine_265 0000:760c-0000:76b4[0000a9] is a potential duplicate of routine samCanAcquireTarget 0000:7757-0000:77ff[0000a9], differs by 0 instructions
+samCanAcquireTarget: Code1 NEAR 760c-76b4 R760c-76b4 duplicate
+# Routine routine_267 0000:76b5-0000:77c2[00010e] is a potential duplicate of routine destroySimObject 0000:7800-0000:790d[00010e], differs by 0 instructions
+destroySimObject: Code1 NEAR 76b5-77c2 R76b5-77c2 duplicate
+# Routine routine_269 0000:77c3-0000:7973[0001b1] is a potential duplicate of routine destroyGroundTarget 0000:790e-0000:7aae[0001a1], differs by 7 instructions
+destroyGroundTarget: Code1 NEAR 77c3-7973 R77c3-7973 duplicate
+# Routine routine_180 0000:7974-0000:7a0a[000097] is a potential duplicate of routine markTargetReached 0000:7aaf-0000:7b45[000097], differs by 0 instructions
+markTargetReached: Code1 NEAR 7974-7a0a R7974-7a0a duplicate
+# Routine routine_266 0000:7a0b-0000:7a64[00005a] is a potential duplicate of routine bombTarget 0000:7b46-0000:7b9f[00005a], differs by 0 instructions
+bombTarget: Code1 NEAR 7a0b-7a64 R7a0b-7a64 duplicate
+# Routine routine_332 0000:7a65-0000:7ced[000289] is a potential duplicate of routine fireMissile 0000:7ba0-0000:7e28[000289], differs by 0 instructions
+fireMissile: Code1 NEAR 7a65-7ced R7a65-7ced duplicate
+# Routine routine_262 0000:7cee-0000:7d26[000039] is a potential duplicate of routine projectWorldPoint 0000:7e29-0000:7e61[000039], differs by 0 instructions
+projectWorldPoint: Code1 NEAR 7cee-7d26 R7cee-7d26 duplicate
+routine_279: Code1 NEAR 7d28-7d39 R7d28-7d39
+# Routine routine_102 0000:7d3a-0000:84f0[0007b7] is a potential duplicate of routine renderHudFrame 0000:7e74-0000:860f[00079c], differs by 22 instructions
+renderHudFrame: Code1 NEAR 7d3a-84f0 R7d3a-84f0 duplicate
+# Routine routine_336 0000:84f1-0000:8531[000041] is a potential duplicate of routine updatePanelMode 0000:8610-0000:8650[000041], differs by 0 instructions
+updatePanelMode: Code1 NEAR 84f1-8531 R84f1-8531 duplicate
+# Routine routine_334 0000:8532-0000:85dc[0000ab] is a potential duplicate of routine drawPanelModeText 0000:8651-0000:86fb[0000ab], differs by 0 instructions
+drawPanelModeText: Code1 NEAR 8532-85dc R8532-85dc duplicate
+# Routine routine_329 0000:85dd-0000:8631[000055] is a potential duplicate of routine updateStatusPanel 0000:86fc-0000:8750[000055], differs by 0 instructions
+updateStatusPanel: Code1 NEAR 85dd-8631 R85dd-8631 duplicate
+routine_185: Code1 NEAR 8632-865f R8632-865f
+# Routine routine_259 0000:8660-0000:86cc[00006d] is a potential duplicate of routine drawGaugeBar 0000:877f-0000:87eb[00006d], differs by 0 instructions
+drawGaugeBar: Code1 NEAR 8660-86cc R8660-86cc duplicate
+# Routine routine_122 0000:86cd-0000:88fb[00022f] is a potential duplicate of routine redrawTacMap 0000:87ec-0000:8a1a[00022f], differs by 0 instructions
+redrawTacMap: Code1 NEAR 86cd-88fb R86cd-88fb duplicate
+# Routine routine_280 0000:88fc-0000:8934[000039] is a potential duplicate of routine zoomIn 0000:8a1b-0000:8a53[000039], differs by 0 instructions
+zoomIn: Code1 NEAR 88fc-8934 R88fc-8934 duplicate
+# Routine routine_340 0000:8935-0000:8974[000040] is a potential duplicate of routine zoomOut 0000:8a54-0000:8a93[000040], differs by 0 instructions
+zoomOut: Code1 NEAR 8935-8974 R8935-8974 duplicate
+routine_252: Code1 NEAR 89e7-89fd R89e7-89fd
+# Routine routine_253 0000:89fe-0000:8a21[000024] is a potential duplicate of routine mapYToScreen 0000:8b1d-0000:8b40[000024], differs by 0 instructions
+mapYToScreen: Code1 NEAR 89fe-8a21 R89fe-8a21 duplicate
+# Routine routine_164 0000:8a22-0000:8aca[0000a9] is a potential duplicate of routine plotMapObject 0000:8b41-0000:8be9[0000a9], differs by 0 instructions
+plotMapObject: Code1 NEAR 8a22-8aca R8a22-8aca duplicate
+# Routine routine_165 0000:8acb-0000:8b56[00008c] is a potential duplicate of routine readMapPixelColor 0000:8bea-0000:8c75[00008c], differs by 0 instructions
+readMapPixelColor: Code1 NEAR 8acb-8b56 R8acb-8b56 duplicate
+# Routine routine_258 0000:8b57-0000:8c0a[0000b4] is a potential duplicate of routine drawMapArc 0000:8c76-0000:8d29[0000b4], differs by 0 instructions
+drawMapArc: Code1 NEAR 8b57-8c0a R8b57-8c0a duplicate
+# Routine routine_326 0000:8c0b-0000:8c51[000047] is a potential duplicate of routine drawMapLine 0000:8d2a-0000:8d70[000047], differs by 0 instructions
+drawMapLine: Code1 NEAR 8c0b-8c51 R8c0b-8c51 duplicate
+# Routine routine_205 0000:8c52-0000:8c7a[000029] is a potential duplicate of routine drawFullscreenLine 0000:8d71-0000:8d99[000029], differs by 0 instructions
+drawFullscreenLine: Code1 NEAR 8c52-8c7a R8c52-8c7a duplicate
+# Routine routine_132 0000:8c7b-0000:8cf2[000078] is a potential duplicate of routine drawViewportLine 0000:8d9a-0000:8e11[000078], differs by 0 instructions
+drawViewportLine: Code1 NEAR 8c7b-8cf2 R8c7b-8cf2 duplicate
+# Routine routine_217 0000:8cf3-0000:8df0[0000fe] is a potential duplicate of routine drawClippedLineRegion 0000:8e12-0000:8f0f[0000fe], differs by 0 instructions
+drawClippedLineRegion: Code1 NEAR 8cf3-8df0 R8cf3-8df0 duplicate
+# Routine routine_216 0000:8df1-0000:8e18[000028] is a potential duplicate of routine drawScreenLineOnePage 0000:8f10-0000:8f37[000028], differs by 0 instructions
+drawScreenLineOnePage: Code1 NEAR 8df1-8e18 R8df1-8e18 duplicate
+# Routine routine_302 0000:8e19-0000:8e7c[000064] is a potential duplicate of routine drawHudViewLine 0000:8f38-0000:8f9b[000064], differs by 0 instructions
+drawHudViewLine: Code1 NEAR 8e19-8e7c R8e19-8e7c duplicate
+routine_129: Code1 NEAR 8e7d-8e92 R8e7d-8e92
+# Routine routine_130 0000:8e93-0000:8ec7[000035] is a potential duplicate of routine fillRectBoth 0000:8fb2-0000:8fe6[000035], differs by 0 instructions
+fillRectBoth: Code1 NEAR 8e93-8ec7 R8e93-8ec7 duplicate
+routine_254: Code1 NEAR 8ec8-8ee7 R8ec8-8ee7
+# Routine routine_136 0000:8ee8-0000:8f51[00006a] is a potential duplicate of routine drawStatusItem 0000:9007-0000:9070[00006a], differs by 0 instructions
+drawStatusItem: Code1 NEAR 8ee8-8f51 R8ee8-8f51 duplicate
+# Routine routine_281 0000:8f52-0000:8fab[00005a] is a potential duplicate of routine drawPanelGridText 0000:9071-0000:90ca[00005a], differs by 0 instructions
+drawPanelGridText: Code1 NEAR 8f52-8fab R8f52-8fab duplicate
+routine_206: Code1 NEAR 8fac-8fc8 R8fac-8fc8
+# Routine routine_123 0000:8fc9-0000:9003[00003b] is a potential duplicate of routine fillPanelBox 0000:90e8-0000:9122[00003b], differs by 0 instructions
+fillPanelBox: Code1 NEAR 8fc9-9003 R8fc9-9003 duplicate
+# Routine routine_312 0000:9004-0000:9094[000091] is a potential duplicate of routine drawCenteredLabelBox 0000:9123-0000:91b3[000091], differs by 0 instructions
+drawCenteredLabelBox: Code1 NEAR 9004-9094 R9004-9094 duplicate
+# Routine routine_86 0000:9095-0000:90c5[000031] is a potential duplicate of routine drawStringBothPages 0000:91b4-0000:91e4[000031], differs by 0 instructions
+drawStringBothPages: Code1 NEAR 9095-90c5 R9095-90c5 duplicate
+# Routine routine_128 0000:90c6-0000:90f9[000034] is a potential duplicate of routine drawStringActivePage 0000:91e5-0000:9218[000034], differs by 0 instructions
+drawStringActivePage: Code1 NEAR 90c6-90f9 R90c6-90f9 duplicate
+# Routine routine_110 0000:90fa-0000:9137[00003e] is a potential duplicate of routine drawStringCentered 0000:9219-0000:9256[00003e], differs by 0 instructions
+drawStringCentered: Code1 NEAR 90fa-9137 R90fa-9137 duplicate
+# Routine routine_134 0000:9138-0000:9162[00002b] is a potential duplicate of routine drawNumber 0000:9257-0000:9281[00002b], differs by 0 instructions
+drawNumber: Code1 NEAR 9138-9162 R9138-9162 duplicate
+# Routine routine_255 0000:9163-0000:9191[00002f] is a potential duplicate of routine readScreenPixel 0000:9282-0000:92b0[00002f], differs by 0 instructions
+readScreenPixel: Code1 NEAR 9163-9191 R9163-9191 duplicate
+routine_137: Code1 NEAR 9192-91ad R9192-91ad
+# Routine routine_268 0000:91ae-0000:91d9[00002c] is a potential duplicate of routine getWeaponStat 0000:92cd-0000:92f8[00002c], differs by 0 instructions
+getWeaponStat: Code1 NEAR 91ae-91d9 R91ae-91d9 duplicate
+# Routine routine_131 0000:91da-0000:966b[000492] is a potential duplicate of routine drawTacticalMap 0000:92fa-0000:978b[000492], differs by 0 instructions
+drawTacticalMap: Code1 NEAR 91da-966b R91da-966b duplicate
+# Routine routine_214 0000:966c-0000:96ef[000084] is a potential duplicate of routine drawMapMarkerBox 0000:978c-0000:980f[000084], differs by 0 instructions
+drawMapMarkerBox: Code1 NEAR 966c-96ef R966c-96ef duplicate
+# Routine routine_213 0000:96f0-0000:979b[0000ac] is a potential duplicate of routine projectMapPoint 0000:9810-0000:98bb[0000ac], differs by 0 instructions
+projectMapPoint: Code1 NEAR 96f0-979b R96f0-979b duplicate
+# Routine routine_215 0000:979c-0000:97f1[000056] is a potential duplicate of routine blitGaugeSprite 0000:98bc-0000:9911[000056], differs by 0 instructions
+blitGaugeSprite: Code1 NEAR 979c-97f1 R979c-97f1 duplicate
+# Routine routine_138 0000:97f2-0000:9858[000067] is a potential duplicate of routine blitSprite 0000:9912-0000:9978[000067], differs by 0 instructions
+blitSprite: Code1 NEAR 97f2-9858 R97f2-9858 duplicate
+# Routine routine_260 0000:9859-0000:9c3d[0003e5] is a potential duplicate of routine drawWaypointPanel 0000:9979-0000:9d5d[0003e5], differs by 0 instructions
+drawWaypointPanel: Code1 NEAR 9859-9c3d R9859-9c3d duplicate
+# Routine routine_327 0000:9c3e-0000:9c82[000045] is a potential duplicate of routine drawStatusBar 0000:9d5e-0000:9da2[000045], differs by 0 instructions
+drawStatusBar: Code1 NEAR 9c3e-9c82 R9c3e-9c82 duplicate
+# Routine routine_282 0000:9c83-0000:9cee[00006c] is a potential duplicate of routine formatMissionClock 0000:9da3-0000:9e0e[00006c], differs by 0 instructions
+formatMissionClock: Code1 NEAR 9c83-9cee R9c83-9cee duplicate
+# Routine routine_344 0000:9cef-0000:9d2e[000040] is a potential duplicate of routine formatTwoDigit 0000:9e0f-0000:9e4e[000040], differs by 0 instructions
+formatTwoDigit: Code1 NEAR 9cef-9d2e R9cef-9d2e duplicate
+# Routine routine_333 0000:9d2f-0000:9f9c[00026e] is a potential duplicate of routine drawLoadoutPanel 0000:9e4f-0000:a0bc[00026e], differs by 0 instructions
+drawLoadoutPanel: Code1 NEAR 9d2f-9f9c R9d2f-9f9c duplicate
+# Routine routine_369 0000:9f9d-0000:a11e[000182] is a potential duplicate of routine drawWeaponsPanel 0000:a0bd-0000:a23e[000182], differs by 0 instructions
+drawWeaponsPanel: Code1 NEAR 9f9d-a11e R9f9d-a11e duplicate
+# Routine routine_208 0000:a11f-0000:a14b[00002d] is a potential duplicate of routine cacheScopePanel 0000:a23f-0000:a26b[00002d], differs by 0 instructions
+cacheScopePanel: Code1 NEAR a11f-a14b Ra11f-a14b duplicate
+# Routine routine_209 0000:a14c-0000:a1a4[000059] is a potential duplicate of routine restoreScopePanel 0000:a26c-0000:a2c4[000059], differs by 0 instructions
+restoreScopePanel: Code1 NEAR a14c-a1a4 Ra14c-a1a4 duplicate
+# Routine routine_257 0000:a1a5-0000:a1df[00003b] is a potential duplicate of routine captureScopePanel 0000:a2c5-0000:a2ff[00003b], differs by 0 instructions
+captureScopePanel: Code1 NEAR a1a5-a1df Ra1a5-a1df duplicate
+# Routine routine_186 0000:a1e0-0000:a2c3[0000e4] is a potential duplicate of routine drawMissionObjectives 0000:a300-0000:a5c6[0002c7], differs by 0 instructions
+drawMissionObjectives: Code1 NEAR a1e0-a4a6 Ra1e0-a2c3 Ua2c4-a306 Ra307-a4a6 duplicate
+routine_368: Code1 NEAR a4a7-a4a7 Ra4a7-a4a7
+# Routine routine_133 0000:a4a8-0000:a610[000169] is a potential duplicate of routine drawThreatIndicator 0000:a5c8-0000:a730[000169], differs by 0 instructions
+drawThreatIndicator: Code1 NEAR a4a8-a610 Ra4a8-a610 duplicate
+# Routine routine_300 0000:a611-0000:a79a[00018a] is a potential duplicate of routine drawTargetInfoPanel 0000:a731-0000:a8ba[00018a], differs by 0 instructions
+drawTargetInfoPanel: Code1 NEAR a611-a79a Ra611-a79a duplicate
+# Routine routine_337 0000:a79b-0000:aa0c[000272] is a potential duplicate of routine drawAirTargetInfoPanel 0000:a8bb-0000:ab2c[000272], differs by 0 instructions
+drawAirTargetInfoPanel: Code1 NEAR a79b-aa0c Ra79b-aa0c duplicate
+# Routine routine_360 0000:aa0d-0000:ab2a[00011e] is a potential duplicate of routine drawWeaponRadarInfo 0000:ab2d-0000:ac4a[00011e], differs by 0 instructions
+drawWeaponRadarInfo: Code1 NEAR aa0d-ab2a Raa0d-ab2a duplicate
+# Routine routine_198 0000:ab2c-0000:b1a9[00067e] is a potential duplicate of routine updateTargetingHud 0000:ac4c-0000:b2c9[00067e], differs by 0 instructions
+updateTargetingHud: Code1 NEAR ab2c-b1a9 Rab2c-b1a9 duplicate
+# Routine routine_200 0000:b1aa-0000:c3db[001232] is a potential duplicate of routine drawHudWorldOverlay 0000:b2ca-0000:c4fb[001232], differs by 0 instructions
+drawHudWorldOverlay: Code1 NEAR b1aa-c3db Rb1aa-c3db duplicate
+# Routine routine_304 0000:c3dc-0000:c4eb[000110] is a potential duplicate of routine drawTargetBox 0000:c4fc-0000:c60b[000110], differs by 0 instructions
+drawTargetBox: Code1 NEAR c3dc-c4eb Rc3dc-c4eb duplicate
+# Routine routine_306 0000:c4ec-0000:c560[000075] is a potential duplicate of routine drawLockReticle 0000:c60c-0000:c680[000075], differs by 0 instructions
+drawLockReticle: Code1 NEAR c4ec-c560 Rc4ec-c560 duplicate
+# Routine routine_301 0000:c561-0000:c5f8[000098] is a potential duplicate of routine drawTargetLabel 0000:c681-0000:c718[000098], differs by 0 instructions
+drawTargetLabel: Code1 NEAR c561-c5f8 Rc561-c5f8 duplicate
+# Routine routine_307 0000:c5f9-0000:c672[00007a] is a potential duplicate of routine buildRangeString 0000:c719-0000:c792[00007a], differs by 0 instructions
+buildRangeString: Code1 NEAR c5f9-c672 Rc5f9-c672 duplicate
+# Routine routine_294 0000:c673-0000:c83e[0001cc] is a potential duplicate of routine computeAimProjection 0000:c793-0000:c95e[0001cc], differs by 0 instructions
+computeAimProjection: Code1 NEAR c673-c83e Rc673-c83e duplicate
+# Routine routine_358 0000:c83f-0000:c891[000053] is a potential duplicate of routine matVecDotAxis 0000:c95f-0000:c9b1[000053], differs by 0 instructions
+matVecDotAxis: Code1 NEAR c83f-c891 Rc83f-c891 duplicate
+# Routine routine_270 0000:c892-0000:c953[0000c2] is a potential duplicate of routine findStoreAtGrid 0000:c9b2-0000:ca73[0000c2], differs by 0 instructions
+findStoreAtGrid: Code1 NEAR c892-c953 Rc892-c953 duplicate
+# Routine routine_297 0000:c954-0000:c973[000020] is a potential duplicate of routine bearingToStore 0000:ca74-0000:ca93[000020], differs by 0 instructions
+bearingToStore: Code1 NEAR c954-c973 Rc954-c973 duplicate
+# Routine routine_296 0000:c974-0000:c993[000020] is a potential duplicate of routine bearingToSimObject 0000:ca94-0000:cab3[000020], differs by 0 instructions
+bearingToSimObject: Code1 NEAR c974-c993 Rc974-c993 duplicate
+# Routine routine_295 0000:c994-0000:c9d1[00003e] is a potential duplicate of routine computeTargetBearing 0000:cab4-0000:caf1[00003e], differs by 0 instructions
+computeTargetBearing: Code1 NEAR c994-c9d1 Rc994-c9d1 duplicate
+# Routine routine_303 0000:c9d2-0000:c9f9[000028] is a potential duplicate of routine hudPitchScale 0000:caf2-0000:cb19[000028], differs by 0 instructions
+hudPitchScale: Code1 NEAR c9d2-c9f9 Rc9d2-c9f9 duplicate
+# Routine routine_308 0000:c9fa-0000:ca32[000039] is a potential duplicate of routine getStoreMapCode 0000:cb1a-0000:cb52[000039], differs by 0 instructions
+getStoreMapCode: Code1 NEAR c9fa-ca32 Rc9fa-ca32 duplicate
+# Routine routine_330 0000:ca33-0000:ca6a[000038] is a potential duplicate of routine isTargetOverWater 0000:cb53-0000:cb8a[000038], differs by 0 instructions
+isTargetOverWater: Code1 NEAR ca33-ca6a Rca33-ca6a duplicate
+# Routine routine_40 0000:ca6c-0000:cb5d[0000f2] is a potential duplicate of routine load15Flt3d3 0000:cb8c-0000:cc7d[0000f2], differs by 0 instructions
+load15Flt3d3: Code1 NEAR ca6c-cb5d Rca6c-cb5d duplicate
+# Routine routine_293 0000:cb5e-0000:ccbd[000160] is a potential duplicate of routine drawWorldObject 0000:cc7e-0000:cddd[000160], differs by 0 instructions
+drawWorldObject: Code1 NEAR cb5e-ccbd Rcb5e-ccbd duplicate
+# Routine routine_305 0000:ccbe-0000:d0a7[0003ea] is a potential duplicate of routine drawTargetView 0000:cdde-0000:d1c7[0003ea], differs by 0 instructions
+drawTargetView: Code1 NEAR ccbe-d0a7 Rccbe-d0a7 duplicate
+# Routine routine_178 0000:d0a8-0000:d0d9[000032] is a potential duplicate of routine shapeDataOffset 0000:d1c8-0000:d1f9[000032], differs by 0 instructions
+shapeDataOffset: Code1 NEAR d0a8-d0d9 Rd0a8-d0d9 duplicate
+# Routine routine_114 0000:d0da-0000:d102[000029] is a potential duplicate of routine clampRange 0000:d1fa-0000:d222[000029], differs by 0 instructions
+clampRange: Code1 NEAR d0da-d102 Rd0da-d102 duplicate
+routine_148: Code1 NEAR d103-d11a Rd103-d11a
+# Routine routine_135 0000:d11b-0000:d17c[000062] is a potential duplicate of routine rangeApprox 0000:d23b-0000:d29c[000062], differs by 0 instructions
+rangeApprox: Code1 NEAR d11b-d17c Rd11b-d17c duplicate
+# Routine routine_126 0000:d17d-0000:d2cb[00014f] is a potential duplicate of routine computeBearing 0000:d29d-0000:d3eb[00014f], differs by 0 instructions
+computeBearing: Code1 NEAR d17d-d2cb Rd17d-d2cb duplicate
+routine_139: Code1 NEAR d2cc-d2e3 Rd2cc-d2e3
+routine_140: Code1 NEAR d2e4-d2f8 Rd2e4-d2f8
+routine_274: Code1 NEAR d2f9-d315 Rd2f9-d315
+routine_221: Code1 NEAR d316-d332 Rd316-d332
+routine_278: Code1 NEAR d333-d34a Rd333-d34a
+# Routine routine_151 0000:d34b-0000:d363[000019] is a potential duplicate of routine randomRange 0000:d46b-0000:d483[000019], differs by 0 instructions
+randomRange: Code1 NEAR d34b-d363 Rd34b-d363 duplicate
+# Routine routine_272 0000:d364-0000:d3a4[000041] is a potential duplicate of routine readAxisInput 0000:d484-0000:d4c4[000041], differs by 0 instructions
+readAxisInput: Code1 NEAR d364-d3a4 Rd364-d3a4 duplicate
+routine_273: Code1 NEAR d3a6-dd7e Rd3a6-dd7e
+# Routine routine_146 0000:dd7f-0000:dda6[000028] is a potential duplicate of routine makeSound 0000:def2-0000:df19[000028], differs by 0 instructions
+makeSound: Code1 NEAR dd7f-dda6 Rdd7f-dda6 duplicate
+routine_240: Code1 NEAR dda7-ddc8 Rdda7-ddc8
+# Routine routine_175 0000:ddc9-0000:de3f[000077] is a potential duplicate of routine recalcTimeScale 0000:df3c-0000:dfb2[000077], differs by 0 instructions
+recalcTimeScale: Code1 NEAR ddc9-de3f Rddc9-de3f duplicate
+# Routine routine_187 0000:de40-0000:de9a[00005b] is a potential duplicate of routine setupLodDistances 0000:dfb4-0000:e00e[00005b], differs by 0 instructions
+setupLodDistances: Code1 NEAR de40-de9a Rde40-de9a duplicate
+routine_339: Code1 NEAR de9b-deaf Rde9b-deaf
+# Routine routine_338 0000:deb0-0000:ded6[000027] is a potential duplicate of routine copyStoreToWaypoint 0000:e026-0000:e04c[000027], differs by 0 instructions
+copyStoreToWaypoint: Code1 NEAR deb0-ded6 Rdeb0-ded6 duplicate
+routine_57: Code1 NEAR e024-e034 Re024-e034
+routine_59: Code1 NEAR e048-e055 Re048-e055
+# Routine routine_75 0000:e09c-0000:e0f2[000057] is a potential duplicate of routine openFile 0000:e212-0000:e268[000057], differs by 0 instructions
+openFile: Code1 NEAR e09c-e0f2 Re09c-e0f2 Re258-e293 duplicate
+# Routine routine_83 0000:e14a-0000:e16a[000021] is a potential duplicate of routine closeFile 0000:e2c0-0000:e2e0[000021], differs by 0 instructions
+closeFile: Code1 NEAR e14a-e16a Re14a-e16a duplicate
+# Routine routine_37 0000:e294-0000:e2cc[000039] is a potential duplicate of routine openBlitClosePic 0000:e40a-0000:e442[000039], differs by 0 instructions
+openBlitClosePic: Code1 NEAR e294-e2cc Re294-e2cc duplicate
+# Routine routine_58 0000:e382-0000:e3f3[000072] is a potential duplicate of routine picBlit 0000:e4f8-0000:e569[000072], differs by 0 instructions
+picBlit: Code1 NEAR e382-e3f3 Re382-e3f3 duplicate
+routine_76: Code1 NEAR e538-e538 Re538-e538
+# Routine routine_80 0000:e53a-0000:e563[00002a] is a potential duplicate of routine decodePicRow 0000:e6b0-0000:e6d9[00002a], differs by 0 instructions
+decodePicRow: Code1 NEAR e53a-e563 Re53a-e563 duplicate
+# Routine routine_107 0000:e564-0000:e5aa[000047] is a potential duplicate of routine picReadDataAndMakeDict 0000:e6da-0000:e720[000047], differs by 0 instructions
+picReadDataAndMakeDict: Code1 NEAR e564-e5aa Re564-e5aa duplicate
+# Routine routine_283 0000:e5ab-0000:e5e0[000036] is a potential duplicate of routine picMakeDict 0000:e721-0000:e756[000036], differs by 0 instructions
+picMakeDict: Code1 NEAR e5ab-e5e0 Re5ab-e5e0 duplicate
+# Routine routine_108 0000:e5e1-0000:e659[000079] is a potential duplicate of routine doPicDecode 0000:e757-0000:e7cf[000079], differs by 0 instructions
+doPicDecode: Code1 NEAR e5e1-e659 Re5e1-e659 duplicate
+# Routine routine_189 0000:e65a-0000:e708[0000af] is a potential duplicate of routine dictionaryLookup 0000:e7d0-0000:e87e[0000af], differs by 0 instructions
+dictionaryLookup: Code1 NEAR e65a-e708 Re65a-e708 duplicate
+# Routine start 0000:e70a-0000:e7bb[0000b2] is a potential duplicate of routine start 0000:e880-0000:e931[0000b2], differs by 0 instructions
+start: Code1 NEAR e70a-e7bb Re70a-e7bb duplicate
+# Routine routine_4 0000:e7bc-0000:e87f[0000c4] is a potential duplicate of routine __cinit 0000:e932-0000:e9f5[0000c4], differs by 0 instructions
+__cinit: Code1 NEAR e7bc-e87f Re7bc-e87f Re94c-e951 duplicate
+routine_8: Code1 NEAR e880-e896 Re880-e896
+# Routine routine_9 0000:e897-0000:e8db[000045] is a potential duplicate of routine __exit 0000:ea0d-0000:ea51[000045], differs by 0 instructions
+__exit: Code1 NEAR e897-e8db Re897-e8db duplicate
+# Routine routine_29 0000:e8dc-0000:e908[00002d] is a potential duplicate of routine __ctermsub 0000:ea52-0000:ea7e[00002d], differs by 0 instructions
+__ctermsub: Code1 NEAR e8dc-e908 Re8dc-e908 duplicate
+routine_13: Code1 NEAR e909-e917 Re909-e917
+routine_12: Code1 NEAR e918-e92a Re918-e92a
+routine_2: Code1 NEAR e92c-e94b Re92c-e94b
+routine_56: Code1 NEAR e952-e967 Re952-e967
+# Routine routine_28 0000:e968-0000:e989[000022] is a potential duplicate of routine __nullcheck 0000:eade-0000:eaff[000022], differs by 0 instructions
+__nullcheck: Code1 NEAR e968-e989 Re968-e989 duplicate
+# Routine routine_11 0000:eb86-0000:ebb0[00002b] is a potential duplicate of routine __NMSG_TEXT 0000:ecfc-0000:ed26[00002b], differs by 0 instructions
+__NMSG_TEXT: Code1 NEAR eb86-ebb0 Reb86-ebb0 duplicate
+# Routine routine_3 0000:ebb1-0000:ebd9[000029] is a potential duplicate of routine __NMSG_WRITE 0000:ed27-0000:ed4f[000029], differs by 0 instructions
+__NMSG_WRITE: Code1 NEAR ebb1-ebd9 Rebb1-ebd9 duplicate
+routine_53: Code1 NEAR ec3c-ec41 Rec3c-ec41
+# Routine routine_74 0000:ec42-0000:ec6f[00002e] is a potential duplicate of routine dosmaperr 0000:edb8-0000:ede5[00002e], differs by 0 instructions
+dosmaperr: Code1 NEAR ec42-ec6f Rec42-ec6f duplicate
+# Routine routine_68 0000:ec70-0000:ed29[0000ba] is a potential duplicate of routine _fclose 0000:ede6-0000:ee9f[0000ba], differs by 0 instructions
+_fclose: Code1 NEAR ec70-ed29 Rec70-ed29 duplicate
+# Routine routine_64 0000:ed5c-0000:ed82[000027] is a potential duplicate of routine _fopen 0000:eed2-0000:eef8[000027], differs by 0 instructions
+_fopen: Code1 NEAR ed5c-ed82 Red5c-ed82 duplicate
+# Routine routine_66 0000:ed84-0000:ef69[0001e6] is a potential duplicate of routine _fread 0000:eefa-0000:f0df[0001e6], differs by 0 instructions
+_fread: Code1 NEAR ed84-ef69 Red84-ef69 duplicate
+# Routine routine_90 0000:ef6a-0000:f029[0000c0] is a potential duplicate of routine __filbuf 0000:f0e0-0000:f19f[0000c0], differs by 0 instructions
+__filbuf: Code1 NEAR ef6a-f029 Ref6a-f029 duplicate
+# Routine routine_92 0000:f02a-0000:f056[00002d] is a potential duplicate of routine __freebuf 0000:f1a0-0000:f1cc[00002d], differs by 0 instructions
+__freebuf: Code1 NEAR f02a-f056 Rf02a-f056 duplicate
+# Routine routine_111 0000:f058-0000:f0c3[00006c] is a potential duplicate of routine __getbuf 0000:f1ce-0000:f239[00006c], differs by 0 instructions
+__getbuf: Code1 NEAR f058-f0c3 Rf058-f0c3 duplicate
+# Routine routine_85 0000:f0c4-0000:f1bb[0000f8] is a potential duplicate of routine __openfile 0000:f23a-0000:f331[0000f8], differs by 0 instructions
+__openfile: Code1 NEAR f0c4-f1bb Rf0c4-f1bb duplicate
+# Routine routine_91 0000:f1bc-0000:f229[00006e] is a potential duplicate of routine _fflush 0000:f332-0000:f39f[00006e], differs by 0 instructions
+_fflush: Code1 NEAR f1bc-f229 Rf1bc-f229 duplicate
+# Routine routine_84 0000:f22a-0000:f263[00003a] is a potential duplicate of routine __getstream 0000:f3a0-0000:f3d9[00003a], differs by 0 instructions
+__getstream: Code1 NEAR f22a-f263 Rf22a-f263 duplicate
+routine_93: Code1 NEAR f264-f283 Rec1c-ec23 Rf264-f283
+# Routine routine_109 0000:f2fe-0000:f490[000193] is a potential duplicate of routine _open 0000:f474-0000:f606[000193], differs by 0 instructions
+_open: Code1 NEAR f2fe-f490 Rf2fe-f490 duplicate
+routine_190: Code1 NEAR f491-f4a1 Rf491-f4a1
+# Routine routine_89 0000:f4a2-0000:f57e[0000dd] is a potential duplicate of routine _read 0000:f618-0000:f6f4[0000dd], differs by 0 instructions
+_read: Code1 NEAR f4a2-f57e Rec2f-ec3b Rf4a2-f57e duplicate
+# Routine routine_112 0000:f580-0000:f625[0000a6] is a potential duplicate of routine _write 0000:f6f6-0000:f79b[0000a6], differs by 0 instructions
+_write: Code1 NEAR f580-f625 Rf580-f625 Rf666-f6a7 duplicate
+# Routine routine_195 0000:f626-0000:f665[000040] is a potential duplicate of routine writeBlock 0000:f79c-0000:f7db[000040], differs by 0 instructions
+writeBlock: Code1 NEAR f626-f665 Rf626-f665 duplicate
+routine_194: Code1 NEAR f6a8-f6b9 Rf6a8-f6b9
+routine_113: Code1 NEAR f6ba-f6cb Rf6ba-f6cb
+# Routine routine_193 0000:f6cc-0000:f711[000046] is a potential duplicate of routine __nmalloc 0000:f842-0000:f887[000046], differs by 0 instructions
+__nmalloc: Code1 NEAR f6cc-f711 Rf6cc-f711 duplicate
+# Routine routine_285 0000:f715-0000:f7f7[0000e3] is a potential duplicate of routine __amalloc 0000:f88b-0000:f96d[0000e3], differs by 0 instructions
+__amalloc: Code1 NEAR f715-f7f7 Rf712-f714 Rf715-f7f7 duplicate
+# Routine routine_347 0000:f7f8-0000:f831[00003a] is a potential duplicate of routine __amexpand 0000:f96e-0000:f9a7[00003a], differs by 0 instructions
+__amexpand: Code1 NEAR f7f8-f831 Rf7f8-f831 duplicate
+# Routine routine_346 0000:f832-0000:f853[000022] is a potential duplicate of routine __amlink 0000:f9a8-0000:f9c9[000022], differs by 0 instructions
+__amlink: Code1 NEAR f832-f853 Rf832-f853 duplicate
+# Routine routine_284 0000:f854-0000:f872[00001f] is a potential duplicate of routine __amallocbrk 0000:f9ca-0000:f9e8[00001f], differs by 0 instructions
+__amallocbrk: Code1 NEAR f854-f872 Rf854-f872 duplicate
+# Routine routine_345 0000:f874-0000:f8e1[00006e] is a potential duplicate of routine _brkctl 0000:f9ea-0000:fa57[00006e], differs by 0 instructions
+_brkctl: Code1 NEAR f874-f8e1 Rf874-f8e1 duplicate
+# Routine routine_370 0000:f8e2-0000:f937[000056] is a potential duplicate of routine brkctlFindSeg 0000:fa58-0000:faad[000056], differs by 0 instructions
+brkctlFindSeg: Code1 NEAR f8e2-f937 Rf8e2-f937 duplicate
+# Routine routine_94 0000:f938-0000:f976[00003f] is a potential duplicate of routine _strcat 0000:faae-0000:faec[00003f], differs by 0 instructions
+_strcat: Code1 NEAR f938-f976 Rf938-f976 duplicate
+# Routine routine_41 0000:f978-0000:f9a9[000032] is a potential duplicate of routine _strcpy 0000:faee-0000:fb1f[000032], differs by 0 instructions
+_strcpy: Code1 NEAR f978-f9a9 Rf978-f9a9 duplicate
+# Routine routine_127 0000:f9aa-0000:f9c4[00001b] is a potential duplicate of routine _strlen 0000:fb20-0000:fb3a[00001b], differs by 0 instructions
+_strlen: Code1 NEAR f9aa-f9c4 Rf9aa-f9c4 duplicate
+routine_95: Code1 NEAR f9c6-f9e0 Rf9c6-f9e0 Rfb28-fb7a
+routine_143: Code1 NEAR f9e2-f9f1 Rf9e2-f9f1
+routine_87: Code1 NEAR f9f6-fa0c Rf9f6-fa09 Ufa0a-fa0b Rfa0c-fa0c
+# Routine routine_27 0000:fa0e-0000:fa8b[00007e] is a potential duplicate of routine _int86 0000:fb84-0000:fc01[00007e], differs by 0 instructions
+_int86: Code1 NEAR fa0e-fa8b Rfa0e-fa8b duplicate
+# Routine routine_69 0000:fa8c-0000:faa9[00001e] is a potential duplicate of routine _movedata 0000:fc02-0000:fc1f[00001e], differs by 0 instructions
+_movedata: Code1 NEAR fa8c-faa9 Rfa8c-faa9 duplicate
+routine_67: Code1 NEAR faaa-fabe Rfaaa-fabe
+# Routine routine_191 0000:face-0000:faef[000022] is a potential duplicate of routine _strupr 0000:fc44-0000:fc65[000022], differs by 0 instructions
+_strupr: Code1 NEAR face-faef Rface-faef duplicate
+# Routine routine_88 0000:faf0-0000:fb1b[00002c] is a potential duplicate of routine _memcpy 0000:fc66-0000:fc91[00002c], differs by 0 instructions
+_memcpy: Code1 NEAR faf0-fb1b Rfaf0-fb1b duplicate
+routine_115: Code1 NEAR fb7c-fb90 Rfb7c-fb90
+routine_343: Code1 NEAR fb92-fba2 Rfb92-fba2
+routine_243: Code1 NEAR fba4-fbc9 Rfba4-fbc9
+routine_96: Code1 NEAR fbca-fbd6 Rfbca-fbd6
+routine_144: Code1 NEAR fbd8-fbeb Rfbd8-fbeb
+# Routine routine_152 0000:fbec-0000:fc87[00009c] is a potential duplicate of routine __aNldiv 0000:fd62-0000:fdfd[00009c], differs by 0 instructions
+__aNldiv: Code1 NEAR fbec-fc87 Rfbec-fc87 duplicate
+# Routine routine_149 0000:fc88-0000:fcbb[000034] is a potential duplicate of routine __aNlmul 0000:fdfe-0000:fe31[000034], differs by 0 instructions
+__aNlmul: Code1 NEAR fc88-fcbb Rfc88-fcbb duplicate
+routine_62: Code1 NEAR fcbc-fcc6 Rfcbc-fcc6
+routine_150: Code1 NEAR fcc8-fcd2 Rfcc8-fcd2
+routine_356: Code1 NEAR fcd4-fcf2 Rfcd4-fcf2
+routine_357: Code1 NEAR fcf4-fd12 Rfcf4-fd12
+# Routine routine_324 0000:fd14-0000:fd74[000061] is a potential duplicate of routine __aNuldiv 0000:fe8a-0000:feea[000061], differs by 0 instructions
+__aNuldiv: Code1 NEAR fd14-fd74 Rfd14-fd74 duplicate
+routine_153: Code1 NEAR fd76-fd80 Rfd76-fd7f Rfd80-fd80
+# Routine routine_372 0fd8:0014-0fd8:0096[000083] is a potential duplicate of routine projectVertexToScreen 0fef:001a-0fef:009c[000083], differs by 0 instructions
+projectVertexToScreen: Code4 NEAR 0014-0096 R0014-0096 duplicate
+routine_371: Code4 NEAR 00af-00d2 R00af-00d2
+routine_373: Code4 NEAR 00d3-00e7 R00d3-00e7
+# Routine routine_387 0fd8:00f9-0fd8:01da[0000e2] is a potential duplicate of routine clipLineSegment 0fef:00ff-0fef:01e0[0000e2], differs by 0 instructions
+clipLineSegment: Code4 NEAR 00f9-01da R00f9-01da duplicate
+# Routine routine_394 0fd8:01db-0fd8:0238[00005e] is a potential duplicate of routine clipLineSubdivP1Outside 0fef:01e1-0fef:023e[00005e], differs by 0 instructions
+clipLineSubdivP1Outside: Code4 NEAR 01db-0238 R01db-0238 duplicate
+# Routine routine_396 0fd8:0239-0fd8:026d[000035] is a potential duplicate of routine writeClippedStart 0fef:023f-0fef:0273[000035], differs by 0 instructions
+writeClippedStart: Code4 NEAR 0239-026d R0239-026d duplicate
+# Routine routine_395 0fd8:026e-0fd8:02a3[000036] is a potential duplicate of routine writeClippedEnd 0fef:0274-0fef:02a9[000036], differs by 0 instructions
+writeClippedEnd: Code4 NEAR 026e-02a3 R026e-02a3 duplicate
+# Routine routine_397 0fd8:02a4-0fd8:02cf[00002c] is a potential duplicate of routine rejectClippedLine 0fef:02aa-0fef:02d5[00002c], differs by 0 instructions
+rejectClippedLine: Code4 NEAR 02a4-02cf R02a4-02cf duplicate
+# Routine routine_404 0fd8:02d0-0fd8:031e[00004f] is a potential duplicate of routine clipPointInside 0fef:02d6-0fef:0324[00004f], differs by 0 instructions
+clipPointInside: Code4 NEAR 02d0-031e R02d0-031e duplicate
+# Routine routine_392 0fd8:031f-0fd8:0355[000037] is a potential duplicate of routine clipComputeOutcode 0fef:0325-0fef:035b[000037], differs by 0 instructions
+clipComputeOutcode: Code4 NEAR 031f-0355 R031f-0355 duplicate
+# Routine routine_393 0fd8:0356-0fd8:03a9[000054] is a potential duplicate of routine clampToClipEdge 0fef:035c-0fef:03af[000054], differs by 0 instructions
+clampToClipEdge: Code4 NEAR 0356-03a9 R0356-03a9 duplicate
+# Routine routine_400 0fd8:03aa-0fd8:041f[000076] is a potential duplicate of routine clipMidpointSubdivide 0fef:03b0-0fef:0425[000076], differs by 0 instructions
+clipMidpointSubdivide: Code4 NEAR 03aa-041f R03aa-041f R0526-055c duplicate
+# Routine routine_399 0fd8:0420-0fd8:048d[00006e] is a potential duplicate of routine clipLineMidpoint 0fef:0426-0fef:0493[00006e], differs by 0 instructions
+clipLineMidpoint: Code4 NEAR 0420-048d R0420-048d R04ec-0525 duplicate
+# Routine routine_403 0fd8:048e-0fd8:04c8[00003b] is a potential duplicate of routine pointOnClipEdge 0fef:0494-0fef:04ce[00003b], differs by 0 instructions
+pointOnClipEdge: Code4 NEAR 048e-04c8 R048e-04c8 duplicate
+# Routine routine_402 0fd8:04c9-0fd8:04eb[000023] is a potential duplicate of routine computeClipOutcode 0fef:04cf-0fef:04f1[000023], differs by 0 instructions
+computeClipOutcode: Code4 NEAR 04c9-04eb R04c9-04eb duplicate
+# Routine routine_390 0fd8:0578-0fd8:0607[000090] is a potential duplicate of routine decodeRleEdgeRow 0fef:057e-0fef:060d[000090], differs by 0 instructions
+decodeRleEdgeRow: Code4 NEAR 0578-0607 R0578-0607 duplicate
+routine_290: Code4 FAR 0608-0619 R0608-0619
+# Routine routine_350 0fd8:061a-0fd8:081f[000206] is a potential duplicate of routine renderHorizonSky 0fef:0620-0fef:0825[000206], differs by 0 instructions
+renderHorizonSky: Code4 NEAR 061a-081f R061a-081f duplicate
+# Routine routine_291 0fd8:0820-0fd8:08a3[000084] is a potential duplicate of routine projectSceneObject 0fef:0826-0fef:08a9[000084], differs by 0 instructions
+projectSceneObject: Code4 FAR 0820-08a3 R0820-08a3 duplicate
+# Routine routine_351 0fd8:08a4-0fd8:09a4[000101] is a potential duplicate of routine transformAndCullObject 0fef:08aa-0fef:09aa[000101], differs by 0 instructions
+transformAndCullObject: Code4 NEAR 08a4-09a4 R08a4-09a4 duplicate
+# Routine routine_352 0fd8:09a5-0fd8:09cd[000029] is a potential duplicate of routine skipDisplayListByLod 0fef:09ab-0fef:09d3[000029], differs by 0 instructions
+skipDisplayListByLod: Code4 NEAR 09a5-09cd R09a5-09cd duplicate
+routine_353: Code4 NEAR 09d2-09e2 R09d2-09e2
+routine_292: Code4 FAR 09e3-09f5 R09e3-09f5
+routine_366: Code4 FAR 09f6-0a03 R09f6-0a03
+routine_298: Code4 FAR 0a12-0a1b R0a12-0a1b
+# Routine routine_355 0fd8:0a1c-0fd8:0afb[0000e0] is a potential duplicate of routine insertSortedObject 0fef:0a22-0fef:0b01[0000e0], differs by 0 instructions
+insertSortedObject: Code4 NEAR 0a1c-0afb R0a1c-0afb duplicate
+# Routine routine_359 0fd8:0afc-0fd8:0b57[00005c] is a potential duplicate of routine renderSortedList 0fef:0b02-0fef:0b5d[00005c], differs by 0 instructions
+renderSortedList: Code4 NEAR 0afc-0b57 R0afc-0b57 duplicate
+routine_367: Code4 FAR 0b66-0b82 R0b66-0b82
+# Routine routine_354 0fd8:0b83-0fd8:0c50[0000ce] is a potential duplicate of routine processSceneObject 0fef:0b89-0fef:0c56[0000ce], differs by 0 instructions
+processSceneObject: Code4 NEAR 0b83-0c50 R0b83-0c50 R1928-1b3f duplicate
+# Routine routine_375 0fd8:0c51-0fd8:0d73[000123] is a potential duplicate of routine rotatePoint3d 0fef:0c57-0fef:0d79[000123], differs by 0 instructions
+rotatePoint3d: Code4 NEAR 0c51-0d73 R0c51-0d73 duplicate
+routine_289: Code4 FAR 0d76-0d7f R0d76-0d7f
+# Routine routine_349 0fd8:0d92-0fd8:0f15[000184] is a potential duplicate of routine transformModelVertices 0fef:0d98-0fef:0f1b[000184], differs by 0 instructions
+transformModelVertices: Code4 NEAR 0d92-0f15 R0d92-0f15 duplicate
+# Routine routine_376 0fd8:108e-0fd8:1162[0000d5] is a potential duplicate of routine transformVertexList 0fef:1094-0fef:1168[0000d5], differs by 0 instructions
+transformVertexList: Code4 NEAR 108e-1162 R0f16-108d R108e-1162 duplicate
+routine_383: Code4 FAR 1164-1175 R1164-1175
+# Routine routine_377 0fd8:1176-0fd8:121f[0000aa] is a potential duplicate of routine projectModelEdges 0fef:117c-0fef:1225[0000aa], differs by 0 instructions
+projectModelEdges: Code4 NEAR 1176-121f R1176-121f duplicate
+# Routine routine_388 0fd8:1220-0fd8:12ca[0000ab] is a potential duplicate of routine clipEdgeNearPlane 0fef:1226-0fef:12d0[0000ab], differs by 0 instructions
+clipEdgeNearPlane: Code4 NEAR 1220-12ca R1220-12ca duplicate
+routine_124: Code4 FAR 12cc-12e3 R12cc-12e3
+# Routine routine_211 0fd8:12fd-0fd8:1418[00011c] is a potential duplicate of routine buildRotationMatrix 0fef:1303-0fef:141e[00011c], differs by 0 instructions
+buildRotationMatrix: Code4 NEAR 12fd-1418 R12fd-1418 duplicate
+# Routine routine_374 0fd8:1419-0fd8:1536[00011e] is a potential duplicate of routine buildInverseRotationMatrix 0fef:141f-0fef:153c[00011e], differs by 0 instructions
+buildInverseRotationMatrix: Code4 NEAR 1419-1536 R1419-1536 duplicate
+routine_385: Code4 NEAR 1537-1555 R1537-1555
+routine_245: Code4 FAR 1556-156a R1556-156a
+# Routine routine_323 0fd8:156b-0fd8:16f9[00018f] is a potential duplicate of routine multiplyMatrix3x3 0fef:1571-0fef:16ff[00018f], differs by 0 instructions
+multiplyMatrix3x3: Code4 NEAR 156b-16f9 R156b-16f9 duplicate
+routine_384: Code4 FAR 16fa-1707 R16fa-1707
+# Routine routine_378 0fd8:1708-0fd8:1792[00008b] is a potential duplicate of routine renderPrimitiveList 0fef:170e-0fef:1798[00008b], differs by 0 instructions
+renderPrimitiveList: Code4 NEAR 1708-1792 R1708-1792 duplicate
+# Routine routine_389 0fd8:1793-0fd8:18d7[000145] is a potential duplicate of routine renderPrimitiveCommand 0fef:1799-0fef:18dd[000145], differs by 0 instructions
+renderPrimitiveCommand: Code4 NEAR 1793-18d7 R1793-18d7 duplicate
+# Routine routine_398 0fd8:18d8-0fd8:1927[000050] is a potential duplicate of routine drawPrimitiveEdges 0fef:18de-0fef:192d[000050], differs by 0 instructions
+drawPrimitiveEdges: Code4 NEAR 18d8-1927 R18d8-1927 duplicate
+routine_386: Code4 NEAR 1b40-1b60 R1b40-1b60
+routine_237: Code4 FAR 1b62-1b65 R1b62-1b65
+routine_220: Code4 FAR 1b66-1b71 R1b66-1b71
+# Routine routine_320 0fd8:1b72-0fd8:1cfd[00018c] is a potential duplicate of routine clipLineCohenSutherland 0fef:1c5a-0fef:1de5[00018c], differs by 0 instructions
+clipLineCohenSutherland: Code4 NEAR 1b72-1cfd R1b72-1cfd duplicate
+# Routine routine_361 0fd8:1cfe-0fd8:1d1e[000021] is a potential duplicate of routine computeLineOutcode 0fef:1de6-0fef:1e06[000021], differs by 0 instructions
+computeLineOutcode: Code4 NEAR 1cfe-1d1e R1cfe-1d1e duplicate
+routine_203: Code4 FAR 1d40-1d55 R1d40-1d55
+routine_202: Code4 FAR 1d56-1d5b R1d56-1d5b
+# Routine routine_309 0fd8:1d5c-0fd8:1d91[000036] is a potential duplicate of routine resetScanlineSpansImpl 0fef:1e44-0fef:1e79[000036], differs by 0 instructions
+resetScanlineSpansImpl: Code4 NEAR 1d5c-1d91 R1d5c-1d91 duplicate
+# Routine routine_362 0fd8:1d92-0fd8:1de0[00004f] is a potential duplicate of routine clampScanlineSpan 0fef:1e7a-0fef:1ec8[00004f], differs by 0 instructions
+clampScanlineSpan: Code4 NEAR 1d92-1de0 R1d92-1de0 duplicate
+# Routine routine_401 0fd8:1df0-0fd8:1ed6[0000e7] is a potential duplicate of routine rasterizeEdgeSpan 0fef:1ed8-0fef:1fbe[0000e7], differs by 0 instructions
+rasterizeEdgeSpan: Code4 NEAR 1df0-1ed6 R1df0-1ed6 duplicate
+routine_204: Code4 FAR 1ed8-1ee3 R1ed8-1ee3
+# Routine routine_311 0fd8:1ee4-0fd8:208b[0001a8] is a potential duplicate of routine clipAndRasterizeEdgeImpl 0fef:1fcc-0fef:2173[0001a8], differs by 0 instructions
+clipAndRasterizeEdgeImpl: Code4 NEAR 1ee4-208b R1de1-1def R1ee4-208b duplicate
+# Routine routine_212 0fd8:20ae-0fd8:211e[000071] is a potential duplicate of routine fillSpanRect 0fef:1b68-0fef:1bd8[000071], differs by 0 instructions
+fillSpanRect: Code4 FAR 20ae-211e R20ae-211e duplicate
+routine_103: Code2 FAR 0000-0003 R0000-0003
+routine_22: Code2 FAR 0004-0007 R0004-0007
+routine_162: Code2 FAR 0008-000b R0008-000b
+# Routine routine_141 11f1:000c-11f1:098d[000982] is a potential duplicate of routine drawInstrumentGauges 1208:0012-1208:0993[000982], differs by 0 instructions
+drawInstrumentGauges: Code2 NEAR 000c-098d R000c-098d duplicate
+routine_35: Code2 NEAR 098e-09a1 R098e-09a1
+routine_250: Code2 NEAR 09a2-0bd7 R09a2-09ab U09ac-0ac1 R0ac2-0bd7
+routine_161: Code2 FAR 0bd8-0be5 R0bd8-0be5
+routine_249: Code2 NEAR 0be6-0bf8 R0be6-0bf8
+routine_147: Code2 FAR 0bf9-0c07 R0bf9-0c07
+# Routine routine_241 11f1:0c08-11f1:0c4f[000048] is a potential duplicate of routine readJoyAxis 1208:0c0e-1208:0c53[000046], differs by 1 instructions
+readJoyAxis: Code2 NEAR 0c08-0c4f R0c08-0c4f duplicate
+# Routine routine_242 11f1:0c50-11f1:0cc0[000071] is a potential duplicate of routine scaleJoyAxis 1208:0c54-1208:0cc4[000071], differs by 0 instructions
+scaleJoyAxis: Code2 NEAR 0c50-0cc0 R0c50-0cc0 duplicate
+routine_25: Code2 FAR 0cc1-0cd2 R0cc1-0cd2
+routine_16: Code2 FAR 0cd3-0ce8 R0cd3-0cdf R0ce0-0ce8
+# Routine routine_46 12bf:000a-12bf:0059[000050] is a potential duplicate of routine setInt9Handler 12d6:000e-12d6:005d[000050], differs by 0 instructions
+setInt9Handler: Code3 FAR 000a-0059 R000a-0059 duplicate
+routine_49: Code3 FAR 005a-0073 R005a-0073
+routine_33: Data1 FAR 01ae-01b2 R01ae-01b2
+routine_225: Data1 FAR 01b3-01b7 R01b3-01b7
+routine_230: Data1 FAR 01b8-01bc R01b8-01bc
+routine_232: Data1 FAR 01bd-01c1 R01bd-01c1
+routine_231: Data1 FAR 01c2-01c6 R01c2-01c6
+routine_192: Data1 FAR 01c7-01cb R01c7-01cb
+routine_238: Data1 FAR 01cc-01d0 R01cc-01d0
+routine_226: Data1 FAR 01e5-01e9 R01e5-01e9
+routine_18: Data1 FAR 01ea-01ee R01ea-01ee
+routine_316: Data1 FAR 01ef-01f3 R01ef-01f3
+routine_319: Data1 FAR 01f4-01f8 R01f4-01f8
+routine_318: Data1 FAR 01f9-01fd R01f9-01fd
+routine_315: Data1 FAR 01fe-0202 R01fe-0202
+routine_233: Data1 FAR 0208-020c R0208-020c
+routine_299: Data1 FAR 0226-022a R0226-022a
+routine_235: Data1 FAR 022b-022f R022b-022f
+routine_219: Data1 FAR 0230-0234 R0230-0234
+routine_236: Data1 FAR 0235-0239 R0235-0239
+routine_55: Data1 FAR 023a-023e R023a-023e
+routine_54: Data1 FAR 023f-0243 R023f-0243
+routine_228: Data1 FAR 0249-024d R0249-024d
+routine_227: Data1 FAR 024e-0252 R024e-0252
+routine_201: Data1 FAR 0253-0257 R0253-0257
+routine_229: Data1 FAR 0258-025c R0258-025c
+routine_120: Data1 FAR 025d-0261 R025d-0261
+routine_310: Data1 FAR 0267-026b R0267-026b
+routine_317: Data1 FAR 0276-027a R0276-027a
+routine_222: Data1 FAR 027b-027f R027b-027f
+routine_38: Data1 FAR 0280-0284 R0280-0284
+routine_104: Data1 FAR 028a-028e R028a-028e
+routine_125: Data1 FAR 028f-0293 R028f-0293
+routine_81: Data1 FAR 02ad-02b1 R02ad-02b1
+routine_82: Data1 FAR 02b7-02bb R02b7-02bb
+routine_77: Data1 FAR 02c6-02ca R02c6-02ca
+routine_79: Data1 FAR 02d0-02d4 R02d0-02d4
+routine_78: Data1 FAR 02d5-02d9 R02d5-02d9
+routine_21: Data1 FAR 02df-02e3 R02df-02e3
+routine_218: Data1 FAR 02e4-02e8 R02e4-02e8
+routine_36: Data1 FAR 02e9-02ed R02e9-02ed
+routine_348: Data1 FAR 02f3-02f7 R02f3-02f7
+routine_188: Data1 FAR 0302-0306 R0302-0306
+routine_20: Data1 FAR 0307-030b R0307-030b
+routine_119: Data1 FAR 030c-0310 R030c-0310
+routine_223: Data1 FAR 0311-0315 R0311-0315
+routine_224: Data1 FAR 031b-031f R031b-031f
+routine_34: Data1 FAR 0325-0329 R0325-0329
+routine_31: Data1 FAR 032a-032e R032a-032e
+routine_50: Data1 FAR 0339-033d R0339-033d
+routine_19: Data1 FAR 0348-034c R0348-034c
+routine_331: Data1 FAR 037f-0383 R037f-0383
+routine_44: Data1 FAR 03a2-03a6 R03a2-03a6
+routine_43: Data1 FAR 03a7-03ab R03a7-03ab
+routine_239: Data1 FAR 03ac-03b0 R03ac-03b0
+routine_322: Data1 FAR 03b6-03ba R03b6-03ba
+routine_251: Data1 FAR 03bb-03bf R03bb-03bf
+routine_155: Data1 FAR 03c0-03c4 R03c0-03c4
+#
+# Discovered variables, one per line, syntax is "VariableName: Segment VAR OffsetWithinSegment"
+#
+var_1: Code1 VAR 1e15
+var_2: Code1 VAR 1e7b
+var_3: Code1 VAR 1e7d
+var_4: Code1 VAR 37c2
+var_5: Code1 VAR a2f7
+var_6: Code3 VAR 0189
+var_7: Code3 VAR 018b
+var_8: Data1 VAR 0001
+var_9: Data1 VAR 0002
+var_10: Data1 VAR 0003
+var_11: Data1 VAR 0004
+var_12: Data1 VAR 0006
+var_13: Data1 VAR 0007
+var_14: Data1 VAR 0008
+var_15: Data1 VAR 000a
+var_16: Data1 VAR 000c
+var_17: Data1 VAR 000e
+var_18: Data1 VAR 000f
+var_19: Data1 VAR 0010
+var_20: Data1 VAR 0012
+var_21: Data1 VAR 0014
+var_22: Data1 VAR 0016
+var_23: Data1 VAR 0018
+var_24: Data1 VAR 001a
+var_25: Data1 VAR 001c
+var_26: Data1 VAR 0020
+var_27: Data1 VAR 0030
+var_28: Data1 VAR 0067
+var_29: Data1 VAR 0068
+var_30: Data1 VAR 006a
+var_31: Data1 VAR 006c
+var_32: Data1 VAR 006e
+var_33: Data1 VAR 0096
+var_34: Data1 VAR 0097
+var_35: Data1 VAR 03ec
+var_36: Data1 VAR 03ee
+var_37: Data1 VAR 0430
+var_38: Data1 VAR 05b0
+var_39: Data1 VAR 05c2
+var_40: Data1 VAR 05d8
+var_41: Data1 VAR 05de
+var_42: Data1 VAR 05e8
+var_43: Data1 VAR 05ea
+var_44: Data1 VAR 05f4
+var_45: Data1 VAR 05f6
+var_46: Data1 VAR 05f8
+var_47: Data1 VAR 06be
+var_48: Data1 VAR 06c2
+var_49: Data1 VAR 06cc
+var_50: Data1 VAR 080c
+var_51: Data1 VAR 080e
+var_52: Data1 VAR 084c
+var_53: Data1 VAR 084e
+var_54: Data1 VAR 0850
+var_55: Data1 VAR 0852
+var_56: Data1 VAR 0956
+var_57: Data1 VAR 0990
+var_58: Data1 VAR 0992
+var_59: Data1 VAR 0996
+var_60: Data1 VAR 0998
+var_61: Data1 VAR 099a
+var_62: Data1 VAR 099c
+var_63: Data1 VAR 099e
+var_64: Data1 VAR 09a0
+var_65: Data1 VAR 09a2
+var_66: Data1 VAR 09a4
+var_67: Data1 VAR 09a6
+var_68: Data1 VAR 09a8
+var_69: Data1 VAR 09aa
+var_70: Data1 VAR 09ac
+var_71: Data1 VAR 09ae
+var_72: Data1 VAR 09af
+var_73: Data1 VAR 09b0
+var_74: Data1 VAR 09b1
+var_75: Data1 VAR 09b3
+var_76: Data1 VAR 09b5
+var_77: Data1 VAR 09b7
+var_78: Data1 VAR 09b9
+var_79: Data1 VAR 09bb
+var_80: Data1 VAR 09bd
+var_81: Data1 VAR 09bf
+var_82: Data1 VAR 09c6
+var_83: Data1 VAR 09d0
+var_84: Data1 VAR 09d2
+var_85: Data1 VAR 09d4
+var_86: Data1 VAR 09d6
+var_87: Data1 VAR 09d7
+var_88: Data1 VAR 09d8
+var_89: Data1 VAR 09da
+var_90: Data1 VAR 09dc
+var_91: Data1 VAR 09df
+var_92: Data1 VAR 09ec
+var_93: Data1 VAR 09f4
+var_94: Data1 VAR 09f6
+var_95: Data1 VAR 09f8
+var_96: Data1 VAR 09fa
+var_97: Data1 VAR 09fc
+var_98: Data1 VAR 0a0c
+var_99: Data1 VAR 0a7c
+var_100: Data1 VAR 0a7e
+var_101: Data1 VAR 0a80
+var_102: Data1 VAR 0a82
+var_103: Data1 VAR 0a84
+var_104: Data1 VAR 0a86
+var_105: Data1 VAR 0a88
+var_106: Data1 VAR 0a8a
+var_107: Data1 VAR 0a8c
+var_108: Data1 VAR 0a8e
+var_109: Data1 VAR 0a90
+var_110: Data1 VAR 0a92
+var_111: Data1 VAR 0a94
+var_112: Data1 VAR 0a96
+var_113: Data1 VAR 0a97
+var_114: Data1 VAR 0a98
+var_115: Data1 VAR 0aa0
+var_116: Data1 VAR 0aa2
+var_117: Data1 VAR 0aa4
+var_118: Data1 VAR 0aa6
+var_119: Data1 VAR 0aa8
+var_120: Data1 VAR 0aa9
+var_121: Data1 VAR 0aaa
+var_122: Data1 VAR 0aac
+var_123: Data1 VAR 0aae
+var_124: Data1 VAR 0ab0
+var_125: Data1 VAR 0ab2
+var_126: Data1 VAR 0ab4
+var_127: Data1 VAR 0ab6
+var_128: Data1 VAR 0ab8
+var_129: Data1 VAR 0aba
+var_130: Data1 VAR 0abc
+var_131: Data1 VAR 0abe
+var_132: Data1 VAR 0ac0
+var_133: Data1 VAR 0ac2
+var_134: Data1 VAR 0ac4
+var_135: Data1 VAR 0ac6
+var_136: Data1 VAR 0ac8
+var_137: Data1 VAR 0aca
+var_138: Data1 VAR 0acc
+var_139: Data1 VAR 0ace
+var_140: Data1 VAR 0ad0
+var_141: Data1 VAR 0ad2
+var_142: Data1 VAR 0ad4
+var_143: Data1 VAR 0ad6
+var_144: Data1 VAR 0ad8
+var_145: Data1 VAR 0ada
+var_146: Data1 VAR 0adc
+var_147: Data1 VAR 0ade
+var_148: Data1 VAR 0ae0
+var_149: Data1 VAR 0ae2
+var_150: Data1 VAR 0ae4
+var_151: Data1 VAR 0ae6
+var_152: Data1 VAR 0ae8
+var_153: Data1 VAR 0aea
+var_154: Data1 VAR 0aec
+var_155: Data1 VAR 0aee
+var_156: Data1 VAR 0af0
+var_157: Data1 VAR 0af4
+var_158: Data1 VAR 0af6
+var_159: Data1 VAR 0af8
+var_160: Data1 VAR 0afa
+var_161: Data1 VAR 0afc
+var_162: Data1 VAR 0afd
+var_163: Data1 VAR 0afe
+var_164: Data1 VAR 0aff
+var_165: Data1 VAR 0cdc
+var_166: Data1 VAR 0cde
+var_167: Data1 VAR 0ce0
+var_168: Data1 VAR 0ce1
+var_169: Data1 VAR 0ce2
+var_170: Data1 VAR 0ce3
+var_171: Data1 VAR 0ec0
+var_172: Data1 VAR 0ec2
+var_173: Data1 VAR 0ec4
+var_174: Data1 VAR 0ec6
+var_175: Data1 VAR 10a4
+var_176: Data1 VAR 10a6
+var_177: Data1 VAR 10a8
+var_178: Data1 VAR 10aa
+var_179: Data1 VAR 1288
+var_180: Data1 VAR 128c
+var_181: Data1 VAR 128e
+var_182: Data1 VAR 146c
+var_183: Data1 VAR 1470
+var_184: Data1 VAR 1472
+var_185: Data1 VAR 16c8
+var_186: Data1 VAR 16ca
+var_187: Data1 VAR 1920
+var_188: Data1 VAR 1922
+var_189: Data1 VAR 1b78
+var_190: Data1 VAR 1b7a
+var_191: Data1 VAR 1bf8
+var_192: Data1 VAR 1bfa
+var_193: Data1 VAR 1c78
+var_194: Data1 VAR 1c7a
+var_195: Data1 VAR 1cf8
+var_196: Data1 VAR 1cfa
+var_197: Data1 VAR 1d18
+var_198: Data1 VAR 1d1a
+var_199: Data1 VAR 1d1f
+var_200: Data1 VAR 1d38
+var_201: Data1 VAR 1d3a
+var_202: Data1 VAR 1d58
+var_203: Data1 VAR 1d5a
+var_204: Data1 VAR 1dd8
+var_205: Data1 VAR 1dda
+var_206: Data1 VAR 1e58
+var_207: Data1 VAR 1e5a
+var_208: Data1 VAR 208c
+var_209: Data1 VAR 2338
+var_210: Data1 VAR 33be
+var_211: Data1 VAR 33c0
+var_212: Data1 VAR 33c2
+var_213: Data1 VAR 33c4
+var_214: Data1 VAR 33c6
+var_215: Data1 VAR 33c8
+var_216: Data1 VAR 33c9
+var_217: Data1 VAR 33cb
+var_218: Data1 VAR 33ce
+var_219: Data1 VAR 33ee
+var_220: Data1 VAR 3450
+var_221: Data1 VAR 3452
+var_222: Data1 VAR 3454
+var_223: Data1 VAR 3456
+var_224: Data1 VAR 3457
+var_225: Data1 VAR 3458
+var_226: Data1 VAR 3459
+var_227: Data1 VAR 345b
+var_228: Data1 VAR 345d
+var_229: Data1 VAR 345f
+var_230: Data1 VAR 3461
+var_231: Data1 VAR 3463
+var_232: Data1 VAR 3465
+var_233: Data1 VAR 3467
+var_234: Data1 VAR 3471
+var_235: Data1 VAR 3472
+var_236: Data1 VAR 3473
+var_237: Data1 VAR 3776
+var_238: Data1 VAR 3778
+var_239: Data1 VAR 3978
+var_240: Data1 VAR 397a
+var_241: Data1 VAR 3b7a
+var_242: Data1 VAR 3b7b
+var_243: Data1 VAR 3b7c
+var_244: Data1 VAR 3b7d
+var_245: Data1 VAR 3b7e
+var_246: Data1 VAR 3b7f
+var_247: Data1 VAR 3b81
+var_248: Data1 VAR 3b83
+var_249: Data1 VAR 3b85
+var_250: Data1 VAR 3b89
+var_251: Data1 VAR 3b8b
+var_252: Data1 VAR 3b8d
+var_253: Data1 VAR 3b8f
+var_254: Data1 VAR 3b91
+var_255: Data1 VAR 3d49
+var_256: Data1 VAR 3f01
+var_257: Data1 VAR 3f03
+var_258: Data1 VAR 3f05
+var_259: Data1 VAR 3f07
+var_260: Data1 VAR 3f0a
+var_261: Data1 VAR 3f0b
+var_262: Data1 VAR 3f0c
+var_263: Data1 VAR 3f0d
+var_264: Data1 VAR 3f0e
+var_265: Data1 VAR 3f0f
+var_266: Data1 VAR 3f11
+var_267: Data1 VAR 3f14
+var_268: Data1 VAR 3f16
+var_269: Data1 VAR 3f30
+var_270: Data1 VAR 3fb0
+var_271: Data1 VAR 4030
+var_272: Data1 VAR 40b0
+var_273: Data1 VAR 4130
+var_274: Data1 VAR 4138
+var_275: Data1 VAR 413a
+var_276: Data1 VAR 413c
+var_277: Data1 VAR 413e
+var_278: Data1 VAR 4140
+var_279: Data1 VAR 4146
+var_280: Data1 VAR 414e
+var_281: Data1 VAR 4150
+var_282: Data1 VAR 4152
+var_283: Data1 VAR 4158
+var_284: Data1 VAR 415a
+var_285: Data1 VAR 415c
+var_286: Data1 VAR 4164
+var_287: Data1 VAR 4166
+var_288: Data1 VAR 4168
+var_289: Data1 VAR 416a
+var_290: Data1 VAR 416e
+var_291: Data1 VAR 4170
+var_292: Data1 VAR 4172
+var_293: Data1 VAR 417a
+var_294: Data1 VAR 417c
+var_295: Data1 VAR 417e
+var_296: Data1 VAR 4188
+var_297: Data1 VAR 418c
+var_298: Data1 VAR 418e
+var_299: Data1 VAR 4190
+var_300: Data1 VAR 4192
+var_301: Data1 VAR 4194
+var_302: Data1 VAR 4196
+var_303: Data1 VAR 41a6
+var_304: Data1 VAR 41a8
+var_305: Data1 VAR 41aa
+var_306: Data1 VAR 41ac
+var_307: Data1 VAR 41ae
+var_308: Data1 VAR 41b0
+var_309: Data1 VAR 41b2
+var_310: Data1 VAR 41b4
+var_311: Data1 VAR 41c4
+var_312: Data1 VAR 41ca
+var_313: Data1 VAR 41e2
+var_314: Data1 VAR 41e8
+var_315: Data1 VAR 4200
+var_316: Data1 VAR 4201
+var_317: Data1 VAR 4203
+var_318: Data1 VAR 4204
+var_319: Data1 VAR 4206
+var_320: Data1 VAR 4207
+var_321: Data1 VAR 4209
+var_322: Data1 VAR 420b
+var_323: Data1 VAR 420d
+var_324: Data1 VAR 420f
+var_325: Data1 VAR 4211
+var_326: Data1 VAR 4213
+var_327: Data1 VAR 4215
+var_328: Data1 VAR 4217
+var_329: Data1 VAR 4219
+var_330: Data1 VAR 421b
+var_331: Data1 VAR 421d
+var_332: Data1 VAR 421e
+var_333: Data1 VAR 4220
+var_334: Data1 VAR 4222
+var_335: Data1 VAR 4224
+var_336: Data1 VAR 4226
+var_337: Data1 VAR 4228
+var_338: Data1 VAR 422a
+var_339: Data1 VAR 422c
+var_340: Data1 VAR 422e
+var_341: Data1 VAR 422f
+var_342: Data1 VAR 4231
+var_343: Data1 VAR 4233
+var_344: Data1 VAR 4235
+var_345: Data1 VAR 4237
+var_346: Data1 VAR 4238
+var_347: Data1 VAR 4239
+var_348: Data1 VAR 423a
+var_349: Data1 VAR 423c
+var_350: Data1 VAR 423f
+var_351: Data1 VAR 4240
+var_352: Data1 VAR 4244
+var_353: Data1 VAR 424c
+var_354: Data1 VAR 429c
+var_355: Data1 VAR 42ec
+var_356: Data1 VAR 42ed
+var_357: Data1 VAR 43b8
+var_358: Data1 VAR 43cc
+var_359: Data1 VAR 43e0
+var_360: Data1 VAR 43e2
+var_361: Data1 VAR 43e4
+var_362: Data1 VAR 43e6
+var_363: Data1 VAR 43e8
+var_364: Data1 VAR 43ea
+var_365: Data1 VAR 4450
+var_366: Data1 VAR 4452
+var_367: Data1 VAR 4454
+var_368: Data1 VAR 4456
+var_369: Data1 VAR 4458
+var_370: Data1 VAR 445a
+var_371: Data1 VAR 44c0
+var_372: Data1 VAR 44c1
+var_373: Data1 VAR 44dc
+var_374: Data1 VAR 44dd
+var_375: Data1 VAR 44f8
+var_376: Data1 VAR 44f9
+var_377: Data1 VAR 44fa
+var_378: Data1 VAR 44fc
+var_379: Data1 VAR 44fe
+var_380: Data1 VAR 4500
+var_381: Data1 VAR 455a
+var_382: Data1 VAR 455c
+var_383: Data1 VAR 455e
+var_384: Data1 VAR 4560
+var_385: Data1 VAR 4562
+var_386: Data1 VAR 4564
+var_387: Data1 VAR 4566
+var_388: Data1 VAR 4568
+var_389: Data1 VAR 456a
+var_390: Data1 VAR 456c
+var_391: Data1 VAR 456e
+var_392: Data1 VAR 456f
+var_393: Data1 VAR 4570
+var_394: Data1 VAR 4571
+var_395: Data1 VAR 4573
+var_396: Data1 VAR 4574
+var_397: Data1 VAR 4575
+var_398: Data1 VAR 45a5
+var_399: Data1 VAR 45a7
+var_400: Data1 VAR 45aa
+var_401: Data1 VAR 45b2
+var_402: Data1 VAR 45ba
+var_403: Data1 VAR 45c2
+var_404: Data1 VAR 45ca
+var_405: Data1 VAR 45d2
+var_406: Data1 VAR 45d4
+var_407: Data1 VAR 45da
+var_408: Data1 VAR 45db
+var_409: Data1 VAR 45de
+var_410: Data1 VAR 45df
+var_411: Data1 VAR 45e0
+var_412: Data1 VAR 45e2
+var_413: Data1 VAR 45e4
+var_414: Data1 VAR 45e6
+var_415: Data1 VAR 45ea
+var_416: Data1 VAR 45ec
+var_417: Data1 VAR 45ed
+var_418: Data1 VAR 45ef
+var_419: Data1 VAR 45f1
+var_420: Data1 VAR 45f3
+var_421: Data1 VAR 45f4
+var_422: Data1 VAR 45fe
+var_423: Data1 VAR 4682
+var_424: Data1 VAR 4684
+var_425: Data1 VAR 4686
+var_426: Data1 VAR 4688
+var_427: Data1 VAR 468a
+var_428: Data1 VAR 4690
+var_429: Data1 VAR 4692
+var_430: Data1 VAR 4696
+var_431: Data1 VAR 469e
+var_432: Data1 VAR 46a2
+var_433: Data1 VAR 46ac
+var_434: Data1 VAR 46ae
+var_435: Data1 VAR 46b2
+var_436: Data1 VAR 46b4
+var_437: Data1 VAR 46b6
+var_438: Data1 VAR 46b8
+var_439: Data1 VAR 46bc
+var_440: Data1 VAR 46be
+var_441: Data1 VAR 46da
+var_442: Data1 VAR 46db
+var_443: Data1 VAR 46dc
+var_444: Data1 VAR 46de
+var_445: Data1 VAR 46df
+var_446: Data1 VAR 46e0
+var_447: Data1 VAR 46e2
+var_448: Data1 VAR 46ea
+var_449: Data1 VAR 46ec
+var_450: Data1 VAR 46ef
+var_451: Data1 VAR 46f2
+var_452: Data1 VAR 46f4
+var_453: Data1 VAR 46f6
+var_454: Data1 VAR 4856
+var_455: Data1 VAR 4858
+var_456: Data1 VAR 485a
+var_457: Data1 VAR 485c
+var_458: Data1 VAR 485e
+var_459: Data1 VAR 4860
+var_460: Data1 VAR 486a
+var_461: Data1 VAR 486c
+var_462: Data1 VAR 4876
+var_463: Data1 VAR 4878
+var_464: Data1 VAR 487a
+var_465: Data1 VAR 49c2
+var_466: Data1 VAR 49c4
+var_467: Data1 VAR 49c6
+var_468: Data1 VAR 49c8
+var_469: Data1 VAR 49ca
+var_470: Data1 VAR 49ce
+var_471: Data1 VAR 4c18
+var_472: Data1 VAR 4c1a
+var_473: Data1 VAR 4c1c
+var_474: Data1 VAR 4c1e
+var_475: Data1 VAR 4c20
+var_476: Data1 VAR 4e6a
+var_477: Data1 VAR 4e6c
+var_478: Data1 VAR 4ece
+var_479: Data1 VAR 4ed0
+var_480: Data1 VAR 4ed4
+var_481: Data1 VAR 4ed6
+var_482: Data1 VAR 4eda
+var_483: Data1 VAR 4edc
+var_484: Data1 VAR 4eea
+var_485: Data1 VAR 4eec
+var_486: Data1 VAR 4eee
+var_487: Data1 VAR 4ef0
+var_488: Data1 VAR 4ef2
+var_489: Data1 VAR 4ef4
+var_490: Data1 VAR 4ef6
+var_491: Data1 VAR 4efa
+var_492: Data1 VAR 4efc
+var_493: Data1 VAR 4f14
+var_494: Data1 VAR 4f16
+var_495: Data1 VAR 5106
+var_496: Data1 VAR 520a
+var_497: Data1 VAR 520c
+var_498: Data1 VAR 5210
+var_499: Data1 VAR 5212
+var_500: Data1 VAR 523a
+var_501: Data1 VAR 523c
+var_502: Data1 VAR 523e
+var_503: Data1 VAR 5240
+var_504: Data1 VAR 5241
+var_505: Data1 VAR 527a
+var_506: Data1 VAR 527c
+var_507: Data1 VAR 53fc
+var_508: Data1 VAR 53fe
+var_509: Data1 VAR 5400
+var_510: Data1 VAR 5402
+var_511: Data1 VAR 5404
+var_512: Data1 VAR 5406
+var_513: Data1 VAR 5408
+var_514: Data1 VAR 540a
+var_515: Data1 VAR 540c
+var_516: Data1 VAR 540e
+var_517: Data1 VAR 5410
+var_518: Data1 VAR 5412
+var_519: Data1 VAR 551c
+var_520: Data1 VAR 551e
+var_521: Data1 VAR 5520
+var_522: Data1 VAR 5522
+var_523: Data1 VAR 5524
+var_524: Data1 VAR 5526
+var_525: Data1 VAR 5528
+var_526: Data1 VAR 552a
+var_527: Data1 VAR 552c
+var_528: Data1 VAR 552e
+var_529: Data1 VAR 5530
+var_530: Data1 VAR 5532
+var_531: Data1 VAR 5534
+var_532: Data1 VAR 5536
+var_533: Data1 VAR 5538
+var_534: Data1 VAR 553a
+var_535: Data1 VAR 553c
+var_536: Data1 VAR 5684
+var_537: Data1 VAR 5686
+var_538: Data1 VAR 5688
+var_539: Data1 VAR 568a
+var_540: Data1 VAR 568c
+var_541: Data1 VAR 5742
+var_542: Data1 VAR 5744
+var_543: Data1 VAR 5746
+var_544: Data1 VAR 5748
+var_545: Data1 VAR 57b0
+var_546: Data1 VAR 57c8
+var_547: Data1 VAR 57e0
+var_548: Data1 VAR 57f8
+var_549: Data1 VAR 5810
+var_550: Data1 VAR 5812
+var_551: Data1 VAR 5814
+var_552: Data1 VAR 5816
+var_553: Data1 VAR 5818
+var_554: Data1 VAR 581a
+var_555: Data1 VAR 581c
+var_556: Data1 VAR 581e
+var_557: Data1 VAR 5820
+var_558: Data1 VAR 5830
+var_559: Data1 VAR 5832
+var_560: Data1 VAR 5834
+var_561: Data1 VAR 5836
+var_562: Data1 VAR 5838
+var_563: Data1 VAR 583a
+var_564: Data1 VAR 583c
+var_565: Data1 VAR 583e
+var_566: Data1 VAR 5842
+var_567: Data1 VAR 5848
+var_568: Data1 VAR 5849
+var_569: Data1 VAR 584e
+var_570: Data1 VAR 5850
+var_571: Data1 VAR 5852
+var_572: Data1 VAR 5854
+var_573: Data1 VAR 5856
+var_574: Data1 VAR 5942
+var_575: Data1 VAR 594a
+var_576: Data1 VAR 5b16
+var_577: Data1 VAR 5b18
+var_578: Data1 VAR 5b1a
+var_579: Data1 VAR 5c2e
+var_580: Data1 VAR 5c68
+var_581: Data1 VAR 5c6a
+var_582: Data1 VAR 5c6c
+var_583: Data1 VAR 5c6e
+var_584: Data1 VAR 5c70
+var_585: Data1 VAR 5c72
+var_586: Data1 VAR 5c74
+var_587: Data1 VAR 5c76
+var_588: Data1 VAR 5c77
+var_589: Data1 VAR 5ee0
+var_590: Data1 VAR 5ee2
+var_591: Data1 VAR 6024
+var_592: Data1 VAR 6026
+var_593: Data1 VAR 6028
+var_594: Data1 VAR 602c
+var_595: Data1 VAR 602e
+var_596: Data1 VAR 6030
+var_597: Data1 VAR 6032
+var_598: Data1 VAR 6034
+var_599: Data1 VAR 6036
+var_600: Data1 VAR 6086
+var_601: Data1 VAR 6095
+var_602: Data1 VAR 6097
+var_603: Data1 VAR 60a1
+var_604: Data1 VAR 60a3
+var_605: Data1 VAR 60a7
+var_606: Data1 VAR 60a9
+var_607: Data1 VAR 60ac
+var_608: Data1 VAR 60ae
+var_609: Data1 VAR 60b0
+var_610: Data1 VAR 60c4
+var_611: Data1 VAR 60c6
+var_612: Data1 VAR 60c8
+var_613: Data1 VAR 60d2
+var_614: Data1 VAR 60d3
+var_615: Data1 VAR 60d4
+var_616: Data1 VAR 60d8
+var_617: Data1 VAR 60da
+var_618: Data1 VAR 60f6
+var_619: Data1 VAR 6198
+var_620: Data1 VAR 619c
+var_621: Data1 VAR 6210
+var_622: Data1 VAR 6213
+var_623: Data1 VAR 6214
+var_624: Data1 VAR 6216
+var_625: Data1 VAR 621a
+var_626: Data1 VAR 621e
+var_627: Data1 VAR 6222
+var_628: Data1 VAR 6228
+var_629: Data1 VAR 622a
+var_630: Data1 VAR 622c
+var_631: Data1 VAR 622e
+var_632: Data1 VAR 6232
+var_633: Data1 VAR 6234
+var_634: Data1 VAR 6236
+var_635: Data1 VAR 623a
+var_636: Data1 VAR 631a
+var_637: Data1 VAR 631c
+var_638: Data1 VAR 631e
+var_639: Data1 VAR 6320
+var_640: Data1 VAR 6322
+var_641: Data1 VAR 6324
+var_642: Data1 VAR 6326
+var_643: Data1 VAR 6328
+var_644: Data1 VAR 632a
+var_645: Data1 VAR 632c
+var_646: Data1 VAR 632e
+var_647: Data1 VAR 6330
+var_648: Data1 VAR 6332
+var_649: Data1 VAR 6334
+var_650: Data1 VAR 6336
+var_651: Data1 VAR 6338
+var_652: Data1 VAR 633a
+var_653: Data1 VAR 6342
+var_654: Data1 VAR 6344
+var_655: Data1 VAR 6346
+var_656: Data1 VAR 6348
+var_657: Data1 VAR 634a
+var_658: Data1 VAR 634c
+var_659: Data1 VAR 634e
+var_660: Data1 VAR 6352
+var_661: Data1 VAR 6392
+var_662: Data1 VAR 6394
+var_663: Data1 VAR 6396
+var_664: Data1 VAR 6398
+var_665: Data1 VAR 639a
+var_666: Data1 VAR 639c
+var_667: Data1 VAR 639e
+var_668: Data1 VAR 63a0
+var_669: Data1 VAR 63a2
+var_670: Data1 VAR 63a4
+var_671: Data1 VAR 63a6
+var_672: Data1 VAR 63a8
+var_673: Data1 VAR 63a9
+var_674: Data1 VAR 63aa
+var_675: Data1 VAR 63ab
+var_676: Data1 VAR 63ac
+var_677: Data1 VAR 63ae
+var_678: Data1 VAR 63b0
+var_679: Data1 VAR 63b2
+var_680: Data1 VAR 63b3
+var_681: Data1 VAR 63b4
+var_682: Data1 VAR 63b6
+var_683: Data1 VAR 65c0
+var_684: Data1 VAR 65c2
+var_685: Data1 VAR 65c4
+var_686: Data1 VAR 65c6
+var_687: Data1 VAR 65de
+var_688: Data1 VAR 65df
+var_689: Data1 VAR 6616
+var_690: Data1 VAR 6618
+var_691: Data1 VAR 661c
+var_692: Data1 VAR 661e
+var_693: Data1 VAR 662a
+var_694: Data1 VAR 662c
+var_695: Data1 VAR 662e
+var_696: Data1 VAR 6630
+var_697: Data1 VAR 6632
+var_698: Data1 VAR 6634
+var_699: Data1 VAR 6636
+var_700: Data1 VAR 6638
+var_701: Data1 VAR 663a
+var_702: Data1 VAR 663c
+var_703: Data1 VAR 663e
+var_704: Data1 VAR 6640
+var_705: Data1 VAR 6642
+var_706: Data1 VAR 6644
+var_707: Data1 VAR 6646
+var_708: Data1 VAR 6648
+var_709: Data1 VAR 664a
+var_710: Data1 VAR 664c
+var_711: Data1 VAR 684c
+var_712: Data1 VAR 684d
+var_713: Data1 VAR 684e
+var_714: Data1 VAR 684f
+var_715: Data1 VAR 6850
+var_716: Data1 VAR 6852
+var_717: Data1 VAR 6a52
+var_718: Data1 VAR 6c54
+var_719: Data1 VAR 6c56
+var_720: Data1 VAR 6c58
+var_721: Data1 VAR 6e58
+var_722: Data1 VAR 6eaa
+var_723: Data1 VAR 6eac
+var_724: Data1 VAR 6eae
+var_725: Data1 VAR 6fb4
+var_726: Data1 VAR 7530
+var_727: Data1 VAR 7f4e
+var_728: Data1 VAR 7f50
+var_729: Data1 VAR 7f90
+var_730: Data1 VAR 7f94
+var_731: Data1 VAR 7f96
+var_732: Data1 VAR 7f98
+var_733: Data1 VAR 7f9a
+var_734: Data1 VAR 7f9c
+var_735: Data1 VAR 7f9e
+var_736: Data1 VAR 7fa0
+var_737: Data1 VAR 7fa2
+var_738: Data1 VAR 7fa4
+var_739: Data1 VAR 7fa6
+var_740: Data1 VAR 8098
+var_741: Data1 VAR 809e
+var_742: Data1 VAR 80a4
+var_743: Data1 VAR 80aa
+var_744: Data1 VAR 80ac
+var_745: Data1 VAR 80ae
+var_746: Data1 VAR 80b0
+var_747: Data1 VAR 80b2
+var_748: Data1 VAR 80b3
+var_749: Data1 VAR 80b4
+var_750: Data1 VAR 80b6
+var_751: Data1 VAR 80b8
+var_752: Data1 VAR 855a
+var_753: Data1 VAR 855c
+var_754: Data1 VAR 855e
+var_755: Data1 VAR 8560
+var_756: Data1 VAR 85f6
+var_757: Data1 VAR 85f8
+var_758: Data1 VAR 85fa
+var_759: Data1 VAR 85fc
+var_760: Data1 VAR 86fc
+var_761: Data1 VAR 86fe
+var_762: Data1 VAR 8794
+var_763: Data1 VAR 8796
+var_764: Data1 VAR 8798
+var_765: Data1 VAR 879a
+var_766: Data1 VAR 879c
+var_767: Data1 VAR 87a6
+var_768: Data1 VAR 87a8
+var_769: Data1 VAR 87aa
+var_770: Data1 VAR 87ae
+var_771: Data1 VAR 87b8
+var_772: Data1 VAR 884e
+var_773: Data1 VAR 8850
+var_774: Data1 VAR 8852
+var_775: Data1 VAR 8854
+var_776: Data1 VAR 8856
+var_777: Data1 VAR 8858
+var_778: Data1 VAR 885a
+var_779: Data1 VAR 885c
+var_780: Data1 VAR 885e
+var_781: Data1 VAR 8860
+var_782: Data1 VAR 8862
+var_783: Data1 VAR 8863
+var_784: Data1 VAR 8864
+var_785: Data1 VAR 8865
+var_786: Data1 VAR 8866
+var_787: Data1 VAR 8867
+var_788: Data1 VAR 8868
+var_789: Data1 VAR 886a
+var_790: Data1 VAR 886b
+var_791: Data1 VAR 886c
+var_792: Data1 VAR 886e
+var_793: Data1 VAR 8870
+var_794: Data1 VAR 8872
+var_795: Data1 VAR 8874
+var_796: Data1 VAR 8b22
+var_797: Data1 VAR 8b24
+var_798: Data1 VAR 8b26
+var_799: Data1 VAR 8b28
+var_800: Data1 VAR 8b2a
+var_801: Data1 VAR 8b2c
+var_802: Data1 VAR 8b2e
+var_803: Data1 VAR 8b30
+var_804: Data1 VAR 8b32
+var_805: Data1 VAR 8b34
+var_806: Data1 VAR 8b36
+var_807: Data1 VAR 8b38
+var_808: Data1 VAR 8b39
+var_809: Data1 VAR 8b3a
+var_810: Data1 VAR 8b3b
+var_811: Data1 VAR 8b3c
+var_812: Data1 VAR 8b3e
+var_813: Data1 VAR 8c28
+var_814: Data1 VAR 8e2a
+var_815: Data1 VAR 8e2c
+var_816: Data1 VAR 8e2e
+var_817: Data1 VAR 8e30
+var_818: Data1 VAR 8e32
+var_819: Data1 VAR 8e34
+var_820: Data1 VAR 8e36
+var_821: Data1 VAR 8e38
+var_822: Data1 VAR 8e3a
+var_823: Data1 VAR 8e3c
+var_824: Data1 VAR 8e3d
+var_825: Data1 VAR 8e3e
+var_826: Data1 VAR 8e3f
+var_827: Data1 VAR 8e46
+var_828: Data1 VAR 8e48
+var_829: Data1 VAR 8e49
+var_830: Data1 VAR 8e4a
+var_831: Data1 VAR 8e4b
+var_832: Data1 VAR 9446
+var_833: Data1 VAR 9448
+var_834: Data1 VAR 944a
+var_835: Data1 VAR 944c
+var_836: Data1 VAR 948c
+var_837: Data1 VAR 948e
+var_838: Data1 VAR 94ce
+var_839: Data1 VAR 94de
+var_840: Data1 VAR 94e0
+var_841: Data1 VAR 94e2
+var_842: Data1 VAR 94e4
+var_843: Data1 VAR 94e6
+var_844: Data1 VAR 94ea
+var_845: Data1 VAR 94ec
+var_846: Data1 VAR 94ee
+var_847: Data1 VAR 94f0
+var_848: Data1 VAR 94f2
+var_849: Data1 VAR 94f4
+var_850: Data1 VAR 94f6
+var_851: Data1 VAR 94fa
+var_852: Data1 VAR 94fc
+var_853: Data1 VAR 94fe
+var_854: Data1 VAR 9500
+var_855: Data1 VAR 9502
+var_856: Data1 VAR 9504
+var_857: Data1 VAR 9506
+var_858: Data1 VAR 956a
+var_859: Data1 VAR 956c
+var_860: Data1 VAR 95be
+var_861: Data1 VAR 95c0
+var_862: Data1 VAR 95c1
+var_863: Data1 VAR 95c3
+var_864: Data1 VAR 95c4
+var_865: Data1 VAR 95c6
+var_866: Data1 VAR 95ce
+var_867: Data1 VAR 95d0
+var_868: Data1 VAR 95d2
+var_869: Data1 VAR 9636
+var_870: Data1 VAR 9638
+var_871: Data1 VAR 963a
+var_872: Data1 VAR 963c
+var_873: Data1 VAR 963e
+var_874: Data1 VAR 9640
+var_875: Data1 VAR 9642
+var_876: Data1 VAR 9644
+var_877: Data1 VAR 9646
+var_878: Data1 VAR 9648
+var_879: Data1 VAR 964a
+var_880: Data1 VAR 964e
+var_881: Data1 VAR 9650
+var_882: Data1 VAR 9652
+var_883: Data1 VAR 9654
+var_884: Data1 VAR 9656
+var_885: Data1 VAR 9666
+var_886: Data1 VAR 9668
+var_887: Data1 VAR 966a
+var_888: Data1 VAR 966c
+var_889: Data1 VAR 966e
+var_890: Data1 VAR 9670
+var_891: Data1 VAR 9672
+var_892: Data1 VAR 9674
+var_893: Data1 VAR 9676
+var_894: Data1 VAR 9678
+var_895: Data1 VAR 967a
+var_896: Data1 VAR 9740
+var_897: Data1 VAR 9742
+var_898: Data1 VAR 9744
+var_899: Data1 VAR 9746
+var_900: Data1 VAR 9a34
+var_901: Data1 VAR 9a36
+var_902: Data1 VAR 9a38
+var_903: Data1 VAR 9a3a
+var_904: Data1 VAR 9a3c
+var_905: Data1 VAR 9a3e
+var_906: Data1 VAR 9b7e
+var_907: Data1 VAR 9b80
+var_908: Data1 VAR 9b82
+var_909: Data1 VAR 9b84
+var_910: Data1 VAR 9b86
+var_911: Data1 VAR 9b87
+var_912: Data1 VAR 9b88
+var_913: Data1 VAR 9b8a
+var_914: Data1 VAR 9b8c
+var_915: Data1 VAR 9b8e
+var_916: Data1 VAR 9b90
+var_917: Data1 VAR 9b92
+var_918: Data1 VAR 9c78
+var_919: Data1 VAR 9c7a
+var_920: Data1 VAR 9c7c
+var_921: Data1 VAR 9c7e
+var_922: Data1 VAR 9c80
+var_923: Data1 VAR 9c82
+var_924: Data1 VAR 9c84
+var_925: Data1 VAR 9c86
+var_926: Data1 VAR 9c88
+var_927: Data1 VAR 9e8a
+var_928: Data1 VAR 9e8c
+var_929: Data1 VAR 9e8e
+var_930: Data1 VAR 9e90
+var_931: Data1 VAR 9e92
+var_932: Data1 VAR 9e94
+var_933: Data1 VAR 9e96
+var_934: Data1 VAR 9e98
+var_935: Data1 VAR 9e9a
+var_936: Data1 VAR 9e9c
+var_937: Data1 VAR 9e9e
+var_938: Data1 VAR 9ea0
+var_939: Data1 VAR ffc0
+var_940: Data1 VAR ffc2
+var_941: Data1 VAR ffc4
+var_942: Data1 VAR ffc6
+var_943: Data1 VAR ffc8
+var_944: Data1 VAR ffca
+var_945: Data1 VAR ffcc
+var_946: Data1 VAR ffce
+var_947: Data1 VAR ffd0
+var_948: Data1 VAR ffd2
+var_949: Data1 VAR ffd4
+var_950: Data1 VAR ffd6
+var_951: Data1 VAR ffd8
+var_952: Data1 VAR ffda
+var_953: Data1 VAR ffdc
+var_954: Data1 VAR ffde
+var_955: Data1 VAR ffe0
+var_956: Data1 VAR ffe2
+var_957: Data1 VAR ffe4
+var_958: Data1 VAR ffe6
+var_959: Data1 VAR ffe8
+var_960: Data1 VAR ffea
+var_961: Data1 VAR ffeb
+var_962: Data1 VAR ffec
+var_963: Data1 VAR ffee
+var_964: Data1 VAR fff0
+var_965: Data1 VAR fff1
+var_966: Data1 VAR fff2
+var_967: Data1 VAR fff4
+var_968: Data1 VAR fff6
+var_969: Data1 VAR fff7
+var_970: Data1 VAR fff8
+var_971: Data1 VAR fff9
+var_972: Data1 VAR fffa
+var_973: Data1 VAR fffb
+var_974: Data1 VAR fffc
+var_975: Data1 VAR fffd
+var_976: Data1 VAR fffe
+var_977: Data1 VAR ffff

@@ -4,12 +4,27 @@
 Size 12430
 #
 # Discovered segments, one per line, syntax is "SegmentName Type(CODE/DATA/STACK) Address [default]"
+# The default data segment is assumed to be used by all routines which don't have data segment overrides.
+# If no default segment is specified, the first one will be used as default.
 #
 seg000 CODE 0000
-dseg DATA 09d9
+dseg DATA 09d9 default
 seg_stack STACK 13c8
 #
-# Discovered routines, one per line, syntax is "RoutineName: Segment Type(NEAR/FAR) Extents[DS] [R/U]Block1[DS]..."
+# Discovered routines, one per line, syntax is "RoutineName: Segment Type(NEAR/FAR) Extents[DS] [R/U]Block1[DS] [R/U]Block2[DS]... [annotation1] [annotation2]..."
+# The routine extents is the largest continuous block of instructions attributed to this routine and originating
+# at the location determined to be the routine's entrypoint.
+# Blocks are offset ranges relative to the segment that the routine belongs to, specifying address as belonging to the routine.
+# Blocks starting with R contain code that was determined reachable, U were unreachable but still likely belong to the routine.
+# The routine blocks may cover a greater area than the extents if the routine has disconected chunks it jumps into.
+# The extents block and/or the individual routine blocks can have an optional data segment override which is the name
+# of the data segment assumed to be selected within that block.# Possible annotation types:
+# ignore - ignore this routine in processing (comparison, signature extraction etc.)
+# complete - this routine was completely reconstructed into C, only influences stat display when printing map
+# external - is part of an external library (e.g. libc), ignore in comparison, don't count as uncompleted in stats
+# detached - routine has no callers, looks useless, don't count as uncompleted in stats
+# assembly - routine was written in assembly, don't include in comparisons by default
+# duplicate - routine is a duplicate of another
 #
 sub_10010: seg000 NEAR 0010-0092 R0010-0092
 sub_10328: seg000 NEAR 0328-0397 R0328-0397
@@ -43,9 +58,11 @@ sub_10E50: seg000 NEAR 0e50-0f09 R0e50-0f09
 sub_10F0A: seg000 NEAR 0f0a-1079 R0f0a-1079
 B$NearRetText: seg000 FAR 107a-107e R107a-107e
 sub_1107F: seg000 NEAR 107f-108a R107f-108a
-sub_1108B: seg000 NEAR 108b-11fe R108b-11fe
+# Routine sub_1108B 0000:108b-0000:11fe[000174] is a potential duplicate of routine clipLineCohenSutherland 0fef:1c5a-0fef:1de5[00018c], differs by 5 instructions
+clipLineCohenSutherland: seg000 NEAR 108b-11fe R108b-11fe duplicate
 sub_111FF: seg000 FAR 11ff-1240 R11ff-1240
-sub_11241: seg000 NEAR 1241-1263 R1241-1263
+# Routine sub_11241 0000:1241-0000:1263[000023] is a potential duplicate of routine installCBreakHandler 0000:1c83-0000:1ca5[000023], differs by 0 instructions
+installCBreakHandler: seg000 NEAR 1241-1263 R1241-1263 duplicate
 sub_11264: seg000 NEAR 1264-1274 R1264-1274
 sub_11275: seg000 FAR 1275-12c5 R1275-12c5
 sub_112C6: seg000 NEAR 12c6-1335 R12c6-1335
@@ -55,25 +72,33 @@ sub_1135A: seg000 NEAR 135a-1367 R135a-1367
 sub_11368: seg000 NEAR 1368-137b R1368-137b
 strcoll: seg000 NEAR 137c-1393 R137c-1393
 sub_11394: seg000 NEAR 1394-13ad R1394-13ad
-sub_113AE: seg000 NEAR 13ae-1404 R13ae-1404
+# Routine sub_113AE 0000:13ae-0000:1404[000057] is a potential duplicate of routine openFile 0000:e212-0000:e268[000057], differs by 0 instructions
+openFile: seg000 NEAR 13ae-1404 R13ae-1404 duplicate
 sub_11405: seg000 NEAR 1405-145b R1405-145b
-sub_1145C: seg000 NEAR 145c-147d R145c-147d
+# Routine sub_1145C 0000:145c-0000:147d[000022] is a potential duplicate of routine closeFile 0000:e2c0-0000:e2e0[000021], differs by 1 instructions
+closeFile: seg000 NEAR 145c-147d R145c-147d duplicate
 sub_1147E: seg000 NEAR 147e-14a8 R147e-14a8
 sub_114A9: seg000 NEAR 14a9-14ff R14a9-14ff
 sub_11500: seg000 NEAR 1500-1520 R1500-1520
 sub_11521: seg000 NEAR 1521-1538 R1521-1538
 sub_11539: seg000 NEAR 1539-15a5 R1539-15a5
-sub_115A6: seg000 NEAR 15a6-15de R15a6-15de
+# Routine sub_115A6 0000:15a6-0000:15de[000039] is a potential duplicate of routine openBlitClosePic 0000:e40a-0000:e442[000039], differs by 0 instructions
+openBlitClosePic: seg000 NEAR 15a6-15de R15a6-15de duplicate
 sub_115DF: seg000 NEAR 15df-1614 R15df-1614
 sub_11615: seg000 NEAR 1615-1693 R1615-1693
-sub_11694: seg000 NEAR 1694-1705 R1694-1705
+# Routine sub_11694 0000:1694-0000:1705[000072] is a potential duplicate of routine picBlit 0000:e4f8-0000:e569[000072], differs by 0 instructions
+picBlit: seg000 NEAR 1694-1705 R1694-1705 duplicate
 sub_11706: seg000 NEAR 1706-17e1 R1706-17e1
 sub_117E2: seg000 NEAR 17e2-1849 R17e2-1849
 sub_1184A: seg000 NEAR 184a-184e R184a-184e
-sub_11876: seg000 NEAR 1876-18bc R1876-18bc
-sub_118BD: seg000 NEAR 18bd-18f2 R18bd-18f2
-sub_118F3: seg000 NEAR 18f3-196b R18f3-196b
-sub_1196C: seg000 NEAR 196c-1a1d R196c-1a1d
+# Routine sub_11876 0000:1876-0000:18bc[000047] is a potential duplicate of routine picReadDataAndMakeDict 0000:e6da-0000:e720[000047], differs by 0 instructions
+picReadDataAndMakeDict: seg000 NEAR 1876-18bc R1876-18bc duplicate
+# Routine sub_118BD 0000:18bd-0000:18f2[000036] is a potential duplicate of routine picMakeDict 0000:e721-0000:e756[000036], differs by 0 instructions
+picMakeDict: seg000 NEAR 18bd-18f2 R18bd-18f2 duplicate
+# Routine sub_118F3 0000:18f3-0000:196b[000079] is a potential duplicate of routine doPicDecode 0000:e757-0000:e7cf[000079], differs by 0 instructions
+doPicDecode: seg000 NEAR 18f3-196b R18f3-196b duplicate
+# Routine sub_1196C 0000:196c-0000:1a1d[0000b2] is a potential duplicate of routine dictionaryLookup 0000:e7d0-0000:e87e[0000af], differs by 1 instructions
+dictionaryLookup: seg000 NEAR 196c-1a1d R196c-1a1d duplicate
 sub_11A3E: seg000 NEAR 1a3e-1a89 R1a3e-1a89
 sub_11A8A: seg000 NEAR 1a8a-20fb R1a8a-20fb
 sub_120FC: seg000 NEAR 20fc-212b R20fc-212b
@@ -144,7 +169,8 @@ sub_153D5: seg000 NEAR 53d5-54b9 R53d5-54b9
 sub_154BA: seg000 NEAR 54ba-54ce R54ba-54ce
 sub_154CF: seg000 NEAR 54cf-54e3 R54cf-54e3
 sub_154E4: seg000 NEAR 54e4-553a R54e4-553a
-sub_1553B: seg000 NEAR 553b-5581 R553b-5581
+# Routine sub_1553B 0000:553b-0000:5581[000047] is a potential duplicate of routine drawMapLine 0000:8d2a-0000:8d70[000047], differs by 0 instructions
+drawMapLine: seg000 NEAR 553b-5581 R553b-5581 duplicate
 sub_15582: seg000 NEAR 5582-55ac R5582-55ac
 sub_155AD: seg000 NEAR 55ad-564e R55ad-564e
 sub_1564F: seg000 NEAR 564f-5665 R564f-5665
@@ -153,41 +179,60 @@ sub_15D1B: seg000 NEAR 5d1b-8531 R5d1b-8531
 sub_18532: seg000 NEAR 8532-85d3 R8532-85d3
 sub_185D9: seg000 NEAR 85d9-85e2 R85d9-85e2
 sub_185E3: seg000 NEAR 85e3-8a0d R85e3-8a0d
-sub_18A0E: seg000 NEAR 8a0e-8ad1 R8a0e-8ad1
+# Routine sub_18A0E 0000:8a0e-0000:8ad1[0000c4] is a potential duplicate of routine __cinit 0000:e932-0000:e9f5[0000c4], differs by 0 instructions
+__cinit: seg000 NEAR 8a0e-8ad1 R8a0e-8ad1 duplicate
 sub_18AD2: seg000 NEAR 8ad2-8b29 R8ad2-8b29
 B$terminate: seg000 NEAR 8b2a-8b2d R8b2a-8b2d
-sub_18B2E: seg000 NEAR 8b2e-8b5a R8b2e-8b5a
+# Routine sub_18B2E 0000:8b2e-0000:8b5a[00002d] is a potential duplicate of routine __ctermsub 0000:ea52-0000:ea7e[00002d], differs by 0 instructions
+__ctermsub: seg000 NEAR 8b2e-8b5a R8b2e-8b5a duplicate
 sub_18B5B: seg000 NEAR 8b5b-8b69 R8b5b-8b69
 sub_18B6A: seg000 NEAR 8b6a-8b7c R8b6a-8b7c
 sub_18B7E: seg000 NEAR 8b7e-8b93 R8b7e-8b93
 sub_18B94: seg000 NEAR 8b94-8c0d R8b94-8c0d
 sub_18C0E: seg000 NEAR 8c0e-8c1f R8c0e-8c1f
-sub_18C20: seg000 NEAR 8c20-8c65 R8c20-8c65
-movedata: seg000 NEAR 8c66-8c83 R8c66-8c83
+# Routine sub_18C20 0000:8c20-0000:8c65[000046] is a potential duplicate of routine __nmalloc 0000:f842-0000:f887[000046], differs by 0 instructions
+__nmalloc: seg000 NEAR 8c20-8c65 R8c20-8c65 duplicate
+# Routine movedata 0000:8c66-0000:8c83[00001e] is a potential duplicate of routine _movedata 0000:fc02-0000:fc1f[00001e], differs by 0 instructions
+_movedata: seg000 NEAR 8c66-8c83 R8c66-8c83 duplicate
 sub_18C84: seg000 NEAR 8c84-8c95 R8c84-8c95
 sub_18C96: seg000 NEAR 8c96-8cbb R8c96-8cbb
-aNldiv: seg000 NEAR 8cbc-8d57 R8cbc-8d57
-aNulmul: seg000 NEAR 8d58-8d8b R8d58-8d8b
+# Routine aNldiv 0000:8cbc-0000:8d57[00009c] is a potential duplicate of routine __aNldiv 0000:fd62-0000:fdfd[00009c], differs by 0 instructions
+__aNldiv: seg000 NEAR 8cbc-8d57 R8cbc-8d57 duplicate
+# Routine aNulmul 0000:8d58-0000:8d8b[000034] is a potential duplicate of routine __aNlmul 0000:fdfe-0000:fe31[000034], differs by 0 instructions
+__aNlmul: seg000 NEAR 8d58-8d8b R8d58-8d8b duplicate
 aNlrem: seg000 NEAR 8d8c-8e2d R8d8c-8e2d
 sub_18E2E: seg000 NEAR 8e2e-8e3b R8e2e-8e3b
-aNuldiv: seg000 NEAR 8e5c-8ebc R8e5c-8ebc
+# Routine aNuldiv 0000:8e5c-0000:8ebc[000061] is a potential duplicate of routine __aNuldiv 0000:fe8a-0000:feea[000061], differs by 0 instructions
+__aNuldiv: seg000 NEAR 8e5c-8ebc R8e5c-8ebc duplicate
 sub_18EBE: seg000 NEAR 8ebe-8edd R8ebe-8edd
 fptrap: seg000 NEAR 8ede-8ee3 R8ede-8ee3
-nullcheck: seg000 NEAR 8ee4-8f05 R8ee4-8f05
-sub_18F06: seg000 NEAR 8f06-8f30 R8f06-8f30
-NMSG_WRITE: seg000 NEAR 8f31-8f59 R8f31-8f59
+# Routine nullcheck 0000:8ee4-0000:8f05[000022] is a potential duplicate of routine __nullcheck 0000:eade-0000:eaff[000022], differs by 0 instructions
+__nullcheck: seg000 NEAR 8ee4-8f05 R8ee4-8f05 duplicate
+# Routine sub_18F06 0000:8f06-0000:8f30[00002b] is a potential duplicate of routine __NMSG_TEXT 0000:ecfc-0000:ed26[00002b], differs by 0 instructions
+__NMSG_TEXT: seg000 NEAR 8f06-8f30 R8f06-8f30 duplicate
+# Routine NMSG_WRITE 0000:8f31-0000:8f59[000029] is a potential duplicate of routine __NMSG_WRITE 0000:ed27-0000:ed4f[000029], differs by 0 instructions
+__NMSG_WRITE: seg000 NEAR 8f31-8f59 R8f31-8f59 duplicate
 dosret0: seg000 NEAR 8f5a-8f61 R8f5a-8f61
 dosreturn: seg000 NEAR 8f62-8f6c R8f62-8f6c
 dosretax: seg000 NEAR 8f6d-8f7f R8f6d-8f7f
-sub_18F80: seg000 NEAR 8f80-8fb0 R8f80-8fb0
-sub_18FB1: seg000 NEAR 8fb1-9093 R8fb1-9093
-sub_19094: seg000 NEAR 9094-90cd R9094-90cd
-amlink: seg000 NEAR 90ce-90ef R90ce-90ef
-amallocbrk: seg000 NEAR 90f0-9111 R90f0-9111
+# Routine sub_18F80 0000:8f80-0000:8fb0[000031] is a potential duplicate of routine dosmaperr 0000:edb8-0000:ede5[00002e], differs by 1 instructions
+dosmaperr: seg000 NEAR 8f80-8fb0 R8f80-8fb0 duplicate
+# Routine sub_18FB1 0000:8fb1-0000:9093[0000e3] is a potential duplicate of routine __amalloc 0000:f88b-0000:f96d[0000e3], differs by 0 instructions
+__amalloc: seg000 NEAR 8fb1-9093 R8fb1-9093 duplicate
+# Routine sub_19094 0000:9094-0000:90cd[00003a] is a potential duplicate of routine __amexpand 0000:f96e-0000:f9a7[00003a], differs by 0 instructions
+__amexpand: seg000 NEAR 9094-90cd R9094-90cd duplicate
+# Routine amlink 0000:90ce-0000:90ef[000022] is a potential duplicate of routine __amlink 0000:f9a8-0000:f9c9[000022], differs by 0 instructions
+__amlink: seg000 NEAR 90ce-90ef R90ce-90ef duplicate
+# Routine amallocbrk 0000:90f0-0000:9111[000022] is a potential duplicate of routine __amallocbrk 0000:f9ca-0000:f9e8[00001f], differs by 1 instructions
+__amallocbrk: seg000 NEAR 90f0-9111 R90f0-9111 duplicate
 sub_1917E: seg000 FAR 917e-9504 R917e-9504
 sub_19C88: seg000 FAR 9c88-9c8b R9c88-9c8b
 sub_19C8C: seg000 FAR 9c8c-9cad R9c8c-9cad
-sub_19CAE: seg000 NEAR 9cae-9cf5 R9cae-9cf5
+# Routine sub_19CAE 0000:9cae-0000:9cf5[000048] is a potential duplicate of routine readJoyAxis 1208:0c0e-1208:0c53[000046], differs by 1 instructions
+readJoyAxis: seg000 NEAR 9cae-9cf5 R9cae-9cf5 duplicate
 sub_19CF6: seg000 FAR 9cf6-9d8e R9cf6-9d8e
 move_ovlcur: dseg NEAR 157d-157d
 movesegenv: dseg NEAR 18f7-18f7
+#
+# Discovered variables, one per line, syntax is "VariableName: Segment VAR OffsetWithinSegment"
+#

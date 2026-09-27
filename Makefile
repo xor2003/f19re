@@ -101,6 +101,32 @@ verify-drivers: drivers
 	python3 tools/compare_exe.py $(F19EN)/MGRAPHIC.EXE $(BUILDDIR)/mgraphic.exe
 	python3 tools/compare_exe.py ASOUND.EXE $(BUILDDIR)/asound.exe
 
+#
+# EN satellite + EN EGAME skeletons (MZ exes): exe2asm.py emits segment
+# skeletons from the mzmap/ada maps; asmfix.py repairs until byte-exact.
+# Routine names come from the .dup maps (mzdup sig matches vs EGAME RU).
+#
+ENEXES := su_en start_en end_en egame_en
+define ENEXE_RULE
+$(BUILDDIR)/$(1).exe $(BUILDDIR)/$(1).obj $(BUILDDIR)/$(1).asm &: tools/asmfix.py tools/exe2asm.py map/$(1).map lst/$(1)_ada.lst | $(BUILDDIR)
+	python3 tools/asmfix.py $(call ENPATH,$(1)) map/$(1).map \
+	    $(BUILDDIR)/$(1).asm --lst lst/$(1)_ada.lst --tool exe2asm.py --build $(BUILDDIR)
+endef
+ENPATH_su_en := $(F19EN)/SU.EXE
+ENPATH_start_en := $(F19EN)/START.EXE
+ENPATH_end_en := $(F19EN)/END.EXE
+ENPATH_egame_en := $(F19EN)/EGAME.EXE
+ENPATH = $(ENPATH_$(1))
+$(foreach e,$(ENEXES),$(eval $(call ENEXE_RULE,$(e))))
+
+.PHONY: exes verify-exes
+exes: $(addprefix $(BUILDDIR)/,$(addsuffix .exe,$(ENEXES)))
+verify-exes: exes
+	python3 tools/compare_exe.py $(F19EN)/SU.EXE $(BUILDDIR)/su_en.exe
+	python3 tools/compare_exe.py $(F19EN)/START.EXE $(BUILDDIR)/start_en.exe
+	python3 tools/compare_exe.py $(F19EN)/END.EXE $(BUILDDIR)/end_en.exe
+	python3 tools/compare_exe.py $(F19EN)/EGAME.EXE $(BUILDDIR)/egame_en.exe
+
 # C declarations generated from the listing (prototypes + data layout)
 hdr: $(BUILDDIR)/EGAME.EXE.h
 $(BUILDDIR)/EGAME.EXE.h: lst/EGAME.EXE.lst conf/egame.json lst/egame.inc | $(BUILDDIR)

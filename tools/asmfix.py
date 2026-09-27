@@ -80,6 +80,9 @@ def db_line(lines, lno, img):
 def main():
     exe, mapfile, asm = sys.argv[1], sys.argv[2], sys.argv[3]
     lst = sys.argv[sys.argv.index('--lst') + 1] if '--lst' in sys.argv else None
+    tool = 'drv2asm.py'
+    if '--tool' in sys.argv:
+        tool = sys.argv[sys.argv.index('--tool') + 1]
     build = 'build'
     if '--build' in sys.argv:
         build = sys.argv[sys.argv.index('--build') + 1]
@@ -91,7 +94,7 @@ def main():
     root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
     subprocess.check_call(
-        [sys.executable, os.path.join(root, 'tools', 'drv2asm.py'),
+        [sys.executable, os.path.join(root, 'tools', tool),
          exe, mapfile, asm] + (['--lst', lst] if lst else []))
     for it in range(200):
         lines = open(asm).read().splitlines()
