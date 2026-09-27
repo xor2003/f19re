@@ -863,3 +863,54 @@ Header layout (load-image offsets): `description[0x18]`,
   f15se2-ex-integration is a clean-room model of the same ABI.
 - No f15 release ships a `*GRAPHIC.EXE`/`*SOUND.EXE` built from source —
   driver reconstruction here would be the first.
+
+### Skeleton emission (`tools/drv2asm.py`)
+
+`drv2asm.py EXE map/x.map out.asm` emits a byte-exact MASM skeleton:
+seg000 = OvlHeader fields as `dw seg`/`dw offset` forms + verbatim data
+bytes; seg001 = one `proc far` per map routine whose body is `db` bytes +
+an ndisasm comment. `make drivers` / `make verify-drivers` reproduce both
+drivers with 0 load-image diffs.
+
+### Ada Script listings (`--lst`, `tools/asmfix.py`)
+
+`~/vextest/ada.py EXE --work-dir W --full --xrefs` produces `W/X.lst` +
+`W/X.asm` — a real disassembly with XREFs. Its limits for these drivers:
+it doesn't know the OvlHeader layout, so header/table bytes decode as
+instructions (e.g. `jnb loc_1CE99` targeting outside the image), and its
+own .asm has ~240 unresolvable labels — it will not assemble directly.
+
+`drv2asm.py --lst x.lst` instead uses the lst **per instruction** inside
+map-defined routine extents, keeping a mnemonic only when it can be
+re-emitted exactly. Name resolution:
+
+- `loc_X/sub_X` at emitted code addrs stay symbolic (labels emitted at
+  their offsets inside procs).
+- ada names in the header/data region (`start`, `loc_100D8`, ...) are
+  emitted as `label byte|word` at their image offsets in seg000 —
+  symbolic refs keep MASM's relocatable mod=10 disp16 encoding (numeric
+  displacement operands get minimized to disp8 by uasm and break).
+- `call far ptr 1CDh:NNNNh` (a same-segment overlay call) rewrites to
+  `call <routine at seg001:NNNN>` — a far-typed proc, producing the same
+  9A ptr32 + segment reloc.
+- anything else (out-of-image targets, mid-instruction labels, unknown
+  idents, 386+ `jcc near`) becomes `db` + the mnemonic as a comment.
+
+Each emitted mnemonic carries a `; @OFF:LEN` tag. `tools/asmfix.py` then
+repairs what still won't assemble exactly, driven by uasm's own `-Fl`
+listing (emitted bytes per source line — no link needed, so a bad line
+never desyncs the comparison):
+
+1. asm-error lines -> db
+2. emitted-length != tag length -> db (these desync the byte stream)
+3. emitted bytes != img[OFF:OFF+LEN] -> db
+4. link + compare_exe -> 0 diffs required (catches reloc/slot-table issues)
+
+Result: MGRAPHIC = 862 mnemonic lines / ASOUND = 1521 mnemonic lines out
+of ~1600/1500 instructions, both byte-exact. Committed lst files:
+`lst/mgraphic_ada.lst`, `lst/asound_ada.lst`. Regenerate ada output with:
+
+```sh
+cd ~/vextest && .venv/bin/python ada.py \
+  /home/xor/games/f19/F19/MGRAPHIC.EXE --work-dir /tmp/ada_mg --full --xrefs
+```

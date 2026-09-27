@@ -56,15 +56,29 @@ verify: $(EGAME_EXE)
 #
 F19EN ?= /home/xor/games/f19/F19
 
+# When an Ada Script listing (lst/<d>_ada.lst, from ~/vextest/ada.py) exists,
+# asmfix.py emits real mnemonics where they reassemble byte-exact and db
+# bytes elsewhere -- a readable skeleton instead of a pure byte blob.
+ifneq ($(wildcard lst/mgraphic_ada.lst),)
+$(BUILDDIR)/mgraphic.exe $(BUILDDIR)/mgraphic.obj $(BUILDDIR)/mgraphic.asm &: tools/asmfix.py tools/drv2asm.py map/mgraphic_en.map lst/mgraphic_ada.lst | $(BUILDDIR)
+	python3 tools/asmfix.py $(F19EN)/MGRAPHIC.EXE map/mgraphic_en.map \
+	    $(BUILDDIR)/mgraphic.asm --lst lst/mgraphic_ada.lst --build $(BUILDDIR)
+else
 $(BUILDDIR)/mgraphic.asm: tools/drv2asm.py map/mgraphic_en.map | $(BUILDDIR)
 	python3 tools/drv2asm.py $(F19EN)/MGRAPHIC.EXE map/mgraphic_en.map $@
-$(BUILDDIR)/asound.asm: tools/drv2asm.py map/asound.map | $(BUILDDIR)
-	python3 tools/drv2asm.py ASOUND.EXE map/asound.map $@
-
 $(BUILDDIR)/mgraphic.exe: $(BUILDDIR)/mgraphic.obj
 	@$(DOSBUILD) link $(LINK_TOOLCHAIN) -i $< -o $@ -f "$(LINKFLAGS)"
+endif
+ifneq ($(wildcard lst/asound_ada.lst),)
+$(BUILDDIR)/asound.exe $(BUILDDIR)/asound.obj $(BUILDDIR)/asound.asm &: tools/asmfix.py tools/drv2asm.py map/asound.map lst/asound_ada.lst | $(BUILDDIR)
+	python3 tools/asmfix.py ASOUND.EXE map/asound.map \
+	    $(BUILDDIR)/asound.asm --lst lst/asound_ada.lst --build $(BUILDDIR)
+else
+$(BUILDDIR)/asound.asm: tools/drv2asm.py map/asound.map | $(BUILDDIR)
+	python3 tools/drv2asm.py ASOUND.EXE map/asound.map $@
 $(BUILDDIR)/asound.exe: $(BUILDDIR)/asound.obj
 	@$(DOSBUILD) link $(LINK_TOOLCHAIN) -i $< -o $@ -f "$(LINKFLAGS)"
+endif
 $(BUILDDIR)/%.obj: $(BUILDDIR)/%.asm
 	$(ASM) $(ASMFLAGS) -Fo$@ $<
 
