@@ -164,3 +164,148 @@ void drawLine(int16 x0, int16 y0, int16 x1, int16 y1, int16 color) { /* seg000:0
     gfx_resetBlitOffset2();
 }
 
+
+void mystrcat(char *d, char *s) {         /* seg000:0x5189 */
+    for (;;) {
+        if (*d == 0) break;
+        d++;
+    }
+    for (; (*d = *s++) != 0; d++) ;
+}
+
+/* seg000:0x51b1 mystrchr — hand-asm (push si never used, ch hoisted to ax
+ * before loop); skeleton stays. */
+
+/* seg000:0x262c/0x2672/0x2706 — cyclic next/prev selectors over worldObjects */
+extern int16 selCursor;                     /* dseg:0x2c144 */
+extern int16 objCursor;                     /* dseg:0x2c968 */
+extern int16 objectCount;                   /* dseg:0x2c978 */
+extern int8  objectActive[];                /* dseg:0x2d278 */
+
+void selectNextObject(void) {
+    int8 again;
+    again = 1;
+    do {
+        objCursor++;
+        if (objCursor > objectCount) objCursor = 0;
+        if (worldObjects[objCursor].pad4 != 0 || objectActive[objCursor] != 0)
+            again = 0;
+    } while (again != 0);
+}
+
+void selectNextUnit(void) {
+    int8 again;
+    again = 1;
+    do {
+        selCursor++;
+        if (selCursor > objectCount) selCursor = 0;
+        if ((worldObjects[selCursor].targetFlags & 1) != 0 ||
+            (worldObjects[selCursor].targetFlags & 0x200) != 0)
+            if ((worldObjects[selCursor].targetFlags & 0x800) == 0)
+                again = 0;
+    } while (again != 0);
+}
+
+void selectPrevUnit(void) {
+    int8 again;
+    again = 1;
+    do {
+        selCursor--;
+        if (selCursor < 0) selCursor = objectCount - 1;
+        if ((worldObjects[selCursor].targetFlags & 1) != 0 ||
+            (worldObjects[selCursor].targetFlags & 0x200) != 0)
+            if ((worldObjects[selCursor].targetFlags & 0x800) == 0)
+                again = 0;
+    } while (again != 0);
+}
+
+/* seg000:0x25ea — RTC sync when enabled: int 0x1a read, stash tick, then 10
+ * settle ticks via sub_16208 */
+extern int16 rtcEnabled;                    /* dseg:0xbb74 */
+extern int8  rtcFlagByte;                   /* dseg:0x3e1f */
+extern int16 rtcTickBuf;                    /* dseg:0x3e24 */
+extern int16 rtcTickSaved;                  /* dseg:0x9920 */
+extern void  sub_167FD(void);
+extern void  sub_16208(void);
+extern void  intDispatch(int16 n, uint8 *a, uint8 *b);
+
+void rtcSync(void) {
+    uint16 i;
+    if (rtcEnabled == 1) {
+        sub_167FD();
+        rtcFlagByte = 0;
+        intDispatch(0x1a, (uint8*)0x3e1e, (uint8*)0x3e1e);
+        rtcTickSaved = rtcTickBuf;
+        sub_16208();
+        i = 0;
+        do {
+            i++;
+            sub_16208();
+        } while (i < 0xa);
+    }
+}
+
+/* seg000:0x669f — script expression evaluator: walks *pp (a near cursor the
+ * routine advances) at fixed index; ')'→0, '|'→1, ':N'→N-1, '('→skip to the
+ * matching ')'.  Called by the briefing-choice interpreter sub_16261. */
+int16 evalChoiceExpr(uint8 **pp, int16 idx) {
+    int8  a, uz;                  /* ch -> [bp-2], digit ch -> [bp-0a] */
+    int16 f, i, res;              /* n -> [bp-4], paren depth -> [bp-6] */
+    res = 0;
+    for (;;) {
+        a = (*pp)[idx];
+        (*pp)++;
+        if (a == 0x29) return 0;
+        if (a == 0x7C) return 1;
+        if (a == 0x3A) {
+            f = 0;
+            goto t;
+b:          if (uz > 0x39) goto r;
+            f = f * 10 + uz - 0x30;
+            (*pp)++;
+t:          uz = (*pp)[idx];
+            if (uz >= 0x30) goto b;
+r:          return f - 1;
+        }
+        if (a == 0x28) {
+            i = 1;
+            do {
+                i += ((*pp)[idx] == 0x28) ? 1 : 0;
+                i -= ((*pp)[idx] == 0x29) ? 1 : 0;
+                (*pp)++;
+            } while (i > 0);
+            continue;
+        }
+    }
+}
+
+
+/* seg000:0x6763 — marks clipTable[i].flag = 0 for entries whose rect
+ * intersects the (x,y,w,h) window translated by the view origin.
+ * The x0 else-arm reads clipTable[iu].x0 (not e->x0): that keeps MSC
+ * from binding e->x0 to si, so the dispatch emits cmp [bx],ax plus a
+ * plain [bx] reload and the second-written arm sinks to body top. */
+struct ClipEntry {
+    int16 x0, y0, w, h;           /* +0,+2,+4,+6 */
+    int8  pad[0x52];
+    int8  flag;                   /* +0x5a */
+};
+extern int16 viewOriginX, viewOriginY;      /* dseg:0x2ca4e/0x2ca50 */
+extern int16 clipEntryCount;                /* dseg:0x2367c */
+extern struct ClipEntry clipTable[];        /* dseg:0x2326, stride 0x5c */
+
+void clipEntries(int16 x, int16 y, int16 w, int16 h) {
+    struct ClipEntry *e;
+    int16 f, i, m, iu, uz;
+    x -= viewOriginX;
+    y -= viewOriginY;
+    for (iu = 0; iu < clipEntryCount; iu++) {
+        e = &clipTable[iu];
+        if (e->x0 > x) uz = clipTable[iu].x0; else uz = x;
+        if (e->y0 > y) m = e->y0; else m = y;
+        i = (e->x0 + e->w <= x + w) ? e->x0 + e->w : x + w;
+        f = (e->y0 + e->h <= y + h) ? e->y0 + e->h : y + h;
+        if (uz < i && m < f)
+            e->flag = 0;
+    }
+}

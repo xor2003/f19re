@@ -44,11 +44,11 @@ sub_11000: seg000 NEAR 1000-12a7 R1000-12a7
 sub_112A8: seg000 NEAR 12a8-133d R12a8-133d
 sub_1133E: seg000 NEAR 133e-1361 R133e-1361
 sub_11366: seg000 NEAR 1366-1415 R1366-1415
-sub_125EA: seg000 NEAR 25ea-262b R25ea-262b
-sub_1262C: seg000 NEAR 262c-2670 R262c-2670
-sub_12672: seg000 NEAR 2672-26c5 R2672-26c5
+rtcSync: seg000 NEAR 25ea-262b R25ea-262b
+selectNextObject: seg000 NEAR 262c-2670 R262c-2670
+selectNextUnit: seg000 NEAR 2672-26c5 R2672-26c5
 sub_126C6: seg000 NEAR 26c6-2704 R26c6-2704
-sub_12706: seg000 NEAR 2706-2753 R2706-2753
+selectPrevUnit: seg000 NEAR 2706-2753 R2706-2753
 sub_12754: seg000 NEAR 2754-3217 R2754-3217
 sub_13218: seg000 NEAR 3218-3253 R3218-3253
 sub_13886: seg000 NEAR 3886-3913 R3886-3913
@@ -90,12 +90,12 @@ installCBreakHandler: seg000 NEAR 46c0-46e2 R46c0-46e2 duplicate
 sub_146E3: seg000 NEAR 46e3-46f3 R46e3-46f3
 sub_146F4: seg000 FAR 46f4-4745 R46f4-4745
 sub_14746: seg000 NEAR 4746-47b5 R4746-47b5
-sub_147B6: seg000 NEAR 47b6-47c6 R47b6-47c6
-sub_147C8: seg000 NEAR 47c8-47d9 R47c8-47d9
-sub_147DA: seg000 NEAR 47da-47e7 R47da-47e7
+resFileOpen: seg000 NEAR 47b6-47c6 R47b6-47c6
+resFileCreate: seg000 NEAR 47c8-47d9 R47c8-47d9
+resFileClose: seg000 NEAR 47da-47e7 R47da-47e7
 sub_147E8: seg000 NEAR 47e8-47fb R47e8-47fb
-strcoll: seg000 NEAR 47fc-4813 R47fc-4813
-sub_14814: seg000 NEAR 4814-482d R4814-482d
+resFileReadFar: seg000 NEAR 47fc-4813 R47fc-4813
+resFileWrite: seg000 NEAR 4814-482d R4814-482d
 # Routine openFile 0000:482e-0000:4884[000057] is a potential duplicate of routine openFile 0000:44ff-0000:4555[000057], differs by 0 instructions
 openFile: seg000 NEAR 482e-4884 R482e-4884 duplicate
 sub_14885: seg000 NEAR 4885-48db R4885-48db
@@ -105,10 +105,10 @@ sub_14929: seg000 NEAR 4929-497f R4929-497f
 sub_14980: seg000 NEAR 4980-49a0 R4980-49a0
 sub_149A1: seg000 NEAR 49a1-49b8 R49a1-49b8
 sub_149B9: seg000 NEAR 49b9-4a25 R49b9-4a25
-openBlitClosePic: seg000 NEAR 4a26-4a5e R4a26-4a5e duplicate
-sub_14A5F: seg000 NEAR 4a5f-4a94 R4a5f-4a94
-sub_14A95: seg000 NEAR 4a95-4aca R4a95-4aca
-sub_14ACB: seg000 NEAR 4acb-4b13 R4acb-4b13
+loadSpriteScaled: seg000 NEAR 4a26-4a5e R4a26-4a5e duplicate
+loadPicRes: seg000 NEAR 4a5f-4a94 R4a5f-4a94
+loadSpriteRes: seg000 NEAR 4a95-4aca R4a95-4aca
+loadResSection: seg000 NEAR 4acb-4b13 R4acb-4b13
 # Routine showPicFile 0000:4b14-0000:4b85[000072] is a potential duplicate of routine showPicFile 0000:474f-0000:47c0[000072], differs by 0 instructions
 showPicFile: seg000 NEAR 4b14-4b85 R4b14-4b85 duplicate
 decodePic: seg000 NEAR 4b86-4bed R4b86-4bed duplicate
@@ -131,7 +131,8 @@ sub_1513B: seg000 NEAR 513b-5151 R513b-5151
 sub_15152: seg000 NEAR 5152-516c R5152-516c
 # Routine sub_1516D 0000:516d-0000:5188[00001c] is a potential duplicate of routine mystrlen 0000:3fd6-0000:3ff1[00001c], differs by 0 instructions
 mystrlen: seg000 NEAR 516d-5188 R516d-5188 duplicate
-sub_15189: seg000 NEAR 5189-51d3 R5189-51d3
+mystrcat: seg000 NEAR 5189-51b0 R5189-51b0
+mystrchr: seg000 NEAR 51b1-51d3 R51b1-51d3
 sub_151D4: seg000 NEAR 51d4-51e7 R51d4-51e7
 sub_151E8: seg000 NEAR 51e8-51fd R51e8-51fd
 sub_151FE: seg000 NEAR 51fe-521b R51fe-521b
@@ -155,7 +156,8 @@ sub_15B68: seg000 NEAR 5b68-61cb R5b68-61cb
 sub_161CC: seg000 NEAR 61cc-6207 R61cc-6207
 sub_16208: seg000 NEAR 6208-6260 R6208-6260
 sub_16261: seg000 NEAR 6261-669e R6261-669e
-sub_1669F: seg000 NEAR 669f-67fc R669f-67fc
+evalChoiceExpr: seg000 NEAR 669f-6762 R669f-6762
+clipEntries: seg000 NEAR 6763-67fc R6763-67fc
 sub_167FD: seg000 NEAR 67fd-6827 R67fd-6827
 # Routine allocBuffer 0000:6828-0000:685b[000034] is a potential duplicate of routine allocBuffer 0000:1d50-0000:1d83[000034], differs by 0 instructions
 allocBuffer: seg000 NEAR 6828-685b R6828-685b duplicate
@@ -220,8 +222,8 @@ doNothing: seg000 NEAR 8d72-8d73 R8d72-8d73
 # Routine sub_18D74 0000:8d74-0000:8d97[000024] is a potential duplicate of routine getItemCoordStr 0000:36d7-0000:36fe[000028], differs by 2 instructions
 getItemCoordStr: seg000 NEAR 8d74-8d97 R8d74-8d97 duplicate
 formatGridRef: seg000 NEAR 8d98-8e71 R8d98-8e71
-sub_18E72: seg000 NEAR 8e72-8e9b R8e72-8e9b
-sub_18E9C: seg000 NEAR 8e9c-a375 R8e9c-a375
+clampValue: seg000 NEAR 8e72-8e9b R8e72-8e9b
+formatTimeStr: seg000 NEAR 8e9c-8f11 R8e9c-8f11
 saveHallfame: seg000 NEAR a376-a4fa Ra376-a4fa
 # Routine loadHallfame 0000:a4fb-0000:a554[00005a] is a potential duplicate of routine loadHallfame 0000:1be2-0000:1c3f[00005e], differs by 3 instructions
 # Routine loadHallfame 0000:a4fb-0000:a554[00005a] is a potential duplicate of routine saveHallfame 0000:1c40-0000:1c9d[00005e], differs by 3 instructions

@@ -266,6 +266,29 @@ char *formatGridRef(int16 wx, int16 wy, int16 theater) {
     return bufCoordStr;
 }
 
+/* seg000:0x8e9c — format "HH:MM" into buf (minutes floored to 5; first digit
+ * is flagPrefix+1, set by runGenerator — END enbrief.c formatTime lineage) */
+extern int16 missionTimeFlag;               /* dseg:0x44e4 (word_244E4) */
+
+void formatTimeStr(char *buf, int16 v) {
+    int16 h, m;
+    mystrcpy(buf, "00:00");
+    h = v / 0x708;
+    buf[0] += missionTimeFlag + 1;
+    buf[1] += h % 10;
+    m = ((v / 0x1e) % 0x3c) / 5 * 5;
+    buf[3] += m / 10;
+    buf[4] += m % 10;
+}
+
+/* seg000:0x8e72 — clamp with a 0xC000 wrap guard (bearing-style clamp) */
+int16 clampValue(int16 v, int16 lo, int16 hi) {
+    if (v > hi) return hi;
+    if (v >= lo) return v;
+    if (v <= (int16)0xC000) return hi;
+    return lo;
+}
+
 /* seg000:0x76c8 — snapshot gameData fields, pick theater world file, then
  * grid/terrain parse + mission generator. Frameless (no params/locals). */
 extern int16 difficultySaved;               /* dseg:0x44e0 */

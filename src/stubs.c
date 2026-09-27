@@ -528,6 +528,17 @@ int16 readItemSize;
 int16 *findNearestTerrain(int32 wx, int32 wy) { return 0; }
 void  drawModelPoint(int16 a, int16 b, int16 c, int16 d, int16 e) { }
 void  setViewPosition(int32 a, int32 b, int32 c) { }
+/* stfile.c res-file shims deps */
+int16 sub_14929(int16 a, int16 b, int16 c, int16 d) { return 0; }
+int16 sub_149B9(int16 a, int16 b, int16 c, int16 d, int16 e) { return 0; }
+int16 sub_1E172(int16 h, int16 b, int16 c, int16 mode) { return 0; }
+void  sub_14C62(int16 fd, int16 sel) { }
+void  sub_14B14(int16 fd, int16 a, int16 b) { }
+void  sub_14B86(int16 fd, int16 sel) { }
+/* stutil.c clipEntries deps */
+struct ClipEntry { int16 x0,y0,w,h; int8 pad[0x52]; int8 flag; };
+int16 viewOriginX, viewOriginY, clipEntryCount;
+struct ClipEntry clipTable[1];
 /* stgen.c parseWorld/exportWorldToComm globals */
 int16 groundUnitCount;
 int16 worldObjectCount;
@@ -569,6 +580,17 @@ uint16 dos_alloc(uint16 size) { return 0; }
 int16 dos_free(uint16 segment) { return 0; }
 void  far gfx_setOvlVal1(int16 v) { }
 void  far gfx_switchColor(int16 *p, int16 a, int16 b, int16 c, int16 d, int16 e, int16 f) { }
+int16 selCursor;                             /* dseg:0x2c144 unit sel cursor */
+int16 objCursor;                             /* dseg:0x2c968 object sel cursor */
+int16 objectCount;                           /* dseg:0x2c978 */
+int8  objectActive[1];                       /* dseg:0x2d278 */
+int16 rtcEnabled;                            /* dseg:0xbb74 */
+int8  rtcFlagByte;                           /* dseg:0x3e1f */
+int16 rtcTickBuf;                            /* dseg:0x3e24 */
+int16 rtcTickSaved;                          /* dseg:0x9920 */
+void  sub_167FD(void) { }
+void  sub_16208(void) { }
+int16 missionTimeFlag;                        /* word_244E4: runGenerator sets 0/1 */
 void  drawLineWrapper(void) { }
 int16 mapToScreenX(int16 v) { return v; }
 int16 mapToScreenY(int16 v) { return v; }

@@ -67,3 +67,15 @@ void saveHallfame(void) {
         gfx_blitToCurrent(savedPage);
     }
 }
+
+/* seg000:0xa4fb — load Roster.Fil hall-of-fame records (mirrors saveHallfame) */
+void loadHallfame() {
+    FILE *file;
+    int16 idx;
+    file = fopen("Roster.Fil", "rb");
+    fread(&hallfameCount, 2, 1, file);
+    for (idx = 0; idx < 0xa; idx++) {
+        fread(&hallfameBuf[idx], 0x50, 1, file);
+    }
+    fclose(file);
+}
