@@ -48,6 +48,32 @@ $(EGAME_EXE): $(BUILDDIR)/egame.obj
 verify: $(EGAME_EXE)
 	python3 tools/compare_exe.py EGAME.EXE $(EGAME_EXE)
 
+#
+# Driver overlays (jump-table drivers, no IDA lst needed):
+#   drvmap.py seeds mzmap with the OvlHeader jump table; drv2asm.py emits a
+#   byte-exact db-skeleton asm. MGRAPHIC target uses the English F19 binary
+#   (the RU one differs ~21%); ASOUND is identical in both.
+#
+F19EN ?= /home/xor/games/f19/F19
+
+$(BUILDDIR)/mgraphic.asm: tools/drv2asm.py map/mgraphic_en.map | $(BUILDDIR)
+	python3 tools/drv2asm.py $(F19EN)/MGRAPHIC.EXE map/mgraphic_en.map $@
+$(BUILDDIR)/asound.asm: tools/drv2asm.py map/asound.map | $(BUILDDIR)
+	python3 tools/drv2asm.py ASOUND.EXE map/asound.map $@
+
+$(BUILDDIR)/mgraphic.exe: $(BUILDDIR)/mgraphic.obj
+	@$(DOSBUILD) link $(LINK_TOOLCHAIN) -i $< -o $@ -f "$(LINKFLAGS)"
+$(BUILDDIR)/asound.exe: $(BUILDDIR)/asound.obj
+	@$(DOSBUILD) link $(LINK_TOOLCHAIN) -i $< -o $@ -f "$(LINKFLAGS)"
+$(BUILDDIR)/%.obj: $(BUILDDIR)/%.asm
+	$(ASM) $(ASMFLAGS) -Fo$@ $<
+
+.PHONY: drivers verify-drivers
+drivers: $(BUILDDIR)/mgraphic.exe $(BUILDDIR)/asound.exe
+verify-drivers: drivers
+	python3 tools/compare_exe.py $(F19EN)/MGRAPHIC.EXE $(BUILDDIR)/mgraphic.exe
+	python3 tools/compare_exe.py ASOUND.EXE $(BUILDDIR)/asound.exe
+
 # C declarations generated from the listing (prototypes + data layout)
 hdr: $(BUILDDIR)/EGAME.EXE.h
 $(BUILDDIR)/EGAME.EXE.h: lst/EGAME.EXE.lst conf/egame.json lst/egame.inc | $(BUILDDIR)
