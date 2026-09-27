@@ -52,6 +52,26 @@ make egame      # assemble + link skeleton → build/egame.exe
 make verify     # byte-compare against original EGAME.EXE
 ```
 
+## Running the reconstruction
+
+`build/egame.exe` is byte-identical to the original load image, so it runs
+exactly like EGAME.EXE. To try it (DOSBox):
+
+```sh
+mkdir /tmp/f19test
+cp *.COM *.PIC *.SPR *.WLD *.3D3 *.3DG *.3DT *.SPK *.EFT *.DRV *.SCR \
+   *.PAR *.FIL *.DAT *.TXT ASOUND.EXE BSOUND.EXE CGRAPHIC.EXE DS.EXE \
+   EGRAPHIC.EXE END.EXE ISOUND.EXE MGRAPHIC.EXE MISC.EXE NGRAPHIC.EXE \
+   RR.COM RSOUND.EXE SCENERY0.EXE SSOUND.EXE START.EXE SU.EXE \
+   TGRAPHIC.EXE TSOUND.EXE /tmp/f19test/
+cp build/egame.exe /tmp/f19test/EGAME.EXE
+dosbox -c 'mount c /tmp/f19test' -c 'c:' -c 'F19.COM'
+```
+
+(The exe can't sit next to the original — FAT names collide. The F19.COM
+chain runs START/SU setup first, then EXECs EGAME.EXE; answer N to the
+joystick prompt.)
+
 ## Porting a routine
 
 ```sh
