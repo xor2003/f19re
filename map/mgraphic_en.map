@@ -1,0 +1,161 @@
+#
+# Size of the executable's load module covered by the map
+#
+Size 2728
+#
+# Discovered segments, one per line, syntax is "SegmentName Type(CODE/DATA/STACK) Address [default]"
+# The default data segment is assumed to be used by all routines which don't have data segment overrides.
+# If no default segment is specified, the first one will be used as default.
+#
+Code2 CODE 0000
+SEG001 CODE 01cd
+#
+# Discovered routines, one per line, syntax is "RoutineName: Segment Type(NEAR/FAR) Extents[DS] [R/U]Block1[DS] [R/U]Block2[DS]... [annotation1] [annotation2]..."
+# The routine extents is the largest continuous block of instructions attributed to this routine and originating
+# at the location determined to be the routine's entrypoint.
+# Blocks are offset ranges relative to the segment that the routine belongs to, specifying address as belonging to the routine.
+# Blocks starting with R contain code that was determined reachable, U were unreachable but still likely belong to the routine.
+# The routine blocks may cover a greater area than the extents if the routine has disconected chunks it jumps into.
+# The extents block and/or the individual routine blocks can have an optional data segment override which is the name
+# of the data segment assumed to be selected within that block.# Possible annotation types:
+# ignore - ignore this routine in processing (comparison, signature extraction etc.)
+# complete - this routine was completely reconstructed into C, only influences stat display when printing map
+# external - is part of an external library (e.g. libc), ignore in comparison, don't count as uncompleted in stats
+# detached - routine has no callers, looks useless, don't count as uncompleted in stats
+# assembly - routine was written in assembly, don't include in comparisons by default
+# duplicate - routine is a duplicate of another
+#
+start: Code2 NEAR 0000-0000
+gfx_setFont: SEG001 FAR 01a1-01cc R01a1-01cc
+gfx_commitPage: SEG001 FAR 01cd-01cd R01cd-01cd
+gfx_nop51: SEG001 FAR 01ce-01ce R01ce-01ce
+gfx_setMonoFlag: SEG001 FAR 01cf-01cf R01cf-01cf
+gfx_getBufSize: SEG001 FAR 01de-01e2 R01de-01e2
+gfx_getAuxBufSize: SEG001 FAR 01e4-01e8 R01e4-01e8
+gfx_getModeFlag2: SEG001 FAR 01e9-01ed R01e9-01ed
+gfx_getConst1: SEG001 FAR 01ee-01f2 R01ee-01f2
+gfx_getModeFlag: SEG001 FAR 01f3-01f7 R01f3-01f7
+gfx_getVal2: SEG001 FAR 01f8-01fc R01f8-01fc
+gfx_getVal: SEG001 FAR 01fd-0201 R01fd-0201
+gfx_getFreeMem: SEG001 FAR 0202-0213 R0202-0213
+gfx_setMode13: SEG001 FAR 0214-0227 R0214-0227 R0281-0293
+gfx_waitRetrace: SEG001 FAR 0228-0241 R0228-0241
+gfx_flipPage: SEG001 FAR 0242-025b R0242-025b
+gfx_allocPage: SEG001 FAR 025c-0280 R025c-0280
+gfx_setDac: SEG001 FAR 0294-02b8 R0294-02b8
+gfx_setColor: SEG001 FAR 02b9-02be R02b9-02be
+gfx_setDrawColor: SEG001 FAR 02bf-02ca R02bf-02ca
+gfx_nop22: SEG001 FAR 02cb-02cb R02cb-02cb
+gfx_plotPixel: SEG001 FAR 02cc-02de R02cc-02de
+routine_77: SEG001 NEAR 02df-02f6 R02df-02f6
+gfx_drawLine: SEG001 FAR 02f7-0366 R02f7-0366
+gfx_drawString: SEG001 FAR 0367-037a R0367-037a
+gfx_clipLeft: SEG001 FAR 037b-038e R037b-038e
+gfx_clipRight: SEG001 FAR 038f-03a2 R038f-03a2
+gfx_clipTop: SEG001 FAR 03a3-03b6 R03a3-03b6
+gfx_clipBottom: SEG001 FAR 03b7-03ca R03b7-03ca
+gfx_drawStringUnclipped: SEG001 FAR 03cb-03d9 R03cb-03d9 R05b6-05b8
+gfx_blitTransparent: SEG001 FAR 03da-03e2 R03da-03e2
+routine_79: SEG001 NEAR 03e3-0415 R03e3-0415 R05b5-05b5
+gfx_blitVariant: SEG001 FAR 0416-041e R0416-041e
+routine_80: SEG001 NEAR 041f-045e R041f-045e
+gfx_fillDirty: SEG001 FAR 045f-0467 R045f-0467
+routine_81: SEG001 NEAR 0468-04a8 R0468-04a8
+gfx_copyBlock: SEG001 FAR 04a9-05b4 R04a9-05b4
+routine_78: SEG001 NEAR 05b9-0612 R05b9-0612
+gfx_complexRender: SEG001 FAR 0613-067e R0613-067e
+gfx_storeBufPtr: SEG001 FAR 0689-069a R0689-069a
+gfx_initOverlay: SEG001 FAR 069b-06a3 R069b-06a3
+gfx_setPageN: SEG001 FAR 06a4-06a9 R06a4-06a9
+gfx_setPage1: SEG001 FAR 06aa-06b9 R06aa-06b9
+gfx_getCurPage: SEG001 FAR 06ba-06ba R06ba-06ba
+gfx_setCurPageSeg: SEG001 FAR 06bb-06bf R06bb-06bf
+gfx_getCurPageSeg: SEG001 FAR 06c0-06c4 R06c0-06c4
+gfx_setBlitOffset2: SEG001 FAR 06c5-06cc R06c5-06cc
+gfx_setBlitOffset: SEG001 FAR 06cd-06d2 R06cd-06d2
+gfx_setBlitOffsetReg: SEG001 FAR 06d3-06d7 R06d3-06d7
+gfx_getPresetOffset1: SEG001 FAR 06d8-06db R06d8-06db
+gfx_getPresetOffset2: SEG001 FAR 06dc-06df R06dc-06df
+gfx_getBlitOffset: SEG001 FAR 06e0-06e4 R06e0-06e4
+gfx_setOvlVal1: SEG001 FAR 06e5-06ea R06e5-06ea
+gfx_storePageSeg: SEG001 FAR 06eb-06f5 R06eb-06f5
+gfx_setOvlVal2: SEG001 FAR 06f6-06fb R06f6-06fb
+gfx_setPageSeg: SEG001 FAR 06fc-0706 R06fc-0706
+gfx_getDisplayPage: SEG001 FAR 0707-070b R0707-070b
+gfx_calcRowAddr: SEG001 FAR 070c-071d R070c-071d
+gfx_getModecode: SEG001 FAR 071e-0721 R071e-0721
+gfx_nop15: SEG001 FAR 0722-0722 R0722-0722
+gfx_spriteVariant1: SEG001 FAR 0723-0733 R0723-0733
+gfx_spriteVariant2: SEG001 FAR 0734-07c7 R0734-07c7
+gfx_blitSprite: SEG001 FAR 07c8-07d8 R07c8-07d8
+gfx_blitCore: SEG001 FAR 07d9-082d R07d9-082d
+gfx_dirtyRect: SEG001 FAR 082e-088c R082e-088c
+gfx_clearPage: SEG001 FAR 088d-0896 R088d-0896
+gfx_clearVga: SEG001 FAR 0897-08a5 R0897-08a5
+gfx_copyRect: SEG001 FAR 08a6-08fc R08a6-08fc
+gfx_switchColor: SEG001 FAR 08fd-0950 R08fd-0950
+gfx_blitToCurrent: SEG001 FAR 0951-0960 R0951-0960
+gfx_dacAnimate: SEG001 FAR 0961-0982 R0961-0982
+gfx_setDacAnimCount: SEG001 FAR 09b1-09bb R09b1-09bb
+gfx_dacCycle: SEG001 FAR 09bc-0a23 R09bc-0a23
+gfx_getRowOffset: SEG001 FAR 0a24-0a2b R0a24-0a2b
+gfx_setPageBuf: SEG001 FAR 0a2c-0a3d R0a2c-0a3d
+gfx_setFadeSteps: SEG001 FAR 0a3e-0a3e R0a3e-0a3e
+gfx_getPageSeg: SEG001 FAR 0a3f-0a46 R0a3f-0a46
+gfx_copyRow: SEG001 FAR 0a47-0a47 R0a47-0a47
+gfx_nop36: SEG001 FAR 0a48-0a48 R0a48-0a48
+gfx_nop37: SEG001 FAR 0a49-0a49 R0a49-0a49
+gfx_fillRow: SEG001 FAR 0a4a-0a57 R0a4a-0a57
+#
+# Discovered variables, one per line, syntax is "VariableName: Segment VAR OffsetWithinSegment"
+#
+var_1: Code2 VAR 0002
+var_2: Code2 VAR 0006
+var_3: Code2 VAR 0008
+var_4: Code2 VAR 000a
+var_5: Code2 VAR 000c
+var_6: Code2 VAR 000e
+var_7: Code2 VAR 0010
+var_8: Code2 VAR 0012
+var_9: Code2 VAR 00cc
+var_10: Code2 VAR 00ce
+var_11: Code2 VAR 00e2
+var_12: Code2 VAR 00ee
+var_13: Code2 VAR 00fa
+var_14: Code2 VAR 0106
+var_15: Code2 VAR 1b6e
+var_16: Code2 VAR 1b70
+var_17: Code2 VAR 1b72
+var_18: Code2 VAR 1b74
+var_19: Code2 VAR 1b76
+var_20: Code2 VAR 1b78
+var_21: Code2 VAR 1b7a
+var_22: Code2 VAR 1b7b
+var_23: Code2 VAR 1c44
+var_24: Code2 VAR 1c45
+var_25: Code2 VAR 1c48
+var_26: Code2 VAR 1c4a
+var_27: Code2 VAR 1c4b
+var_28: Code2 VAR 1c4c
+var_29: Code2 VAR 1c4d
+var_30: Code2 VAR 1c4e
+var_31: Code2 VAR 1c50
+var_32: Code2 VAR 1c52
+var_33: Code2 VAR 1c5a
+var_34: Code2 VAR 1c62
+var_35: Code2 VAR 1c96
+var_36: Code2 VAR 1c9a
+var_37: SEG001 VAR 000c
+var_38: SEG001 VAR 019c
+var_39: SEG001 VAR 019e
+var_40: SEG001 VAR 01a0
+var_41: SEG001 VAR 01d0
+var_42: SEG001 VAR 01d2
+var_43: SEG001 VAR 01d4
+var_44: SEG001 VAR 01d6
+var_45: SEG001 VAR 01d8
+var_46: SEG001 VAR 01da
+var_47: SEG001 VAR 01dc
+var_48: SEG001 VAR 067f
+var_49: SEG001 VAR 0681
+var_50: SEG001 VAR 09b0

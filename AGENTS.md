@@ -7,9 +7,15 @@ ports verified against the original binary.
 Scope: EGAME.EXE (the flight sim proper, 364 routines) is fully classified —
 183 byte-exact C ports + 2 Z3-proven + ~179 asm/CRT (skeleton-reproduced).
 The satellite exes are mapped but not reconstructed: START.EXE (179 rtns),
-END.EXE (208), SU.EXE (68), 5 graphics drivers (~1 analyzed each) — ~460
+END.EXE (208), SU.EXE (68), 5 graphics drivers — ~460
 routines total, of which mzdup signature-matching already finds ~30-35%
 shared with EGAME/f15 (run `mzdup sig/egame.sig <EXE> map/<x>.map`).
+Current satellite focus is the English F19 drivers only:
+MGRAPHIC.EXE (82 rtns, map/mgraphic_en.map — all 84 ABI slots named from
+f15 slot.h, handlers ~94% byte-identical to f15's driver) and ASOUND.EXE
+(48 rtns, map/asound.map — STEALTH.EXE-gen driver, 9 slots 0x64-0x6c per
+f15se2-ex asound_model ABI). Drivers need `tools/drvmap.py` seeding before
+mzmap (jump-table headers, no call-reachable exports).
 
 ## Layout
 

@@ -1,0 +1,161 @@
+#
+# Size of the executable's load module covered by the map
+#
+Size 275a
+#
+# Discovered segments, one per line, syntax is "SegmentName Type(CODE/DATA/STACK) Address [default]"
+# The default data segment is assumed to be used by all routines which don't have data segment overrides.
+# If no default segment is specified, the first one will be used as default.
+#
+Code2 CODE 0000
+SEG001 CODE 01d0
+#
+# Discovered routines, one per line, syntax is "RoutineName: Segment Type(NEAR/FAR) Extents[DS] [R/U]Block1[DS] [R/U]Block2[DS]... [annotation1] [annotation2]..."
+# The routine extents is the largest continuous block of instructions attributed to this routine and originating
+# at the location determined to be the routine's entrypoint.
+# Blocks are offset ranges relative to the segment that the routine belongs to, specifying address as belonging to the routine.
+# Blocks starting with R contain code that was determined reachable, U were unreachable but still likely belong to the routine.
+# The routine blocks may cover a greater area than the extents if the routine has disconected chunks it jumps into.
+# The extents block and/or the individual routine blocks can have an optional data segment override which is the name
+# of the data segment assumed to be selected within that block.# Possible annotation types:
+# ignore - ignore this routine in processing (comparison, signature extraction etc.)
+# complete - this routine was completely reconstructed into C, only influences stat display when printing map
+# external - is part of an external library (e.g. libc), ignore in comparison, don't count as uncompleted in stats
+# detached - routine has no callers, looks useless, don't count as uncompleted in stats
+# assembly - routine was written in assembly, don't include in comparisons by default
+# duplicate - routine is a duplicate of another
+#
+start: Code2 NEAR 0000-0000
+mgcmd_01a3: SEG001 FAR 01a3-01ce R01a3-01ce
+mgcmd_01cf: SEG001 FAR 01cf-01cf R01cf-01cf
+mgcmd_01d0: SEG001 FAR 01d0-01d0 R01d0-01d0
+mgcmd_01d1: SEG001 FAR 01d1-01d1 R01d1-01d1
+mgcmd_01e0: SEG001 FAR 01e0-01e4 R01e0-01e4
+mgcmd_01e6: SEG001 FAR 01e6-01ea R01e6-01ea
+mgcmd_01eb: SEG001 FAR 01eb-01ef R01eb-01ef
+mgcmd_01f0: SEG001 FAR 01f0-01f4 R01f0-01f4
+mgcmd_01f5: SEG001 FAR 01f5-01f9 R01f5-01f9
+mgcmd_01fa: SEG001 FAR 01fa-01fe R01fa-01fe
+mgcmd_01ff: SEG001 FAR 01ff-0203 R01ff-0203
+mgcmd_0204: SEG001 FAR 0204-0215 R0204-0215
+mgcmd_0216: SEG001 FAR 0216-0229 R0216-0229 R0283-0295
+mgcmd_022a: SEG001 FAR 022a-0243 R022a-0243
+mgcmd_0244: SEG001 FAR 0244-025d R0244-025d
+mgcmd_025e: SEG001 FAR 025e-0282 R025e-0282
+mgcmd_0296: SEG001 FAR 0296-02ba R0296-02ba
+mgcmd_02bb: SEG001 FAR 02bb-02c0 R02bb-02c0
+mgcmd_02c1: SEG001 FAR 02c1-02cc R02c1-02cc
+mgcmd_02cd: SEG001 FAR 02cd-02cd R02cd-02cd
+mgcmd_02ce: SEG001 FAR 02ce-02e0 R02ce-02e0
+routine_77: SEG001 NEAR 02e1-02f8 R02e1-02f8
+mgcmd_02f9: SEG001 FAR 02f9-0368 R02f9-0368
+mgcmd_0369: SEG001 FAR 0369-037c R0369-037c
+mgcmd_037d: SEG001 FAR 037d-0390 R037d-0390
+mgcmd_0391: SEG001 FAR 0391-03a4 R0391-03a4
+mgcmd_03a5: SEG001 FAR 03a5-03b8 R03a5-03b8
+mgcmd_03b9: SEG001 FAR 03b9-03cc R03b9-03cc
+mgcmd_03cd: SEG001 FAR 03cd-03db R03cd-03db R05b8-05ba
+mgcmd_03dc: SEG001 FAR 03dc-03e4 R03dc-03e4
+routine_79: SEG001 NEAR 03e5-0417 R03e5-0417 R05b7-05b7
+mgcmd_0418: SEG001 FAR 0418-0420 R0418-0420
+routine_80: SEG001 NEAR 0421-0460 R0421-0460
+mgcmd_0461: SEG001 FAR 0461-0469 R0461-0469
+routine_81: SEG001 NEAR 046a-04aa R046a-04aa
+mgcmd_04ab: SEG001 FAR 04ab-05b6 R04ab-05b6
+routine_78: SEG001 NEAR 05bb-0614 R05bb-0614
+mgcmd_0615: SEG001 FAR 0615-0680 R0615-0680
+mgcmd_068b: SEG001 FAR 068b-069c R068b-069c
+mgcmd_069d: SEG001 FAR 069d-06a5 R069d-06a5
+mgcmd_06a6: SEG001 FAR 06a6-06ab R06a6-06ab
+mgcmd_06ac: SEG001 FAR 06ac-06bb R06ac-06bb
+mgcmd_06bc: SEG001 FAR 06bc-06bc R06bc-06bc
+mgcmd_06bd: SEG001 FAR 06bd-06c1 R06bd-06c1
+mgcmd_06c2: SEG001 FAR 06c2-06c6 R06c2-06c6
+mgcmd_06c7: SEG001 FAR 06c7-06ce R06c7-06ce
+mgcmd_06cf: SEG001 FAR 06cf-06d4 R06cf-06d4
+mgcmd_06d5: SEG001 FAR 06d5-06d9 R06d5-06d9
+mgcmd_06da: SEG001 FAR 06da-06dd R06da-06dd
+mgcmd_06de: SEG001 FAR 06de-06e1 R06de-06e1
+mgcmd_06e2: SEG001 FAR 06e2-06e6 R06e2-06e6
+mgcmd_06e7: SEG001 FAR 06e7-06ec R06e7-06ec
+mgcmd_06ed: SEG001 FAR 06ed-06f7 R06ed-06f7
+mgcmd_06f8: SEG001 FAR 06f8-06fd R06f8-06fd
+mgcmd_06fe: SEG001 FAR 06fe-0708 R06fe-0708
+mgcmd_0709: SEG001 FAR 0709-070d R0709-070d
+mgcmd_070e: SEG001 FAR 070e-071f R070e-071f
+mgcmd_0720: SEG001 FAR 0720-0723 R0720-0723
+mgcmd_0724: SEG001 FAR 0724-0724 R0724-0724
+mgcmd_0725: SEG001 FAR 0725-0735 R0725-0735
+mgcmd_0736: SEG001 FAR 0736-07c9 R0736-07c9
+mgcmd_07ca: SEG001 FAR 07ca-07da R07ca-07da
+mgcmd_07db: SEG001 FAR 07db-082f R07db-082f
+mgcmd_0830: SEG001 FAR 0830-088e R0830-088e
+mgcmd_088f: SEG001 FAR 088f-0898 R088f-0898
+mgcmd_0899: SEG001 FAR 0899-08a7 R0899-08a7
+mgcmd_08a8: SEG001 FAR 08a8-08fe R08a8-08fe
+mgcmd_08ff: SEG001 FAR 08ff-0952 R08ff-0952
+mgcmd_0953: SEG001 FAR 0953-0962 R0953-0962
+mgcmd_0963: SEG001 FAR 0963-0984 R0963-0984
+mgcmd_09b3: SEG001 FAR 09b3-09bd R09b3-09bd
+mgcmd_09be: SEG001 FAR 09be-0a25 R09be-0a25
+mgcmd_0a26: SEG001 FAR 0a26-0a2d R0a26-0a2d
+mgcmd_0a2e: SEG001 FAR 0a2e-0a3f R0a2e-0a3f
+mgcmd_0a40: SEG001 FAR 0a40-0a40 R0a40-0a40
+mgcmd_0a41: SEG001 FAR 0a41-0a48 R0a41-0a48
+mgcmd_0a49: SEG001 FAR 0a49-0a49 R0a49-0a49
+mgcmd_0a4a: SEG001 FAR 0a4a-0a4a R0a4a-0a4a
+mgcmd_0a4b: SEG001 FAR 0a4b-0a4b R0a4b-0a4b
+mgcmd_0a4c: SEG001 FAR 0a4c-0a59 R0a4c-0a59
+#
+# Discovered variables, one per line, syntax is "VariableName: Segment VAR OffsetWithinSegment"
+#
+var_1: Code2 VAR 0002
+var_2: Code2 VAR 0006
+var_3: Code2 VAR 0008
+var_4: Code2 VAR 000a
+var_5: Code2 VAR 000c
+var_6: Code2 VAR 000e
+var_7: Code2 VAR 0010
+var_8: Code2 VAR 0012
+var_9: Code2 VAR 00cc
+var_10: Code2 VAR 00ce
+var_11: Code2 VAR 00e2
+var_12: Code2 VAR 00ee
+var_13: Code2 VAR 00fa
+var_14: Code2 VAR 0106
+var_15: Code2 VAR 1b6e
+var_16: Code2 VAR 1b70
+var_17: Code2 VAR 1b72
+var_18: Code2 VAR 1b74
+var_19: Code2 VAR 1b76
+var_20: Code2 VAR 1b78
+var_21: Code2 VAR 1b7a
+var_22: Code2 VAR 1b7b
+var_23: Code2 VAR 1c76
+var_24: Code2 VAR 1c77
+var_25: Code2 VAR 1c7a
+var_26: Code2 VAR 1c7c
+var_27: Code2 VAR 1c7d
+var_28: Code2 VAR 1c7e
+var_29: Code2 VAR 1c7f
+var_30: Code2 VAR 1c80
+var_31: Code2 VAR 1c82
+var_32: Code2 VAR 1c84
+var_33: Code2 VAR 1c8c
+var_34: Code2 VAR 1c94
+var_35: Code2 VAR 1cc8
+var_36: Code2 VAR 1ccc
+var_37: SEG001 VAR 000e
+var_38: SEG001 VAR 019e
+var_39: SEG001 VAR 01a0
+var_40: SEG001 VAR 01a2
+var_41: SEG001 VAR 01d2
+var_42: SEG001 VAR 01d4
+var_43: SEG001 VAR 01d6
+var_44: SEG001 VAR 01d8
+var_45: SEG001 VAR 01da
+var_46: SEG001 VAR 01dc
+var_47: SEG001 VAR 01de
+var_48: SEG001 VAR 0681
+var_49: SEG001 VAR 0683
+var_50: SEG001 VAR 09b2

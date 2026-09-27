@@ -1,0 +1,164 @@
+#
+# Size of the executable's load module covered by the map
+#
+Size 2558
+#
+# Discovered segments, one per line, syntax is "SegmentName Type(CODE/DATA/STACK) Address [default]"
+# The default data segment is assumed to be used by all routines which don't have data segment overrides.
+# If no default segment is specified, the first one will be used as default.
+#
+Code2 CODE 0000
+SEG001 CODE 0129
+#
+# Discovered routines, one per line, syntax is "RoutineName: Segment Type(NEAR/FAR) Extents[DS] [R/U]Block1[DS] [R/U]Block2[DS]... [annotation1] [annotation2]..."
+# The routine extents is the largest continuous block of instructions attributed to this routine and originating
+# at the location determined to be the routine's entrypoint.
+# Blocks are offset ranges relative to the segment that the routine belongs to, specifying address as belonging to the routine.
+# Blocks starting with R contain code that was determined reachable, U were unreachable but still likely belong to the routine.
+# The routine blocks may cover a greater area than the extents if the routine has disconected chunks it jumps into.
+# The extents block and/or the individual routine blocks can have an optional data segment override which is the name
+# of the data segment assumed to be selected within that block.# Possible annotation types:
+# ignore - ignore this routine in processing (comparison, signature extraction etc.)
+# complete - this routine was completely reconstructed into C, only influences stat display when printing map
+# external - is part of an external library (e.g. libc), ignore in comparison, don't count as uncompleted in stats
+# detached - routine has no callers, looks useless, don't count as uncompleted in stats
+# assembly - routine was written in assembly, don't include in comparisons by default
+# duplicate - routine is a duplicate of another
+#
+start: Code2 NEAR 0000-0000
+routine_19: SEG001 NEAR 000d-003f R000d-003f
+routine_16: SEG001 NEAR 0040-0058 R0040-0058
+routine_24: SEG001 NEAR 0059-0078 R0059-0078
+routine_17: SEG001 NEAR 0079-00ba R0079-00ba
+routine_11: SEG001 NEAR 00bb-011d R00bb-011d
+routine_12: SEG001 NEAR 011e-0197 R011e-0197
+routine_37: SEG001 NEAR 0198-01a1 R0198-01a1
+routine_18: SEG001 NEAR 01a2-01c2 R01a2-01c2
+routine_23: SEG001 NEAR 01c3-01d4 R01c3-01d4
+routine_14: SEG001 NEAR 01d5-025f R01d5-025f
+routine_15: SEG001 NEAR 0260-02a2 R0260-02a2
+routine_39: SEG001 NEAR 02a3-02b6 R02a3-02b6
+routine_25: SEG001 NEAR 02c8-02ff R02c8-02ff
+routine_20: SEG001 NEAR 0300-0349 R0300-0349
+routine_13: SEG001 NEAR 0394-03df R0394-03df
+routine_21: SEG001 NEAR 03e0-0429 R03e0-0429
+sound_driver_setup: SEG001 FAR 0589-0597 R0589-0597
+sound_driver_shutdown: SEG001 FAR 0598-05a2 R0598-05a2
+sound_driver_dispatch_sound: SEG001 FAR 05a3-05bb R05a3-05bb
+sound_driver_play_intro: SEG001 FAR 05bc-05d5 R05bc-05d5
+sound_driver_timer_tick: SEG001 FAR 05d6-05fb R05d6-05fb
+sound_driver_noise_tick: SEG001 FAR 05fc-0608 R05fc-0608
+sound_driver_set_drone_pitch: SEG001 FAR 0609-0623 R0609-0623
+sound_driver_enable_drone: SEG001 FAR 0624-0630 R0624-0630
+sound_driver_disable_drone: SEG001 FAR 0631-063d R0631-063d
+routine_36: SEG001 NEAR 063e-0669 R063e-0669
+routine_33: SEG001 NEAR 066a-06d5 R066a-06d5
+routine_35: SEG001 NEAR 06d6-071d R06d6-071d
+routine_38: SEG001 NEAR 071e-07ad R071e-07ad
+routine_32: SEG001 NEAR 07ae-0807 R07ae-0807
+routine_28: SEG001 NEAR 0808-088d R0808-088d
+routine_29: SEG001 NEAR 088e-0906 R088e-0906
+routine_30: SEG001 NEAR 0908-0983 R0908-0983
+routine_31: SEG001 NEAR 0984-0b2f R0984-0b2f
+routine_41: SEG001 NEAR 0b30-0b79 R0b30-0b79
+routine_42: SEG001 NEAR 0b7a-0b95 R0b7a-0b95
+routine_43: SEG001 NEAR 0b96-0bda R0b96-0bda
+routine_44: SEG001 NEAR 0bdc-0c22 R0bdc-0c22
+routine_45: SEG001 NEAR 0c24-0c65 R0c24-0c65
+routine_46: SEG001 NEAR 0c66-0ca8 R0c66-0ca8
+routine_47: SEG001 NEAR 0caa-0d30 R0caa-0d30
+routine_48: SEG001 NEAR 0d32-0d59 R0d32-0d59
+routine_40: SEG001 NEAR 0d5a-0d72 R0d5a-0d72
+routine_34: SEG001 NEAR 0d74-0e88 R0d74-0e88
+routine_26: SEG001 NEAR 0e8a-1177 R0e8a-0eff U0f00-104b R104c-105f U1060-106f R1070-1177
+routine_27: SEG001 NEAR 1178-1276 R1178-1276
+routine_22: SEG001 NEAR 1278-12c6 R1278-12c6
+#
+# Discovered variables, one per line, syntax is "VariableName: Segment VAR OffsetWithinSegment"
+#
+var_1: Code2 VAR 0001
+var_2: Code2 VAR 0002
+var_3: Code2 VAR 0003
+var_4: Code2 VAR 0004
+var_5: Code2 VAR 0005
+var_6: Code2 VAR 0006
+var_7: Code2 VAR 0007
+var_8: Code2 VAR 0008
+var_9: Code2 VAR 0009
+var_10: Code2 VAR 000a
+var_11: Code2 VAR 000b
+var_12: Code2 VAR 000c
+var_13: Code2 VAR 000d
+var_14: Code2 VAR 000e
+var_15: Code2 VAR 0010
+var_16: Code2 VAR 0012
+var_17: Code2 VAR 0014
+var_18: Code2 VAR 0259
+var_19: Code2 VAR 025b
+var_20: Code2 VAR 025d
+var_21: Code2 VAR 025f
+var_22: Code2 VAR 0261
+var_23: Code2 VAR 0263
+var_24: Code2 VAR 0265
+var_25: Code2 VAR 0266
+var_26: Code2 VAR 0268
+var_27: Code2 VAR 026a
+var_28: Code2 VAR 026e
+var_29: Code2 VAR 0270
+var_30: Code2 VAR 0271
+var_31: Code2 VAR 0272
+var_32: Code2 VAR 0276
+var_33: Code2 VAR 027c
+var_34: Code2 VAR 0294
+var_35: Code2 VAR 0295
+var_36: Code2 VAR 0296
+var_37: Code2 VAR 0298
+var_38: Code2 VAR 02ae
+var_39: Code2 VAR 034a
+var_40: Code2 VAR 042a
+var_41: Code2 VAR 080e
+var_42: Code2 VAR 081c
+var_43: Code2 VAR 0828
+var_44: Code2 VAR 0836
+var_45: Code2 VAR 0848
+var_46: Code2 VAR 085a
+var_47: Code2 VAR 0fdc
+var_48: Code2 VAR 0fe8
+var_49: Code2 VAR 0ff4
+var_50: Code2 VAR 1004
+var_51: Code2 VAR 1016
+var_52: Code2 VAR 102c
+var_53: Code2 VAR 1092
+var_54: Code2 VAR 1094
+var_55: Code2 VAR 1096
+var_56: Code2 VAR 1098
+var_57: Code2 VAR 109a
+var_58: Code2 VAR 109c
+var_59: Code2 VAR 10b0
+var_60: Code2 VAR 10c4
+var_61: Code2 VAR 10d8
+var_62: Code2 VAR 10ec
+var_63: Code2 VAR 1100
+var_64: Code2 VAR 1128
+var_65: Code2 VAR 1129
+var_66: Code2 VAR 112a
+var_67: Code2 VAR 112c
+var_68: Code2 VAR 112e
+var_69: Code2 VAR 112f
+var_70: Code2 VAR 1130
+var_71: Code2 VAR 1132
+var_72: Code2 VAR 11ef
+var_73: Code2 VAR 1232
+var_74: Code2 VAR 128a
+var_75: Code2 VAR 128c
+var_76: Code2 VAR 128e
+var_77: SEG001 VAR 0009
+var_78: SEG001 VAR 000b
+var_79: SEG001 VAR 0565
+var_80: SEG001 VAR 1060
+var_81: Code2 VAR fff4
+var_82: Code2 VAR fff6
+var_83: Code2 VAR fff8
+var_84: Code2 VAR fffa
+var_85: Code2 VAR fffc
+var_86: Code2 VAR fffe

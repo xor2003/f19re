@@ -811,3 +811,55 @@ gaugesFar@0x0A/layoutFar@0x0E).
   one routine can break its siblings.
 - `_t.c`/`T.COD` scratch files are for experiments only — keep them out of
   commits.
+
+## 8. Driver overlays (*GRAPHIC.EXE / *SOUND.EXE)
+
+The graphics/sound drivers are ordinary MZ executables but **not** normal
+programs: the load image starts with an `OvlHeader` (see
+f15se2-re/src/overlay.c) — an embedded signature string
+(`"MGRAPHIC.EXE09-19-88"`), two segment pointers, and a **jump table of
+near offsets into the code segment**. Exported routines are reached
+through the table only, so `mzmap`'s reachability scan finds just `start`.
+`tools/drvmap.py` parses the header and emits an MS-link-format seed file;
+feed it with `mzmap --linkmap`:
+
+```sh
+python3 tools/drvmap.py MGRAPHIC.EXE map/x.link conf/gfx_slots.txt
+mzretools/build/mzmap --overwrite --linkmap map/x.link MGRAPHIC.EXE map/x.map
+```
+
+Header layout (load-image offsets): `description[0x18]`,
+`code_segment`@0x18 (paragraph of the code seg), `base_segment`@0x1a,
+`first_slot`@0x1c, `size1`@0x1e, `size2`@0x20 (code-seg length),
+`jump_count`@0x22, then `jump_count` near-offset words @0x24. A slot index
++ `code_segment` gives the far entry point
+(`overlay_functionAddress(seg, n)` in f15se2-re).
+
+### Cross-game findings
+
+| driver | f19-en img | f15 img | body match | signature |
+|---|---|---|---|---|
+| MGRAPHIC | 0x2728 | 0x275a | ~94% of handler bytes | both `MGRAPHIC.EXE09-19-88` |
+| TGRAPHIC | 0x2ab4 | 0x2abe | ~96% | both `TGRAPHIC.EXE09-19-88` |
+| EGRAPHIC | 0x3bcb | 0x3be9 | ~74% | both `EGRAPHIC.EXE07-27-88` |
+| CGRAPHIC | 0x3b3c | 0x3c4f | ~69% | both `CGRAPHIC.EXE07-27-88` |
+| ASOUND   | 0x2558 | 0x2bfe | ~25% (different gen) | f19 ` STEALTH.EXE11-16-90`, f15 `F15 II AdLib 3-14-91` |
+| ISOUND   | 0x8df  | 0x163e | ~13% | f19 ` IBMSNDS.EXE09-28-88`, f15 ` F15 II IBM 03-22-91` |
+| RSOUND   | 0x2a4e | 0x2c6d | ~57% | both Roland MT-32, 11-90 vs 3-90 |
+
+- f19-en and f19-ru **sound drivers are byte-identical**; graphics drivers
+  differ en↔ru (~21% for MGRAPHIC — localization touched the code too).
+- MGRAPHIC is the **same source revision** in f15 and f19 (identical
+  signature date): f15's slot table = f19's table +2 shift on nearly every
+  entry; per-slot handler bytes match 86-100%. The f15 `src/slot.h` ABI
+  (84 gfx slots) names f19's handlers directly — verified per-slot.
+- ASOUND (f19) is the F-117-generation `"STEALTH.EXE"` driver: 9 slots
+  `0x64-0x6c` matching f15se2-ex's `asound_model.h` ABI exactly (setup,
+  shutdown, dispatch_sound, play_intro, enable/disable drone,
+  set_drone_pitch, timer_tick, noise_tick — no 0x6d `play_sample`).
+  f15's ASOUND is a different build (10 slots, jump-stub table).
+- f15se2-re loads the original MGRAPHIC.EXE as a binary overlay;
+  `gfx_impl.c` is an SDL reimplementation, not a port. `asound/` in
+  f15se2-ex-integration is a clean-room model of the same ABI.
+- No f15 release ships a `*GRAPHIC.EXE`/`*SOUND.EXE` built from source —
+  driver reconstruction here would be the first.
