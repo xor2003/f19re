@@ -82,6 +82,19 @@ endif
 $(BUILDDIR)/%.obj: $(BUILDDIR)/%.asm
 	$(ASM) $(ASMFLAGS) -Fo$@ $<
 
+# Regenerate the committed Ada listings (needs ~/vextest ada.py):
+# drv2idc.py seeds segments/jump-table data/handlers via an IDC script so the
+# listing is properly segmented and named; ada.py also emits <stem>.map.
+ADA ?= $(HOME)/vextest/.venv/bin/python $(HOME)/vextest/ada.py
+.PHONY: ada-driver-lsts
+ada-driver-lsts: tools/drv2idc.py map/mgraphic_en.map map/asound.map | $(BUILDDIR)
+	python3 tools/drv2idc.py $(F19EN)/MGRAPHIC.EXE map/mgraphic_en.map conf/mgraphic.idc
+	$(ADA) $(F19EN)/MGRAPHIC.EXE --work-dir $(BUILDDIR)/ada_mg -s conf/mgraphic.idc --full --xrefs
+	cp $(BUILDDIR)/ada_mg/MGRAPHIC.lst lst/mgraphic_ada.lst
+	python3 tools/drv2idc.py $(F19EN)/ASOUND.EXE map/asound.map conf/asound.idc
+	$(ADA) $(F19EN)/ASOUND.EXE --work-dir $(BUILDDIR)/ada_as -s conf/asound.idc --full --xrefs
+	cp $(BUILDDIR)/ada_as/ASOUND.lst lst/asound_ada.lst
+
 .PHONY: drivers verify-drivers
 drivers: $(BUILDDIR)/mgraphic.exe $(BUILDDIR)/asound.exe
 verify-drivers: drivers

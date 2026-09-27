@@ -872,13 +872,24 @@ bytes; seg001 = one `proc far` per map routine whose body is `db` bytes +
 an ndisasm comment. `make drivers` / `make verify-drivers` reproduce both
 drivers with 0 load-image diffs.
 
-### Ada Script listings (`--lst`, `tools/asmfix.py`)
+### Ada Script listings (`--lst`, `tools/asmfix.py`, `tools/drv2idc.py`)
 
 `~/vextest/ada.py EXE --work-dir W --full --xrefs` produces `W/X.lst` +
-`W/X.asm` — a real disassembly with XREFs. Its limits for these drivers:
-it doesn't know the OvlHeader layout, so header/table bytes decode as
-instructions (e.g. `jnb loc_1CE99` targeting outside the image), and its
-own .asm has ~240 unresolvable labels — it will not assemble directly.
+`W/X.asm` + `W/X.map`. Unseeded it doesn't know the OvlHeader layout:
+header/table bytes decode as instructions and its .asm has ~240
+unresolvable labels. `tools/drv2idc.py EXE map/x.map conf/x.idc` fixes
+that by emitting an IDC seed script (`ada.py -s conf/x.idc`) that
+
+- redeclares the image as seg000 DATA (header/table) + seg001 CODE,
+  renames them, sets `ds` for code refs,
+- marks the 0x18 header fields + jump-table words as data items,
+- `add_func`/`set_name`/`set_func_flags(..., FUNC_FAR)` every map routine.
+
+With seeds, ada reaches ~88% coverage on MGRAPHIC (vs 57%) and emits
+`proc far` handlers plus a mzmap-format `.map` (tools/ada_script/
+map_writer.py in vextest — extents from the functions table, NEAR/FAR from
+FUNC_FAR/far-xref/retf-or-iret terminators; disjoint tail-chunks are not
+attributed). Regenerate everything with `make ada-driver-lsts`.
 
 `drv2asm.py --lst x.lst` instead uses the lst **per instruction** inside
 map-defined routine extents, keeping a mnemonic only when it can be
@@ -906,11 +917,16 @@ never desyncs the comparison):
 3. emitted bytes != img[OFF:OFF+LEN] -> db
 4. link + compare_exe -> 0 diffs required (catches reloc/slot-table issues)
 
-Result: MGRAPHIC = 862 mnemonic lines / ASOUND = 1521 mnemonic lines out
-of ~1600/1500 instructions, both byte-exact. Committed lst files:
-`lst/mgraphic_ada.lst`, `lst/asound_ada.lst`. Regenerate ada output with:
+Result: MGRAPHIC = 879 mnemonic lines / ASOUND = 1625 mnemonic lines,
+both byte-exact. Committed artifacts: `lst/mgraphic_ada.lst`,
+`lst/asound_ada.lst` (IDC-seeded) and `conf/mgraphic.idc`,
+`conf/asound.idc`. Regenerate with `make ada-driver-lsts` (needs
+`~/vextest`), or manually:
 
 ```sh
-cd ~/vextest && .venv/bin/python ada.py \
-  /home/xor/games/f19/F19/MGRAPHIC.EXE --work-dir /tmp/ada_mg --full --xrefs
+python3 tools/drv2idc.py /home/xor/games/f19/F19/MGRAPHIC.EXE \
+  map/mgraphic_en.map conf/mgraphic.idc
+~/vextest/.venv/bin/python ~/vextest/ada.py \
+  /home/xor/games/f19/F19/MGRAPHIC.EXE --work-dir /tmp/ada_mg \
+  -s conf/mgraphic.idc --full --xrefs    # writes MGRAPHIC.lst/.asm/.map
 ```

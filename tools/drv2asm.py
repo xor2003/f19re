@@ -31,19 +31,28 @@ from compare_exe import load_image
 NAME_RE = re.compile(r'\b(loc|sub|byte|word|dword|unk|off|proc)_([0-9A-Fa-f]{4,})\b')
 
 
-def parse_ada_lst(path):
-    """ada .lst (flat seg000:off lines, off = image offset) -> instr text per
-    offset, label defs. Ada name suffixes encode LINEAR addresses (image base
-    0x10000); labels dict maps image offsets to all defined names."""
+def parse_ada_lst(path, seg_base=None):
+    """ada .lst -> {image off: instr text}, {image off: [label names]}.
+
+    segNNN:off fields are segment-relative; seg_base maps the lst segment
+    name to its image-offset base (map paragraph * 16). Without seg_base
+    (or for unknown segments) only flat seg000 lines at base 0 are kept --
+    the pre-IDC listing layout. Ada name suffixes encode LINEAR addresses
+    (image base 0x10000)."""
     instr = {}        # image off -> text
     labels = {}       # image off -> [names]
     for line in open(path, encoding='utf-8', errors='replace'):
         m = re.match(r'seg(\w+):([0-9A-F]+)\s+(.*)', line)
         if not m:
             continue
-        if m.group(1) != '000':          # ada lists code under flat seg000;
-            break                        # stop at the seg_stack duplicate
-        off, rest = int(m.group(2), 16), m.group(3).strip()
+        segname = 'seg' + m.group(1)
+        if seg_base is None:
+            base = 0 if m.group(1) == '000' else None
+        else:
+            base = seg_base.get(segname)
+        if base is None:                 # unknown segment (e.g. seg_stack)
+            continue
+        off, rest = base + int(m.group(2), 16), m.group(3).strip()
         if not rest or rest.startswith(';'):
             continue
         pm = re.match(r'([\w$]+)\s+proc\s+(near|far)', rest)
@@ -217,7 +226,8 @@ BRANCH_MN = re.compile(
 
 
 def emit_code_lst(f, img, lo, hi, instr, labels, code_defs, data_defs,
-                  name_addr, code_lin0, seg_para, entry_by_off):
+                  name_addr, code_lin0, seg_para, entry_by_off,
+                  self_name=None):
     """Emit a routine body from the ada listing; lo/hi are image offsets.
 
     Keeps ada mnemonics after rewrite_insn name resolution; instructions we
@@ -233,7 +243,8 @@ def emit_code_lst(f, img, lo, hi, instr, labels, code_defs, data_defs,
         if a > off:  # unlisted gap inside the extent
             emit_db(f, img[off:a])
         for nm in labels.get(a, []):
-            f.write(f'{nm}:\n')
+            if nm != self_name:          # proc header already defines it
+                f.write(f'{nm}:\n')
         nxt = min([x for x in addrs if x > a], default=hi + 1)
         nxt = min(nxt, hi + 1)
         raw = img[a:nxt]
@@ -258,8 +269,12 @@ def main():
     segs, routines = parse_map(mapfile)
     instr = labels = None
     name_addr = {}
+    # lst segment names (seg000/seg001 by para order) -> image-offset base
+    seg_lstnames = {name: f'seg{i:03d}' for i, (name, para) in
+                    enumerate(sorted(segs.items(), key=lambda kv: kv[1]))}
+    seg_base = {seg_lstnames[n]: p * 16 for n, p in segs.items()}
     if lst:
-        instr, labels = parse_ada_lst(lst)
+        instr, labels = parse_ada_lst(lst, seg_base)
         # every ada-defined name -> its image offset
         for a, nms in labels.items():
             for nm in nms:
@@ -359,7 +374,8 @@ def main():
                 emit_code_lst(f, img, code_lin0 + r['lo'],
                               code_lin0 + r['hi'], instr, labels,
                               code_defs, data_defs, name_addr, code_lin0,
-                              seg_para[code_seg_name], entry_by_off)
+                              seg_para[code_seg_name], entry_by_off,
+                              self_name=r['name'])
             else:
                 emit_code(f, body, r['lo'])
             f.write(f"{r['name']} endp\n")
