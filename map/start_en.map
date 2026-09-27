@@ -41,7 +41,7 @@ sub_10AE8: seg000 NEAR 0ae8-0f40 R0ae8-0f40
 sub_10F43: seg000 NEAR 0f43-0fd2 R0f43-0fd2
 sub_10FEE: seg000 NEAR 0fee-0ffd R0fee-0ffd
 sub_11000: seg000 NEAR 1000-12a7 R1000-12a7
-sub_112A8: seg000 NEAR 12a8-133d R12a8-133d
+toggleSelRect: seg000 NEAR 12a8-133d R12a8-133d
 sub_1133E: seg000 NEAR 133e-1361 R133e-1361
 sub_11366: seg000 NEAR 1366-1415 R1366-1415
 rtcSync: seg000 NEAR 25ea-262b R25ea-262b
@@ -51,8 +51,8 @@ sub_126C6: seg000 NEAR 26c6-2704 R26c6-2704
 selectPrevUnit: seg000 NEAR 2706-2753 R2706-2753
 sub_12754: seg000 NEAR 2754-3217 R2754-3217
 sub_13218: seg000 NEAR 3218-3253 R3218-3253
-sub_13886: seg000 NEAR 3886-3913 R3886-3913
-sub_13914: seg000 NEAR 3914-3b4f R3914-3b4f
+drawTileIcon: seg000 NEAR 3886-3913 R3886-3913
+drawRiskPanel: seg000 NEAR 3914-3b4f R3914-3b4f
 sub_13B50: seg000 NEAR 3b50-3b75 R3b50-3b75
 # Routine drawStringAt 0000:3b76-0000:3b9a[000025] is a potential duplicate of routine drawStringAt 0000:3957-0000:397d[000027], differs by 1 instructions
 drawStringAt: seg000 NEAR 3b76-3b9a R3b76-3b9a duplicate
@@ -234,18 +234,19 @@ sub_1BAC2: seg000 NEAR bac2-bc80 Rbac2-bc80
 sub_1BC81: seg000 NEAR bc81-bd7d Rbc81-bd7d
 sub_1BD7E: seg000 NEAR bd7e-be08 Rbd7e-be08
 sub_1BE09: seg000 NEAR be09-be89 Rbe09-be89
-sub_1BE8A: seg000 NEAR be8a-be98 Rbe8a-be98
-sub_1BE99: seg000 NEAR be99-bea7 Rbe99-bea7
-sub_1BEA8: seg000 NEAR bea8-bf02 Rbea8-bf02
-sub_1BF03: seg000 NEAR bf03-c010 Rbf03-c010
+mapToScreenX: seg000 NEAR be8a-be98 Rbe8a-be98
+mapToScreenY: seg000 NEAR be99-bea7 Rbe99-bea7
+plotMapPoint: seg000 NEAR bea8-bf02 Rbea8-bf02
+drawMapArc: seg000 NEAR bf03-c010 Rbf03-c010
 drawMapLine: seg000 NEAR c011-c057 Rc011-c057 duplicate
-sub_1C058: seg000 NEAR c058-c082 Rc058-c082
+drawClippedMapLine: seg000 NEAR c058-c082 Rc058-c082
 # Routine sub_1C083 0000:c083-0000:c0b2[000030] is a potential duplicate of routine drawLine 0000:05e0-0000:061e[00003f], differs by 5 instructions
 drawLine: seg000 NEAR c083-c0b2 Rc083-c0b2 duplicate
-sub_1C0B3: seg000 NEAR c0b3-c163 Rc0b3-c163
-sub_1C164: seg000 NEAR c164-c17a Rc164-c17a
-sub_1C17B: seg000 NEAR c17b-c192 Rc17b-c192
-sub_1C193: seg000 NEAR c193-c698 Rc193-c698
+drawClippedLineEx: seg000 NEAR c0b3-c163 Rc0b3-c163
+drawMapPoint: seg000 NEAR c164-c17a Rc164-c17a
+sinMul: seg000 NEAR c17b-c192 Rc17b-c192
+cosMul: seg000 NEAR c193-c1a7 Rc193-c1a7
+sub_1C1A8: seg000 NEAR c1a8-c698 Rc1a8-c698
 sub_1C699: seg000 NEAR c699-cbcd Rc699-cbcd
 sub_1D8AA: seg000 NEAR d8aa-d979 Rd8aa-d979
 sub_1D97A: seg000 NEAR d97a-dbe7 Rd97a-dbe7

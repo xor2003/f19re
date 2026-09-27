@@ -164,6 +164,71 @@ void drawLine(int16 x0, int16 y0, int16 x1, int16 y1, int16 color) { /* seg000:0
     gfx_resetBlitOffset2();
 }
 
+/* seg000:0xc0b3 drawClippedLineEx — drawLine with a clip window; START's
+ * variant stores raw coords and re-states the driver clip bounds. */
+extern int16 g_clipMaxX, g_clipMaxY;    /* dseg:0xd25/0xd27 */
+extern int16 *g_vpParms;                /* dseg:0x6572 — vpParms->f[2] = color */
+extern int16 far gfx_calcRowAddr(int16 a, int16 b);  /* slot 0x3e */
+extern void far gfx_setBlitOffset(int16 a);          /* slot 0x1a */
+extern void far gfx_setOvlVal1(int16 v);             /* slot 0x40 */
+extern void far gfx_setOvlVal2(int16 v);             /* slot 0x41 */
+
+void drawClippedLineEx(int16 x1, int16 y1, int16 x2, int16 y2,
+                       int16 clipL, int16 clipR, int16 clipT, int16 clipB,
+                       int16 both) {
+    int16 clipH, clipW;
+    clipW = clipR - clipL;
+    clipH = clipB - clipT;
+    gfx_setBlitOffset(gfx_calcRowAddr(clipL, clipT));
+    g_clipMaxX = clipW - 1;
+    g_clipMaxY = clipH - 1;
+    gfx_setOvlVal1(clipH - 1);
+    gfx_setOvlVal2(g_clipMaxX);
+    gfx_setColor(g_vpParms[2]);
+    g_lineX0 = x1;
+    g_lineY0 = y1;
+    g_lineX1 = x2;
+    g_lineY1 = y2;
+    sub_141A3();
+    gfx_resetBlitOffset2();
+    g_clipMaxX = 0x13F;
+    g_clipMaxY = 0xC7;
+    gfx_setOvlVal1(0xC7);
+    gfx_setOvlVal2(g_clipMaxX);
+    gfx_setBlitOffset(0);
+}
+
+/* seg000:0x3886 — draws a tile's icon sprites while flag bit 0x80 is set;
+ * forces obj.f06 = 3 (palette bank) around the blit. */
+struct TileEntry {
+    int16 pad[0x10];
+    int16 x0, y0, x1, y1;              /* +0x20..+0x27 span rect for sub_14622 */
+    int16 spr1;                        /* +0x28 sprite handle */
+    int16 spr2;                        /* +0x2A optional second sprite */
+    int16 f2C, f2E;
+    int8  flag;                        /* +0x30 bit 0x80 = visible */
+    int8  pad31;
+};
+extern int16 flag_29948;                              /* dseg:0x9948 */
+extern void far gfx_blitSprite(int16 spr);            /* slot 0x11 */
+extern void sub_14622(void *o, int16 x0, int16 y0, int16 x1, int16 y1);
+struct ObjF06 { int16 pad[3]; int16 f06; };
+
+void drawTileIcon(struct TileEntry *t, uint16 idx, struct ObjF06 *o) {
+    int16 save;
+    if (t[idx].flag & 0x80) {
+        save = o->f06;
+        o->f06 = 3;
+        if (flag_29948 == 0) {
+            register struct TileEntry *e = &t[idx];
+            sub_14622(o, e->x0, e->y0, e->x1, e->y1);
+        }
+        gfx_blitSprite(t[idx].spr1);
+        o->f06 = save;
+        if (t[idx].spr2 != 0)
+            gfx_blitSprite(t[idx].spr2);
+    }
+}
 
 void mystrcat(char *d, char *s) {         /* seg000:0x5189 */
     for (;;) {
@@ -308,4 +373,49 @@ void clipEntries(int16 x, int16 y, int16 w, int16 h) {
         if (uz < i && m < f)
             e->flag = 0;
     }
+}
+
+/* ==== seg000:0xbf03 drawMapArc — angle-swept arc/ring on the map.
+ * /Os module: under /Ot the step-size ternary emits a stray relax-pad nop.
+ * Local slots: q@-2, x@-4, i@-6, j(prevX)@-8, k(y)@-A, l(step)@-C,
+ * m(spare)@-E, n(prevY)@-0x10 — names chosen for the hash buckets. ==== */
+extern int16 sinMul(int16 angle, int16 value);
+extern int16 cosMul(int16 angle, int16 value);
+extern void  plotMapPoint(int16 x, int16 y, int16 color, int16 unused);
+extern void  drawMapLine(int16 x1, int16 y1, int16 x2, int16 y2);
+
+void drawMapArc(int16 cx, int16 cy, int16 radius, int16 color,
+                int16 connect, int16 a1, int16 a2) {
+    int16 q, x, i, j, k, l, m, n;
+
+    if (a2 < a1)
+        a1 += 0x100;
+    g_vpParms[2] = color;
+    l = connect ? 8 : 0x10;
+    if (!connect && radius >= 0xBB8)
+        l = 8;
+    if (!connect && radius >= 0x1B58)
+        l = 4;
+    i = a1;
+    goto test;
+body:
+    q = i << 8;
+    x = cx + sinMul(q, radius);
+    k = cy - cosMul(q, radius);
+    if ((uint16)x > 0xC000)
+        x = 0;
+    if ((uint16)k > 0xC000)
+        k = 0;
+    if (x && k && j && n) {
+        if (i != a1 && connect)
+            drawMapLine(x, k, j, n);
+        else
+            plotMapPoint(x, k, color, 0);
+    }
+    j = x;
+    n = k;
+    i += l;
+test:
+    if (i <= a2)
+        goto body;
 }

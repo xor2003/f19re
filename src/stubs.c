@@ -485,7 +485,6 @@ void  cleanup(void) { }
 #ifdef EXE_START /* START-only callees (real defs live in the skeleton asm) */
 void  intDispatch(int16 n, uint8 *a, uint8 *b) { }
 void  far misc_clearKeyFlags(void) { }
-void  drawClippedLineEx(int16 a, int16 b, int16 c, int16 d, int16 e, int16 f, int16 g, int16 h, int16 i) { }
 /* stutil.c deps: driver-slot far calls + skeleton routines + globals */
 int16 far misc_jump_5a_keybuf(void) { return 0; }
 int16 far misc_jump_5b_getkey(void) { return 0; }
@@ -574,6 +573,19 @@ int16 savedPage;
 int16 doFcbSearch(void) { return 0; }
 void  sub_14089(int16 n) { }
 int16 far gfx_blitToCurrent(int16 p) { return 0; }
+/* stutil.c drawTileIcon deps */
+int16 flag_29948;
+void  far gfx_blitSprite(int16 spr) { }
+void  sub_14622(void *o, int16 a, int16 b, int16 c, int16 d) { }
+/* stutil.c drawRiskPanel deps */
+void *unitRec;
+uint16 esTabBase;
+int16 far *esTable[4];
+int16 statT1[1], statT2[1], statT3[1], statT4[1];
+char  scrStr[0x40];
+void  sub_15120(char *d, char *s) { }
+void  sub_13FB3(int16 n, char *b) { }
+void  sub_13B76(void *o, char *s, int16 x, int16 y) { }
 #endif
 void  dos_printstring(const char *s) { }
 uint16 dos_alloc(uint16 size) { return 0; }
@@ -592,8 +604,10 @@ void  sub_167FD(void) { }
 void  sub_16208(void) { }
 int16 missionTimeFlag;                        /* word_244E4: runGenerator sets 0/1 */
 void  drawLineWrapper(void) { }
+#ifndef EXE_START /* src_start/stmap.c provides the real ports */
 int16 mapToScreenX(int16 v) { return v; }
 int16 mapToScreenY(int16 v) { return v; }
+#endif
 void  drawMapPixel(int16 x, int16 y, int16 c) { }
 #ifndef EXE_START /* src_start/stutil.c provides the real port */
 void  mystrcpy(char *d, const char *s) { }
