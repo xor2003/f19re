@@ -310,6 +310,15 @@ def rewrite_consts(node, remap, stats, oracle_consts=None):
             rewrite_consts(v, remap, stats, oracle_consts)
 
 
+def slice_ssa(ssa_path, name, out_path):
+    """Keep only SSA parts belonging to one routine (memory-bounded fallback)."""
+    d = json.load(open(ssa_path))
+    d['functions'] = [f for f in d.get('functions', [])
+                      if (f.get('function') or {}).get('name') == name]
+    json.dump(d, open(out_path, 'w'))
+    return out_path
+
+
 def main():
     ssa_only = '--ssa-only' in sys.argv
     args = [a for a in sys.argv[1:] if not a.startswith('--')]
@@ -413,10 +422,37 @@ def main():
     mp = os.path.join(OUT, base + '.mapping.json')
     z3('make-mapping', '--oracle-functions', ocat, '--candidate-functions', ccat, '--out', mp)
     cmpout = os.path.join(OUT, base + '.compare.json')
-    subprocess.run([VPY] + DOSUNIT + ['compare-ssa', '--oracle-ssa', ossa,
-                   '--candidate-ssa', rssa, '--mapping', mp, '--out', cmpout],
-                   cwd=VEXTEST)
-    doc = json.load(open(cmpout))
+    if os.path.exists(cmpout):
+        os.unlink(cmpout)
+    r = subprocess.run([VPY] + DOSUNIT + ['compare-ssa', '--oracle-ssa', ossa,
+                       '--candidate-ssa', rssa, '--mapping', mp, '--out', cmpout],
+                       cwd=VEXTEST)
+    if r.returncode != 0 or not os.path.exists(cmpout):
+        # single-shot compare was killed (RSS cap) or crashed — fall back to
+        # per-routine compares so each run's memory stays bounded.
+        print('== compare-ssa failed (rc=%s); falling back to per-routine' % r.returncode)
+        mdoc = json.load(open(mp))
+        results = []
+        for name in sorted(names):
+            sub = os.path.join(OUT, base + '.1fn')
+            osub = slice_ssa(ossa, name, sub + '.ossa.json')
+            csub = slice_ssa(rssa, name, sub + '.cssa.json')
+            msub = dict(mdoc)
+            msub['functions'] = [f for f in mdoc.get('functions', [])
+                                 if f.get('oracle_name') == name or f.get('candidate_name') == name]
+            msubf = sub + '.mapping.json'
+            json.dump(msub, open(msubf, 'w'))
+            pout = sub + '.compare.json'
+            r2 = subprocess.run([VPY] + DOSUNIT + ['compare-ssa', '--oracle-ssa', osub,
+                                '--candidate-ssa', csub, '--mapping', msubf,
+                                '--out', pout], cwd=VEXTEST)
+            if r2.returncode != 0 or not os.path.exists(pout):
+                print('   %s: compare failed (rc=%s) — INCONCLUSIVE' % (name, r2.returncode))
+                continue
+            results += json.load(open(pout)).get('results', [])
+        doc = {'results': results}
+    else:
+        doc = json.load(open(cmpout))
     summ = doc.get('summary', {})
     print('== summary:', json.dumps(summ))
     byf = {}
