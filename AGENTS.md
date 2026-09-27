@@ -6,15 +6,24 @@ ports verified against the original binary.
 
 Scope: EGAME.EXE (the flight sim proper, 364 routines) is fully classified —
 183 byte-exact C ports + 2 Z3-proven + ~179 asm/CRT (skeleton-reproduced).
-The satellite exes are mapped but not reconstructed. The EN install at
-/home/xor/games/f19/F19 is now authoritative (differs substantially from RU):
-SU.EXE (101 rtns, map/su_en.map — 24 egame sig matches), END.EXE (180,
-map/end_en.map — 27), START.EXE (251, map/start_en.map — 41). Maps and
-lst/<x>_en_ada.lst come from ~/vextest ada.py runs; RU-era maps kept as
-map/{su,start,end}.map (different binaries). mzdup over the EN binaries
-needed mzretools decoder hardening: 286/x87 opcodes and never-throw
-semantics for unimplemented bytes (data inside routine extents would
-desync the instruction stream otherwise).
+All four EN exes rebuild byte-exact as asm skeletons (`make verify-exes`):
+SU.EXE, START.EXE, END.EXE, EGAME.EXE via `tools/exe2asm.py` +
+`lst/<x>_en_ada.lst` + `map/<x>_en.map`. EN-EGAME C porting is done:
+144/152 candidate routines MATCH via `src_en/` override modules
+(egmain/egtarget/egcombat/egframe/egflight/egtacmap/egui.c) — the 8
+non-matching are documented hand-asm/CRT routines that stay skeleton
+(openFile closeFile picBlit openBlitClosePic installCBreakHandler
+setInt9Handler fillSpanRect projectSceneObject). Port EN routines with
+`python3 tools/portcheck.py src_en/<mod>.c <name> --srcdir src_en
+--exe /home/xor/games/f19/F19/EGAME.EXE --map map/egame_en.map`.
+The EN install at /home/xor/games/f19/F19 is now authoritative (differs
+substantially from RU): SU.EXE (101 rtns, map/su_en.map — 24 egame sig
+matches), END.EXE (180, map/end_en.map — 27), START.EXE (251,
+map/start_en.map — 41). Maps and lst/<x>_en_ada.lst come from ~/vextest
+ada.py runs; RU-era maps kept as map/{su,start,end}.map (different
+binaries). mzdup over the EN binaries needed mzretools decoder hardening:
+286/x87 opcodes and never-throw semantics for unimplemented bytes (data
+inside routine extents would desync the instruction stream otherwise).
 Current satellite focus is the English F19 drivers only:
 MGRAPHIC.EXE (82 rtns, map/mgraphic_en.map — all 84 ABI slots named from
 f15 slot.h, handlers ~94% byte-identical to f15's driver) and ASOUND.EXE

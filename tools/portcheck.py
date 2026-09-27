@@ -89,15 +89,17 @@ def public_offset(name, linkmap_path, image_base):
     return None
 
 
-def kvikdos(args):
+def kvikdos(args, extra_srcdir=None):
     cmd = [KVIKDOS,
            '--mount=C:%s/' % MSC,
            '--mount=D:%s/' % os.path.join(ROOT, 'src'),
            '--mount=E:%s/' % BUILD,
-           '--env=LIB=C:\\lib', '--env=INCLUDE=C:\\INCLUDE',
+           '--env=LIB=C:\\lib', '--env=INCLUDE=C:\\INCLUDE;D:\\',
            '--env=PATH=C:\\bin;C:\\BBIN', '--env=TMP=D:\\',
-           '--drive=E'] + args
-    return subprocess.run(cmd)
+           '--drive=E']
+    if extra_srcdir:
+        cmd += ['--mount=F:%s/' % os.path.abspath(extra_srcdir)]
+    return subprocess.run(cmd + args)
 
 
 def main():
@@ -112,6 +114,11 @@ def main():
         i = args.index('--map')
         mapfile = args[i + 1]
         del args[i:i + 2]
+    srcdir = os.path.join(ROOT, 'src')
+    if '--srcdir' in args:
+        i = args.index('--srcdir')
+        srcdir = args[i + 1]
+        del args[i:i + 2]
     flags = [a for a in args if a.startswith('/')]
     args = [a for a in args if not a.startswith('/')]
     if len(args) < 2:
@@ -124,17 +131,32 @@ def main():
 
     base = os.path.splitext(os.path.basename(src))[0].upper()[:8]
     srcdos = 'D:\\' + os.path.basename(src).upper()
-    # compile every src/*.c module (except stubs.c) so cross-module
+    # compile every module from the src dir (except stubs.c) so cross-module
     # references resolve to real implementations; stubs fills the rest.
+    # With --srcdir SRCDIR (e.g. src_en/), modules found there override the
+    # base src/*.c of the same basename -- version-divergent routines live
+    # in src_en/ while unchanged modules continue to come from src/.
     import glob
-    modules = [os.path.basename(p) for p in glob.glob(os.path.join(ROOT, 'src', '*.c'))
+    baseglob = glob.glob(os.path.join(ROOT, 'src', '*.c'))
+    if os.path.abspath(srcdir) != os.path.join(ROOT, 'src'):
+        over = {os.path.basename(p).lower(): p
+                for p in glob.glob(os.path.join(srcdir, '*.c'))}
+        picked = [over.pop(os.path.basename(p).lower(), p) for p in baseglob]
+        picked += over.values()
+    else:
+        picked = baseglob
+    modules = [os.path.basename(p) for p in picked
                if os.path.basename(p).lower() not in ('stubs.c', '_stub.c')]
+    modpath = {os.path.basename(p): p for p in picked}
     linkobjs = []
     for mod in sorted(modules):
         modbase = os.path.splitext(mod)[0].upper()[:8]
         modflags = flags if mod == os.path.basename(src) else module_flags(mod)
+        # override modules live in srcdir (mounted F:), base ones on D:
+        dosdir = 'F' if os.path.dirname(os.path.abspath(modpath[mod])) == os.path.abspath(srcdir) else 'D'
         # cl drops the obj into its own directory (C:\bin) under kvikdos
-        r = kvikdos(['C:\\bin\\CL.EXE'] + modflags + ['/c', 'D:\\' + mod.upper()])
+        r = kvikdos(['C:\\bin\\CL.EXE'] + modflags + ['/c', f'{dosdir}:\\' + mod.upper()],
+                    extra_srcdir=srcdir if dosdir == 'F' else None)
         if r.returncode != 0:
             sys.exit(r.returncode)
         if not os.path.exists(os.path.join(MSC, 'bin', modbase + '.OBJ')):
@@ -194,12 +216,14 @@ def main():
         print('link produced no exe/map in', BUILD)
         sys.exit(1)
     map_path = mapfile or os.path.join(ROOT, 'map', exe + '.map')
-    ref_exe = os.path.join(ROOT, exe.upper() + '.EXE')
-    if not os.path.exists(ref_exe):
-        # drivers live in the reference install (e.g. F19EN for the
-        # English MGRAPHIC.EXE, which differs from the repo's RU one)
-        f19en = os.environ.get('F19EN', '/home/xor/games/f19/F19')
-        ref_exe = os.path.join(f19en, exe.upper() + '.EXE')
+    if os.path.exists(exe):
+        ref_exe = exe                      # --exe given a direct path
+    else:
+        ref_exe = os.path.join(ROOT, exe.upper() + '.EXE')
+        if not os.path.exists(ref_exe):
+            # drivers/EN binaries live in the reference install
+            f19en = os.environ.get('F19EN', '/home/xor/games/f19/F19')
+            ref_exe = os.path.join(f19en, exe.upper() + '.EXE')
 
     rc = 0
     for name in names:

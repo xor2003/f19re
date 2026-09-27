@@ -118,6 +118,27 @@ The loop for one routine:
 
 10. **Commit** with the verified-count bump.
 
+### English-variant overrides (`src_en/`)
+
+The EN binaries reuse the RU sources for ~90% of routines, but a handful
+diverge (data-layout aliases, added calls, signedness). Those live in
+`src_en/<module>.c` — a full copy of the module with only the divergent
+routines changed, leaving `src/` byte-exact against RU. portcheck picks the
+override automatically:
+
+```sh
+python3 tools/portcheck.py src_en/egcombat.c spawnSamThreat \
+    --srcdir src_en --exe /home/xor/games/f19/F19/EGAME.EXE \
+    --map map/egame_en.map
+```
+
+`--srcdir` mounts the directory as `F:` in kvikdos; modules not overridden
+still compile from `src/` (`D:`). `INCLUDE` must contain `D:\` so `F:` sources
+resolve the project headers, and the `dosdir` pick must compare
+`os.path.abspath(modpath[mod])` — a relative `modpath` silently falls back to
+the RU module and reports stale mismatches (the bug that hid all src_en
+results initially).
+
 ## 4. MSC 5.1 codegen field guide
 
 Everything below was determined empirically from `.COD` experiments. This is
@@ -156,6 +177,18 @@ compiled *without* `/Gs`.
   MSC never shares a register home with a dead local, and never spills a
   register var to its home for operand reads (`imul reg`, never
   `imul [home]`). `volatile register` does not defeat this.
+  The home word is *dead* — nothing ever stores to or loads from it — so
+  `mzdiff --loose` tolerates the extra `sub sp,2`: a `register` local is a
+  legitimate match even when the original's frame is 2 bytes smaller.
+  (EN `spawnSamThreat` matched this way: `register int16 off` binds si to
+  `slot*24`, frees `di` for the map index, and only costs the dead home.)
+- `v = v;` (self-assignment) evicts MSC's cached copy of `v`, forcing a
+  recompute at the next use — used in EN `drawWeaponRadarInfo` to get the
+  second `imul weaponIdx,14` where the first `si` value was already dead.
+  Phantom `register` params are a codegen device only when callers push the
+  extra arg count; when the original callers push fewer args (EN
+  `drawWeaponRadarInfo` pushes 2), remove the param and use repeated
+  expressions + self-assignment instead.
 - So: `imul [bp-var_4]` in the original means the multiplier operand is a
   **plain memory local**; `imul si` means a `register` var held the operand.
 - To get `imul [bp-var_4]` *and* a persistent `si` index without paying for a
@@ -196,6 +229,17 @@ compiled *without* `/Gs`.
   + B + `jmp end` + A — same semantics, opposite layout. Match the
   original's block placement by picking the comparison sense, not by
   `goto`s (`stepFlightModel`'s seeker `an =` block needed `>= 0`).
+- **`jcc +5; jmp L` is jump-span relaxation, not a different control-flow
+  shape.** Pre-386 has no long conditional jumps, so when a `jz`/`jnz` target
+  lands >127 bytes away MSC emits the inverted `jcc +5` over a near `jmp L`.
+  Before restructuring an `if/else` for a `jne;jmp` pair in the original,
+  measure the arm: if the target is >0x7f past the jump it is just a relaxed
+  conditional — the real divergence is whatever made the arm that big
+  (EN `destroyGroundTarget`: the "impossible" layout resolved itself once a
+  missing `makeSound(0,2)` call inside the loop's `if` grew the arm past the
+  short-jump limit; conversely a source-side `if (x==0) goto else` gets
+  *folded* back to `jz else` by MSC's jump threading, so `goto` cannot
+  reproduce this pattern).
 
 ### Rotated loops: nested `if`s, not `continue`
 
@@ -489,9 +533,18 @@ divergence shows on indexed `[reg+ofs]` operands.)
   casting `int16` decls with `(uint16)` at the site does not flip the
   eval order — MSC still picks its own order (`mov ax,[a]; cmp [b],ax;
   jbe`) no matter how the operands are written. Declared signedness, not
-  casts, steers compare emission — same lesson as the
-  `bearingToStore(...) < (g_viewZ>>5)*5` site where `g_viewZ` needed a
-  `uint16` decl to get `cmp bx,ax; jnb`.
+  casts, steers compare emission.
+- Compare-operand direction rescue: `a < b` where `b` is the heavier
+  expression (call result parked vs a `mul` temp) canonicalizes to
+  `cmp a,b; jbe` (the `b > a` body form) no matter how the `<`/`<=`/`>=`
+  is written. Writing it as a subtraction test `a - b < 0` makes MSC emit
+  the compare in source order: `cmp a,b; jnb` — matching e.g. EN
+  `drawHudWorldOverlay`'s `bearingToStore(x) - ((uint16)g_viewZ>>5)*5 < 0`
+  (`cmp bx,ax; jnb`). Same bytes come from `(u = f(x)) < y` assignment-in-
+  test forms; the subtraction is the simplest spelling.
+- `-(x >> 5)` on a signed `int16` decl emits `sar; neg`; EN wants unsigned
+  `shr; neg` — cast the *shifted operand*: `-((uint16)g_viewZ >> 5)`. The
+  same cast fixed the `* 5` mul site one block earlier.
 - `-((uint32)(uint16)x - K)` emits the full 32-bit negation
   `sub dx,dx; sub ax,K; sbb dx,dx; neg ax; adc dx,0; neg dx` — the unsigned
   32-bit subtract form, NOT `cwd` sign-extension.
@@ -623,6 +676,15 @@ built with — determined empirically, since flag choice is visible in codegen:
   offset. `drawHudWorldOverlay` uses both forms for `g_targetSlots`
   fields within one routine.
 
+- **data offset *collisions* mean variable aliasing, not bad codegen** — when
+  the instruction stream matches but mzdiff reports `Data offset mapping
+  A->B collides with existing A->C`, the two versions store to different
+  globals at that site. EN reuses storage the RU source kept separate:
+  `findStoreAtGrid` writes the selection scratch into `g_storeDefs[0]`
+  (slot 0; its search loop starts at index 1), and `initStoreData` writes
+  `g_nameTab[0]` rather than a separate `g_nameTabBase`. Diff the *operands*
+  at the colliding ref to see which global the original aliases.
+
 After the spec'd walk drains, `checkMissedRoutines` re-seeds every unvisited
 routine in the ref map, so a `--map` run effectively compares the whole map:
 each missed routine resolves its target via opcode-pattern search, and a
@@ -685,6 +747,16 @@ overwritten by `mov si,ax` before any use), so the routine is semantically
 exact. The prologue param-load is skipped only when the param is redefined in
 the entry block; here it can't be, and no other construct dedicates si without
 a home or a load — so byte-exact is unreachable for this routine under MSC 5.1.
+
+**EN postscript.** The EN binary's `spawnSamThreat` (seg000:0x56ec, the
+`duplicate` map entry) is the same routine *without* the phantom param —
+callers push no arg. The winning EN form is `register int16 off` as a plain
+local: it dedicates si to `slot*24`, pushes di for the map index, emits no
+param load, and the only cost is the dead home word (`sub sp,0xa` vs the
+original's `sub sp,8`), which `mzdiff --loose` tolerates as literal/frame
+remap. So the *instruction stream* is byte-exact for EN even though the RU
+binary keeps its one dead-load mismatch; the register-local home is never
+read or written, so the runtime stack usage differs by two inert bytes.
 
 Lesson: when a port resists, isolate to a `src/_t.c` repro (one function,
 minimal externs), compile with `/FcD:\t.cod`, and diff the `.COD` asm against

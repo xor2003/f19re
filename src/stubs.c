@@ -148,6 +148,7 @@ void far drawModelDisplayList(void) {}
 struct { char pad[0x16]; } nearestTile;
 struct { int16 gridX[9]; int16 gridY[11]; int16 lut[3]; } g_neighborSampling;
 uint8 g_shapeTargetCategory[128];
+int16 g_geeShakeToggle;		/* EN-only: key-toggled gee-warning override */
 struct { uint8 lod, subIndex, tileX, tileY; int16 value; uint8 shape, pad7; } g_dynTileEntries[16];
 int16 g_tileEntryIdx, g_render3DTiles;
 
