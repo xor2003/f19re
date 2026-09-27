@@ -249,12 +249,21 @@ def main():
             # means the global lives at a different offset in the test exe —
             # the instruction stream itself matched. All mismatching pairs must
             # be data-offset conflicts for this to count as a match.
+            # Errors are scoped to the requested routine's compare sections:
+            # mzdiff keeps walking the call queue after the seed routine, and
+            # for satellite exes those callees legitimately differ.
             lines = r.stdout.splitlines()
             errors = 0
             allowed = 0
             prev_conflict = False
+            in_target = True
             for ln in lines:
+                cm = re.match(r'--- Comparing .*?routine [0-9a-f]+:[0-9a-f]+-[0-9a-f]+:[0-9a-f]+\[\w+\]: (\S+)', ln)
+                if cm:
+                    in_target = cm.group(1) == name
                 if 'ERROR:' in ln:
+                    if not in_target:
+                        continue
                     errors += 1
                     # tolerated: data-offset remap conflicts, and stray 'nop'
                     # pads (MSC aligns jump targets to even; pad placement
@@ -262,7 +271,7 @@ def main():
                     if prev_conflict or 'nop' in ln:
                         allowed += 1
                 prev_conflict = ('data segment offset mapping conflict' in ln)
-            if errors > 0 and errors == allowed:
+            if errors == allowed:
                 ok = True
         print(f'{name}: {"MATCH" if ok else "MISMATCH"}'
               f'  ({os.path.basename(src)} @0x{tgt:x} vs ref 0x{ext[0]:x}-0x{ext[1]:x})')
