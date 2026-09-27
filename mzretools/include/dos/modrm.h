@@ -86,7 +86,8 @@ static constexpr Byte MODRM_MEM_SHIFT = 0;
     X(MODRM_M) \
     X(MODRM_Mp) \
     X(MODRM_1) \
-    X(MODRM_CL)
+    X(MODRM_CL) \
+    X(MODRM_X)
 enum ModrmOperand {
 #define X(x) x,
 MODRM_OPERAND

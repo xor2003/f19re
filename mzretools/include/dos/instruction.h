@@ -95,7 +95,8 @@
     X(INS_MUL) \
     X(INS_IMUL) \
     X(INS_DIV) \
-    X(INS_IDIV)
+    X(INS_IDIV) \
+    X(INS_FPU)
 enum InstructionClass {
 #define X(x) x,
 INSTRUCTION_CLASS

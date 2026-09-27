@@ -76,7 +76,8 @@ MzImage::MzImage(const std::string &path) : path_(path), loadSegment_(0) {
     loadModuleOffset_ = header_.header_paragraphs * PARAGRAPH_SIZE;
     if (header_.pages_in_file == 0)
         throw DosError("Page count in MZ header is zero");
-    loadModuleSize_ = (header_.pages_in_file - 1) * PAGE_SIZE + header_.last_page_size - loadModuleOffset_;
+    const Size lastPageBytes = header_.last_page_size == 0 ? PAGE_SIZE : header_.last_page_size;
+    loadModuleSize_ = (header_.pages_in_file - 1) * PAGE_SIZE + lastPageBytes - loadModuleOffset_;
     // store original values at relocation offsets
     for (auto &reloc : relocs_) {
         Address relocAddr(reloc.segment, reloc.offset);

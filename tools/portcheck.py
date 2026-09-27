@@ -107,6 +107,11 @@ def main():
         i = args.index('--exe')
         exe = args[i + 1]
         del args[i:i + 2]
+    mapfile = None
+    if '--map' in args:
+        i = args.index('--map')
+        mapfile = args[i + 1]
+        del args[i:i + 2]
     flags = [a for a in args if a.startswith('/')]
     args = [a for a in args if not a.startswith('/')]
     if len(args) < 2:
@@ -188,8 +193,13 @@ def main():
     if not testexe or not linkmap:
         print('link produced no exe/map in', BUILD)
         sys.exit(1)
-    map_path = os.path.join(ROOT, 'map', exe + '.map')
+    map_path = mapfile or os.path.join(ROOT, 'map', exe + '.map')
     ref_exe = os.path.join(ROOT, exe.upper() + '.EXE')
+    if not os.path.exists(ref_exe):
+        # drivers live in the reference install (e.g. F19EN for the
+        # English MGRAPHIC.EXE, which differs from the repo's RU one)
+        f19en = os.environ.get('F19EN', '/home/xor/games/f19/F19')
+        ref_exe = os.path.join(f19en, exe.upper() + '.EXE')
 
     rc = 0
     for name in names:
