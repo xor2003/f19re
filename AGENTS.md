@@ -6,10 +6,15 @@ ports verified against the original binary.
 
 Scope: EGAME.EXE (the flight sim proper, 364 routines) is fully classified —
 183 byte-exact C ports + 2 Z3-proven + ~179 asm/CRT (skeleton-reproduced).
-The satellite exes are mapped but not reconstructed: START.EXE (179 rtns),
-END.EXE (208), SU.EXE (68), 5 graphics drivers — ~460
-routines total, of which mzdup signature-matching already finds ~30-35%
-shared with EGAME/f15 (run `mzdup sig/egame.sig <EXE> map/<x>.map`).
+The satellite exes are mapped but not reconstructed. The EN install at
+/home/xor/games/f19/F19 is now authoritative (differs substantially from RU):
+SU.EXE (101 rtns, map/su_en.map — 24 egame sig matches), END.EXE (180,
+map/end_en.map — 27), START.EXE (251, map/start_en.map — 41). Maps and
+lst/<x>_en_ada.lst come from ~/vextest ada.py runs; RU-era maps kept as
+map/{su,start,end}.map (different binaries). mzdup over the EN binaries
+needed mzretools decoder hardening: 286/x87 opcodes and never-throw
+semantics for unimplemented bytes (data inside routine extents would
+desync the instruction stream otherwise).
 Current satellite focus is the English F19 drivers only:
 MGRAPHIC.EXE (82 rtns, map/mgraphic_en.map — all 84 ABI slots named from
 f15 slot.h, handlers ~94% byte-identical to f15's driver) and ASOUND.EXE
