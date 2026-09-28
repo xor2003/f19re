@@ -633,6 +633,20 @@ int16 setViewOrigin(int16 a, int16 b, int16 flag) {
     return 0;
 }
 
+/* seg000:0x61f1 — tick gate: on every 7th tick resets byte_20A1B and runs
+ * sub_16208 once when word_22324 is armed. */
+extern uint8 byte_20A1B;
+extern int16 word_22324;
+extern void sub_16208(void);
+
+void sub_161F1(void) {
+    if (byte_20A1B > 6) {
+        byte_20A1B = 0;
+        if (word_22324 != 0)
+            sub_16208();
+    }
+}
+
 /* seg000:0x4089 — waits n RTC ticks: arms the tick counter byte_20A1A via
  * sub_14E9C (PIT/vector install), spins until it reaches n, then restores
  * via sub_14EDA. */

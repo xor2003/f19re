@@ -714,6 +714,7 @@ void  sub_14E9C(void) { }
 void  sub_14EDA(void) { }
 void  sub_16C0E(void) { }
 uint8 byte_20A1A;
+uint8 byte_20A1B;                           /* tick counter (sub_161F1) */
 int16 word_21714;
 int8  byte_212C2[4];
 void  sub_149A1(int16 h) { }

@@ -70,7 +70,7 @@ map/<x>_en.map --srcdir src_<x>`):
     selectNextObject selectNextUnit selectPrevUnit selectPrevObject
     drawUnitMarkers drawTileMarkers drawSiteMarkers rtcSync
     evalChoiceExpr clipEntries drawMapArc dosRead advanceBufPos
-    setViewOrigin delayTicks bufReadBytes resetTableFlags bufReadFile
+    setViewOrigin sub_161F1 delayTicks bufReadBytes resetTableFlags bufReadFile
     tickEffectTable dispatchDrawMode wrapUnitText wrapUnitTextFar
     srand rand seedRng drawRoutePath drawThreatRings printMission
     printObjective drawStoreIcons stepPanelAnim
