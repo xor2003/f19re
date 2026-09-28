@@ -655,3 +655,11 @@ void  wrapUnitTextFar(int16 a, char far *s, int16 w, int16 x, int16 y, int16 b) 
 #endif
 void  sub_151FE(char *d, uint8 *s, int16 n) { }        /* near copy */
 void  sub_1521C(char *d, char far *s, int16 n) { }     /* far copy */
+uint32 rngState;                                       /* dseg:0x7a50 LCG state */
+int16 sub_150BA(void) { return 0; }                    /* int 1Ah tick read */
+/* stutil.c drawRoutePath deps */
+int16 pathWpA, pathWpB, pathWpC, pathWpD;              /* dseg:0xb94a/48/5a/5c */
+char  str682E[4], str6832[4], str6834[4], str6836[4], str6838[4];
+/* stutil.c drawThreatRings deps */
+uint8 ringMode;                                        /* dseg:0x9922 */
+uint8 ringTypes[0x40];                                 /* dseg:0x3e26 */

@@ -66,6 +66,26 @@ int16 randMul(uint16 arg) {              /* seg000:0x40ae */
     return (rand() * (int32)arg) >> 0xf;
 }
 
+/* seg000:0xe29e/0xe2b0 — START's own LCG rand/srand (libc-style duplicates
+ * of the CRT pair): 32-bit state at dseg:0x7a50, MSVC constants. */
+extern uint32 rngState;                           /* dseg:0x7a50 */
+
+void srand(int16 seed) {
+    rngState = (uint32)(uint16)seed;
+}
+
+int16 rand(void) {
+    rngState = rngState * 0x343FDUL + 0x269EC3UL;
+    return (int16)(rngState >> 16) & 0x7FFF;
+}
+
+/* seg000:0x40a3 — seed the LCG from the BIOS tick counter. */
+extern int16 sub_150BA(void);                     /* int 1Ah tick read (asm) */
+
+void seedRng(void) {
+    srand(sub_150BA());
+}
+
 void mystrcpy(char *dst, const char *src) {   /* seg000:0x5120 */
     while ((*dst++ = *src++) != 0);
 }
@@ -372,6 +392,63 @@ void drawSiteMarkers(void) {
                     mapToScreenY(worldObjects[i].y_coord) + mapClipY1 - 2;
                 gfx_blitSprite(siteSprOff1);
             }
+        }
+    }
+}
+
+
+/* ==== seg000:0xbac2 drawThreatRings — per-object range ring + icon on the
+ * tactical map overlay. Skips dead/low-activity objects; ring radius comes
+ * from ringTypes[pad4] (mode 1 scales f0 by f1/16), color by the type flag
+ * and objectActive level. The blit arm duplicates the store block like
+ * drawSiteMarkers. ==== */
+typedef struct { int16 f0, f1; uint8 flag; uint8 padT[9]; } RingType; /* 0xE */
+extern uint8    ringMode;                    /* dseg:0x9922 */
+extern RingType ringTypes[];                 /* dseg:0x3e26, stride 0xe */
+
+void drawThreatRings(void) {
+    int16 c;
+    uint16 i;
+    if (ringMode == 0) return;
+    for (i = 0; i < (uint16)objectCount; i++) {
+        if (worldObjects[i].pad4 == 0 && (uint8)objectActive[i] <= 1) continue;
+        if (ringTypes[worldObjects[i].pad4].flag & 1) {
+            if ((uint8)objectActive[i] > 1) c = 0xF;
+            else c = 1;
+            if (ringMode == 1)
+                drawMapArc(worldObjects[i].x_coord, worldObjects[i].y_coord,
+                           (ringTypes[worldObjects[i].pad4].f0 *
+                            ringTypes[worldObjects[i].pad4].f1) / 16 << 6,
+                           c, 1, 0, 0x100);
+            else
+                drawMapArc(worldObjects[i].x_coord, worldObjects[i].y_coord,
+                           ringTypes[worldObjects[i].pad4].f0 << 6,
+                           c, 1, 0, 0x100);
+        } else {
+            if ((uint8)objectActive[i] > 1) c = 0xF;
+            else c = 0;
+            if (ringMode == 1)
+                drawMapArc(worldObjects[i].x_coord, worldObjects[i].y_coord,
+                           (ringTypes[worldObjects[i].pad4].f0 *
+                            ringTypes[worldObjects[i].pad4].f1) / 16 << 6,
+                           c, 0, 0, 0x100);
+            else
+                drawMapArc(worldObjects[i].x_coord, worldObjects[i].y_coord,
+                           ringTypes[worldObjects[i].pad4].f0 << 6,
+                           c, 0, 0, 0x100);
+        }
+        if (worldObjects[i].targetFlags & 8) {
+            *(int16 *)(sprParmsTab + siteSprOff2 + 8) =
+                mapToScreenX(worldObjects[i].x_coord) + mapClipX1 - 2;
+            *(int16 *)(sprParmsTab + siteSprOff2 + 0xA) =
+                mapToScreenY(worldObjects[i].y_coord) + mapClipY1 - 2;
+            gfx_blitSprite(siteSprOff2);
+        } else {
+            *(int16 *)(sprParmsTab + siteSprOff1 + 8) =
+                mapToScreenX(worldObjects[i].x_coord) + mapClipX1 - 2;
+            *(int16 *)(sprParmsTab + siteSprOff1 + 0xA) =
+                mapToScreenY(worldObjects[i].y_coord) + mapClipY1 - 2;
+            gfx_blitSprite(siteSprOff1);
         }
     }
 }
@@ -763,4 +840,46 @@ join:
         b = c;
         if (!g) break;
     }
+}
+
+/* seg000:0xb8e7 — route-path overlay on the tactical map: polyline through the
+ * four route waypoint indices (worldObjects entries) plus waypoint labels.
+ * Endpoints share one label when the path is closed (A==D). Called back-to-back
+ * with drawRouteFill (sub_1BAC2) from the map orchestrator. No stack frame. */
+extern int16 pathWpB;                            /* dseg:0xb948 */
+extern int16 pathWpA;                            /* dseg:0xb94a */
+extern int16 pathWpC;                            /* dseg:0xb95a */
+extern int16 pathWpD;                            /* dseg:0xb95c */
+extern char  str682E[], str6832[], str6834[], str6836[], str6838[];
+extern void  sub_13B76(int16 *o, char *s, int16 x, int16 y); /* drawObjString */
+
+void drawRoutePath(void) {
+    g_vpParms[2] = 0;
+    plotMapPoint(worldObjects[pathWpA].x_coord, worldObjects[pathWpA].y_coord,
+                 0xF, 0);
+    drawMapLine(worldObjects[pathWpA].x_coord, worldObjects[pathWpA].y_coord,
+                worldObjects[pathWpB].x_coord, worldObjects[pathWpB].y_coord);
+    drawMapLine(worldObjects[pathWpB].x_coord, worldObjects[pathWpB].y_coord,
+                worldObjects[pathWpC].x_coord, worldObjects[pathWpC].y_coord);
+    drawMapLine(worldObjects[pathWpC].x_coord, worldObjects[pathWpC].y_coord,
+                worldObjects[pathWpD].x_coord, worldObjects[pathWpD].y_coord);
+    g_vpParms[2] = 1;
+    if (pathWpA == pathWpD)
+        sub_13B76(g_vpParms, str682E,
+                  mapToScreenX(worldObjects[pathWpA].x_coord) + mapClipX1,
+                  mapToScreenY(worldObjects[pathWpA].y_coord - 2) + mapClipY1);
+    else {
+        sub_13B76(g_vpParms, str6832,
+                  mapToScreenX(worldObjects[pathWpA].x_coord) + mapClipX1,
+                  mapToScreenY(worldObjects[pathWpA].y_coord - 2) + mapClipY1);
+        sub_13B76(g_vpParms, str6834,
+                  mapToScreenX(worldObjects[pathWpD].x_coord) + mapClipX1,
+                  mapToScreenY(worldObjects[pathWpD].y_coord - 2) + mapClipY1);
+    }
+    sub_13B76(g_vpParms, str6836,
+              mapToScreenX(worldObjects[pathWpB].x_coord) + mapClipX1,
+              mapToScreenY(worldObjects[pathWpB].y_coord - 2) + mapClipY1);
+    sub_13B76(g_vpParms, str6838,
+              mapToScreenX(worldObjects[pathWpC].x_coord) + mapClipX1,
+              mapToScreenY(worldObjects[pathWpC].y_coord - 2) + mapClipY1);
 }

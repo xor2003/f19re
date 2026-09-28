@@ -66,7 +66,7 @@ my_ltoa: seg000 NEAR 3e7c-3fb2 R3e7c-3fb2 duplicate
 # Routine my_itoa 0000:3fb3-0000:4088[0000d6] is a potential duplicate of routine my_itoa 0000:3b33-0000:3c0d[0000db], differs by 3 instructions
 my_itoa: seg000 NEAR 3fb3-4088 R3fb3-4088 duplicate
 delayTicks: seg000 NEAR 4089-40a2 R4089-40a2
-sub_140A3: seg000 NEAR 40a3-40ad R40a3-40ad
+seedRng: seg000 NEAR 40a3-40ad R40a3-40ad
 # Routine sub_140AE 0000:40ae-0000:40c6[000019] is a potential duplicate of routine randMul 0000:124b-0000:126f[000025], differs by 8 instructions
 randMul: seg000 NEAR 40ae-40c6 R40ae-40c6 duplicate
 # Routine sub_140C8 0000:40c8-0000:40dd[000016] is a potential duplicate of routine getTimeOfDay 0000:3f24-0000:3f40[00001d], differs by 4 instructions
@@ -231,8 +231,8 @@ saveHallfame: seg000 NEAR a376-a4fa Ra376-a4fa
 # Routine loadHallfame 0000:a4fb-0000:a554[00005a] is a potential duplicate of routine saveHallfame 0000:1c40-0000:1c9d[00005e], differs by 3 instructions
 loadHallfame: seg000 NEAR a4fb-a554 Ra4fb-a554 duplicate
 sub_1A555: seg000 NEAR a555-b8e6 Ra555-b8e6
-sub_1B8E7: seg000 NEAR b8e7-bac1 Rb8e7-bac1
-sub_1BAC2: seg000 NEAR bac2-bc80 Rbac2-bc80
+drawRoutePath: seg000 NEAR b8e7-bac1 Rb8e7-bac1
+drawThreatRings: seg000 NEAR bac2-bc80 Rbac2-bc80
 drawSiteMarkers: seg000 NEAR bc81-bd7d Rbc81-bd7d
 drawUnitMarkers: seg000 NEAR bd7e-be08 Rbd7e-be08
 drawTileMarkers: seg000 NEAR be09-be89 Rbe09-be89
@@ -280,7 +280,7 @@ movedata: seg000 NEAR e218-e235 Re218-e235 duplicate
 time: seg000 NEAR e236-e286 Re236-e286
 # Routine abs 0000:e288-0000:e29d[000016] is a potential duplicate of routine abs 0000:61b4-0000:61c9[000016], differs by 0 instructions
 abs: seg000 NEAR e288-e29d Re288-e29d duplicate
-sub_1E29E: seg000 NEAR e29e-e2af Re29e-e2af
+srand: seg000 NEAR e29e-e2af Re29e-e2af
 # Routine sub_1E2B0 0000:e2b0-0000:e2d5[000026] is a potential duplicate of routine rand 0000:61dc-0000:6201[000026], differs by 0 instructions
 rand: seg000 NEAR e2b0-e2d5 Re2b0-e2d5 duplicate
 # Routine __aNldiv 0000:e2d6-0000:e371[00009c] is a potential duplicate of routine _aNldiv 0000:6210-0000:62ab[00009c], differs by 0 instructions
