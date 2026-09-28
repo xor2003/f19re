@@ -42,7 +42,7 @@ map/<x>_en.map --srcdir src_<x>`):
   setTimerIrqHandler/installCBreakHandler (int21h vectors), clearRect
   (rep stosw), clipAndDrawLine/calibrateTimerSpeed/readJoyAxis (hw asm),
   strcoll/gety/move_ovlcur + all CRT.
-- src_start/ — 144 MATCH:
+- src_start/ — 145 MATCH:
   cleanup.c: cleanup
   drawstr.c: drawStringAt drawStringFar drawStringAtFar
   stalloc.c: allocBuffer freeBuffer
@@ -53,8 +53,8 @@ map/<x>_en.map --srcdir src_<x>`):
     formatGridRef formatTimeStr clampValue missionGenerate runGenerator
   stgrid.c: parseGrid replaceExtension
   stload.c: loadSpriteScaled loadPicRes loadSpriteRes loadResSection
-  stmenu.c(/Os): sub_18F12 sub_1A68C sub_1ACA0 sub_1AE22 sub_1AFA8
-    sub_1B184 sub_1B304 sub_1B452
+  stmenu.c(/Os): sub_18F12 sub_193EE sub_1A68C sub_1ACA0 sub_1AE22
+    sub_1AFA8 sub_1B184 sub_1B304 sub_1B452
   stmap.c(/Ot): mapToScreenX mapToScreenY drawMapLine drawClippedMapLine
     drawMapPoint plotMapPoint sinMul cosMul toggleSelRect drawRiskPanel
     rectInView shiftByMode drawScorePanel drawUnitList
@@ -337,6 +337,18 @@ mzmap (jump-table headers, no call-reachable exports).
 - `f->a = f->b = 0` chained field stores emit `sub ax,ax; mov es:[bx+a],ax;
   mov es:[bx+b],ax` — far-struct field stores keep `es:bx` live and reuse
   the zeroed ax across the chain (no reload). sub_18F12 gameData wipe.
+- A `mov byte [bp-<odd>],K` write into a word local's HIGH byte is a union
+  alias: `union { int16 w; char b[2]; } u` gives `u.b[1]` → the odd byte.
+  Plain `char` locals always take the low byte of their own word slot and
+  byte arrays are word-aligned, so nothing else produces odd offsets.
+  sub_193EE `sel`/`[bp-15h]`.
+- Frames with never-touched slots are just more declared locals — MSC
+  sizes `sub sp` by bucket-assigned slots regardless of use. A dead
+  `char buf[2n]` occupies n consecutive word slots at its name's bucket
+  position, which is the cheap way to cover a big dead span (sub_193EE's
+  29-word frame with only 7 live locals).
+- `(K - v) >> 1` on int16 operands emits `sar`; write `(uint16)(K - v) >> 1`
+  for the ref's `shr` centering arithmetic. sub_193EE row loop.
 
 ## Routines that are asm in the original (do NOT port)
 

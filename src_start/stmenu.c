@@ -4,9 +4,11 @@
  * and the result lands in gameData->theater; byte_2C160 picks the next page. */
 #include "inttype.h"
 
-struct GD { int16 f0;                       /* 0x00 next-page */
+struct GD { uint16 f0;                      /* 0x00 next-page (mul'd index) */
             int8 pad0[0x1E];
-            int16 f20,f22,f24,f26,f28,f2a,f2c,f2e,f30,f32,f34,f36;
+            int16 f20,f22,f24,f26,f28,f2a,f2c,f2e,f30;
+            union { struct { int16 f32, f34; } w; long coord; } u32;
+            int16 f36;
             int16 theater;                  /* 0x38 */
             int16 isCampaignMission;        /* 0x3a */
             int16 flags3c;                  /* 0x3c */
@@ -134,6 +136,35 @@ extern void far ovlCall_bc7(int16 *pg, int16 a, int16 b, int16 c,
                             int16 d, int16 e, int16 f);
 extern uint8 blinkTimer;                    /* dseg:0x0a1c timer-irq counter */
 extern void sub_15152(char *d, const char far *s);  /* far-src strcpy */
+/* sub_193EE (roster screen) externs */
+struct MsnRec {                             /* dseg:0x9d54, stride 0x50 */
+    int16 f0;                               /* record id */
+    char  name[0x1E];                       /* mission name */
+    int16 f20, f22, f24, f26, f28, f2a, f2c, f2e, f30;
+    union { struct { int16 f32, f34; } w; long coord; } u32;
+    int16 f36, f38, f3a, f3c, f3e, f40;
+    int16 f42, f44, f46, f48, f4a, f4c, f4e;
+};
+extern struct MsnRec word_29D54[];          /* roster records */
+extern int16 word_25722[][0x19];            /* per-sel rect/state blocks */
+extern int16 word_256E2, word_256FA;        /* page record indices */
+extern int16 word_256FC, word_2591A, word_298D2;
+extern int16 word_2B38A;                    /* roster-active flag */
+extern int16 far *word_2B942;               /* far ptr → reload request */
+extern uint16 word_29B52;                   /* roster slot index */
+extern char *word_2591C[];                  /* theater field table */
+extern char *word_2592A[];                  /* mission-kind field table */
+extern uint8 byte_212BA, byte_2D06B, byte_298F6;
+extern int8  sprParmsTab[];                 /* sprite-params pool (page base) */
+extern void sub_1A4FB(void), sub_1A376(void), sub_10882(void);
+extern void sub_15189(char *d, char *s);
+extern void sub_13D15(int16 *pg, char *s, int16 a, int16 b, int16 c,
+                      int16 d);
+extern void sub_13E7C(long v, char *buf);
+extern void sub_13FB3(int16 n, char *b);    /* seg000:0x3fb3 numToStr */
+extern void sub_146E3(void), sub_1DCAC(int16);
+extern char *pilotNameInput(int16 *page, int16 x, int16 y, int16 maxLen,
+                            int16 a5, int16 a6);
 extern void loadSpriteRes(char *n, int16 sel);
 extern int16 randMul(uint16 n);
 extern void selectNextObject(void);
@@ -223,7 +254,7 @@ void sub_18F12(void) {
     }
     sub_15120((char *)0xB96A, (char *)0x4F49);
     len = sub_13E38(word_24FFC, (char *)0xB96A);
-    sub_13B76(word_24FFC, (char *)0xB96A, (uint16)(0x140 - len) >> 1, 0x15);
+    sub_13B76(word_24FFC, (char *)0xB96A, (uint16)(uint16)(0x140 - len) >> 1, 0x15);
     sub_13B76(word_25014, (char *)0x4F66, 0x46, 0xC1);
     ovlCall_c8a();
     ovlCall_c4e(1);
@@ -280,7 +311,7 @@ NEXT:
     gameData->f2c = 0;
     gameData->f2e = 0;
     gameData->f30 = 0;
-    gameData->f32 = gameData->f34 = 0;
+    gameData->u32.w.f32 = gameData->u32.w.f34 = 0;
     gameData->f36 = 0;
     gameData->theater = 0;
     gameData->isCampaignMission = 0;
@@ -308,6 +339,323 @@ NEXT:
         }
     } while (t2 < 8);
     sub_14EDA();
+}
+
+/* seg000:0x93ee — mission roster screen: if a reload is flagged, copy
+ * missionList[word_29B52] into gameData (else write gameData back into the
+ * record), load the word_2C7D4 resources, draw the 10-row roster (name /
+ * coord / status / kind columns), then loop the select widget: sel<=9
+ * switches on missionList[sel].f4e for the info panels, sel>9 creates a
+ * new record via pilotNameInput, and case 0 / guard bytes leave the loop
+ * and copy the final record into gameData. */
+void sub_193EE(void) {
+    char  *nameResult;              /* [bp-2]  */
+    int16  a, b, c;                 /* [bp-4/6/8] unused */
+    int16  v;                       /* [bp-0a] */
+    int16  h;                       /* [bp-0e] unused */
+    int16  looping;                 /* [bp-0c] */
+    int16  y;                       /* [bp-12] */
+    int16  i;                       /* [bp-10] */
+    int16  j;                       /* [bp-14] unused */
+    union { int16 sel; char sb[2]; } selw;  /* [bp-16] */
+    char   obuf[34];                /* [bp-18..-38] unused */
+    int16  len;                     /* [bp-3a] */
+
+    sub_1A4FB();
+    if (gameData->f0 == 0xA)
+        *word_2B942 = 1;
+    if (*word_2B942 == 1) {
+        gameData->f0 = word_29D54[word_29B52].f0;
+        sub_1513B((char far *)gameData + 2, word_29D54[word_29B52].name);
+        gameData->f20 = word_29D54[word_29B52].f20;
+        gameData->f22 = word_29D54[word_29B52].f22;
+        gameData->f24 = word_29D54[word_29B52].f24;
+        gameData->f26 = word_29D54[word_29B52].f26;
+        gameData->f28 = word_29D54[word_29B52].f28;
+        gameData->f2a = word_29D54[word_29B52].f2a;
+        gameData->f2c = word_29D54[word_29B52].f2c;
+        gameData->f2e = word_29D54[word_29B52].f2e;
+        gameData->f30 = word_29D54[word_29B52].f30;
+        gameData->u32.coord = word_29D54[word_29B52].u32.coord;
+        gameData->f36 = word_29D54[word_29B52].f36;
+        gameData->theater = word_29D54[word_29B52].f38;
+        gameData->isCampaignMission = word_29D54[word_29B52].f3a;
+        gameData->flags3c = word_29D54[word_29B52].f3c;
+        gameData->flags3e = word_29D54[word_29B52].f3e;
+        gameData->flags40 = word_29D54[word_29B52].f40;
+        gameData->f42 = word_29D54[word_29B52].f42;
+        gameData->f44 = word_29D54[word_29B52].f44;
+        gameData->f46 = word_29D54[word_29B52].f46;
+        gameData->f48 = word_29D54[word_29B52].f48;
+        gameData->f4a = word_29D54[word_29B52].f4a;
+        gameData->f4c = word_29D54[word_29B52].f4c;
+        gameData->f4e = word_29D54[word_29B52].f4e;
+        *word_2B942 = 0;
+    } else {
+        word_29D54[gameData->f0].f0 = gameData->f0;
+        sub_15152(word_29D54[gameData->f0].name, (char far *)gameData + 2);
+        word_29D54[gameData->f0].f20 = gameData->f20;
+        word_29D54[gameData->f0].f22 = gameData->f22;
+        word_29D54[gameData->f0].f24 = gameData->f24;
+        word_29D54[gameData->f0].f26 = gameData->f26;
+        word_29D54[gameData->f0].f28 = gameData->f28;
+        word_29D54[gameData->f0].f2a = gameData->f2a;
+        word_29D54[gameData->f0].f2c = gameData->f2c;
+        word_29D54[gameData->f0].f2e = gameData->f2e;
+        word_29D54[gameData->f0].f30 = gameData->f30;
+        word_29D54[gameData->f0].u32.coord = gameData->u32.coord;
+        word_29D54[gameData->f0].f36 = gameData->f36;
+        word_29D54[gameData->f0].f38 = gameData->theater;
+        word_29D54[gameData->f0].f3a = gameData->isCampaignMission;
+        word_29D54[gameData->f0].f3c = gameData->flags3c;
+        word_29D54[gameData->f0].f3e = gameData->flags3e;
+        word_29D54[gameData->f0].f40 = gameData->flags40;
+        word_29D54[gameData->f0].f42 = gameData->f42;
+        word_29D54[gameData->f0].f44 = gameData->f44;
+        word_29D54[gameData->f0].f46 = gameData->f46;
+        word_29D54[gameData->f0].f48 = gameData->f48;
+        word_29D54[gameData->f0].f4a = gameData->f4a;
+        word_29D54[gameData->f0].f4c = gameData->f4c;
+        word_29D54[gameData->f0].f4e = gameData->f4e;
+    }
+    if (byte_29B50 == 1) {
+        sub_14622(word_256E2, 0x2D, 0x15, 0x113, 0xC7);
+        ovlCall_c8a();
+        ovlCall_c4e(0);
+        switch (word_2C7D4) {
+        case 0:
+            gfx_unknown2b(1);
+            loadSpriteRes((char *)0x54C8, word_2D26E);
+            v = word_2D26E;
+            break;
+        case 1:
+            v = word_2D272;
+            if (byte_298F6 == 0) {
+                gfx_unknown2b(0xF);
+                loadSpriteRes((char *)0x54D3, word_2D272);
+                byte_298F6 = 1;
+            }
+            break;
+        case 2:
+            v = word_2D272;
+            break;
+        }
+    } else {
+        switch (word_2C7D4) {
+        case 0:
+            gfx_unknown2b(0);
+            sub_14746((char *)0x54DE, word_2C972, word_2C974);
+            sub_14BEE(word_2D064, word_2D06C);
+            gfx_unknown2b(1);
+            loadSpriteRes((char *)0x54E9, word_2D26E);
+            v = word_2D26E;
+            ovlCall_c53();
+            ovlCall_bea(word_2D06C);
+            ovlCall_c4e(0);
+            break;
+        case 1:
+            v = word_2D272;
+            if (byte_2D06A == 0) {
+                gfx_unknown2b(0);
+                sub_14746((char *)0x54F4, word_2C972, word_2C974);
+                sub_14BEE(word_2D064, word_2D06C);
+                byte_2D06A = 1;
+            }
+            if (byte_298F6 == 0) {
+                gfx_unknown2b(0xF);
+                loadSpriteRes((char *)0x54FF, word_2D272);
+                byte_298F6 = 1;
+            }
+            ovlCall_c53();
+            ovlCall_bea(word_2D06C);
+            ovlCall_c4e(0);
+            break;
+        case 2:
+            gfx_unknown2b(0);
+            sub_14746((char *)0x550A, word_2C972, word_2C974);
+            sub_14BEE(word_2D064, word_2D06C);
+            v = word_2D272;
+            ovlCall_c53();
+            ovlCall_bea(word_2D06C);
+            ovlCall_c4e(0);
+            break;
+        }
+    }
+    sub_1A376();
+    word_256FC = v;
+    *(int16 *)(sprParmsTab + word_256E2 + 4) = 0;
+    *(int16 *)(sprParmsTab + word_256E2 + 0xC) = 4;
+    sub_13B76(word_256E2, (char *)0x5515, 0xB1, 0x50);
+    sub_13B76(word_256E2, (char *)0x551C, 0xB6, 0x58);
+    *(int16 *)(sprParmsTab + word_256E2 + 4) = 6;
+    y = 0x60;
+    for (i = 0; i < 0xA; i++) {
+        sub_15120((char *)0xB96A, word_2591C[word_29D54[i].f20]);
+        sub_15189((char *)0xB96A, word_29D54[i].name);
+        sub_13B76(word_256E2, (char *)0xB96A, 0x23, y);
+        sub_13E7C(word_29D54[i].u32.coord, (char *)0xB96A);
+        sub_13B76(word_256E2, (char *)0xB96A, 0xB4, y);
+        sub_13FB3(word_29D54[i].f36, (char *)0xB96A);
+        sub_13B76(word_256E2, (char *)0xB96A, 0xE0, y);
+        sub_15120((char *)0xB96A, word_2592A[word_29D54[i].f4e]);
+        len = sub_13E38(word_256E2, (char *)0xB96A);
+        sub_13B76(word_256E2, (char *)0xB96A, ((uint16)(0x23 - len) >> 1) + 0xF5, y);
+        y += 8;
+    }
+    *(int16 *)(sprParmsTab + word_256E2 + 0xC) = 1;
+    *(int16 *)(sprParmsTab + word_256E2 + 4) = 0;
+    sub_15120((char *)0xB96A, (char *)0x5533);
+    len = sub_13E38(word_256E2, (char *)0xB96A);
+    sub_13B76(word_256E2, (char *)0xB96A, 0x23, 0x54);
+    sub_108B7();
+    sub_14E9C();
+    word_25722[gameData->f0][0x13] = 2;
+    selw.sel = gameData->f0;
+    looping = 1;
+    word_2B38A = 1;
+    while (looping) {
+        *(int16 *)(sprParmsTab + word_256FA + 0xC) = 4;
+        *(int16 *)(sprParmsTab + word_256FA + 4) = 9;
+        sub_15120((char *)0xB96A, (char *)0x5543);
+        len = sub_13E38(word_256FA, (char *)0xB96A);
+        sub_13B76(word_256FA, (char *)0xB96A, (uint16)(0x140 - len) >> 1, 0xB5);
+        sub_15120((char *)0xB96A, (char *)0x5576);
+        *(int16 *)(sprParmsTab + word_256FA + 0xC) = 3;
+        *(int16 *)(sprParmsTab + word_256FA + 4) = 1;
+        len = sub_13E38(word_256FA, (char *)0xB96A);
+        sub_13B76(word_256FA, (char *)0xB96A, (uint16)(0x140 - len) >> 1, 0xBE);
+        sub_10924((char *)0x571A, word_298D2, 0xA, 0x64,
+                  (selw.sel << 3) + 0x60, word_256E2);
+        selw.sel = sub_10AE8((char *)0x571A, word_298D2, 0xA, word_2591A,
+                        word_256E2);
+        if (byte_212BA == 0 && byte_2D06B == 0) {
+            if (selw.sel <= 9) {
+                switch (word_29D54[selw.sel].f4e) {
+                case 0:
+                    looping = 0;
+                    break;
+                case 1:
+                    sub_14622(word_256FA, 0x2C, 0x1A, 0x113, 0x4F);
+                    sub_15120((char *)0xB96A, (char *)0x55A6);
+                    sub_15189((char *)0xB96A, (char *)0x55D4);
+                    sub_13D15(word_256FA, (char *)0xB96A, 0xCE, 0x41,
+                              0x28, 8);
+                    word_25722[selw.sel][0x13] = 2;
+                    blinkTimer = 0;
+                    while (blinkTimer < 0xC8) ;
+                    sub_14622(word_256FA, 0x2C, 0x1A, 0x113, 0x4F);
+                    break;
+                case 2:
+                    sub_14622(word_256FA, 0x2C, 0x1A, 0x113, 0x4F);
+                    sub_15120((char *)0xB96A, (char *)0x55EA);
+                    sub_15189((char *)0xB96A, (char *)0x5618);
+                    sub_15189((char *)0xB96A, (char *)0x564E);
+                    sub_13D15(word_256FA, (char *)0xB96A, 0xD4, 0x3E,
+                              0x28, 8);
+                    word_25722[selw.sel][0x13] = 2;
+                    blinkTimer = 0;
+                    while (blinkTimer < 0xF0) ;
+                    sub_14622(word_256FA, 0x2C, 0x1A, 0x113, 0x4F);
+                    break;
+                }
+            } else {
+                selw.sb[1] = 0;
+                sub_14622(word_256FA, 0x2D, 0x1A, 0x113, 0x45);
+                sub_14622(word_256FA, 0x14, 0xB5, 0x122, 0xC7);
+                sub_15120((char *)0xB96A, (char *)0x5677);
+                sub_15189((char *)0xB96A, (char *)0x56A8);
+                sub_13D15(word_256FA, (char *)0xB96A, 0xCE, 0x41,
+                          0x28, 8);
+                sub_15120((char *)0xB96A, (char *)0x56C2);
+                sub_13B76(word_256E2, (char *)0xB96A, 0x41, 0x3C);
+                *(int16 *)(sprParmsTab + word_256FA + 0xC) = 4;
+                nameResult = pilotNameInput((int16 *)word_256E2,
+                    *(int16 *)(sprParmsTab + word_256E2 + 8),
+                    0x3C, 0x1D, 8, 8);
+                *(int16 *)(sprParmsTab + word_256FA + 0xC) = 3;
+                if (*nameResult != 0) {
+                    word_29D54[selw.sel].f0 = selw.sel;
+                    sub_15120(word_29D54[selw.sel].name, nameResult);
+                    word_29D54[selw.sel].f20 = 0;
+                    word_29D54[selw.sel].f22 = 0;
+                    word_29D54[selw.sel].f24 = 0;
+                    word_29D54[selw.sel].f26 = 0;
+                    word_29D54[selw.sel].f28 = 0;
+                    word_29D54[selw.sel].f2a = 0;
+                    word_29D54[selw.sel].f2c = 0;
+                    word_29D54[selw.sel].f2e = 0;
+                    word_29D54[selw.sel].f30 = 0;
+                    word_29D54[selw.sel].f38 = word_29D54[selw.sel].f36 =
+                        word_29D54[selw.sel].u32.w.f32 = word_29D54[selw.sel].u32.w.f34 = 0;
+                    word_29D54[selw.sel].f3a = 2;
+                    word_29D54[selw.sel].f3c = 3;
+                    word_29D54[selw.sel].f40 = word_29D54[selw.sel].f3e = 0;
+                    word_29D54[selw.sel].f42 = 4;
+                    word_29D54[selw.sel].f4e = word_29D54[selw.sel].f4c =
+                        word_29D54[selw.sel].f4a = word_29D54[selw.sel].f48 =
+                        word_29D54[selw.sel].f46 = word_29D54[selw.sel].f44 = 0;
+                }
+                word_25722[selw.sel][0x13] = 2;
+                sub_14622(word_256FA, 0x2D, 0x1A, 0x113, 0x45);
+                *(int16 *)(sprParmsTab + word_256E2 + 0xC) = 4;
+                *(int16 *)(sprParmsTab + word_256E2 + 4) = 6;
+                sub_14622(word_256E2, word_25722[selw.sel][0],
+                          word_25722[selw.sel][1], word_25722[selw.sel][2],
+                          word_25722[selw.sel][3]);
+                sub_15120((char *)0xB96A, word_2591C[word_29D54[selw.sel].f20]);
+                sub_15189((char *)0xB96A, word_29D54[selw.sel].name);
+                sub_13B76(word_256E2, (char *)0xB96A, 0x23,
+                          (selw.sel << 3) + 0x60);
+                sub_13E7C(word_29D54[selw.sel].u32.coord, (char *)0xB96A);
+                sub_13B76(word_256E2, (char *)0xB96A, 0xB4,
+                          (selw.sel << 3) + 0x60);
+                sub_13FB3(word_29D54[selw.sel].f36, (char *)0xB96A);
+                sub_13B76(word_256E2, (char *)0xB96A, 0xE0,
+                          (selw.sel << 3) + 0x60);
+                sub_15120((char *)0xB96A, word_2592A[word_29D54[selw.sel].f4e]);
+                len = sub_13E38(word_256E2, (char *)0xB96A);
+                sub_13B76(word_256E2, (char *)0xB96A,
+                          ((uint16)(0x23 - len) >> 1) + 0xF5, (selw.sel << 3) + 0x60);
+                *(int16 *)(sprParmsTab + word_256E2 + 0xC) = 1;
+            }
+        } else
+            looping = 0;
+    }
+    sub_14EDA();
+    gameData->f0 = word_29D54[selw.sel].f0;
+    sub_1513B((char far *)gameData + 2, word_29D54[selw.sel].name);
+    gameData->f20 = word_29D54[selw.sel].f20;
+    gameData->f22 = word_29D54[selw.sel].f22;
+    gameData->f24 = word_29D54[selw.sel].f24;
+    gameData->f26 = word_29D54[selw.sel].f26;
+    gameData->f28 = word_29D54[selw.sel].f28;
+    gameData->f2a = word_29D54[selw.sel].f2a;
+    gameData->f2c = word_29D54[selw.sel].f2c;
+    gameData->f2e = word_29D54[selw.sel].f2e;
+    gameData->f30 = word_29D54[selw.sel].f30;
+    gameData->u32.coord = word_29D54[selw.sel].u32.coord;
+    gameData->f36 = word_29D54[selw.sel].f36;
+    gameData->theater = word_29D54[selw.sel].f38;
+    gameData->isCampaignMission = word_29D54[selw.sel].f3a;
+    gameData->flags3c = word_29D54[selw.sel].f3c;
+    gameData->flags3e = word_29D54[selw.sel].f3e;
+    gameData->flags40 = word_29D54[selw.sel].f40;
+    gameData->f42 = word_29D54[selw.sel].f42;
+    gameData->f44 = word_29D54[selw.sel].f44;
+    gameData->f46 = word_29D54[selw.sel].f46;
+    gameData->f48 = word_29D54[selw.sel].f48;
+    gameData->f4a = word_29D54[selw.sel].f4a;
+    gameData->f4c = word_29D54[selw.sel].f4c;
+    gameData->f4e = word_29D54[selw.sel].f4e;
+    byte_29B50 = 0;
+    word_2B38A = 0;
+    byte_2C160 = 0xF;
+    if (byte_2D06B == 1) {
+        sub_10882();
+        if (byte_212BA != 0)
+            sub_146E3();
+        sub_1DCAC(0);
+    }
 }
 
 /* seg000:0xa68c — main select screen: word_2C7D4 resource block, five
