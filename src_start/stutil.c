@@ -419,3 +419,33 @@ test:
     if (i <= a2)
         goto body;
 }
+
+/* seg000:0x47e8 — thin CDECL wrapper over the int21h raw-read routine
+ * (seg000:0x48fe: bx=handle, cx=count, dx=buf). */
+extern int16 sub_148FE(int16 handle, int16 count, int16 buf);
+
+int16 dosRead(int16 handle, int16 count, int16 buf) {
+    return sub_148FE(handle, count, buf);
+}
+
+/* seg000:0x5b02 — advances the scratch-buffer cursor word_22322 by n after
+ * handing (pos, n) to sub_15B22; returns the pre-advance position. */
+extern int16 sub_15B22(int16 pos, int16 n);
+extern int16 word_22322;
+
+int16 advanceBufPos(int16 n) {
+    sub_15B22(word_22322, n);
+    word_22322 += n;
+    return word_22322 - n;
+}
+
+/* seg000:0x61cc — stores the view origin then redraws via sub_15B68. */
+extern int16 sub_15B68(int16 flag);
+
+int16 setViewOrigin(int16 a, int16 b, int16 flag) {
+    viewOriginX = b;
+    viewOriginY = a;
+    if (sub_15B68(flag) != 0)
+        return 1;
+    return 0;
+}
