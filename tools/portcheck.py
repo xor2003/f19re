@@ -69,6 +69,8 @@ MODULE_FLAGS = {
     # stgrid parseGrid/replaceExtension need /Os (stray relax-pad nop under /Ot);
     # lookupGridCell needed /Ot and lives in stterr.c (default flags).
     'start/stgrid.c':  ['/AS', '/Gs', '/Os'],
+    # EN stmenu: /Os drops the loop-top pad nop (sub_1ACA0 row loop).
+    'start/stmenu.c':  ['/AS', '/Gs', '/Os'],
     'start/stgen.c':   ['/AS', '/Gs', '/Ot'],
     # EN stload: no /Gs — loadResSection prologue is `mov ax,2; call __chkstk`
     'start/stload.c':  ['/AS', '/Od'],

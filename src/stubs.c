@@ -623,6 +623,71 @@ struct LinkPair linkTab[0x20];               /* dseg:0x447e */
 int16 *page1Num;                             /* dseg:0x56fa */
 int16 blinkColors[6];                        /* dseg:0x5930 */
 uint8 blinkTimer;                            /* dseg:0x0a1c */
+/* stmenu.c menu-screen globals */
+struct MenuRow { int16 name, yoff; };
+struct MenuRow *word_2B386;                  /* menu row-table near ptr */
+uint8 far **word_2CA46;                      /* ptr→far menu string table */
+int16 word_2CA48;                            /* second table selector */
+uint8 far *word_207EA;                       /* far ptr→item count byte */
+int16 *word_25F7C, *word_25D30, *word_25D48; /* page record handles */
+int16 word_2D26E;                            /* sel-init broadcast value */
+int16 selInitTab[10 * 15];                   /* dseg:0x25d4a, stride 30 */
+struct MenuSelBlk { int16 sel; int16 pad[24]; };
+struct MenuSelBlk menuSelTab[6];             /* dseg:0x25ea4, stride 0x32 */
+struct MenuSelBlk menuSelTab2[6];            /* dseg:0x25fdc, stride 0x32 */
+uint8 byte_2C160;                            /* next-screen selector */
+struct MenuRow *word_2D276;                  /* second row-table near ptr */
+int16 word_2C7D2;                            /* row-draw y cursor */
+uint8 far *word_20822;                       /* far ptr→item count byte */
+int16 *word_26050, *word_25F94, *word_25FAC; /* page record handles */
+struct MenuSelBlk menuSelTab3[6];            /* dseg:0x26202, stride 0x32 */
+int16 word_2D272;                            /* initTab2 broadcast value */
+int16 initTab2[10 * 16];                     /* dseg:0x26094, stride 0x20 */
+uint8 byte_2D060;                            /* briefing-block active flag */
+int16 word_2D06C, word_2D2CA, word_2D2CC;    /* briefing string/rect args */
+uint8 far *word_20862;                       /* far ptr→item count byte */
+int16 *word_262A8, *word_2607A, *word_26092; /* page record handles */
+struct MenuSelBlk menuSelTab4[6];            /* dseg:0x26308, stride 0x32 */
+uint8 far *word_20896;                       /* far ptr→item count byte */
+int16 *word_263AE, *word_262C0, *word_262D8; /* page record handles */
+struct MenuSelBlk menuSelTab5[6];            /* dseg:0x2640c, stride 0x32 */
+uint8 far *word_208BA;                       /* far ptr→item count byte */
+int16 *word_26480, *word_263C6;              /* page record handles */
+int16 word_2A0C4;                            /* rtc-bail arg */
+void  sub_13B50(int16 *p, struct MenuRow r, int16 c, int16 d) { }
+void  sub_10924(char *s, int16 t, int16 n, int16 a, int16 b, int16 *p, int16 f) { }
+int16 sub_10AE8(char *s, int16 t, int16 n, int16 *sp, int16 *p, int16 f) { return 0; }
+void  sub_125EA(void) { }
+void  sub_14584(void *o, int16 a, int16 b, int16 c, int16 d) { }
+void  sub_14A5F(char *s, int16 v) { }
+void  sub_14746(char *s, int16 a, int16 b) { }
+void  sub_1685C(int16 v) { }
+int16 far gfx_unknown2b(int16 v) { return v; }   /* overlay slot 0x2b */
+/* stmenu.c sub_1B452 (mission-setup screen) globals + overlay slots */
+int16 word_2BE4A;                            /* scratch index */
+char  far *word_209B6[4];                    /* theater name far-ptr table */
+int8  byte_2B388;                            /* last theater */
+uint8 byte_298F0, byte_2CA62, byte_2CA6A;    /* mode flags */
+int16 word_2C7D4;                            /* mission kind selector */
+int16 word_2D2C8;                            /* second sel-init value */
+int16 *word_26572, *word_2655A;              /* page record handles */
+int16 word_26574[10 * 16];                   /* dseg:0x6574, stride 0x20 */
+int16 word_26592, word_265B2;                /* 0b4f-handler args */
+int16 word_265B6, word_265D6;                /* row x coords */
+int16 word_26676, word_26696;
+int16 *word_2681E;                           /* selp arg */
+char  *word_26820[8];                        /* list-label string table */
+struct MenuSelBlk menuSelTab6[7];            /* dseg:0x66e2, stride 0x32 */
+int16 word_2CA6C;                            /* mode-out code */
+int16 word_2B948, word_2B95A;                /* excluded object indices */
+uint8 byte_2C976, byte_2C977;                /* marks-present flag, toggle */
+struct PgParms { int8 pad[0x72]; int16 f72; };
+struct PgParms far *word_2D066;              /* far page parm record */
+void  far ovlCall_b4f(int16 h) { }           /* overlay 1000:0b4f */
+int16 far ovlCall_c53(void) { return 0; }    /* overlay 1000:0c53 */
+void  far ovlCall_c58(void) { }              /* overlay 1000:0c58 */
+void  far ovlCall_c8a(void) { }              /* overlay 1000:0c8a */
+int16 far ovlCall_ccb(int16 v) { return v; } /* overlay 1000:0ccb poll */
 #endif
 void  dos_printstring(const char *s) { }
 uint16 dos_alloc(uint16 size) { return 0; }

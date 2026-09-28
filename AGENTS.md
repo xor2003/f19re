@@ -42,7 +42,7 @@ map/<x>_en.map --srcdir src_<x>`):
   setTimerIrqHandler/installCBreakHandler (int21h vectors), clearRect
   (rep stosw), clipAndDrawLine/calibrateTimerSpeed/readJoyAxis (hw asm),
   strcoll/gety/move_ovlcur + all CRT.
-- src_start/ — 136 MATCH:
+- src_start/ — 142 MATCH:
   cleanup.c: cleanup
   drawstr.c: drawStringAt drawStringFar drawStringAtFar
   stalloc.c: allocBuffer freeBuffer
@@ -53,6 +53,8 @@ map/<x>_en.map --srcdir src_<x>`):
     formatGridRef formatTimeStr clampValue missionGenerate runGenerator
   stgrid.c: parseGrid replaceExtension
   stload.c: loadSpriteScaled loadPicRes loadSpriteRes loadResSection
+  stmenu.c(/Os): sub_1ACA0 sub_1AE22 sub_1AFA8 sub_1B184 sub_1B304
+    sub_1B452
   stmap.c(/Ot): mapToScreenX mapToScreenY drawMapLine drawClippedMapLine
     drawMapPoint plotMapPoint sinMul cosMul toggleSelRect drawRiskPanel
     rectInView shiftByMode drawScorePanel drawUnitList
@@ -294,6 +296,25 @@ mzmap (jump-table headers, no call-reachable exports).
   occupies -0x54..-0x05 with buf[0] at -0x54 (just below scalars at -2/-4),
   and later scalars (cursor,len) continue descending to -0x56/-0x58.
   Undersizing the array shifts them all up. pilotNameInput.
+- A scalar `char` local still eats a full word slot; a `char[2]` array packs
+  both bytes into ONE word slot. Dead byte-pair inits (`mov byte [bp-x],K`)
+  emit in DECLARATION order, independent of the bucket-assigned slot order —
+  pick names whose buckets reproduce the slot layout, then order the decls
+  to reproduce the init stream. sub_1B452.
+- `case K1: case K2:` sharing one body gets RANGE-folded by MSC
+  (`cmp/jl/jle/jg` chains). Writing the identical body per case lets dedup
+  coalesce them instead, emitting individual `cmp ax,K; jz` tests — and when
+  the shared arm is out of `jz` reach, MSC relaxes to `jnz skip; jmp arm`,
+  which is what the original shows. sub_1B452 (twice).
+- `if (a[i].f1 != 0 && (a[i].f2 & M) == 0)` as ONE `&&` condition keeps
+  `i*stride` CSE'd in `si` across both field reads; as two separate
+  `if`s MSC recomputes the index in `bx` per test. sub_1B452 object scan.
+- A 4-byte struct passed BY VALUE emits `push [bx+si+2]; push [bx+si]` —
+  the ONLY idiom that splits table base (`si`) and scaled index (`bx`)
+  into the two-reg EA; every scalar/pointer spelling folds to `[reg+disp]`.
+  Declare `func(struct Row r)` and call `func(tab[i])`. sub_1ACA0 row loop.
+- Jump-table operand bytes sit inside the routine extent: mark them `U`
+  in the map (`R..x U tab R..`) or mzdiff disassembles the table as code.
 
 ## Routines that are asm in the original (do NOT port)
 
