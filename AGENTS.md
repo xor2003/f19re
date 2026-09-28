@@ -42,7 +42,7 @@ map/<x>_en.map --srcdir src_<x>`):
   setTimerIrqHandler/installCBreakHandler (int21h vectors), clearRect
   (rep stosw), clipAndDrawLine/calibrateTimerSpeed/readJoyAxis (hw asm),
   strcoll/gety/move_ovlcur + all CRT.
-- src_start/ — 135 MATCH:
+- src_start/ — 136 MATCH:
   cleanup.c: cleanup
   drawstr.c: drawStringAt drawStringFar drawStringAtFar
   stalloc.c: allocBuffer freeBuffer
@@ -57,7 +57,7 @@ map/<x>_en.map --srcdir src_<x>`):
     drawMapPoint plotMapPoint sinMul cosMul toggleSelRect drawRiskPanel
     rectInView shiftByMode drawScorePanel drawUnitList
   stparse.c: parseGridTerrain parseTerrain
-  stpinp.c: saveHallfame loadHallfame
+  stpinp.c: saveHallfame loadHallfame pilotNameInput
   stterr.c: lookupGridCell
   stutil.c(/Os): randMul mystrcpy getTimeOfDay drawStringCentered
     showMsgWaitKey itemDistance getItemCoordStr readInputKey initGraphics
@@ -281,6 +281,19 @@ mzmap (jump-table headers, no call-reachable exports).
   `missionMidX[4..7]` writes land on the NEXT dseg global (mzdiff reports
   "data offset mapping collides"). Size stub arrays to the full indexed
   range seen in the ref (here `missionMidX[8]`).
+- Switch cmp-chains emit case TESTS sorted by value ascending (8,0x18,0x1b)
+  regardless of declaration order, but case ARMS emit in declaration order.
+  To get ref's "test 8 first / arm 8 deferred last" layout, declare the
+  clear cases first: `case 0x18: case 0x1b: ...; case 8: ...; default: ...`.
+  pilotNameInput.
+- `x = ++x % K` (pre-inc fused into the modulo expr) emits
+  `inc [x]; mov ax,[x]; cwd; mov cx,K; idiv cx` — dividend loads BEFORE the
+  divisor. `x++; x %= 6` or `x = x % 6` emit `mov cx,K` first.
+  pilotNameInput blink counter.
+- Char-buffer locals descend from the named-scalar area: `buf[0x50]`
+  occupies -0x54..-0x05 with buf[0] at -0x54 (just below scalars at -2/-4),
+  and later scalars (cursor,len) continue descending to -0x56/-0x58.
+  Undersizing the array shifts them all up. pilotNameInput.
 
 ## Routines that are asm in the original (do NOT port)
 

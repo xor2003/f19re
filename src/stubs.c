@@ -579,6 +579,7 @@ int16 far gfx_blitToCurrent(int16 p) { return 0; }
 int16 flag_29948;
 void  far gfx_blitSprite(int16 spr) { }
 void  sub_14622(void *o, int16 a, int16 b, int16 c, int16 d) { }
+int16 sub_13E38(int16 *p, char *s) { return 0; }   /* seg000:0x3e38 stringWidth dup */
 /* stutil.c drawRiskPanel deps */
 void *unitRec;
 uint16 esTabBase;
@@ -618,6 +619,10 @@ struct SiteParm { int16 theaterMask, campMask, kind, reqType, flags, extra; };
 struct SiteParm siteParms[0x38];             /* dseg:0x4b0c */
 struct LinkPair { int16 nextA, nextB; };
 struct LinkPair linkTab[0x20];               /* dseg:0x447e */
+/* pilotNameInput (stpinp.c) globals */
+int16 *page1Num;                             /* dseg:0x56fa */
+int16 blinkColors[6];                        /* dseg:0x5930 */
+uint8 blinkTimer;                            /* dseg:0x0a1c */
 #endif
 void  dos_printstring(const char *s) { }
 uint16 dos_alloc(uint16 size) { return 0; }

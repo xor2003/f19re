@@ -79,3 +79,70 @@ void loadHallfame() {
     }
     fclose(file);
 }
+
+/* seg000:0xa555 — pilot-name entry on the roster screen. Text input into a
+ * local buffer with a blinking cursor; returns a near ptr to the buf (the
+ * caller copies it before the frame is reused). f15 pilotNameInput lineage. */
+extern void far misc_jump_5e_clearKeyFlags(void);
+extern int16 *page1Num;                     /* dseg:0x56fa */
+extern int16 blinkColors[6];                /* dseg:0x5930 */
+extern uint8 blinkTimer;                    /* dseg:0x0a1c timer-irq counter */
+extern void sub_14622(void *o, int16 x0, int16 y0, int16 x1, int16 y1);
+extern int16 sub_13E38(int16 *page, char *s); /* seg000:0x3e38 stringWidth */
+
+char *pilotNameInput(int16 *page, int16 x, int16 y, int16 maxLen,
+                     int16 unused, int16 h) {
+    uint8 keyCode;
+    int16 blinkIdx;
+    char  buf[0x50];
+    int16 cursor;
+    int16 len;
+
+    misc_jump_5e_clearKeyFlags();
+    keyCode = 0x18;
+    while (keyCode != 0x1b) {
+        switch (keyCode) {
+        case 0x18:
+        case 0x1b:
+            len = 0;
+            buf[0] = 0;
+            sub_14622(page, x, y, x + 0xa8, y + h);
+            drawStringAt(page, buf, x, y);
+            cursor = page[4];
+            break;
+        case 8:
+            if (len > 0) {
+                len--;
+                buf[len] = 0;
+                sub_14622(page, x, y, x + 0xa8, y + h);
+                drawStringAt(page, buf, x, y);
+                cursor = page[4];
+            }
+            break;
+        default:
+            if (keyCode >= 0x20 && keyCode <= 0x7f && len < maxLen &&
+                sub_13E38(page1Num, buf) <= 0x67) {
+                buf[len++] = keyCode;
+                buf[len] = 0;
+                sub_14622(page, x, y, x + 0xa8, y + h);
+                drawStringAt(page, buf, x, y);
+                cursor = page[4];
+            }
+            break;
+        }
+        blinkIdx = 0;
+        while (misc_jump_5a_keybuf() != 0) {
+            if (blinkTimer > 6) {
+                blinkTimer = 0;
+                page[2] = blinkColors[blinkIdx];
+                drawStringAt(page, "_", cursor, y);
+                blinkIdx = ++blinkIdx % 6;
+            }
+        }
+        page[2] = blinkColors[0];
+        drawStringAt(page, " ", cursor, y);
+        keyCode = misc_jump_5b_getkey();
+        if (keyCode == 0xd) break;
+    }
+    return buf;
+}
