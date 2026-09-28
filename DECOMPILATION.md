@@ -1019,3 +1019,23 @@ python3 tools/drv2idc.py /home/xor/games/f19/F19/MGRAPHIC.EXE \
   /home/xor/games/f19/F19/MGRAPHIC.EXE --work-dir /tmp/ada_mg \
   -s conf/mgraphic.idc --full --xrefs    # writes MGRAPHIC.lst/.asm/.map
 ```
+
+## 9. English START.EXE binary patches (`sub_18F12`)
+
+The shipped English START.EXE was patched after link — the patch is visible
+by comparing with the Russian build, which still carries the unpatched code:
+
+- seg000:0x918E — `call sub_10AE8` (menu-select widget, second call site)
+  was replaced by `nop nop nop`. The orphaned `push ax` in front of it and
+  the trailing `add sp,0xA` remain, so `ax` (still holding literal 0x5036)
+  lands in `res` (`[bp-14h]`) — the widget never runs.
+- seg000:0x91B9 — the guarded dispatch `mov ax,[choice]; cmp ax,[res];
+  jz ACCEPT` became `mov [res],ax; jmp short ACCEPT` (+dead `jmp NEXT`),
+  forcing the accept arm: `res = choice` is always taken.
+
+Both patches are equal-size byte swaps, so no MSC source produces them.
+The C port (`src_start/stmenu.c`) carries the unpatched semantics —
+`if (res == choice) goto ACCEPT; goto NEXT;` — and map/start_en.map marks
+both 3-/5-byte patch sites `U` so mzdiff skips them. Effect of the patch:
+the briefing screen auto-accepts the randomly chosen mission without
+running the selection widget.

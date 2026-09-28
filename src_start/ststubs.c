@@ -21,3 +21,14 @@ void  sub_14BEE(int16 a, int16 b) { }
 void  sub_161CC(int16 a, int16 b, int16 c) { }
 void  far ovlCall_c4e(int16 v) { }           /* overlay 1000:0c4e */
 void  far ovlCall_bea(int16 v) { }           /* overlay 1000:0bea */
+/* stmenu.c sub_18F12 (briefing/objectives screen) globals + slots */
+int16 word_2542C[0x14];                      /* per-mission values (long arg) */
+char  *word_25454[0x14];                     /* row string-id table */
+int16 word_2547C[2], word_25480[2];          /* packed 4/4 nibble pairs */
+int16 *word_25014, *word_24FFC, *word_2542A; /* page record handles/selp */
+int16 word_25016, word_25034, word_25064;    /* sel-init / b4f arg / widget */
+uint8 byte_29B50, byte_2D06A;                /* res-loaded flags */
+void  sub_14ACB(char *s, int16 v, long x) { }
+void  sub_1513B(char far *d, char *s) { }
+void  far ovlCall_bc7(int16 *pg, int16 a, int16 b, int16 c, int16 d,
+                      int16 e, int16 f) { }  /* overlay 1000:0bc7 */

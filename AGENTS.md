@@ -42,7 +42,7 @@ map/<x>_en.map --srcdir src_<x>`):
   setTimerIrqHandler/installCBreakHandler (int21h vectors), clearRect
   (rep stosw), clipAndDrawLine/calibrateTimerSpeed/readJoyAxis (hw asm),
   strcoll/gety/move_ovlcur + all CRT.
-- src_start/ — 143 MATCH:
+- src_start/ — 144 MATCH:
   cleanup.c: cleanup
   drawstr.c: drawStringAt drawStringFar drawStringAtFar
   stalloc.c: allocBuffer freeBuffer
@@ -53,8 +53,8 @@ map/<x>_en.map --srcdir src_<x>`):
     formatGridRef formatTimeStr clampValue missionGenerate runGenerator
   stgrid.c: parseGrid replaceExtension
   stload.c: loadSpriteScaled loadPicRes loadSpriteRes loadResSection
-  stmenu.c(/Os): sub_1A68C sub_1ACA0 sub_1AE22 sub_1AFA8 sub_1B184
-    sub_1B304 sub_1B452
+  stmenu.c(/Os): sub_18F12 sub_1A68C sub_1ACA0 sub_1AE22 sub_1AFA8
+    sub_1B184 sub_1B304 sub_1B452
   stmap.c(/Ot): mapToScreenX mapToScreenY drawMapLine drawClippedMapLine
     drawMapPoint plotMapPoint sinMul cosMul toggleSelRect drawRiskPanel
     rectInView shiftByMode drawScorePanel drawUnitList
@@ -323,6 +323,20 @@ mzmap (jump-table headers, no call-reachable exports).
 - CL heap exhaustion (`fatal error C1002`) on stubs.c under -DEXE_START:
   satellite overflow stubs go in a new `src_start/ststubs.c`-style module —
   satellite builds compile every srcdir *.c, so defs still link.
+- Patched binaries (EN START.EXE sub_18F12): some sites were hand-patched
+  after link — a `call sub_10AE8` NOP'd out (`push ax; nop nop nop` orphan
+  remains) and `cmp ax,[r]; jz A` replaced by `mov [r],ax; jmp short A`
+  forcing a branch. No C produces the patched bytes; write the unpatched
+  semantics (confirmed vs the RU build) and mark each equal-size patch
+  site a `U` block in the map.
+- `while (n < K) { if (t <= K) continue; ...; n++; }` emits the ref's
+  backward-test loop (`CMP: cmp; jge out; if-skip; body; inc; jmp CMP`) —
+  the `continue` gives the early `jmp` to CMP, and the body falling out of
+  the loop makes `n++` land where ref has it. A `do/while` there emits the
+  test at the bottom instead. sub_18F12 wait loop.
+- `f->a = f->b = 0` chained field stores emit `sub ax,ax; mov es:[bx+a],ax;
+  mov es:[bx+b],ax` — far-struct field stores keep `es:bx` live and reuse
+  the zeroed ax across the chain (no reload). sub_18F12 gameData wipe.
 
 ## Routines that are asm in the original (do NOT port)
 

@@ -4,8 +4,15 @@
  * and the result lands in gameData->theater; byte_2C160 picks the next page. */
 #include "inttype.h"
 
-struct GD { int8 pad[0x38]; int16 theater; int16 isCampaignMission;
-            int16 flags3c; int16 flags3e; int16 flags40; };
+struct GD { int16 f0;                       /* 0x00 next-page */
+            int8 pad0[0x1E];
+            int16 f20,f22,f24,f26,f28,f2a,f2c,f2e,f30,f32,f34,f36;
+            int16 theater;                  /* 0x38 */
+            int16 isCampaignMission;        /* 0x3a */
+            int16 flags3c;                  /* 0x3c */
+            int16 flags3e;                  /* 0x3e */
+            int16 flags40;                  /* 0x40 */
+            int16 f42,f44,f46,f48,f4a,f4c,f4e; };
 extern struct GD far *gameData;             /* far ptr dseg:0x991c */
 
 extern void sub_108B7(void);                /* seg000:0x08b7 screen reset */
@@ -90,7 +97,8 @@ typedef struct {                            /* worldObjects: stride 0x10 */
     int16 pad8[4];                          /* 0x08 */
 } WorldObject;
 extern WorldObject worldObjects[];          /* dseg:0xb390 */
-struct PgParms { int8 pad[0x22]; int16 f22; int8 pad2[0x72-0x24]; int16 f72; };
+struct PgParms { int8 pad[0x22]; int16 f22; int8 pad1[0x0C]; int16 f30;
+                 int8 pad2[0x40]; int16 f72; };
 extern struct PgParms far *word_2D066;      /* far page parm record */
 /* sub_1A68C (main select screen) externs */
 extern int16 word_2D2C6;                    /* sub_161CC arg */
@@ -113,6 +121,18 @@ extern void sub_15120(char *d, char *s);
 extern int16 sub_13E38(int16 *p, char *s);
 extern void far ovlCall_c4e(int16 v);       /* overlay 1000:0c4e */
 extern void far ovlCall_bea(int16 v);       /* overlay 1000:0bea */
+/* sub_18F12 (briefing screen) externs */
+extern int16 word_2542C[];                  /* per-mission value table */
+extern char *word_25454[];                  /* row string-id table */
+extern int16 word_2547C[], word_25480[];    /* packed nibble pairs */
+extern int16 *word_25014, *word_24FFC, *word_2542A;
+extern int16 word_25016, word_25034, word_25064;
+extern uint8 byte_29B50, byte_2D06A;        /* res-loaded flags */
+extern void sub_14ACB(char *s, int16 v, long x);
+extern void sub_1513B(char far *d, char *s);
+extern void far ovlCall_bc7(int16 *pg, int16 a, int16 b, int16 c,
+                            int16 d, int16 e, int16 f);
+extern uint8 blinkTimer;                    /* dseg:0x0a1c timer-irq counter */
 extern void sub_15152(char *d, const char far *s);  /* far-src strcpy */
 extern void loadSpriteRes(char *n, int16 sel);
 extern int16 randMul(uint16 n);
@@ -129,6 +149,166 @@ extern int16 far ovlCall_c53(void);         /* overlay 1000:0c53 */
 extern void far ovlCall_c58(void);          /* overlay 1000:0c58 */
 extern void far ovlCall_c8a(void);          /* overlay 1000:0c8a */
 extern int16 far ovlCall_ccb(int16 v);      /* overlay 1000:0ccb poll */
+
+/* seg000:0x8f12 — briefing/mission-summary screen: builds the objective
+ * list (two word_25454 row runs), picks a random mission index, runs the
+ * select widget, then branches to the accept or next-page arm. The shipped
+ * EN binary is patched: the second sub_10AE8 call site was nop'd (3 bytes)
+ * and `if (res == choice)` became `res = choice` + unconditional jumps,
+ * forcing the accept arm — the map marks both patch sites U so mzdiff
+ * skips them; the C below carries the unpatched semantics. */
+void sub_18F12(void) {
+    int16 low;                  /* [bp-2]  */
+    int16 fl;                   /* [bp-4]  */
+    int16 hn;                   /* [bp-6]  */
+    int16 v;                    /* [bp-8]  */
+    int16 t2;                   /* [bp-0a] */
+    int16 pad1;                 /* [bp-0c] */
+    int16 i;                    /* [bp-0e] */
+    int16 y;                    /* [bp-10] */
+    int16 w2;                   /* [bp-12] */
+    int16 res;                  /* [bp-14] */
+    int16 w3;                   /* [bp-16] */
+    int16 choice;               /* [bp-18] */
+    int16 len;                  /* [bp-1a] */
+
+    if (word_2D066->f22 == 1) {
+        byte_2C160 = 8;
+        return;
+    }
+    choice = randMul(0x14);
+    word_2B386 = (struct MenuRow *)0x992;
+    word_2CA46 = (uint8 far **)0x98E;
+    word_2CA48 = 0x996;
+    byte_29B50 = 1;
+    byte_298F0 = 1;
+    gfx_unknown2b(0);
+    switch (word_2C7D4) {
+    case 0:
+        sub_14746((char *)0x4F0A, word_2C972, word_2C974);
+        sub_14BEE(word_2D064, word_2D06C);
+        sub_14ACB((char *)0x4F15, word_2D26E, (long)word_2542C[choice]);
+        v = word_2D26E;
+        break;
+    case 1:
+        sub_14ACB((char *)0x4F1F, word_2D2C8, (long)word_2542C[choice]);
+        v = word_2D2C8;
+        if (byte_2D06A == 0) {
+            gfx_unknown2b(0);
+            sub_14746((char *)0x4F29, word_2C972, word_2C974);
+            sub_14BEE(word_2D064, word_2D06C);
+            byte_2D06A = 1;
+        }
+        break;
+    case 2:
+        sub_14746((char *)0x4F34, word_2C972, word_2C974);
+        sub_14BEE(word_2D064, word_2D06C);
+        sub_14ACB((char *)0x4F3F, word_2D2C8, (long)word_2542C[choice]);
+        v = word_2D2C8;
+        break;
+    }
+    ovlCall_c53();
+    ovlCall_bea(word_2D06C);
+    word_25016 = v;
+    ovlCall_b4f(word_25034);
+    y = 0x6F;
+    for (i = 0; i < 0xA; i++) {
+        sub_13B76(word_24FFC, word_25454[i], 0x2E, y);
+        y += 8;
+    }
+    y = 0x6F;
+    for (i = 0xA; i < 0x14; i++) {
+        sub_13B76(word_24FFC, word_25454[i], 0x9F, y);
+        y += 8;
+    }
+    sub_15120((char *)0xB96A, (char *)0x4F49);
+    len = sub_13E38(word_24FFC, (char *)0xB96A);
+    sub_13B76(word_24FFC, (char *)0xB96A, (uint16)(0x140 - len) >> 1, 0x15);
+    sub_13B76(word_25014, (char *)0x4F66, 0x46, 0xC1);
+    ovlCall_c8a();
+    ovlCall_c4e(1);
+    sub_108B7();
+    sub_14E9C();
+    word_25064 = 2;
+    res = 0;
+    sub_10924((char *)0x5036, word_2CA48, **word_2CA46, 0x64, 0x70,
+              word_24FFC);
+    res = sub_10AE8((char *)0x5036, word_2CA48, **word_2CA46,
+                    word_2542A, word_24FFC);
+    sub_14622(word_25014, 0x1E, 0xC1, 0x12C, 0xC6);
+    fl = 0;
+    if (res == choice)
+        goto ACCEPT;
+    goto NEXT;
+
+ACCEPT:
+    word_25014[2] = 2;
+    sub_13B76(word_25014, (char *)0x4F94, 0x6E, 0xC1);
+    ovlCall_c8a();
+    byte_2C160 = 8;
+    word_2D066->f22 = 1;
+    t2 = 0;
+    while (t2 < 8) {
+        if (blinkTimer <= 8)
+            continue;
+        blinkTimer = 0;
+        {
+            register int16 sv = word_2547C[fl];
+            hn = sv >> 4;
+            low = sv & 0xF;
+        }
+        ovlCall_bc7(word_25014, 0x64, 0xC1, 0x12C, 0xC6, hn, low);
+        fl = (fl + 1) & 1;
+        t2++;
+    }
+    sub_14EDA();
+    return;
+
+NEXT:
+    word_25014[2] = 4;
+    sub_13B76(word_25014, (char *)0x4FAB, 0x46, 0xC1);
+    ovlCall_c8a();
+    byte_2C160 = 0xF;
+    gameData->f0 = 0xA;
+    sub_1513B((char far *)gameData + 2, (char *)0x4FDC);
+    gameData->f20 = 0;
+    gameData->f22 = 0;
+    gameData->f24 = 0;
+    gameData->f26 = 0;
+    gameData->f28 = 0;
+    gameData->f2a = 0;
+    gameData->f2c = 0;
+    gameData->f2e = 0;
+    gameData->f30 = 0;
+    gameData->f32 = gameData->f34 = 0;
+    gameData->f36 = 0;
+    gameData->theater = 0;
+    gameData->isCampaignMission = 0;
+    gameData->flags3e = 0;
+    gameData->flags40 = 0;
+    gameData->flags3c = 3;
+    gameData->f42 = 4;
+    gameData->f44 = 0;
+    gameData->f46 = 0;
+    gameData->f48 = 0;
+    gameData->f4a = 0;
+    gameData->f4c = 0;
+    gameData->f4e = 0;
+    word_2D066->f30 = 1;
+    word_2D066->f22 = 0;
+    t2 = 0;
+    do {
+        if (blinkTimer > 0xC) {
+            register int16 sv = word_25480[fl];
+            hn = sv >> 4;
+            low = sv & 0xF;
+            ovlCall_bc7(word_25014, 0x46, 0xC1, 0x12C, 0xC6, hn, low);
+            fl = (fl + 1) & 1;
+            t2++;
+        }
+    } while (t2 < 8);
+    sub_14EDA();
+}
 
 /* seg000:0xa68c — main select screen: word_2C7D4 resource block, five
  * per-theater overlay calls, item rows (or a single row) by word_2D066->f22,

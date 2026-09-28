@@ -681,7 +681,8 @@ struct MenuSelBlk menuSelTab6[7];            /* dseg:0x66e2, stride 0x32 */
 int16 word_2CA6C;                            /* mode-out code */
 int16 word_2B948, word_2B95A;                /* excluded object indices */
 uint8 byte_2C976, byte_2C977;                /* marks-present flag, toggle */
-struct PgParms { int8 pad[0x22]; int16 f22; int8 pad2[0x72-0x24]; int16 f72; };
+struct PgParms { int8 pad[0x22]; int16 f22; int8 pad1[0x0C]; int16 f30;
+                 int8 pad2[0x40]; int16 f72; };
 struct PgParms far *word_2D066;              /* far page parm record */
 void  far ovlCall_b4f(int16 h) { }           /* overlay 1000:0b4f */
 int16 far ovlCall_c53(void) { return 0; }    /* overlay 1000:0c53 */
