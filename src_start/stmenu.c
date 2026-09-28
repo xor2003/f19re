@@ -91,7 +91,7 @@ extern uint8 byte_20A1A;                    /* input-wait counter */
 extern uint8 unitMarksOn, tileMarksOn;      /* dseg:0x98e8/0xbe48 */
 extern int8  tileMarkMap[];                 /* dseg:0xb842 — 16x16, bit 0x10 */
 extern int16 objectCount;                   /* dseg:0x2c978 */
-extern int8  objectActive[];                /* dseg:0x2d278 */
+extern uint8 objectActive[];                /* dseg:0x2d278 */
 typedef struct {                            /* worldObjects: stride 0x10 */
     int16 x_coord, y_coord;                 /* 0x00, 0x02 */
     int16 pad4;                             /* 0x04 */
@@ -136,6 +136,28 @@ extern void far ovlCall_bc7(int16 *pg, int16 a, int16 b, int16 c,
                             int16 d, int16 e, int16 f);
 extern uint8 blinkTimer;                    /* dseg:0x0a1c timer-irq counter */
 extern void sub_15152(char *d, const char far *s);  /* far-src strcpy */
+/* sub_12754 (object detail panel) externs */
+extern int16 word_2C968, word_2C144;        /* selected object indices */
+extern int16 word_2CA70[];                  /* id→string-id table */
+struct ObjD {                               /* dseg:0xb38e, stride 0x10 */
+    int16 f0;                               /* linked id (0 ⇒ fE byte) */
+    int16 pad2[2];                          /* worldObjects x/y_coord */
+    int16 pad4;                             /* sub-record index */
+    int16 targetFlags;                      /* &0x400 / &0x100 tested */
+    int16 padA;                             /* *0x20 name-table index */
+    int16 padC;                             /* count field (itoa'd) */
+    uint8  fE;                              /* fallback id */
+    uint8  padF;
+};
+extern struct ObjD word_2B38E[];
+struct Attr14 { int16 f0, f2;               /* dseg:0x3e26, stride 0x0e */
+                uint8 f4, pad5[9]; };
+extern struct Attr14 word_23E26[];
+extern int16 word_23E28;                      /* dseg:0x3e28 = word_23E26[0].f2 */
+struct Rec18 { int16 f0, pad[8]; };
+extern struct Rec18 word_241C8[];           /* dseg:0x41c8, stride 0x12 */
+extern char strTab14[][0x0E];               /* dseg:0x3e1e name strings */
+extern char strTab32[][0x20];               /* dseg:0x3f60 name strings */
 /* sub_193EE (roster screen) externs */
 struct MsnRec {                             /* dseg:0x9d54, stride 0x50 */
     int16 f0;                               /* record id */
@@ -188,6 +210,7 @@ extern int16 far ovlCall_ccb(int16 v);      /* overlay 1000:0ccb poll */
  * and `if (res == choice)` became `res = choice` + unconditional jumps,
  * forcing the accept arm — the map marks both patch sites U so mzdiff
  * skips them; the C below carries the unpatched semantics. */
+
 void sub_18F12(void) {
     int16 low;                  /* [bp-2]  */
     int16 fl;                   /* [bp-4]  */

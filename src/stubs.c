@@ -750,7 +750,9 @@ uint8 byte_2C9E0;
 int16 selAvailTab[4], typeIdxTab[4];
 char *namePtrTab[2], *typeNameTab[2];
 char  strB96A[8], str282[4];
+#ifndef EXE_START /* src_start/stpanel.c provides the real port */
 void  sub_12754(void *t, int16 i, int16 *pd) { }
+#endif
 void  sub_13218(void *t, int16 i, int16 *pd) { }
 #ifndef EXE_START /* src_start/stutil.c provides the real ports */
 void  wrapUnitText(int16 a, char *s, int16 w, int16 x, int16 y, int16 b) { }

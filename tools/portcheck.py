@@ -71,6 +71,9 @@ MODULE_FLAGS = {
     'start/stgrid.c':  ['/AS', '/Gs', '/Os'],
     # EN stmenu: /Os drops the loop-top pad nop (sub_1ACA0 row loop).
     'start/stmenu.c':  ['/AS', '/Gs', '/Os'],
+    # EN stpanel (sub_12754): /Ot — original emits branch-target alignment
+    # nops that /Os suppresses; routine was in a different original module.
+    'start/stpanel.c': ['/AS', '/Gs', '/Ot'],
     'start/stgen.c':   ['/AS', '/Gs', '/Ot'],
     # EN stload: no /Gs — loadResSection prologue is `mov ax,2; call __chkstk`
     'start/stload.c':  ['/AS', '/Od'],

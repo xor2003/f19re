@@ -1039,3 +1039,36 @@ The C port (`src_start/stmenu.c`) carries the unpatched semantics —
 both 3-/5-byte patch sites `U` so mzdiff skips them. Effect of the patch:
 the briefing screen auto-accepts the randomly chosen mission without
 running the selection widget.
+
+## 10. `/Ot` branch-target alignment nops (`sub_12754`)
+
+`src_start/stpanel.c` ports `sub_12754` (seg000:0x2754, 2755B) — the
+per-row object/detail panel: `base`=item-table pointer, `row`=record index
+(stride 0x32), `pg`=`int16*` into the sprite-param table. Flag byte at
+record+0x30 selects panel families (`& 7`); a function-level
+`register int16 id` pins `si` (reassigned `id = row*0x32` at each flag
+re-read, reused for the f0-selects and the `pad4*14` index), which is why
+the last test's bare `row*0x32` temp lands in `di` — two-register model.
+
+The binary has 13 interior `nop` pads — first nop-heavy routine ported.
+They are MSC `/Ot` branch-target alignment: every pad is a single 0x90
+between a `jmp`/`jcc` and an odd-offset jump-target label (pad → even).
+`/Os` suppresses them entirely (verified empirically — same source emits
+`jmp` + label back-to-back). The pad is decided at compile time on the
+routine's offset within the module's .obj code segment, so it reproduces
+only when in-function emission is byte-identical AND the function starts
+at an even module offset — sub_12754 as the first function in stpanel.c
+(offset 0) reproduces all 13 exactly.
+
+This forced a module split: the routine's original module was `/Ot`
+(interior pads), while stmenu.c's other routines are `/Os` (sub_1ACA0's
+row loop must NOT emit one). MODULE_FLAGS now has `start/stpanel.c` at
+`/AS /Gs /Ot`.
+
+Also learned: `A*B` where both operands share a base symbol
+(`*(p+i) * *(p+i+2)`) puts the larger-displacement operand in `ax` for
+`imul` regardless of source order; the original used distinct symbols
+`word_23E26[si]`/`word_23E28[si]` (the +2 field as its own IDA symbol) —
+declared `int16 word_23E28` in ststubs.c to reproduce
+`mov ax,[si+base]; imul [si+base+2]`. `uint8 objectActive[]` gives
+`sub ah,ah` zero-extension where `int8` gave `cbw`.

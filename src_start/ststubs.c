@@ -57,3 +57,25 @@ void  sub_15189(char *d, char *s) { }
 void  sub_13D15(int16 *pg, char *s, int16 a, int16 b, int16 c, int16 d) { }
 void  sub_13E7C(long v, char *buf) { }
 void  sub_10882(void) { }
+/* stpanel.c sub_12754 (object detail panel) globals */
+int16 word_2C968, word_2C144;               /* selected object indices */
+int16 word_2CA70[8];                        /* id→string-id table */
+struct ObjD {                               /* dseg:0xb38e, stride 0x10 */
+    int16 f0;                               /* linked id (0 => fE byte) */
+    int16 pad2[2];                          /* worldObjects x/y_coord */
+    int16 pad4;                             /* sub-record index */
+    int16 targetFlags;                      /* &0x400 / &0x100 tested */
+    int16 padA;                             /* *0x20 name-table index */
+    int16 padC;                             /* count field (itoa'd) */
+    uint8  fE;                              /* fallback id */
+    uint8  padF;
+};
+struct ObjD word_2B38E[8];
+struct Attr14 { int16 f0, f2;               /* dseg:0x3e26, stride 0x0e */
+                uint8 f4, pad5[9]; };
+struct Attr14 word_23E26[8];
+int16 word_23E28;                             /* aliases word_23E26[0].f2 */
+struct Rec18 { int16 f0, pad[8]; };
+struct Rec18 word_241C8[8];                 /* dseg:0x41c8, stride 0x12 */
+char  strTab14[8][0x0E];                    /* dseg:0x3e1e name strings */
+char  strTab32[8][0x20];                    /* dseg:0x3f60 name strings */

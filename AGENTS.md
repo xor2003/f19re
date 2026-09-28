@@ -55,6 +55,7 @@ map/<x>_en.map --srcdir src_<x>`):
   stload.c: loadSpriteScaled loadPicRes loadSpriteRes loadResSection
   stmenu.c(/Os): sub_18F12 sub_193EE sub_1A68C sub_1ACA0 sub_1AE22
     sub_1AFA8 sub_1B184 sub_1B304 sub_1B452
+  stpanel.c(/Ot): sub_12754
   stmap.c(/Ot): mapToScreenX mapToScreenY drawMapLine drawClippedMapLine
     drawMapPoint plotMapPoint sinMul cosMul toggleSelRect drawRiskPanel
     rectInView shiftByMode drawScorePanel drawUnitList
@@ -243,6 +244,19 @@ mzmap (jump-table headers, no call-reachable exports).
 - `/Oi` folds libc calls into intrinsics: memcpy → `rep movsw` (+`adc cx,cx;
   rep movsb` for odd tails — MSC 5.1 doesn't eliminate the tail even when the
   count is known-even; that residual may be genuinely unmatchable).
+- `/Ot` pads branch-target labels to even with a `nop` (visible in EN
+  binaries as `jmp short X; nop; label:`); `/Os` suppresses it. The pad is
+  emitted at compile time on .obj-relative parity, so it reproduces only
+  when the routine's in-module offset has the original parity — putting the
+  routine first in its own module file makes that offset 0 (even), which
+  matched sub_12754's 13 pads exactly. Function-END pads emit under both.
+- `imul`/`mov ax` operand pairing for `A*B` on same-base memory operands
+  (`*(p+i) * *(p+i+2)`, `p[0]*p[1]`): MSC puts the LARGER-displacement
+  operand in `ax` regardless of source order. To get `mov ax,[f0]; imul
+  [f2]` order, index two DISTINCT symbol bases — the original used
+  `word_23E26[si]` / `word_23E28[si]` (IDA auto-named the +2 field as its
+  own symbol). Struct-field form `arr[i].f0 * arr[i].f2` also preserves
+  left-to-right. sub_12754.
 - `if ((a | b) == 0)` on two byte fields emits `mov al,[a]; sub ah,ah;
   mov cl,[b]; sub ch,ch; or ax,cx; jnz` — `a==0 && b==0` emits two
   `cmp byte/jnz` pairs instead. stepPanelAnim letter-case gate.
