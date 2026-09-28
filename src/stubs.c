@@ -595,8 +595,16 @@ char *wldNameTab[8];
 uint8 siteNameData[0x10], siteObjData[0x10];
 char far *briefTextP;
 void  sub_108B7(void) { }
-void  sub_1C699(int16 a) { }
 char *sub_17558(int16 n, char *b, int16 t) { return b; }
+/* printObjective (stutil.c) globals */
+struct BriefTarget { int16 f[5]; char coord[6]; int16 dist; };
+struct BriefTarget briefTargs[2];
+struct MissionKind { int16 kind, pad2; uint8 flags; int8 pad5; int16 status, pad8[2]; };
+struct MissionKind missionKinds[1];
+int16 briefDepartSite, briefPatrolType;
+char  unitNameTab[1][0x20];
+char  briefTimeA[8], briefTimeB[8], briefCoord2[8];
+int16 mystrlen(char *s) { int16 n = 0; while (s[n]) n++; return n; }
 void  far gfx_commitPage(void) { }
 #endif
 void  dos_printstring(const char *s) { }

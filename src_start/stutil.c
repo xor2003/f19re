@@ -891,7 +891,7 @@ void drawRoutePath(void) {
  * briefing.txt into an alloc'd block, draws the frame + CLASSIFIED banner +
  * title, then either the objectives page (briefPage==1: PRIMARY/SECONDARY
  * mission headers, mission-type numbers, wrapped objective text via
- * sub_17558 + sub_1C699) or the flight-plan page (FLIGHT PLAN header,
+ * sub_17558 + printObjective) or the flight-plan page (FLIGHT PLAN header,
  * TAKEOFF/RETURN fields built from waypoint name/coord lookups, FUEL
  * ESTIMATE, MISSION BEGINS AT, RULES OF ENGAGEMENT wrapped far text).
  * Locals a/e/f/h are color/CR escape strings; only a is actually read. ==== */
@@ -908,7 +908,7 @@ extern uint8  siteObjData[];                    /* dseg:0xb39c objectIdx lo   */
 extern char  far *briefTextP;                   /* dseg:0x099a far ptr pair   */
 extern char   scrStr[];                         /* dseg:0xb96a work buffer    */
 extern void   sub_108B7(void);                  /* seg000:0x08b7 misc jump    */
-extern void   sub_1C699(int16 n);               /* seg000:0xc699 obj detail   */
+extern void   printObjective(uint16 n);               /* seg000:0xc699 obj detail   */
 extern char  *sub_17558(int16 n, char *b, int16 t); /* 0x7558 briefing line  */
 extern void   far gfx_commitPage(void);         /* far driver slot 0x50      */
 extern void   my_itoa(int16 n, char *b);        /* seg000:0x3fb3             */
@@ -951,7 +951,7 @@ void printMission(void) {
         wrapUnitText(briefParms, sub_17558(targets[0], scrStr, b),
                      0x12C, 0x0A, 0x1E, 8);
         mystrcpy(scrStr, "Your \x89primary\x80 objective is ");
-        sub_1C699(0);
+        printObjective(0);
         wrapUnitText(briefParms, scrStr, 0x12C, 0x0A,
                      *(int16 *)(sprParmsTab + briefParms + 0xA), 8);
         mystrcpy(scrStr, "\x89SECONDARY MISSION ");
@@ -965,7 +965,7 @@ void printMission(void) {
                      0x12C, 0x0A,
                      *(int16 *)(sprParmsTab + briefParms + 0xA) + 8, 8);
         mystrcpy(scrStr, "Your \x89secondary\x80 objective is ");
-        sub_1C699(1);
+        printObjective(1);
         wrapUnitText(briefParms, scrStr, 0x12C, 0x0A,
                      *(int16 *)(sprParmsTab + briefParms + 0xA), 8);
     } else {
@@ -1019,3 +1019,139 @@ void printMission(void) {
 }
 
 
+
+/* -------------------------------------------------------------------------
+ * printObjective (seg000:0xc699) — append the detail sentence for briefing
+ * objective n to scrStr.  Eight mission kinds dispatched on
+ * missionKinds[briefTargs[n].missionNum].kind; each case is a chain of
+ * mystrcat() appends of literals plus generator-filled time/coord buffers.
+ * ------------------------------------------------------------------------- */
+struct BriefTarget {                        /* dseg:0xb946, stride 0x12       */
+    int16 missionType;                      /* +0                             */
+    int16 targetIdx;                        /* +2  siteRec index (<<4)        */
+    int16 baseIdx;                          /* +4                             */
+    int16 missionCode;                      /* +6                             */
+    int16 missionNum;                       /* +8  x0xC into missionKinds[]   */
+    char  coord[6];                         /* +A  ONC grid ref               */
+    int16 distance;                         /* +10                            */
+};
+extern struct BriefTarget briefTargs[];
+
+struct MissionKind {                        /* dseg:0x4b10, stride 0x0C       */
+    int16 kind;                             /* +0  text selector 1..8         */
+    int16 pad2;                             /* +2                             */
+    uint8 flags;                            /* +4  0x20/0x02 deadline flags   */
+    int8  pad5;                             /* +5                             */
+    int16 status;                           /* +6  == -2 -> patrol suffix     */
+    int16 pad8[2];                          /* +8,+A                          */
+};
+extern struct MissionKind missionKinds[];
+
+extern int16  mystrlen(char *s);            /* seg000:0x516d hand-asm strlen  */
+extern int16  briefDepartSite;              /* dseg:0xbb72 departure base idx */
+extern int16  briefPatrolType;              /* dseg:0xbb8e unit type (x0x20)  */
+extern char   unitNameTab[][0x20];          /* dseg:0x3f60 unit-type names    */
+extern char   briefTimeA[];                 /* dseg:0x4db6 depart/seen time   */
+extern char   briefTimeB[];                 /* dseg:0x4dbc deadline time      */
+extern char   briefCoord2[];                /* dseg:0x4dc8 second ONC coord   */
+
+void printObjective(uint16 n) {
+    int16 a, b, c, d, e;                    /* dead locals: 0xA frame pad     */
+    switch (missionKinds[briefTargs[n].missionNum].kind) {
+    case 1:
+        mystrcat(scrStr, "to \x89photograph the ");
+        mystrcat(scrStr, wldNameTab[siteObjData[briefTargs[n].targetIdx << 4]]);
+        if (mystrlen(wldNameTab[*(int16 *)(siteNameData + (briefTargs[n].targetIdx << 4))])) {
+            mystrcat(scrStr, " at ");
+            mystrcat(scrStr, wldNameTab[*(int16 *)(siteNameData + (briefTargs[n].targetIdx << 4))]);
+        }
+        mystrcat(scrStr, "\x80, ONC ");
+        mystrcat(scrStr, briefTargs[n].coord);
+        if (missionKinds[briefTargs[n].missionNum].flags & 0x20) {
+            mystrcat(scrStr, ", \x89before ");
+            mystrcat(scrStr, briefTimeB);
+            mystrcat(scrStr, " hours\x80, while the cargo is still being unloaded.");
+        } else
+            mystrcat(scrStr, ".");
+        break;
+    case 2:
+        mystrcat(scrStr, "to \x89destroy the ");
+        mystrcat(scrStr, wldNameTab[siteObjData[briefTargs[n].targetIdx << 4]]);
+        if (mystrlen(wldNameTab[*(int16 *)(siteNameData + (briefTargs[n].targetIdx << 4))])) {
+            mystrcat(scrStr, " at ");
+            mystrcat(scrStr, wldNameTab[*(int16 *)(siteNameData + (briefTargs[n].targetIdx << 4))]);
+        }
+        mystrcat(scrStr, "\x80, ONC ");
+        mystrcat(scrStr, briefTargs[n].coord);
+        if (missionKinds[briefTargs[n].missionNum].flags & 0x20) {
+            mystrcat(scrStr, ", \x89before ");
+            mystrcat(scrStr, briefTimeB);
+            mystrcat(scrStr, " hours\x80, while the cargo is still being unloaded.");
+        } else if (missionKinds[briefTargs[n].missionNum].flags & 2) {
+            mystrcat(scrStr, ", \x89before ");
+            mystrcat(scrStr, briefTimeB);
+            mystrcat(scrStr, " hours\x80.");
+        } else
+            mystrcat(scrStr, ".");
+        break;
+    case 3:
+        mystrcat(scrStr, "to \x89reach the beacon\x80 at ONC ");
+        mystrcat(scrStr, briefTargs[n].coord);
+        mystrcat(scrStr, " and \x89drop the supplies before ");
+        mystrcat(scrStr, briefTimeB);
+        mystrcat(scrStr, " hours\x80.  To minimize the chance of enemy detection, ");
+        mystrcat(scrStr, "the beacon will be on ONLY during this period.");
+        break;
+    case 4:
+        mystrcat(scrStr, "to \x89reach the secret airstrip\x80 at ONC ");
+        mystrcat(scrStr, briefTargs[n].coord);
+        mystrcat(scrStr, " \x89before ");
+        mystrcat(scrStr, briefTimeB);
+        mystrcat(scrStr, " hours\x80.  The airstrip will be lighted ONLY during this period.");
+        break;
+    case 5:
+        mystrcat(scrStr, "to \x89intercept and destroy\x80 the \x89AN-72 Coaler transport\x80 departing from ");
+        mystrcat(scrStr, wldNameTab[*(int16 *)(siteNameData + (briefDepartSite << 4))]);
+        mystrcat(scrStr, " airbase, ONC ");
+        mystrcat(scrStr, briefCoord2);
+        mystrcat(scrStr, ", at ");
+        mystrcat(scrStr, briefTimeA);
+        mystrcat(scrStr, " hours.  It is expected to arrive at ");
+        mystrcat(scrStr, wldNameTab[*(int16 *)(siteNameData + (briefTargs[n].targetIdx << 4))]);
+        mystrcat(scrStr, " airbase, ONC ");
+        mystrcat(scrStr, briefTargs[n].coord);
+        mystrcat(scrStr, ", at ");
+        mystrcat(scrStr, briefTimeB);
+        mystrcat(scrStr, " hours.");
+        break;
+    case 7:
+        mystrcat(scrStr, "to \x89intercept and destroy\x80 the \x89AN-72 Coaler transport\x80 leaving from ");
+        mystrcat(scrStr, wldNameTab[*(int16 *)(siteNameData + (briefTargs[n].targetIdx << 4))]);
+        mystrcat(scrStr, " airbase, ONC ");
+        mystrcat(scrStr, briefTargs[n].coord);
+        mystrcat(scrStr, ", at ");
+        mystrcat(scrStr, briefTimeA);
+        mystrcat(scrStr, " hours.  The ultimate destination is unknown.");
+        break;
+    case 6:
+        mystrcat(scrStr, "to \x89intercept and destroy the Tu-95\x80, last seen in grid ONC ");
+        mystrcat(scrStr, briefCoord2);
+        mystrcat(scrStr, " at ");
+        mystrcat(scrStr, briefTimeA);
+        mystrcat(scrStr, " hours.  Based on past experience it is probably heading for");
+        mystrcat(scrStr, wldNameTab[*(int16 *)(siteNameData + (briefTargs[n].targetIdx << 4))]);
+        mystrcat(scrStr, " airbase.  If so, its estimated arrival time is ");
+        mystrcat(scrStr, briefTimeB);
+        mystrcat(scrStr, " hours.");
+        break;
+    case 8:
+        mystrcat(scrStr, "to \x89intercept and destroy the ");
+        mystrcat(scrStr, unitNameTab[briefPatrolType]);
+        if (missionKinds[briefTargs[n].missionNum].status == -2)
+            mystrcat(scrStr, " fighter patrol");
+        mystrcat(scrStr, "\x80 at, ONC ");
+        mystrcat(scrStr, briefTargs[n].coord);
+        mystrcat(scrStr, ".  ");
+        break;
+    }
+}

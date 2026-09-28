@@ -42,7 +42,7 @@ map/<x>_en.map --srcdir src_<x>`):
   setTimerIrqHandler/installCBreakHandler (int21h vectors), clearRect
   (rep stosw), clipAndDrawLine/calibrateTimerSpeed/readJoyAxis (hw asm),
   strcoll/gety/move_ovlcur + all CRT.
-- src_start/ — 131 MATCH:
+- src_start/ — 132 MATCH:
   cleanup.c: cleanup
   drawstr.c: drawStringAt drawStringFar drawStringAtFar
   stalloc.c: allocBuffer freeBuffer
@@ -68,6 +68,7 @@ map/<x>_en.map --srcdir src_<x>`):
     setViewOrigin delayTicks bufReadBytes resetTableFlags bufReadFile
     tickEffectTable dispatchDrawMode wrapUnitText wrapUnitTextFar
     srand rand seedRng drawRoutePath drawThreatRings printMission
+    printObjective
   textfmt.c: my_ltoa my_itoa
   Left as skeleton: dos_alloc doFcbSearch (int21h),
   decodePic/showPicFile/openBlitClosePic + pic cluster, clearRect/
