@@ -90,8 +90,29 @@ typedef struct {                            /* worldObjects: stride 0x10 */
     int16 pad8[4];                          /* 0x08 */
 } WorldObject;
 extern WorldObject worldObjects[];          /* dseg:0xb390 */
-struct PgParms { int8 pad[0x72]; int16 f72; };
+struct PgParms { int8 pad[0x22]; int16 f22; int8 pad2[0x72-0x24]; int16 f72; };
 extern struct PgParms far *word_2D066;      /* far page parm record */
+/* sub_1A68C (main select screen) externs */
+extern int16 word_2D2C6;                    /* sub_161CC arg */
+extern int16 word_22324;                    /* sub_161CC side flag */
+extern int16 word_2C972, word_2C974;        /* sub_14746 args */
+extern uint8 byte_298E9, byte_2B384;        /* res-loaded flags */
+extern int16 word_2D064, word_2D270;        /* sub_14BEE args */
+extern int16 *word_25B2C, *word_25B44, *word_25CF6; /* page records */
+extern int16 word_25CE6;                    /* widget param */
+extern uint8 far *word_209AA;               /* far ptr→item count byte */
+extern int16 word_25B46[];                  /* dseg:0x5b46, stride 0x20 */
+extern int16 word_25B64, word_25B84;        /* theater 0 b4f args */
+extern int16 word_25BA4, word_25BC4;
+extern int16 word_25BE4, word_25C04;
+extern int16 word_25C24, word_25C44;
+extern int16 word_25C64, word_25C84;
+extern void sub_14BEE(int16 a, int16 b);
+extern void sub_161CC(int16 a, int16 b, int16 c);
+extern void sub_15120(char *d, char *s);
+extern int16 sub_13E38(int16 *p, char *s);
+extern void far ovlCall_c4e(int16 v);       /* overlay 1000:0c4e */
+extern void far ovlCall_bea(int16 v);       /* overlay 1000:0bea */
 extern void sub_15152(char *d, const char far *s);  /* far-src strcpy */
 extern void loadSpriteRes(char *n, int16 sel);
 extern int16 randMul(uint16 n);
@@ -108,6 +129,168 @@ extern int16 far ovlCall_c53(void);         /* overlay 1000:0c53 */
 extern void far ovlCall_c58(void);          /* overlay 1000:0c58 */
 extern void far ovlCall_c8a(void);          /* overlay 1000:0c8a */
 extern int16 far ovlCall_ccb(int16 v);      /* overlay 1000:0ccb poll */
+
+/* seg000:0xa68c — main select screen: word_2C7D4 resource block, five
+ * per-theater overlay calls, item rows (or a single row) by word_2D066->f22,
+ * centered strings for gameData->f3a..f40, then the select widget. */
+void sub_1A68C(void) {
+    int16 v;                    /* [bp-2]  */
+    int16 i;                    /* [bp-4]  */
+    int16 dy;                   /* [bp-6]  */
+    int16 len;                  /* [bp-0a] */
+    int16 result;               /* [bp-8]  */
+
+    sub_108B7();
+    switch (word_2C7D4) {
+    case 0:
+        if (rtcEnabled == 1) {
+            sub_14746((char *)0x59B0, word_2D2CA, word_2D2CC);
+            sub_161CC(0x6A, 1, word_2D2C6);
+            word_22324 = 0;
+        }
+        gfx_unknown2b(8);
+        sub_14746((char *)0x59BA, word_2C972, word_2C974);
+        sub_14BEE(word_2D064, word_2D06C);
+        gfx_unknown2b(0xB);
+        loadSpriteRes((char *)0x59C3, word_2D26E);
+        v = word_2D26E;
+        ovlCall_c53();
+        ovlCall_bea(word_2D06C);
+        break;
+    case 1:
+        if (rtcEnabled == 1) {
+            sub_161CC(0x6A, 1, word_2D2C6);
+            word_22324 = 0;
+        }
+        v = word_2D26E;
+        if (byte_298E9 == 0) {
+            gfx_unknown2b(8);
+            sub_14746((char *)0x59CC, word_2C972, word_2C974);
+            sub_14BEE(word_2D064, word_2D270);
+            byte_298E9 = 1;
+        }
+        if (byte_2B384 == 0) {
+            gfx_unknown2b(0xB);
+            loadSpriteRes((char *)0x59D5, word_2D26E);
+            byte_2B384 = 1;
+        }
+        ovlCall_c53();
+        ovlCall_bea(word_2D270);
+        break;
+    case 2:
+        gfx_unknown2b(6);
+        sub_14746((char *)0x59DE, word_2C972, word_2C974);
+        sub_14BEE(word_2D064, word_2D06C);
+        if (rtcEnabled == 1) {
+            sub_161CC(0x6A, 1, word_2D2C6);
+            word_22324 = 0;
+        }
+        v = word_2D26E;
+        ovlCall_c53();
+        ovlCall_bea(word_2D06C);
+        break;
+    }
+    word_25B46[0] = word_25B46[16] = word_25B46[32] = word_25B46[48] =
+        word_25B46[64] = word_25B46[80] = word_25B46[96] = word_25B46[112] =
+        word_25B46[128] = word_25B46[144] = v;
+    switch (gameData->theater) {
+    case 0:
+        ovlCall_b4f(word_25B64);
+        ovlCall_b4f(word_25B84);
+        break;
+    case 1:
+        ovlCall_b4f(word_25BA4);
+        ovlCall_b4f(word_25BC4);
+        break;
+    case 2:
+        ovlCall_b4f(word_25BE4);
+        ovlCall_b4f(word_25C04);
+        break;
+    case 3:
+        ovlCall_b4f(word_25C24);
+        ovlCall_b4f(word_25C44);
+        break;
+    case 4:
+        ovlCall_b4f(word_25C64);
+        ovlCall_b4f(word_25C84);
+        break;
+    }
+    ovlCall_c4e(1);
+    word_2B386 = (struct MenuRow *)0x9AE;
+    word_2CA46 = (uint8 far **)0x9AA;
+    word_25CF6[5] = ((int16)*word_209AA - 1) * word_25CF6[1] + word_25CF6[4];
+    flag_29948 = 1;
+    word_25B2C[2] = 0xF;
+    sub_14584(word_25B2C, 0x96, 0x82, 0x104, 0xBE);
+    word_25B2C[2] = 6;
+    if (word_2D066->f22 == 1) {
+        dy = 0x82;
+        for (i = 0; i < **word_2CA46; i++) {
+            sub_13B50(word_25B2C, word_2B386[i], 0xA0, dy);
+            dy += 0xB;
+        }
+        word_25B44[2] = 9;
+        sub_13B76(word_25B44, (char *)0x59E7, 0x98, 0x48);
+        word_25CF6[4] = 0x84;
+    } else {
+        sub_13B50(word_25B2C, word_2B386[1], 0xA0, 0x8D);
+        word_25B44[2] = 9;
+        sub_13B76(word_25B44, (char *)0x5A08, 0x98, 0x48);
+        word_25CF6[4] = 0x8F;
+    }
+    sub_15120((char *)0xB96A, (char *)0x5A23);
+    len = sub_13E38(word_25B44, (char *)0xB96A);
+    sub_13B76(word_25B44, (char *)0xB96A, 0x98 + (0x82 - len) / 2, 8);
+    word_25B44[2] = 0;
+    switch (gameData->isCampaignMission) {
+    case 0:  sub_15120((char *)0xB96A, (char *)0x5A37); break;
+    case 1:  sub_15120((char *)0xB96A, (char *)0x5A40); break;
+    case 2:  sub_15120((char *)0xB96A, (char *)0x5A4C); break;
+    }
+    len = sub_13E38(word_25B44, (char *)0xB96A);
+    sub_13B76(word_25B44, (char *)0xB96A, 0x98 + (0x82 - len) / 2, 0x12);
+    switch (gameData->flags3c) {
+    case 0:  sub_15120((char *)0xB96A, (char *)0x5A5D); break;
+    case 1:  sub_15120((char *)0xB96A, (char *)0x5A71); break;
+    case 2:  sub_15120((char *)0xB96A, (char *)0x5A81); break;
+    case 3:  sub_15120((char *)0xB96A, (char *)0x5A95); break;
+    }
+    len = sub_13E38(word_25B44, (char *)0xB96A);
+    sub_13B76(word_25B44, (char *)0xB96A, 0x98 + (0x82 - len) / 2, 0x1C);
+    switch (gameData->flags3e) {
+    case 0:  sub_15120((char *)0xB96A, (char *)0x5AA5); break;
+    case 1:  sub_15120((char *)0xB96A, (char *)0x5AB5); break;
+    case 2:  sub_15120((char *)0xB96A, (char *)0x5AC7); break;
+    case 3:  sub_15120((char *)0xB96A, (char *)0x5AD9); break;
+    }
+    len = sub_13E38(word_25B44, (char *)0xB96A);
+    sub_13B76(word_25B44, (char *)0xB96A, 0x98 + (0x82 - len) / 2, 0x26);
+    switch (gameData->flags40) {
+    case 0:  sub_15120((char *)0xB96A, (char *)0x5AE9); break;
+    case 1:  sub_15120((char *)0xB96A, (char *)0x5AF4); break;
+    case 2:  sub_15120((char *)0xB96A, (char *)0x5B02); break;
+    }
+    len = sub_13E38(word_25B44, (char *)0xB96A);
+    sub_13B76(word_25B44, (char *)0xB96A, 0x98 + (0x82 - len) / 2, 0x30);
+    word_25B2C[2] = 0xF;
+    sub_14E9C();
+    word_25CE6 = 2;
+    sub_10924((char *)0x5C86, word_2CA48, **word_2CA46, 0xC8,
+              word_25CF6[1] + 0x84, word_25B2C, 0);
+    result = sub_10AE8((char *)0x5C86, word_2CA48, **word_2CA46,
+                       word_25CF6, word_25B2C, 0);
+    if (result == 1)
+        byte_2C160 = 4;
+    else
+        byte_2C160 = 1;
+    sub_125EA();
+    sub_14EDA();
+    byte_2CA62 = 0;
+    sub_14622(word_25B2C, 0x98, 0x48, 0x117, 0x4E);
+    ovlCall_c8a();
+    if (rtcEnabled == 1)
+        sub_1685C(word_2A0C4);
+}
 
 /* seg000:0xaca0 — single-column theater list: draws items, highlights the
  * current theater row, runs the select widget. */

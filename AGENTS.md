@@ -42,7 +42,7 @@ map/<x>_en.map --srcdir src_<x>`):
   setTimerIrqHandler/installCBreakHandler (int21h vectors), clearRect
   (rep stosw), clipAndDrawLine/calibrateTimerSpeed/readJoyAxis (hw asm),
   strcoll/gety/move_ovlcur + all CRT.
-- src_start/ — 142 MATCH:
+- src_start/ — 143 MATCH:
   cleanup.c: cleanup
   drawstr.c: drawStringAt drawStringFar drawStringAtFar
   stalloc.c: allocBuffer freeBuffer
@@ -53,8 +53,8 @@ map/<x>_en.map --srcdir src_<x>`):
     formatGridRef formatTimeStr clampValue missionGenerate runGenerator
   stgrid.c: parseGrid replaceExtension
   stload.c: loadSpriteScaled loadPicRes loadSpriteRes loadResSection
-  stmenu.c(/Os): sub_1ACA0 sub_1AE22 sub_1AFA8 sub_1B184 sub_1B304
-    sub_1B452
+  stmenu.c(/Os): sub_1A68C sub_1ACA0 sub_1AE22 sub_1AFA8 sub_1B184
+    sub_1B304 sub_1B452
   stmap.c(/Ot): mapToScreenX mapToScreenY drawMapLine drawClippedMapLine
     drawMapPoint plotMapPoint sinMul cosMul toggleSelRect drawRiskPanel
     rectInView shiftByMode drawScorePanel drawUnitList
@@ -315,6 +315,14 @@ mzmap (jump-table headers, no call-reachable exports).
   Declare `func(struct Row r)` and call `func(tab[i])`. sub_1ACA0 row loop.
 - Jump-table operand bytes sit inside the routine extent: mark them `U`
   in the map (`R..x U tab R..`) or mzdiff disassembles the table as code.
+- `for` vs `while` chunk layout: `for (i=0;i<n;i++)` emits
+  `init; jmp TEST; INC:inc; TEST:cmp; jbe out; body; jmp INC` — the initial
+  `jmp` forward lets pending DEFERRED chunks (earlier switch arms) land in
+  the gap before INC/TEST. The same body as `while` emits the test INLINE
+  (top-tested) instead. sub_1A68C row loop after the theater switch.
+- CL heap exhaustion (`fatal error C1002`) on stubs.c under -DEXE_START:
+  satellite overflow stubs go in a new `src_start/ststubs.c`-style module —
+  satellite builds compile every srcdir *.c, so defs still link.
 
 ## Routines that are asm in the original (do NOT port)
 
