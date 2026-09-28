@@ -74,6 +74,11 @@ MODULE_FLAGS = {
     # EN stpanel (sub_12754): /Ot — original emits branch-target alignment
     # nops that /Os suppresses; routine was in a different original module.
     'start/stpanel.c': ['/AS', '/Gs', '/Ot'],
+    # EN stobj (sub_15460): /Ot — same branch-target alignment nops.
+    'start/stobj.c':   ['/AS', '/Gs', '/Ot'],
+    # EN stobjb (sub_161A4 view-origin wrapper): /Os — original shares the
+    # epilogue tail (jmp over sub ax,ax); /Ot inlines per-return epilogues.
+    'start/stobjb.c':  ['/AS', '/Gs', '/Os'],
     'start/stgen.c':   ['/AS', '/Gs', '/Ot'],
     # EN stload: no /Gs — loadResSection prologue is `mov ax,2; call __chkstk`
     'start/stload.c':  ['/AS', '/Od'],

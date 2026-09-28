@@ -1072,3 +1072,29 @@ Also learned: `A*B` where both operands share a base symbol
 declared `int16 word_23E28` in ststubs.c to reproduce
 `mov ax,[si+base]; imul [si+base+2]`. `uint8 objectActive[]` gives
 `sub ah,ah` zero-extension where `int8` gave `cbw`.
+
+`src_start/stobj.c` ports `sub_15460` (seg000:0x5460) and `sub_15B68`
+(seg000:0x5b68) — the twin theater/object-data loaders. Both build the
+200-entry EGA row/plane table `word_2C7D8` (`(i/4)*160 + ((i&3)<<13)`),
+expand 16 packed palette bytes into four nibble tables, unpack big-endian
+0x5C-stride attribute records + 0x49-stride name records, delta-decode the
+packed sign/hi-bit table into `word_21718`, then run the icon/marker blit
+loops and the `word_2B83E` gfx-mode screen-segment switch. sub_15460 reads
+via `bufReadFile`/file handle (`resFileOpen`+`sub_149A1` init,
+`sub_153F2` advance); sub_15B68 is the stream variant (`seg_2D274`=
+arg + `sub_16C0E` refill, `sub_15B22`/`sub_15B02` reads, `sub_16AE7`
+instead of `sub_169BE`, no close). Both are `/Ot` (interior nop pads).
+
+Two codegen finds: `sub_15AD2(0xFFFFL)` — the caller pushes a 32-bit const
+(`mov ax,-1; sub dx,dx; push dx; push ax`), so declare the param `int32`
+even though the callee is `(int16,int16)`. And palette nibble temps reuse
+the named `int16 j` slot — written as plain `int16` assignments MSC emits
+`sub ah,ah; and ax,imm` word ops (vs byte `and al,imm` for a uint8 temp),
+keeping the 12-byte frame exact.
+
+The 0x61a4 wrapper (`sub_161A4`, unnamed in the map) sits inside
+sub_15B68's extent but was `/Os` in the original (shared-epilogue
+`jmp`/`sub ax,ax` tail that /Ot inlines). Moved to its own module
+`stobjb.c` whose basename sorts right after stobj.c — the portcheck test
+exe links modules alphabetically, so it lands contiguous and the full
+5b68-61cb extent matches.

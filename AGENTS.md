@@ -56,6 +56,8 @@ map/<x>_en.map --srcdir src_<x>`):
   stmenu.c(/Os): sub_18F12 sub_193EE sub_1A68C sub_1ACA0 sub_1AE22
     sub_1AFA8 sub_1B184 sub_1B304 sub_1B452
   stpanel.c(/Ot): sub_12754
+  stobj.c(/Ot):  sub_15460 sub_15B68
+  stobjb.c(/Os): sub_161A4
   stmap.c(/Ot): mapToScreenX mapToScreenY drawMapLine drawClippedMapLine
     drawMapPoint plotMapPoint sinMul cosMul toggleSelRect drawRiskPanel
     rectInView shiftByMode drawScorePanel drawUnitList
@@ -135,7 +137,11 @@ mzmap (jump-table headers, no call-reachable exports).
 - Small model `/AS`: near code+data; cross-segment callees declared `far`.
 - Optimize on: `/Gs` + `/Os` or `/Ot` — never `/Od`. The choice is per-module
   and recorded in `tools/portcheck.py` `MODULE_FLAGS`; `/Os` vs `/Ot` shows on
-  routines with early returns (shared vs inlined epilogue).
+  routines with early returns (shared vs inlined epilogue). `/Ot` also emits
+  nop pads before odd-aligned branch targets; `/Os` suppresses them. A map
+  extent may swallow an unnamed trailing function from a different original
+  module — put it in a separately-flagged module whose basename sorts next
+  (test-exe link order is alphabetical) — stobjb.c after stobj.c.
 - MSC 5.1 has no working `volatile` (accepted syntactically, ignored). Code
   touching timer/interrupt-updated globals was likely shipped under `/Zi`
   (debug) because optimized builds broke — if a routine resists matching under

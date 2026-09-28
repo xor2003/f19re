@@ -79,3 +79,34 @@ struct Rec18 { int16 f0, pad[8]; };
 struct Rec18 word_241C8[8];                 /* dseg:0x41c8, stride 0x12 */
 char  strTab14[8][0x0E];                    /* dseg:0x3e1e name strings */
 char  strTab32[8][0x20];                    /* dseg:0x3f60 name strings */
+/* stobj.c sub_15460 (theater/object data loader) globals */
+int16 word_21716;                           /* RLE run state */
+uint8 byte_22318, byte_22319, byte_2231A, byte_2231B,
+      byte_2231C, byte_2231D, byte_2231E;
+int16 word_2C7D8[200];                      /* row-offset table */
+int16 word_2D05C;                           /* object file handle */
+int16 word_2D2F4;                           /* second alloc seg */
+int16 word_2B83E;                           /* gfx mode 0..3 */
+int16 word_216D6, word_216CA;
+int16 *word_21706, *word_21708;             /* screen ptr pair */
+int16 word_21712;
+uint8 *word_22320;                          /* buffer ptr (0x1b18) */
+uint8 byte_27D37[16], byte_27D47[16],
+      byte_27D57[16], byte_27D67[16];       /* nibble palette tables */
+int16 word_2367E, word_23680;
+int16 word_21718[0x100];                    /* delta-decoded pair table */
+int16 word_2CA4E, word_2CA50;               /* draw offsets */
+int16 word_2D05A;                           /* stream state flag */
+int16 seg_2D274;                            /* source data segment */
+int16 sub_15AD2(int32 a) { return (int16)a; }
+int16 sub_153F2(int16 a, int16 fd) { return 0; }
+int16 sub_15B02(int16 n) { return n; }
+void  sub_169BE(int16 a, int16 b, int16 c, int16 d) { }
+void  sub_16AE7(int16 a, int16 b, int16 c, int16 d) { }
+void  sub_168C8(int16 a, int16 b, int16 c, int16 d,
+                int16 e, int16 f, int16 g, int16 h) { }
+void  sub_16D93(int16 a, int16 b, int16 c, int16 d, int16 e, int16 f) { }
+void  sub_16D90(int16 a, int16 b, int16 c, int16 d, int16 e, int16 f) { }
+void  sub_16DC2(int16 a, int16 b, int16 c, int16 d, int16 e, int16 f) { }
+void  sub_16E0C(int16 a, int16 b, int16 c, int16 d, int16 e, int16 f) { }
+void  far ovlCall_ba9(void) { }             /* overlay 1000:0ba9 */

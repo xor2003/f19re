@@ -708,7 +708,6 @@ void  sub_16208(void) { }
 int16 sub_148FE(int16 h, int16 n, int16 b) { return h; }   /* int21h raw read */
 void  sub_15152(char *d, const char far *s) { }            /* far-src strcpy */
 int16 sub_15B22(int16 a, int16 b) { return a; }
-int16 sub_15B68(int16 f) { return f; }
 int16 word_22322;                                         /* scratch buf cursor */
 int16 word_2CA60, word_2CA64;                             /* map window bounds */
 void  sub_14E9C(void) { }
