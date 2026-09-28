@@ -554,7 +554,7 @@ int8  wldReadBuf11[0x2ee];
 int16 wldOffsets[0x64];
 int16 missionDistAccum;
 int16 escortMissionFlag;
-int16 missionMidX[4];
+int16 missionMidX[8];
 uint8 targets[0x24];
 int8  bufCoordStr[8];
 /* stparse.c globals */
@@ -568,7 +568,6 @@ uint8 terrainTileBlock[0x2860];
 /* stgen.c missionGenerate globals */
 int16 difficultySaved, theaterSaved, flag4Saved;
 char *plhFiles[4] = {"lb.xxx","pg.xxx","nc.xxx","ce.xxx"};
-void  runGenerator(void) { }
 /* stpinp.c saveHallfame globals + callees */
 int16 *uiPage;
 char  scrStrBuf[0x80];
@@ -609,6 +608,16 @@ char  unitNameTab[1][0x20];
 char  briefTimeA[8], briefTimeB[8], briefCoord2[8];
 int16 mystrlen(char *s) { int16 n = 0; while (s[n]) n++; return n; }
 void  far gfx_commitPage(void) { }
+/* runGenerator (stgen.c) globals */
+int16 escortObj;                             /* dseg:0xbb72 */
+int32 tgtPreciseX, tgtPreciseY;              /* dseg:0xc146,0xc1c6 */
+char  briefTimeC[8];                         /* dseg:0x4dc2 */
+uint8 loadoutTab[8 * 13];                    /* dseg:0x46f6 */
+int16 missionSpeedTab[0x40];                 /* dseg:0x4506 */
+struct SiteParm { int16 theaterMask, campMask, kind, reqType, flags, extra; };
+struct SiteParm siteParms[0x38];             /* dseg:0x4b0c */
+struct LinkPair { int16 nextA, nextB; };
+struct LinkPair linkTab[0x20];               /* dseg:0x447e */
 #endif
 void  dos_printstring(const char *s) { }
 uint16 dos_alloc(uint16 size) { return 0; }

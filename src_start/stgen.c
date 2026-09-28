@@ -41,7 +41,10 @@ void commFetch(void *ptr, int16 itemsz, int16 count) {
 }
 
 /* seg000:0x8cf0 — point the comm write cursor at commData->worldBuf */
-struct GameComm { int8 pad[0x7a]; int16 worldBuf; };
+struct GameComm { int8 pad[0x2e]; int16 missionRange;  /* +0x2e */
+                  int8 pad30[8];  int16 missionKind[4];  /* +0x38..3e */
+                  int16 missionStat[4];                  /* +0x40..46 */
+                  int8 pad48[0x32]; int16 worldBuf; };
 extern struct GameComm far *commData;         /* far ptr dseg:0xd066 */
 
 FILE *setMoveDstComm7A() {           /* K&R: no params -> no bp frame */
@@ -70,12 +73,13 @@ typedef struct {
 } FlightUnit;
 
 typedef struct {
-    uint16 x_coord, y_coord; /* 0x00, 0x02 */
-    int16 pad4;             /* 0x04 */
-    int16 targetFlags;      /* 0x06 */
-    int16 pad8[2];          /* 0x08 */
-    int16 objectIdx;        /* 0x0c */
-    int16 padE;             /* 0x0e */
+    int16 link;             /* 0x00 — object name/link word (dseg 0xb38e) */
+    uint16 x_coord, y_coord; /* 0x02, 0x04 (uint16: <<5 widening emits sub dx,dx) */
+    int16 unitType;         /* 0x06 — ground-unit type (link-chase) */
+    int16 targetFlags;      /* 0x08 */
+    int16 escortType;       /* 0x0a */
+    int16 escortNum;        /* 0x0c */
+    int16 objectIdx;        /* 0x0e */
 } WorldObject;
 
 typedef struct {
@@ -187,8 +191,46 @@ extern int8 wldReadBuf11[];         /* dseg:0xcb38 */
 extern int16 wldOffsets[];          /* dseg:0xca70 */
 extern int16 missionDistAccum;      /* dseg:0xca4a */
 extern int16 escortMissionFlag;     /* dseg:0x98ea */
-extern int16 missionMidX[];         /* dseg:0x3e0a */
-extern uint8 targets[];             /* dseg:0xb946 */
+extern uint16 missionMidX[];        /* dseg:0x3e0a */
+
+struct Target {             /* dseg:0xb946, stride 0x12 */
+    int16 kind;             /* +0  mission-target kind */
+    int16 objIdx;           /* +2  worldObjects[] index */
+    int16 siteObj;          /* +4  site anchor object */
+    int16 flags;            /* +6  lo=site flags, hi=extra */
+    int16 siteIdx;          /* +8  siteParms[] index */
+    char  name[6];          /* +0a coord string */
+    int16 tail;             /* +10 */
+};
+extern struct Target targets[];
+
+struct SiteParm {           /* dseg:0x4b0c, stride 0x0c */
+    int16 theaterMask;      /* +0  bit per theater */
+    int16 campMask;         /* +2  bit per campaign flag */
+    int16 kind;             /* +4  -> targets.kind */
+    int16 reqType;          /* +6  required unit-class byte */
+    int16 flags;            /* +8  -> targets.flags lo byte */
+    int16 extra;            /* +0a >0 -> flags hi byte, <0 -> -planeType */
+};
+extern struct SiteParm siteParms[];
+
+struct LinkPair {           /* dseg:0x447e, stride 4 */
+    int16 nextA;            /* +0 */
+    int16 nextB;            /* +2 */
+};
+extern struct LinkPair linkTab[];
+
+extern int16 escortObj;                         /* dseg:0xbb72 */
+extern int32 tgtPreciseX, tgtPreciseY;          /* dseg:0xc146, 0xc1c6 */
+extern uint8 loadoutTab[];                      /* dseg:0x46f6 13-stride */
+extern int16 missionSpeedTab[];                 /* dseg:0x4506 */
+extern char   briefTimeA[];                     /* dseg:0x4db6 */
+extern char   briefTimeB[];                     /* dseg:0x4dbc */
+extern char   briefTimeC[];                     /* dseg:0x4dc2 */
+extern char   briefCoord2[];                    /* dseg:0x4dc8 */
+extern int16  randMul(uint16 n);
+extern int16  itemDistance(int16 a, int16 b);
+extern char  *getItemCoordStr(int16 idx);
 
 void parseWorld(const char *filename) {
     int16 j, l;
@@ -238,7 +280,7 @@ void exportWorldToComm(const char *filename) {
 /* seg000:0x8d98 — format "TD00"-style grid ref into bufCoordStr (dseg:0x98cc).
  * EN has only theaters 0-3; other values fall through with gridOff* uninitialized. */
 struct GD { int8 pad[0x38]; int16 theater; int16 isCampaignMission;
-            int8 pad3c[2]; int16 difficulty; };
+            uint8 flags3c; int8 pad3d; int16 difficulty; };
 extern struct GD far *gameData;             /* far ptr dseg:0x991c */
 extern int8 bufCoordStr[];                  /* dseg:0x98cc */
 extern void mystrcpy(char *d, const char *s);
@@ -312,4 +354,402 @@ void missionGenerate() {
     mystrcpy(regnPlhPtr, plhFiles[gameData->theater]);
     parseGridTerrain();
     runGenerator();
+}
+
+/* ---- runGenerator (seg000:0x7738) — campaign mission generator: pick two
+ * target sites, score them, place escorts, export mission data to commData.
+ * Retries via goto restart_40a8 (re-runs cycle++/check) — the inner target
+ * pick is a do/while, so its re-rolls do NOT consume an cycle. */
+
+void runGenerator(void)
+{
+    int16 cycle;
+    int16 mDist;
+    int16 head;
+    int16 mKind;
+    int16 have;
+    int16 waypt;
+    int16 baseBrg;
+    int16 pick;
+    int16 tmpW;
+    int16 rngLim;
+    int16 minD2;
+    int16 grType;
+    int16 randW;
+    int16 weap;
+    int16 range[3];
+    int16 randY;
+    int16 retryCount;
+    int16 sl;
+    int16 okCnt;
+    int16 m2;
+
+    cycle = missionDistAccum = 0;
+    minD2 = 0x1c2;
+restart_40a8:
+    cycle = cycle + 1;
+    if (999 < cycle) goto counterMore1k;
+    do {
+        if (!(gameData->flags3c & 1)) {
+            do {
+                randW = randMul(worldObjectCount - 3) + 3;
+            } while ((worldObjects[randW].targetFlags & 0xd01) != 1);
+            targets[0].objIdx = randW;
+        }
+        else {
+            do {
+                randW = randMul(0xe0) * 0x80 + 0x840;
+                randY = randMul(0xe0) * 0x80 + 0x840;
+            } while ((terrainGrid[(randW >> 0xb) + ((randY >> 0xb) * 0x10)] & 3) != 0 ||
+                     (targets[0].objIdx = findOrPlaceItem(randW, randY, 1)) == 0xffff ||
+                     (worldObjects[targets[0].objIdx].targetFlags & 0x801) == 1);
+        }
+        do {
+            randW = randMul(0xe0) * 0x80 + 0x840;
+            randY = randMul(0xe0) * 0x80 + 0x840;
+        } while ((terrainGrid[(randW >> 0xb) + ((randY >> 0xb) * 0x10)] & 3) != 0 ||
+                 (targets[1].objIdx = findOrPlaceItem(randW, randY, 2)) == 0xffff ||
+                 ((gameData->flags3c & 1) &&
+                  (worldObjects[targets[1].objIdx].targetFlags & 0x801) == 1));
+    } while (targets[0].objIdx == targets[1].objIdx ||
+             (itemDistance(targets[0].objIdx, targets[1].objIdx) >> 6) > 0xc8);
+    for (sl = 0; sl < 2; sl++) {
+        range[sl] = 0x7fff;
+        for (m2 = worldObjectCount; m2 < readItemSize; m2++) {
+            register int16 f = worldObjects[m2].targetFlags;
+            if ((f & 0x500) != 0 && (f & 0x201) != 0) {
+                range[2] = clampValue(itemDistance(targets[sl].objIdx, m2) +
+                    ((f & 0x100) != 0 ?
+                     randMul(0x64) * 0x40 + 0xc80 : 0), 0, 0x7fff);
+                if (range[2] < 0x7000 &&
+                    randMul(0x500) + range[2] <
+                        ((worldObjects[m2].targetFlags & 0x200) ? 0xc80 : 0) +
+                        range[sl]) {
+                    targets[sl].siteObj = m2;
+                    range[sl] = range[2];
+                }
+            }
+        }
+    }
+    if ((gameData->flags3c & 2) && theaterSaved == 0) {
+        if (gameData->flags3c & 1) {
+            targets[0].objIdx = 3;
+            targets[1].objIdx = 0xf;
+            targets[0].siteObj = 0x22;
+            targets[1].siteObj = 0x21;
+        }
+        else {
+            targets[0].objIdx = 0x16;
+            targets[1].objIdx = 8;
+            targets[0].siteObj = 0x22;
+            targets[1].siteObj = 0x23;
+        }
+        range[0] = itemDistance(targets[0].objIdx, targets[0].siteObj);
+        range[1] = itemDistance(targets[1].objIdx, targets[1].siteObj);
+    }
+    mDist = (itemDistance(targets[0].objIdx, targets[1].objIdx) >> 6) +
+                (range[0] >> 6) + (range[1] >> 6);
+    if (cycle + 0x2e4 < mDist || mDist < minD2) {
+        minD2 -= 5 - difficultySaved;
+        goto restart_40a8;
+    }
+    for (m2 = 0; m2 < 2; m2++) {
+        targets[m2].kind = 0;
+        for (retryCount = 0; retryCount < 2; retryCount++) {
+            okCnt = 0;
+            for (sl = 0; sl < 0x38; sl++) {
+                if ((siteParms[sl].theaterMask & (1 << gameData->theater)) != 0 &&
+                    (siteParms[sl].campMask & (1 << gameData->isCampaignMission)) != 0 &&
+                    (int8)objectTypeTable[
+                        worldObjects[targets[m2].objIdx].objectIdx & 0x7f] ==
+                        siteParms[sl].reqType &&
+                    (m2 == 0 || sl != targets[0].siteIdx)) {
+                    if (retryCount != 0 && okCnt == pick) {
+                        targets[m2].kind = siteParms[sl].kind;
+                        targets[m2].siteIdx = sl;
+                        targets[m2].flags = siteParms[sl].flags;
+                        if (siteParms[sl].extra > 0)
+                            targets[m2].flags += siteParms[sl].extra << 8;
+                    }
+                    okCnt++;
+                }
+            }
+            pick = randMul(okCnt);
+        }
+    }
+    if ((gameData->flags3c & 2) && theaterSaved == 0) {
+        sl = (gameData->flags3c & 1) ? 5 : 0x37;
+        targets[0].kind = siteParms[sl].kind;
+        targets[0].siteIdx = sl;
+        targets[0].flags = siteParms[sl].flags;
+    }
+    if (targets[0].kind == 0) goto restart_40a8;
+    if (targets[1].kind == 0) goto restart_40a8;
+    if (targets[0].siteIdx == targets[1].siteIdx) goto restart_40a8;
+    if ((targets[0].flags & 1) && targets[1].kind == 1) goto restart_40a8;
+    if ((targets[1].flags & 1) && targets[0].kind == 1) goto restart_40a8;
+    if (range[0] < range[1] && !(gameData->flags3c & 2)) {
+        tmpW = targets[0].objIdx;
+        targets[0].objIdx = targets[1].objIdx;
+        targets[1].objIdx = tmpW;
+        tmpW = targets[0].kind;
+        targets[0].kind = targets[1].kind;
+        targets[1].kind = tmpW;
+        tmpW = targets[0].siteObj;
+        targets[0].siteObj = targets[1].siteObj;
+        targets[1].siteObj = tmpW;
+        tmpW = targets[0].siteIdx;
+        targets[0].siteIdx = targets[1].siteIdx;
+        targets[1].siteIdx = tmpW;
+        tmpW = targets[0].flags;
+        targets[0].flags = targets[1].flags;
+        targets[1].flags = tmpW;
+        tmpW = range[0];
+        range[0] = range[1];
+        range[1] = tmpW;
+    }
+    if ((targets[1].flags & 2) && (targets[1].flags & 2)) goto restart_40a8;
+    if (targets[1].kind == 5) goto restart_40a8;
+    if (targets[1].kind == 7) goto restart_40a8;
+    if (targets[1].kind == 6) goto restart_40a8;
+    if (targets[1].kind == 8) goto restart_40a8;
+    if (targets[0].kind == 4 && difficultySaved == 0) goto restart_40a8;
+    if ((targets[0].flags & 8) && targets[1].kind == 1) goto restart_40a8;
+    if ((targets[1].flags & 8) && targets[0].kind == 1) goto restart_40a8;
+    if ((targets[0].flags & 8) && (targets[1].flags & 8)) goto restart_40a8;
+    if (targets[0].flags & 2)
+        missionDistAccum =
+            (itemDistance(targets[0].siteObj, targets[0].objIdx) >> 4) + 0x1c2;
+    if (targets[1].flags & 2)
+        missionDistAccum =
+            (itemDistance(targets[0].siteObj, targets[1].objIdx) >> 4) + 0x1c2;
+    escortMissionFlag = -1;
+    if (siteParms[targets[0].siteIdx].extra < 0)
+        flightUnits[0].planeType = -siteParms[targets[0].siteIdx].extra;
+    if (targets[0].kind == 5) {
+        tmpW = 0x7fff;
+        escortObj = -1;
+        for (m2 = 0; m2 < worldObjectCount; m2++) {
+            range[2] = abs(itemDistance(targets[0].objIdx, m2) - range[0]);
+            if (range[2] < tmpW &&
+                (worldObjects[m2].targetFlags & 1) != 0 &&
+                (worldObjects[m2].targetFlags & 0x100) == 0) {
+                escortObj = m2;
+                tmpW = range[2];
+            }
+        }
+        if (escortObj == -1) goto restart_40a8;
+        positionUnit(0, escortObj);
+        flightUnits[0].waypointIdx = targets[0].objIdx;
+        flightUnits[0].flags |= 4;
+        escortMissionFlag = 0;
+        mystrcpy(briefCoord2, getItemCoordStr(escortObj));
+        missionDistAccum = itemDistance(escortObj, targets[0].objIdx) /
+            ((flightUnits[escortMissionFlag].maxSpeed >> 6) * 3);
+    }
+    if (targets[0].kind == 7 || targets[0].kind == 6) {
+        tmpW = 0x7fff;
+        for (m2 = 3; m2 < readItemSize; m2++) {
+            register int16 f = worldObjects[m2].targetFlags;
+            if ((f & 0x500) == 0) continue;
+            if ((f & 0xa00) != 0) continue;
+            range[2] = abs(itemDistance(targets[0].objIdx, m2) - range[0]);
+            if (range[2] >= tmpW) continue;
+            if (m2 == targets[0].siteObj) continue;
+            escortObj = m2;
+            tmpW = range[2];
+        }
+        mystrcpy(briefCoord2, getItemCoordStr(escortObj));
+        if (targets[0].kind == 7) {
+            positionUnit(0, targets[0].objIdx);
+            flightUnits[0].waypointIdx = escortObj;
+            flightUnits[0].flags |= 4;
+            escortMissionFlag = 0;
+            escortObj = targets[0].objIdx;
+        }
+        else {
+            positionUnit(0, escortObj);
+            flightUnits[0].waypointIdx = targets[0].objIdx;
+            flightUnits[0].flags |= 4;
+            escortMissionFlag = 0;
+            missionDistAccum = itemDistance(escortObj, targets[0].objIdx) /
+                ((flightUnits[escortMissionFlag].maxSpeed >> 6) * 2);
+        }
+    }
+    if (targets[0].kind == 8) {
+        positionUnit(0, targets[0].objIdx);
+        if (flightUnits[0].planeType == 2 && theaterSaved == 1)
+            flightUnits[0].planeType = 0xc;
+        flightUnits[0].waypointIdx = targets[0].objIdx;
+        flightUnits[0].flags |= 0x40;
+        escortMissionFlag = 0;
+        escortObj = targets[0].objIdx;
+    }
+    if (escortMissionFlag == 0)
+        flightUnits[0].fuel = 0x4e1f;
+    for (m2 = 0; m2 < 2; m2++) {
+        mystrcpy(targets[m2].name, getItemCoordStr(targets[m2].objIdx));
+        if (targets[m2].objIdx < 3) {
+            tmpW = 0x7fff;
+            for (sl = 3; sl < readItemSize; sl++) {
+                if ((worldObjects[sl].targetFlags & 0x500) == 0 &&
+                    itemDistance(sl, targets[m2].objIdx) < tmpW &&
+                    worldObjects[sl].link != 0) {
+                    tmpW = itemDistance(sl, targets[m2].objIdx);
+                    worldObjects[targets[m2].objIdx].link = worldObjects[sl].link;
+                }
+            }
+        }
+    }
+    targets[0].tail = missionDistAccum >> 4;
+counterMore1k:
+    tgtPreciseX = (int32)worldObjects[targets[0].siteObj].x_coord << 5;
+    tgtPreciseY = (-((int32)worldObjects[targets[0].siteObj].y_coord - 0x8000) << 5)
+                  - (int32)((worldObjects[targets[0].siteObj].targetFlags & 0x200) ?
+                            0 : 0x708);
+    missionMidX[2] = worldObjects[targets[0].objIdx].x_coord;
+    missionMidX[3] = worldObjects[targets[0].objIdx].y_coord;
+    missionMidX[0] = (worldObjects[targets[0].siteObj].x_coord / 2) +
+                     (missionMidX[2] / 2);
+    missionMidX[1] = (worldObjects[targets[0].siteObj].y_coord / 2) +
+                     (missionMidX[3] / 2);
+    missionMidX[6] = worldObjects[targets[1].siteObj].x_coord;
+    missionMidX[7] = worldObjects[targets[1].siteObj].y_coord;
+    missionMidX[4] = worldObjects[targets[1].objIdx].x_coord;
+    missionMidX[5] = worldObjects[targets[1].objIdx].y_coord;
+    if (targets[0].flags & 0x10) {
+        missionMidX[2] = ((missionMidX[2] >> 0xa) << 0xa) + 0x200;
+        missionMidX[3] = ((missionMidX[3] >> 0xa) << 0xa) + 0x200;
+    }
+    for (m2 = 0; m2 < flightUnitCount - 4; m2++) {
+        if ((int8)flightUnits[m2].flags & 0x80) {
+            rngLim = (range[0] / 4) * (4 - difficultySaved);
+            if ((int8)flightUnits[m2].flags & 0x40)
+                rngLim = range[0] << 1;
+            do {
+                range[2] = randMul(worldObjectCount - 3) + 3;
+            } while ((worldObjects[range[2]].targetFlags & 0x100) ||
+                     rangeApprox(missionMidX[0] - worldObjects[range[2]].x_coord,
+                                 missionMidX[1] - worldObjects[range[2]].y_coord) >
+                     (rngLim += 0x10));
+            positionUnit(m2, range[2]);
+            rngLim = 0x3000;
+            baseBrg = calcBearing(
+                worldObjects[targets[0].siteObj].x_coord - flightUnits[m2].x,
+                flightUnits[m2].y - worldObjects[targets[0].siteObj].y_coord);
+            for (sl = 0; sl < 8; sl++) {
+                waypt = randMul(worldObjectCount) + 1;
+                if ((worldObjects[waypt].targetFlags & 0x400) == 0) {
+                    head = calcBearing(
+                        worldObjects[waypt].x_coord - flightUnits[m2].x,
+                        flightUnits[m2].y - worldObjects[waypt].y_coord);
+                    if (abs(baseBrg - head) < rngLim) {
+                        rngLim = abs(baseBrg - head);
+                        flightUnits[m2].waypointIdx = waypt;
+                        break;
+                    }
+                }
+            }
+        }
+        if ((flightUnits[m2].flags & 0x100) != 0 && escortMissionFlag != -1) {
+            positionUnit(m2, escortObj);
+            flightUnits[m2].fuel = 0x4e1f;
+        }
+        if (m2 != 0) {
+            range[2] = 0;
+            do {
+                waypt = randMul(worldObjectCount - 3) + 3;
+            } while (!((worldObjects[waypt].targetFlags & 0x801) == 1 &&
+                       worldObjects[waypt].escortNum == 0) &&
+                     range[2]++ < 20);
+            worldObjects[waypt].escortType = flightUnits[m2].planeType;
+            worldObjects[waypt].escortNum = randMul(theaterSaved + 1) + 1;
+        }
+    }
+    for (m2 = 0; m2 < groundUnitCount; m2++) {
+        grType = worldObjects[m2].unitType;
+        if (grType != 0 && grType != 0x15) {
+            switch (randMul(5) + (gameData->isCampaignMission != 0) +
+                    difficultySaved) {
+            case 0:
+            case 1:
+            case 3:
+                grType = linkTab[grType].nextB;
+            case 2:
+            case 4:
+            case 6:
+                break;
+            case 5:
+            case 7:
+            case 8:
+                grType = linkTab[grType].nextA;
+                break;
+            }
+            worldObjects[m2].unitType = grType;
+            if ((worldObjects[m2].targetFlags & 8) != 0 &&
+                gameData->isCampaignMission + difficultySaved + 2 < randMul(0xa))
+                worldObjects[m2].unitType = 0;
+        }
+    }
+    for (randW = 0; randW < 0x10; randW++) {
+        for (randY = 0; randY < 0x10; randY++) {
+            if ((terrainGrid[randY + randW * 0x10] & 0x10) != 0 &&
+                randMul(5) >= difficultySaved)
+                terrainGrid[randY + randW * 0x10] &= 0xef;
+        }
+    }
+    commData->missionKind[0] = 1;
+    commData->missionKind[2] = randMul(2) ? 5 : 9;
+    commData->missionKind[3] = 0;
+    commData->missionKind[1] = 2;
+    commData->missionRange = mDist << 4;
+    if (mDist * 16 > 0x2710)
+        commData->missionKind[2] = 0x11;
+    have = 0;
+    for (m2 = 0; m2 < 2; m2++) {
+        weap = -1;
+        if (targets[m2].kind == 1 && have == 0) {
+            weap = 0x10;
+            have = 1;
+        }
+        if (targets[m2].kind == 4 || targets[m2].kind == 3)
+            weap = 0x13;
+        if (targets[m2].kind == 2) {
+            do {
+                weap = randMul(0x10);
+            } while (loadoutTab[weap * 13 +
+                ((int8)wldReadBuf7[
+                    worldObjects[targets[m2].objIdx].objectIdx & 0x7f] &
+                 0xf)] < 4);
+        }
+        if (weap != -1)
+            commData->missionKind[m2] = weap;
+    }
+    if ((gameData->flags3c & 2) && theaterSaved == 0) {
+        if (gameData->flags3c & 1) {
+            commData->missionKind[0] = 5;
+            commData->missionKind[2] = 1;
+        }
+        else {
+            commData->missionKind[2] = 5;
+            commData->missionKind[0] = 1;
+        }
+        commData->missionKind[3] = 0;
+        if (mDist * 16 > 0x2710)
+            commData->missionKind[3] = 0x11;
+    }
+    for (m2 = 0; m2 < 4; m2++)
+        commData->missionStat[m2] =
+            missionSpeedTab[commData->missionKind[m2] * 13];
+    mKind = targets[0].siteIdx + targets[1].siteIdx;
+    missionTimeFlag = ((uint8)mKind & 3) == 0;
+    mKind = (mKind & 0xf) << 8;
+    if (targets[0].kind == 1 || targets[1].kind == 1)
+        missionTimeFlag = 0;
+    if (targets[0].kind == 4 || targets[1].kind == 4)
+        missionTimeFlag = 1;
+    formatTimeStr(briefTimeA, mKind);
+    formatTimeStr(briefTimeB, mKind + missionDistAccum);
+    formatTimeStr(briefTimeC, mKind + missionDistAccum + 0x1c2);
+    missionDistAccum -= (mKind + missionDistAccum) % 0x96;
 }

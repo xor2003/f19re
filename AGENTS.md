@@ -42,7 +42,7 @@ map/<x>_en.map --srcdir src_<x>`):
   setTimerIrqHandler/installCBreakHandler (int21h vectors), clearRect
   (rep stosw), clipAndDrawLine/calibrateTimerSpeed/readJoyAxis (hw asm),
   strcoll/gety/move_ovlcur + all CRT.
-- src_start/ — 134 MATCH:
+- src_start/ — 135 MATCH:
   cleanup.c: cleanup
   drawstr.c: drawStringAt drawStringFar drawStringAtFar
   stalloc.c: allocBuffer freeBuffer
@@ -50,7 +50,7 @@ map/<x>_en.map --srcdir src_<x>`):
     resFileWrite resFileReadBlock resFileWriteBlock
   stgen.c: rangeApprox memAppend commFetch setMoveDstComm7A doNothing
     positionUnit calcBearing findOrPlaceItem parseWorld exportWorldToComm
-    formatGridRef formatTimeStr clampValue missionGenerate
+    formatGridRef formatTimeStr clampValue missionGenerate runGenerator
   stgrid.c: parseGrid replaceExtension
   stload.c: loadSpriteScaled loadPicRes loadSpriteRes loadResSection
   stmap.c(/Ot): mapToScreenX mapToScreenY drawMapLine drawClippedMapLine
@@ -257,6 +257,30 @@ mzmap (jump-table headers, no call-reachable exports).
 - A 4-way char dispatch that the ref renders as a `cmp ax,K` chain (not
   jump table) is a `switch` — `if/else if` on a local emits `mov ax,[c]`
   differently. stepPanelAnim `<` `>` `^` `_` arm.
+- `f->flag` value cached in si across a call (escort/site loops): declare
+  `register int16 f = obj[i].flags` at loop-body top — but ONLY under `/Ot`;
+  `/Oa` makes MSC CSE the field ADDRESS instead of the value, spills loop
+  temps (`i*stride`, `&arr[sl]`, call results) to stack, and grows the
+  frame. Re-read the field plainly for any test the ref recomputes —
+  write `worldObjects[m2].targetFlags & 0x200` NOT `(f & 0x200)` when the
+  ref does `mov bx,[m2]; shl bx,4; test word[bx+off]` afresh.
+- `x != 0` (or `(uint16)x != 0`, `!!x`) materializes branchless:
+  `cmp mem,1; sbb ax,ax; inc ax`. `x >= 1` on int16 emits `jl/jmp` branch
+  arms, and the branch forces later terms into a deferred chunk. In a
+  `switch (randMul(k) + (cond) + bias)` index expression, the branchy bool
+  also flips the range guard (`ja`+inline dispatch vs ref's `jbe`+deferred
+  dispatch block). runGenerator ground-unit switch.
+- A switch jump table mid-routine must be marked as a `U` block in the
+  map (`R7738-8323 U8324-8335 R8336-866b`) — mzdiff then skips ref's table
+  bytes and guesses the target offset by equal U-block size.
+- `== 0xffff` vs `== -1`: the unsigned constant emits `cmp ax,0FFFFh` and
+  keeps ax live into a following `mov bx,ax`; `== -1` emits `inc ax; jz`
+  + reload. Use the F15-spelling `0xffff`/`0xffffu` where ref reuses the
+  compared value.
+- Struct-globals sized too small silently collide: `missionMidX[4]` made
+  `missionMidX[4..7]` writes land on the NEXT dseg global (mzdiff reports
+  "data offset mapping collides"). Size stub arrays to the full indexed
+  range seen in the ref (here `missionMidX[8]`).
 
 ## Routines that are asm in the original (do NOT port)
 
