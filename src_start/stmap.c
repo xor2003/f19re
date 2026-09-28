@@ -88,7 +88,7 @@ extern void sub_13FB3(int16 n, char *buf);    /* seg000:0x3fb3 numToStr */
 extern void sub_13B76(void *o, char *s, int16 x, int16 y); /* drawObjString */
 extern void sub_14622(void *o, int16 x0, int16 y0, int16 x1, int16 y1);
 extern void mystrcat(char *d, char *s);
-struct ObjF04 { int16 pad[2]; int16 f04; int16 pad3, f08, f0A; };
+struct ObjF04 { int16 pad[2]; int16 f04; int16 f06, f08, f0A; };
 
 void drawRiskPanel(struct ObjF04 *o, int16 type, int16 k) {
     char tmp[10];
@@ -136,4 +136,55 @@ void drawRiskPanel(struct ObjF04 *o, int16 type, int16 k) {
     o->f04 = 6;
     sub_14622(o, 0xB2, 0xBE, 0xD7, 0xC5);
     sub_13B76(o, scrStr, 0xB2, 0xBE);
+}
+
+/* seg000:0x133e — rect-in-bounds test against the map window globals:
+ * o->f0 <= maxX, o->f4 >= maxX is wrong; reads as point-in-rect on a
+ * {x,y,x1,y1} struct: o[0]<=v1 && o[2]>=v1 && o[1]<=v2 && o[3]>=v2. */
+extern uint16 word_2CA60, word_2CA64;
+
+int16 rectInView(uint16 *o) {
+    if (o[0] <= word_2CA60 && o[2] >= word_2CA60 &&
+        o[1] <= word_2CA64 && o[3] >= word_2CA64)
+        return 1;
+    else
+        return 0;
+}
+
+
+/* seg000:0x7072 — 32-bit shift-by-mode: v>>6/4/2, v, v<<1 — result dx:ax */
+uint32 shiftByMode(int16 mode, uint32 v) {
+    switch (mode) {
+    case 4: return v >> 6;
+    case 3: return v >> 4;
+    case 2: return v >> 2;
+    case 1: return v;
+    case 0: return v << 1;
+    }
+}
+
+/* seg000:0xd8aa — score panel: count scoreRec->f38[]==0x11, print total score */
+extern struct ObjF04 *objParms;             /* dseg:0x70ac — current obj parms */
+extern struct UnitRec38 far *scoreRec;      /* dseg:0xd066 */
+extern char str7964[];                      /* dseg:0x7964 — score suffix */
+
+void drawScorePanel(void) {
+    char buf[20];
+    int16 saveo, score3;
+    uint16 n1, i6;
+    objParms->f06 = 9;
+    sub_14622(objParms, 0x5E, 0x6C, 0xB4, 0x72);
+    objParms->f06 = 0xF;
+    saveo = objParms->f04;
+    objParms->f04 = 0xF;
+    n1 = 0;
+    for (i6 = 0; i6 < 4; i6++)
+        if ((&scoreRec->f38)[i6] == 0x11) n1++;
+    score3 = 0x76C * n1 + 0x2710;
+    sub_15120(scrStr, "Risk: ");
+    sub_13FB3(score3, buf);
+    mystrcat(scrStr, buf);
+    mystrcat(scrStr, str7964);
+    sub_13B76(objParms, scrStr, 0x5E, 0x6C);
+    objParms->f04 = saveo;
 }

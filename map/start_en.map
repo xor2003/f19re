@@ -42,12 +42,12 @@ sub_10F43: seg000 NEAR 0f43-0fd2 R0f43-0fd2
 sub_10FEE: seg000 NEAR 0fee-0ffd R0fee-0ffd
 sub_11000: seg000 NEAR 1000-12a7 R1000-12a7
 toggleSelRect: seg000 NEAR 12a8-133d R12a8-133d
-sub_1133E: seg000 NEAR 133e-1361 R133e-1361
+rectInView: seg000 NEAR 133e-1361 R133e-1361
 sub_11366: seg000 NEAR 1366-1415 R1366-1415
 rtcSync: seg000 NEAR 25ea-262b R25ea-262b
 selectNextObject: seg000 NEAR 262c-2670 R262c-2670
 selectNextUnit: seg000 NEAR 2672-26c5 R2672-26c5
-sub_126C6: seg000 NEAR 26c6-2704 R26c6-2704
+selectPrevObject: seg000 NEAR 26c6-2704 R26c6-2704
 selectPrevUnit: seg000 NEAR 2706-2753 R2706-2753
 sub_12754: seg000 NEAR 2754-3217 R2754-3217
 sub_13218: seg000 NEAR 3218-3253 R3218-3253
@@ -65,7 +65,7 @@ stringWidth: seg000 NEAR 3e38-3e7b R3e38-3e7b duplicate
 my_ltoa: seg000 NEAR 3e7c-3fb2 R3e7c-3fb2 duplicate
 # Routine my_itoa 0000:3fb3-0000:4088[0000d6] is a potential duplicate of routine my_itoa 0000:3b33-0000:3c0d[0000db], differs by 3 instructions
 my_itoa: seg000 NEAR 3fb3-4088 R3fb3-4088 duplicate
-sub_14089: seg000 NEAR 4089-40a2 R4089-40a2
+delayTicks: seg000 NEAR 4089-40a2 R4089-40a2
 sub_140A3: seg000 NEAR 40a3-40ad R40a3-40ad
 # Routine sub_140AE 0000:40ae-0000:40c6[000019] is a potential duplicate of routine randMul 0000:124b-0000:126f[000025], differs by 8 instructions
 randMul: seg000 NEAR 40ae-40c6 R40ae-40c6 duplicate
@@ -89,7 +89,8 @@ sub_14622: seg000 NEAR 4622-46bf R4622-46bf
 installCBreakHandler: seg000 NEAR 46c0-46e2 R46c0-46e2 duplicate
 sub_146E3: seg000 NEAR 46e3-46f3 R46e3-46f3
 sub_146F4: seg000 FAR 46f4-4745 R46f4-4745
-sub_14746: seg000 NEAR 4746-47b5 R4746-47b5
+resFileReadBlock: seg000 NEAR 4746-477d R4746-477d
+resFileWriteBlock: seg000 NEAR 477e-47b5 R477e-47b5
 resFileOpen: seg000 NEAR 47b6-47c6 R47b6-47c6
 resFileCreate: seg000 NEAR 47c8-47d9 R47c8-47d9
 resFileClose: seg000 NEAR 47da-47e7 R47da-47e7
@@ -146,27 +147,27 @@ sub_15330: seg000 NEAR 5330-5377 R5330-5377
 sub_15378: seg000 NEAR 5378-53e4 R5378-53e4
 # Routine sub_153E5 0000:53e5-0000:53f3[00000f] is a potential duplicate of routine putch 0000:6118-0000:6127[000010], differs by 4 instructions
 putch: seg000 NEAR 53e5-53f3 R53e5-53f3 duplicate
-sub_15414: seg000 NEAR 5414-545f R5414-545f
+bufReadFile: seg000 NEAR 5414-545f R5414-545f
 sub_15460: seg000 NEAR 5460-5ad1 R5460-5ad1
 # Routine sub_15AD2 0000:5ad2-0000:5b01[000030] is a potential duplicate of routine drawStringCentered 0000:397e-0000:39b4[000037], differs by 9 instructions
 drawStringCentered: seg000 NEAR 5ad2-5b01 R5ad2-5b01 duplicate
 advanceBufPos: seg000 NEAR 5b02-5b21 R5b02-5b21
-sub_15B22: seg000 NEAR 5b22-5b67 R5b22-5b67
+bufReadBytes: seg000 NEAR 5b22-5b67 R5b22-5b67
 sub_15B68: seg000 NEAR 5b68-61cb R5b68-61cb
 setViewOrigin: seg000 NEAR 61cc-61f0 R61cc-61f0
 sub_161F1: seg000 NEAR 61f1-6207 R61f1-6207
-sub_16208: seg000 NEAR 6208-6260 R6208-6260
+tickEffectTable: seg000 NEAR 6208-6260 R6208-6260
 sub_16261: seg000 NEAR 6261-669e R6261-669e
 evalChoiceExpr: seg000 NEAR 669f-6762 R669f-6762
 clipEntries: seg000 NEAR 6763-67fc R6763-67fc
-sub_167FD: seg000 NEAR 67fd-6827 R67fd-6827
+resetTableFlags: seg000 NEAR 67fd-6827 R67fd-6827
 # Routine allocBuffer 0000:6828-0000:685b[000034] is a potential duplicate of routine allocBuffer 0000:1d50-0000:1d83[000034], differs by 0 instructions
 allocBuffer: seg000 NEAR 6828-685b R6828-685b duplicate
 freeBuffer: seg000 NEAR 685c-6883 R685c-6883
 # Routine dos_alloc 0000:6884-0000:68a9[000026] is a potential duplicate of routine dos_alloc 0000:4a57-0000:4a7c[000026], differs by 0 instructions
 dos_alloc: seg000 NEAR 6884-68a9 R6884-68a9 duplicate
 dos_free: seg000 NEAR 68aa-68c9 R68aa-68c9
-sub_168FD: seg000 NEAR 68fd-69bd R68fd-69bd
+dispatchDrawMode: seg000 NEAR 68fd-69bd R68fd-69bd
 sub_169BE: seg000 NEAR 69be-6a93 R69be-6a93
 sub_16A94: seg000 NEAR 6a94-6ae6 R6a94-6ae6
 sub_16AE7: seg000 NEAR 6ae7-6bbc R6ae7-6bbc
@@ -184,7 +185,7 @@ sub_16DF5: seg000 NEAR 6df5-6e0b R6df5-6e0b
 sub_16E0C: seg000 NEAR 6e0c-6e32 R6e0c-6e32
 sub_16E33: seg000 NEAR 6e33-6e4b R6e33-6e4b
 sub_16E4C: seg000 NEAR 6e4c-6e8d R6e4c-6e8d
-sub_17072: seg000 NEAR 7072-70df R7072-70df
+shiftByMode: seg000 NEAR 7072-70df R7072-70df
 # Routine process3dg 0000:70e0-0000:71f7[000118] is a potential duplicate of routine lookupGridCell 0000:1fed-0000:2115[000129], differs by 39 instructions
 lookupGridCell: seg000 NEAR 70e0-71f7 R70e0-71f7 duplicate
 parseGridTerrain: seg000 NEAR 71f8-720b R71f8-720b
@@ -233,8 +234,8 @@ sub_1A555: seg000 NEAR a555-b8e6 Ra555-b8e6
 sub_1B8E7: seg000 NEAR b8e7-bac1 Rb8e7-bac1
 sub_1BAC2: seg000 NEAR bac2-bc80 Rbac2-bc80
 sub_1BC81: seg000 NEAR bc81-bd7d Rbc81-bd7d
-sub_1BD7E: seg000 NEAR bd7e-be08 Rbd7e-be08
-sub_1BE09: seg000 NEAR be09-be89 Rbe09-be89
+drawUnitMarkers: seg000 NEAR bd7e-be08 Rbd7e-be08
+drawTileMarkers: seg000 NEAR be09-be89 Rbe09-be89
 mapToScreenX: seg000 NEAR be8a-be98 Rbe8a-be98
 mapToScreenY: seg000 NEAR be99-bea7 Rbe99-bea7
 plotMapPoint: seg000 NEAR bea8-bf02 Rbea8-bf02
@@ -249,7 +250,7 @@ sinMul: seg000 NEAR c17b-c192 Rc17b-c192
 cosMul: seg000 NEAR c193-c1a7 Rc193-c1a7
 sub_1C1A8: seg000 NEAR c1a8-c698 Rc1a8-c698
 sub_1C699: seg000 NEAR c699-cbcd Rc699-cbcd
-sub_1D8AA: seg000 NEAR d8aa-d979 Rd8aa-d979
+drawScorePanel: seg000 NEAR d8aa-d979 Rd8aa-d979
 sub_1D97A: seg000 NEAR d97a-dbe7 Rd97a-dbe7
 # Routine __cinit 0000:dbe8-0000:dcab[0000c4] is a potential duplicate of routine _cinit 0000:4be4-0000:4ca7[0000c4], differs by 0 instructions
 _cinit: seg000 NEAR dbe8-dcab Rdbe8-dcab duplicate

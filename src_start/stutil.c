@@ -284,6 +284,62 @@ void selectPrevUnit(void) {
     } while (again != 0);
 }
 
+void selectPrevObject(void) {
+    int8 again;
+    again = 1;
+    do {
+        objCursor--;
+        if (objCursor < 0) objCursor = objectCount - 1;
+        if (worldObjects[objCursor].pad4 != 0 || objectActive[objCursor] != 0)
+            again = 0;
+    } while (again != 0);
+}
+
+/* seg000:0xbd7e / 0xbe09 — map overlay markers: per-unit blip & 16x16 tile grid.
+ * dstX/dstY written via byte offset into the SpriteParams pool at word_20000. */
+extern uint8 unitMarksOn;                  /* dseg:0x98e8 */
+extern uint8 tileMarksOn;                  /* dseg:0xbe48 */
+extern int8  tileMarkMap[];                /* dseg:0xb842 — 16x16, bit 0x10 */
+extern int16 unitSprOff, gridSprOff;       /* dseg:0x6612/0x6652 — byte offs into pool */
+extern int8  sprParmsTab[];                /* dseg:0x0008 (word_20000) */
+extern int16 mapClipX1, mapClipY1;         /* stmap.c — map origin for markers */
+extern void far gfx_blitSprite(int16 sprOff);
+extern int16 mapToScreenX(int16 v);
+extern int16 mapToScreenY(int16 v);
+
+void drawUnitMarkers(void) {
+    uint16 i;
+    if (unitMarksOn == 0) return;
+    for (i = 0; i < (uint16)objectCount; i++) {
+        if ((worldObjects[i].targetFlags & 1) != 0 ||
+            (worldObjects[i].targetFlags & 0x200) != 0)
+            if ((worldObjects[i].targetFlags & 0x800) == 0) {
+                *(int16 *)(sprParmsTab + unitSprOff + 8) =
+                    mapToScreenX(worldObjects[i].x_coord) + mapClipX1 - 2;
+                *(int16 *)(sprParmsTab + unitSprOff + 0xA) =
+                    mapToScreenY(worldObjects[i].y_coord) + mapClipY1 - 2;
+                gfx_blitSprite(unitSprOff);
+            }
+    }
+}
+
+void drawTileMarkers(void) {
+    uint16 i, j;
+    if (tileMarksOn == 0) return;
+    for (i = 0; i < 16; i++) {
+        for (j = 0; j < 16; j++) {
+            if ((tileMarkMap[i + j * 16] & 0x10) != 0) {
+                *(int16 *)(sprParmsTab + gridSprOff + 8) =
+                    mapToScreenX(i * 0x7FF) + mapClipX1;
+                *(int16 *)(sprParmsTab + gridSprOff + 0xA) =
+                    mapToScreenY(j * 0x7FF) + mapClipY1;
+                gfx_blitSprite(gridSprOff);
+            }
+        }
+    }
+}
+
+
 /* seg000:0x25ea — RTC sync when enabled: int 0x1a read, stash tick, then 10
  * settle ticks via sub_16208 */
 extern int16 rtcEnabled;                    /* dseg:0xbb74 */
@@ -448,4 +504,115 @@ int16 setViewOrigin(int16 a, int16 b, int16 flag) {
     if (sub_15B68(flag) != 0)
         return 1;
     return 0;
+}
+
+/* seg000:0x4089 — waits n RTC ticks: arms the tick counter byte_20A1A via
+ * sub_14E9C (PIT/vector install), spins until it reaches n, then restores
+ * via sub_14EDA. */
+extern void sub_14E9C(void);
+extern void sub_14EDA(void);
+extern uint8 byte_20A1A;
+
+void delayTicks(int16 n) {
+    byte_20A1A = 0;
+    sub_14E9C();
+    while (n >= (uint8)byte_20A1A)
+        ;
+    sub_14EDA();
+}
+
+/* seg000:0x5b22 — drains n bytes from the 0x200 file buffer at dseg:0x12c2;
+ * refills via sub_16C0E and resets the read pos when it passes 0x1ff. */
+extern void sub_16C0E(void);
+extern int16 word_21714;
+extern int8 byte_212C2[];
+
+int16 bufReadBytes(int8 *dst, int16 n) {
+    int16 c;
+    for (c = 0; c < n; c++) {
+        if (word_21714 > 0x1FF) {
+            sub_16C0E();
+            word_21714 = 0;
+        }
+        *dst++ = byte_212C2[word_21714++];
+    }
+    return c;
+}
+
+/* seg000:0x67fd — clears byte +9 on 30 entries of the 0x5c-stride table
+ * at dseg:0x2326. */
+extern int8 byte_22326[];
+
+void resetTableFlags(void) {
+    int16 i;
+    int16 e;
+    for (i = 0; i < 0x1E; i++) {
+        e = 0x2326 + i * 0x5C;
+        ((int8 *)e)[9] = 0;
+    }
+}
+
+/* seg000:0x5414 — same 0x200-byte file-buffer drain as bufReadBytes, but
+ * refills via sub_149A1(handle) — used while reading a specific file. */
+extern void sub_149A1(int16 h);
+
+int16 bufReadFile(int8 *dst, int16 n, int16 h) {
+    int16 c;
+    for (c = 0; c < n; c++) {
+        if (word_21714 > 0x1FF) {
+            sub_149A1(h);
+            word_21714 = 0;
+        }
+        *dst++ = byte_212C2[word_21714++];
+    }
+    return c;
+}
+
+/* seg000:0x6208 — per-tick effect table walk (0x5c-stride, word_2367C
+ * entries): if flag +0x5a set, f09 += f08; on wrap past 0xff fires
+ * sub_16261(entry) and stores the wrapped byte. */
+extern void sub_16261(int16 e);
+extern int16 word_2367C;
+
+struct TickEnt { char _p[8]; uint8 f08, f09; char _q[0x52]; int8 f5A; };
+
+void tickEffectTable(void) {
+    int16 i;
+    int16 e;
+    int16 t;
+    for (i = 0; i < word_2367C; i++) {
+        e = 0x2326 + i * 0x5C;
+        if (((struct TickEnt *)e)->f5A != 0) {
+            t = ((struct TickEnt *)e)->f09 + ((struct TickEnt *)e)->f08;
+            if (t > 0xFF) {
+                t -= 0x100;
+                sub_16261(e);
+            }
+            ((struct TickEnt *)e)->f09 = t;
+        }
+    }
+}
+
+/* seg000:0x68fd — dispatch to overlay draw proc selected by byte_2B83E (0-3).
+ * pa/pd are object pointers dereferenced for the call's w1/w4 args. */
+extern uint8 drawModeSel;                    /* dseg:0xb83e */
+extern void far ovl_47B(int16 w1, int16 w2, int16 w3, int16 w4,
+                        int16 w5, int16 w6, int16 w7, int16 w8);
+extern void far ovl_766(int16 w1, int16 w2, int16 w3, int16 w4,
+                        int16 w5, int16 w6, int16 w7, int16 w8);
+extern void far ovl_169(int16 w1, int16 w2, int16 w3, int16 w4,
+                        int16 w5, int16 w6, int16 w7, int16 w8);
+extern void far ovl_A65(int16 w1, int16 w2, int16 w3, int16 w4,
+                        int16 w5, int16 w6, int16 w7, int16 w8);
+
+void dispatchDrawMode(int16 *pa, int16 b, int16 c, int16 *pd,
+                    int16 e, int16 f, int16 g, int16 h) {
+    if (g == 0) return;
+    if (h == 0) return;
+    switch (drawModeSel) {
+    case 0: ovl_47B(*pa, b, c, *pd, e, f, g, h); break;
+    case 1: ovl_766(*pa, b, c, *pd, e, f, g, h); break;
+    case 2: ovl_169(*pa, b, c, *pd, e, f, g, h); break;
+    case 3: ovl_A65(*pa, b, c, *pd, e, f, g, h); break;
+    }
 }

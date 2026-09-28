@@ -607,6 +607,26 @@ void  sub_15152(char *d, const char far *s) { }            /* far-src strcpy */
 int16 sub_15B22(int16 a, int16 b) { return a; }
 int16 sub_15B68(int16 f) { return f; }
 int16 word_22322;                                         /* scratch buf cursor */
+int16 word_2CA60, word_2CA64;                             /* map window bounds */
+void  sub_14E9C(void) { }
+void  sub_14EDA(void) { }
+void  sub_16C0E(void) { }
+uint8 byte_20A1A;
+int16 word_21714;
+int8  byte_212C2[4];
+void  sub_149A1(int16 h) { }
+int16 sub_16261(int16 e) { return e; }
+int16 word_2367C;
+uint8 unitMarksOn, tileMarksOn;
+int8  tileMarkMap[4], sprParmsTab[4];
+int16 unitSprOff, gridSprOff;
+void *objParms, *scoreRec;
+char  str7964[4];
+uint8 drawModeSel;
+void far ovl_47B(int16 a,int16 b,int16 c,int16 d,int16 e,int16 f,int16 g,int16 h) {}
+void far ovl_766(int16 a,int16 b,int16 c,int16 d,int16 e,int16 f,int16 g,int16 h) {}
+void far ovl_169(int16 a,int16 b,int16 c,int16 d,int16 e,int16 f,int16 g,int16 h) {}
+void far ovl_A65(int16 a,int16 b,int16 c,int16 d,int16 e,int16 f,int16 g,int16 h) {}
 int16 missionTimeFlag;                        /* word_244E4: runGenerator sets 0/1 */
 void  drawLineWrapper(void) { }
 #ifndef EXE_START /* src_start/stmap.c provides the real ports */

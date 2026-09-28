@@ -33,3 +33,21 @@ int16 resFileReadFar(int16 h, int16 b, int16 c, int16 d) {
 int16 resFileWrite(int16 a, int16 b, int16 c, int16 d, int16 e) {
     return sub_149B9(a, b, c, d, e);
 }
+
+/* seg000:0x4746 — open(path,0) → resFileReadFar(h,-1,b,c) → close; returns r */
+int16 resFileReadBlock(const char *path, int16 b, int16 c) {
+    int16 h, r;
+    h = resFileOpen(path, 0);
+    r = resFileReadFar(h, -1, b, c);
+    resFileClose(h);
+    return r;
+}
+
+/* seg000:0x477e — create(path,0) → resFileWrite(h,e,b,c,d) → close */
+int16 resFileWriteBlock(const char *path, int16 b, int16 c, int16 d, int16 e) {
+    int16 h, r;
+    h = resFileCreate(path, 0);
+    r = resFileWrite(h, e, b, c, d);
+    resFileClose(h);
+    return r;
+}
