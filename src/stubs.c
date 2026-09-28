@@ -683,3 +683,8 @@ char  str682E[4], str6832[4], str6834[4], str6836[4], str6838[4];
 /* stutil.c drawThreatRings deps */
 uint8 ringMode;                                        /* dseg:0x9922 */
 uint8 ringTypes[0x40];                                 /* dseg:0x3e26 */
+/* stutil.c drawStoreIcons deps */
+int16 word_298E6;                                     /* dseg:0x98e6 */
+int16 word_27990[4], word_27998[4];                   /* dseg:0x7990/0x7998 */
+int16 far gfx_getVal(void) { return 0; }              /* slot 0x4e */
+void  far gfx_setDac(int16 n) { }                     /* slot 0x44 */

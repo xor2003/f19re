@@ -16,7 +16,7 @@ extern int16 far misc_jump_5b_getkey(void);           /* slot 0x5b */
 extern int16 far misc_jump_5d_readJoy(int16);         /* slot 0x5d */
 extern void far misc_jump_5e_clearKeyFlags(void);     /* slot 0x5e */
 extern void far audio_jump_6b(void);                  /* slot 0x6b */
-extern void far gfx_allocPage(int16 page);            /* slot 0x00 */
+extern int16 far gfx_allocPage(int16 page);           /* slot 0x00 */
 extern void far gfx_setPageN(uint16 n);               /* slot 0x0e */
 extern void far gfx_setMode13(int16 mono);            /* slot 0x3c */
 extern int16 far gfx_getModecode(void);               /* slot 0x3f */
@@ -38,11 +38,15 @@ extern uint8 g_cntA, g_cntB, g_cntC, g_cntD;  /* dseg:0xa1a..0xa1d */
 extern uint8 cbreakHit;                       /* byte dseg:0x12ba */
 
 struct CommData {                             /* far ptr dseg:0xd066 */
-    int8 pad24[0x24];
+    int8 pad24[0x20];
+    int16 f20;                                /* 0x20 — sprite-res sel */
+    int8 pad22[0x02];
     int16 setupMono;                          /* 0x24 */
     int8 pad26[0x08];
     int16 fuelEst;                            /* 0x2e */
-    int8 pad30[0x42];
+    int8 pad30[0x08];
+    uint16 storeType;                         /* 0x38 — (&storeType)[i] slots */
+    int8 pad3A[0x38];
     int16 setupUseJoy;                        /* 0x72 */
     int8 pad74[0x04];
     int16 gfxModeNum;                         /* 0x78 */
@@ -1153,5 +1157,62 @@ void printObjective(uint16 n) {
         mystrcat(scrStr, briefTargs[n].coord);
         mystrcat(scrStr, ".  ");
         break;
+    }
+}
+
+/* ==== seg000:0xd97a — drawStoreIcons: loads the arming.spr / f19.spr sheets
+ * and blits the four weapon-station icons into the sprite page.  A station
+ * type of 0x13 paints the empty-pylon icon 0xA5; anything else indexes the
+ * 6-column icon sheet at ((t%6)*0x33+1, (t/6)*0x23+2).  The first arm draws
+ * straight to the display page; the other allocates an offscreen page and
+ * redirects the blitter there.  loadSpriteScaled is invoked with only two
+ * args — its callee reads a third it never receives (the original TU's
+ * extern decl had two params). ==== */
+extern int16 far gfx_getVal(void);                        /* slot 0x4e */
+extern void  far gfx_setDac(int16 pal);                   /* slot 0x44 */
+extern void  far gfx_setFadeSteps(int16 steps);           /* slot 0x3d */
+extern void  far gfx_storeBufPtr(int16 p, int16 n);       /* slot 0x4b */
+extern void  far gfx_copyRect(int16 src, int16 sx, int16 sy, int16 dst,
+                              int16 dx, int16 dy, int16 w, int16 h); /* 0x2a */
+extern int16 word_298E6;                       /* dseg:0x98e6 — saved gfx_getVal */
+extern int16 word_27990[], word_27998[];       /* dseg:0x7990/0x7998 icon dsts */
+extern void  loadSpriteScaled(char *n, int16 mode);       /* 2-arg call site */
+extern void  loadSpriteRes(char *n, int16 sel);
+
+void drawStoreIcons(void) {
+    uint16 i;
+    int16 page;
+
+    word_298E6 = gfx_getVal();
+    gfx_setDac(3);
+    gfx_setFadeSteps(1);
+    if (word_298E6 == 0) {
+        loadSpriteScaled("arming.spr", 0);
+        gfx_setFadeSteps(8);
+        loadSpriteScaled("f19.spr", 2);
+        for (i = 0; i < 4; i++) {
+            if ((&commData->storeType)[i] != 0x13)
+                gfx_copyRect(0, ((&commData->storeType)[i] % 6) * 0x33 + 1,
+                             ((&commData->storeType)[i] / 6) * 0x23 + 2, 2,
+                             word_27990[i], word_27998[i], 0x31, 0x15);
+            else
+                gfx_copyRect(0, 1, 0xA5, 2,
+                             word_27990[i], word_27998[i], 0x31, 0x15);
+        }
+    } else {
+        page = gfx_allocPage(1);
+        gfx_storeBufPtr(page, 1);
+        loadSpriteScaled("arming.spr", 1);
+        gfx_setFadeSteps(8);
+        loadSpriteRes("f19.spr", commData->f20);
+        for (i = 0; i < 4; i++) {
+            if ((&commData->storeType)[i] != 0x13)
+                gfx_copyRect(1, ((&commData->storeType)[i] % 6) * 0x33 + 1,
+                             ((&commData->storeType)[i] / 6) * 0x23 + 2, 2,
+                             word_27990[i], word_27998[i], 0x31, 0x15);
+            else
+                gfx_copyRect(1, 1, 0xA5, 2,
+                             word_27990[i], word_27998[i], 0x31, 0x15);
+        }
     }
 }
