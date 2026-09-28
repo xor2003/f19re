@@ -586,6 +586,18 @@ char  scrStr[0x40];
 void  sub_15120(char *d, char *s) { }
 void  sub_13FB3(int16 n, char *b) { }
 void  sub_13B76(void *o, char *s, int16 x, int16 y) { }
+/* stutil.c printMission deps */
+int16 briefParms, titleParms, briefPage;
+char far **briefTab;
+uint8 briefActive;
+int8  gamePhase;
+char *wldNameTab[8];
+uint8 siteNameData[0x10], siteObjData[0x10];
+char far *briefTextP;
+void  sub_108B7(void) { }
+void  sub_1C699(int16 a) { }
+char *sub_17558(int16 n, char *b, int16 t) { return b; }
+void  far gfx_commitPage(void) { }
 #endif
 void  dos_printstring(const char *s) { }
 uint16 dos_alloc(uint16 size) { return 0; }

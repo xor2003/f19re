@@ -40,7 +40,9 @@ extern uint8 cbreakHit;                       /* byte dseg:0x12ba */
 struct CommData {                             /* far ptr dseg:0xd066 */
     int8 pad24[0x24];
     int16 setupMono;                          /* 0x24 */
-    int8 pad26[0x4c];
+    int8 pad26[0x08];
+    int16 fuelEst;                            /* 0x2e */
+    int8 pad30[0x42];
     int16 setupUseJoy;                        /* 0x72 */
     int8 pad74[0x04];
     int16 gfxModeNum;                         /* 0x78 */
@@ -59,7 +61,7 @@ typedef struct {                          /* worldObjects: stride 0x10 */
 } WorldObject;
 extern WorldObject worldObjects[];            /* dseg:0xb390 */
 
-struct GameData { int8 pad[0x38]; int16 theater; };
+struct GameData { int8 pad[0x38]; int16 theater; int16 roeIdx; };
 extern struct GameData far *gameData;         /* far ptr dseg:0x991c */
 
 int16 randMul(uint16 arg) {              /* seg000:0x40ae */
@@ -883,3 +885,137 @@ void drawRoutePath(void) {
               mapToScreenX(worldObjects[pathWpC].x_coord) + mapClipX1,
               mapToScreenY(worldObjects[pathWpC].y_coord - 2) + mapClipY1);
 }
+
+
+/* ==== seg000:0xc1a8 printMission — the mission-briefing screen. Loads
+ * briefing.txt into an alloc'd block, draws the frame + CLASSIFIED banner +
+ * title, then either the objectives page (briefPage==1: PRIMARY/SECONDARY
+ * mission headers, mission-type numbers, wrapped objective text via
+ * sub_17558 + sub_1C699) or the flight-plan page (FLIGHT PLAN header,
+ * TAKEOFF/RETURN fields built from waypoint name/coord lookups, FUEL
+ * ESTIMATE, MISSION BEGINS AT, RULES OF ENGAGEMENT wrapped far text).
+ * Locals a/e/f/h are color/CR escape strings; only a is actually read. ==== */
+extern int16  briefParms;                       /* dseg:0x69d8 */
+extern int16  titleParms;                       /* dseg:0x69c0 */
+extern char far **briefTab;                     /* dseg:0xca48 — ptr into parms pool */
+extern int16  briefPage;                        /* dseg:0xca6c */
+extern uint8  briefActive;                      /* dseg:0xca62 */
+extern int8   gamePhase;                        /* dseg:0xc160 — byte store */
+extern char  *wldNameTab[];                     /* dseg:0xca70 name ptr table */
+extern int16  targets[];                        /* dseg:0xb94e, stride 0x12 */
+extern uint8  siteNameData[];                   /* dseg:0xb38e unitRef fields */
+extern uint8  siteObjData[];                    /* dseg:0xb39c objectIdx lo   */
+extern char  far *briefTextP;                   /* dseg:0x099a far ptr pair   */
+extern char   scrStr[];                         /* dseg:0xb96a work buffer    */
+extern void   sub_108B7(void);                  /* seg000:0x08b7 misc jump    */
+extern void   sub_1C699(int16 n);               /* seg000:0xc699 obj detail   */
+extern char  *sub_17558(int16 n, char *b, int16 t); /* 0x7558 briefing line  */
+extern void   far gfx_commitPage(void);         /* far driver slot 0x50      */
+extern void   my_itoa(int16 n, char *b);        /* seg000:0x3fb3             */
+extern void   freeBuffer(uint16 s);             /* seg000:0x685c stalloc.c   */
+extern int16  resFileReadBlock(const char *p, int16 a, int16 b); /* 0x4746    */
+
+void printMission(void) {
+    char   a[2];                 /* "\r" line terminator appended into scrStr */
+    int16  b, c, d;
+    char   e[3];                 /* {9,10,0} — init but unread                */
+    char   f[2];                 /* {0x80,0} — init but unread               */
+    char   g[0x10];              /* coord/name scratch (my_itoa)              */
+    char   h[2];                 /* {0x8E,0} — init but unread               */
+    uint16 i;                    /* stringWidth result — unsigned: >>1 = shr  */
+
+    sub_108B7();
+    a[0] = 0x0D; a[1] = 0;
+    e[0] = 9; e[1] = 0x0A; e[2] = 0;
+    h[0] = 0x8E; h[1] = 0;
+    f[0] = 0x80; f[1] = 0;
+    briefTab = (char far **)0x99E;
+    c = b = allocBuffer(0x2328);
+    d = 0;
+    resFileReadBlock("briefing.txt", d += 0, b);   /* +=0: force slot reload */
+    flag_29948 = 0;
+    sub_14622((void *)briefParms, 8, 0, 0x13F, 0xB1);
+    gfx_commitPage();
+    *(int16 *)(sprParmsTab + titleParms + 4) = 0xC;
+    sub_13B76((int16 *)titleParms, "CLASSIFIED                        CLASSIFIED", 0x1E, 5);
+    *(int16 *)(sprParmsTab + titleParms + 4) = 0;
+    sub_13B76((int16 *)titleParms, "Mission Briefing", 0x6F, 5);
+    briefActive = 1;
+    if (briefPage == 1) {
+        mystrcpy(scrStr, "\x89PRIMARY MISSION ");
+        my_itoa(targets[0], g);
+        mystrcat(scrStr, g);
+        i = stringWidth((int16 *)briefParms, (uint8 *)scrStr);
+        sub_13B76((int16 *)briefParms, scrStr, (0x140 - i) >> 1, 0x14);
+        *(int16 *)(sprParmsTab + briefParms + 4) = 0;
+        wrapUnitText(briefParms, sub_17558(targets[0], scrStr, b),
+                     0x12C, 0x0A, 0x1E, 8);
+        mystrcpy(scrStr, "Your \x89primary\x80 objective is ");
+        sub_1C699(0);
+        wrapUnitText(briefParms, scrStr, 0x12C, 0x0A,
+                     *(int16 *)(sprParmsTab + briefParms + 0xA), 8);
+        mystrcpy(scrStr, "\x89SECONDARY MISSION ");
+        my_itoa(targets[9], g);
+        mystrcat(scrStr, g);
+        i = stringWidth((int16 *)briefParms, (uint8 *)scrStr);
+        sub_13B76((int16 *)briefParms, scrStr, (0x140 - i) >> 1,
+                  *(int16 *)(sprParmsTab + briefParms + 0xA) + 8);
+        *(int16 *)(sprParmsTab + briefParms + 4) = 0;
+        wrapUnitText(briefParms, sub_17558(targets[9], scrStr, b),
+                     0x12C, 0x0A,
+                     *(int16 *)(sprParmsTab + briefParms + 0xA) + 8, 8);
+        mystrcpy(scrStr, "Your \x89secondary\x80 objective is ");
+        sub_1C699(1);
+        wrapUnitText(briefParms, scrStr, 0x12C, 0x0A,
+                     *(int16 *)(sprParmsTab + briefParms + 0xA), 8);
+    } else {
+        mystrcpy(scrStr, "\x89FLIGHT PLAN");
+        i = stringWidth((int16 *)briefParms, (uint8 *)scrStr);
+        sub_13B76((int16 *)briefParms, scrStr, (0x140 - i) >> 1, 0x14);
+        mystrcpy(scrStr, "\x89TAKEOFF:\x80 You will depart from ");
+        {
+            register int16 v;    /* si: site unitRef, register-held         */
+            v = *(int16 *)(siteNameData + (pathWpA << 4));
+            mystrcat(scrStr, wldNameTab[v ? v : siteObjData[pathWpA << 4]]);
+        }
+        mystrcat(scrStr, ", ONC ");
+        mystrcat(scrStr, getItemCoordStr(pathWpA));
+        mystrcat(scrStr, a);
+        wrapUnitText(briefParms, scrStr, 0x12C, 0x0A, 0x1E, 8);
+        wrapUnitTextFar(briefParms, briefTextP, 0x12C, 0x0A,
+                        *(int16 *)(sprParmsTab + briefParms + 0xA), 8);
+        mystrcpy(scrStr, "\x89RETURN:\x80 You are scheduled to land at ");
+        {
+            register int16 v;
+            v = *(int16 *)(siteNameData + (pathWpD << 4));
+            mystrcat(scrStr, wldNameTab[v ? v : siteObjData[pathWpD << 4]]);
+        }
+        mystrcat(scrStr, ", ONC ");
+        mystrcat(scrStr, getItemCoordStr(pathWpD));
+        mystrcat(scrStr, a);
+        mystrcat(scrStr, "\x89FUEL ESTIMATE: \x80");
+        my_itoa(commData->fuelEst, g);
+        mystrcat(scrStr, g);
+        mystrcat(scrStr, " lbs.");
+        mystrcat(scrStr, a);
+        mystrcat(scrStr, "\x89MISSION BEGINS AT: \x80");
+        mystrcat(scrStr, "00:00");
+        wrapUnitText(briefParms, scrStr, 0x12C, 0x0A,
+                     *(int16 *)(sprParmsTab + briefParms + 0xA) + 2, 8);
+        mystrcpy(scrStr, "\x89RULES OF ENGAGEMENT");
+        i = stringWidth((int16 *)briefParms, (uint8 *)scrStr);
+        sub_13B76((int16 *)briefParms, scrStr, (0x140 - i) >> 1,
+                  *(int16 *)(sprParmsTab + briefParms + 0xA) + 8);
+        *(int16 *)(sprParmsTab + briefParms + 4) = 0;
+        wrapUnitTextFar(briefParms, briefTab[gameData->roeIdx], 0x12C, 0x0A,
+                        *(int16 *)(sprParmsTab + briefParms + 0xA) + 8, 8);
+    }
+    *(int16 *)(sprParmsTab + briefParms + 4) = 9;
+    sub_13B76((int16 *)briefParms, "Press Selector to continue", 0x64, 0xB2);
+    gfx_commitPage();
+    readInputKey();
+    freeBuffer(b);
+    gamePhase = 4;
+}
+
+
