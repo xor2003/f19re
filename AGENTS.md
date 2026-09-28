@@ -42,7 +42,7 @@ map/<x>_en.map --srcdir src_<x>`):
   setTimerIrqHandler/installCBreakHandler (int21h vectors), clearRect
   (rep stosw), clipAndDrawLine/calibrateTimerSpeed/readJoyAxis (hw asm),
   strcoll/gety/move_ovlcur + all CRT.
-- src_start/ — 133 MATCH:
+- src_start/ — 134 MATCH:
   cleanup.c: cleanup
   drawstr.c: drawStringAt drawStringFar drawStringAtFar
   stalloc.c: allocBuffer freeBuffer
@@ -68,7 +68,7 @@ map/<x>_en.map --srcdir src_<x>`):
     setViewOrigin delayTicks bufReadBytes resetTableFlags bufReadFile
     tickEffectTable dispatchDrawMode wrapUnitText wrapUnitTextFar
     srand rand seedRng drawRoutePath drawThreatRings printMission
-    printObjective drawStoreIcons
+    printObjective drawStoreIcons stepPanelAnim
   textfmt.c: my_ltoa my_itoa
   Left as skeleton: dos_alloc doFcbSearch (int21h),
   decodePic/showPicFile/openBlitClosePic + pic cluster, clearRect/
@@ -241,6 +241,22 @@ mzmap (jump-table headers, no call-reachable exports).
 - `/Oi` folds libc calls into intrinsics: memcpy → `rep movsw` (+`adc cx,cx;
   rep movsb` for odd tails — MSC 5.1 doesn't eliminate the tail even when the
   count is known-even; that residual may be genuinely unmatchable).
+- `if ((a | b) == 0)` on two byte fields emits `mov al,[a]; sub ah,ah;
+  mov cl,[b]; sub ch,ch; or ax,cx; jnz` — `a==0 && b==0` emits two
+  `cmp byte/jnz` pairs instead. stepPanelAnim letter-case gate.
+- `[bx+si]` register roles in `s[i++]`: a POINTER-typed local `uint8 *s`
+  gives `bx=i; inc i; si=s; mov al,[bx+si]`; an int offset + cast swaps
+  them (`si=i, bx=s`). stepPanelAnim DSL string walk.
+- `while ((peek = s[i]) >= lo && peek <= hi)` bottom-tests: the `&&` splits
+  the bounds checks across the rotation (>= at bottom, <= at top); an
+  `if (!...) break` inside fuses both compares at the top. For a ref loop
+  whose FIRST instruction is a call, use `do { } while` not `while`.
+- To keep a byte-dec/inc and its wrap test separate (`dec byte [bx+0xa];
+  mov bx,[bp+4]; cmp byte [bx+0xa],0xff`) split `--e->f` and the `if` into
+  two statements — `--e->f == 0xff` fused them.
+- A 4-way char dispatch that the ref renders as a `cmp ax,K` chain (not
+  jump table) is a `switch` — `if/else if` on a local emits `mov ax,[c]`
+  differently. stepPanelAnim `<` `>` `^` `_` arm.
 
 ## Routines that are asm in the original (do NOT port)
 

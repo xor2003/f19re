@@ -528,7 +528,14 @@ r:          return f - 1;
  * plain [bx] reload and the second-written arm sinks to body top. */
 struct ClipEntry {
     int16 x0, y0, w, h;           /* +0,+2,+4,+6 */
-    int8  pad[0x52];
+    int8  f8, f9;                 /* +8,+9 anim phase step/accum (sub_16208) */
+    uint8 col, row;               /* +0x0a,+0x0b cell cursor */
+    uint8 grp;                    /* +0x0c saved group index */
+    int8  timer[10];              /* +0x0d per-group countdown */
+    uint8 save[11];               /* +0x17 per-group saved cursor */
+    int16 sprX[18];               /* +0x22 per-field sprite X */
+    uint8 sprY[18];               /* +0x46 per-field sprite Y/icon */
+    uint8 *strOff;                /* +0x58 DSL string pointer */
     int8  flag;                   /* +0x5a */
 };
 extern int16 viewOriginX, viewOriginY;      /* dseg:0x2ca4e/0x2ca50 */
@@ -690,8 +697,8 @@ int16 bufReadFile(int8 *dst, int16 n, int16 h) {
 
 /* seg000:0x6208 — per-tick effect table walk (0x5c-stride, word_2367C
  * entries): if flag +0x5a set, f09 += f08; on wrap past 0xff fires
- * sub_16261(entry) and stores the wrapped byte. */
-extern void sub_16261(int16 e);
+ * stepPanelAnim(entry) and stores the wrapped byte. */
+extern void stepPanelAnim(struct ClipEntry *e);
 extern int16 word_2367C;
 
 struct TickEnt { char _p[8]; uint8 f08, f09; char _q[0x52]; int8 f5A; };
@@ -1215,4 +1222,131 @@ void drawStoreIcons(void) {
                              word_27990[i], word_27998[i], 0x31, 0x15);
         }
     }
+}
+
+/* ==== seg000:0x6261 — panel-DSL stepper: runs the layout program at
+ * e->strOff for one clipTable record until a field redraws (dflag=1) or a
+ * saved group resumes.  DSL: digits set the current group's repeat count,
+ * ':' skips a numeric arg, '<' '>' '^' '_' move the cell cursor with
+ * wraparound, 'A'..'Z' draw field c&0x1F-1 (whole panel when the cursor is
+ * at 0,0, else the four edge strips around the cell), '(...)'.N repeats the
+ * group while timer>0 else skips to the matching ')', '|'/')' pop a group
+ * level, and NUL restarts the program. ==== */
+extern int16 *word_2170A, *word_2170C;   /* dseg:0x170a/0x170c draw parms */
+extern uint8 *word_2BE50;                /* dseg:0xbe50 DSL scan cursor */
+
+void stepPanelAnim(struct ClipEntry *e) {
+    int16 num, c, i, cur, fidx, nlvl, dflag, dead, totx;
+    uint8 *srcof;
+    uint8 peekz;
+
+    dflag = 0;
+    srcof = e->strOff;
+    i = e->grp;
+    if (e->timer[i] != 0) {
+        cur = e->save[i];
+        e->timer[i]--;
+    } else
+        cur = e->save[i] + 1;
+    while (dflag == 0) {
+        c = srcof[cur++];
+        if (c >= 0x30 && c <= 0x39) {
+            num = c - 0x30;
+            while ((peekz = srcof[cur]) >= 0x30 && peekz <= 0x39)
+                num = num * 10 + srcof[cur++] - 0x30;
+            e->timer[i] = num - 1;
+        } else if (c == 0x3A) {
+            while ((peekz = srcof[cur]) >= 0x30 && peekz <= 0x39)
+                cur++;
+        } else if (c == 0x3C || c == 0x3E || c == 0x5E || c == 0x5F) {
+            switch (c) {
+            case 0x3E:
+                e->col--;
+                if (e->col == 0xFF) goto wc;
+                break;
+            wc: e->col = e->w - 1;
+                break;
+            case 0x3C:
+                e->col++;
+                if (e->col == e->w) goto zc;
+                break;
+            zc: e->col = 0;
+                break;
+            case 0x5F:
+                e->row--;
+                if (e->row == 0xFF) goto wr;
+                break;
+            wr: e->row = e->h - 1;
+                break;
+            case 0x5E:
+                e->row++;
+                if (e->row == e->h) goto zr;
+                break;
+            zr: e->row = 0;
+                break;
+            }
+        } else if (c >= 0x41 && c <= 0x5A) {
+            fidx = (c & 0x1F) - 1;
+            if ((e->col | e->row) == 0) {
+                dispatchDrawMode(word_2170C, e->sprX[fidx], e->sprY[fidx],
+                                 word_2170A, e->x0 + viewOriginX,
+                                 e->y0 + viewOriginY, e->w, e->h);
+            } else {
+                dispatchDrawMode(word_2170C, e->sprX[fidx], e->sprY[fidx],
+                                 word_2170A,
+                                 e->x0 + e->w + viewOriginX - e->col,
+                                 e->y0 + e->h + viewOriginY - e->row,
+                                 e->col, e->row);
+                dispatchDrawMode(word_2170C, e->sprX[fidx] + e->col,
+                                 e->sprY[fidx], word_2170A,
+                                 e->x0 + viewOriginX,
+                                 e->y0 + e->h + viewOriginY - e->row,
+                                 e->w - e->col, e->row);
+                dispatchDrawMode(word_2170C, e->sprX[fidx],
+                                 e->sprY[fidx] + e->row, word_2170A,
+                                 e->x0 + e->w + viewOriginX - e->col,
+                                 e->y0 + viewOriginY,
+                                 e->col, e->h - e->row);
+                dispatchDrawMode(word_2170C, e->sprX[fidx] + e->col,
+                                 e->sprY[fidx] + e->row, word_2170A,
+                                 e->x0 + viewOriginX, e->y0 + viewOriginY,
+                                 e->w - e->col, e->h - e->row);
+            }
+            e->save[i] = cur - 1;
+            dflag = 1;
+        } else if (c == 0x28) {
+            e->save[i++] = cur - 1;
+            totx = 1;
+            word_2BE50 = (uint8 *)cur;
+            do {
+                fidx = evalChoiceExpr(&word_2BE50, (int16)srcof);
+                totx += fidx;
+            } while (fidx != 0);
+            totx = randMul(-1) % totx;
+            word_2BE50 = (uint8 *)cur;
+            while (totx > 0)
+                totx -= evalChoiceExpr(&word_2BE50, (int16)srcof);
+            cur = (int16)word_2BE50;
+        } else if (c == 0x7C || c == 0x29) {
+            i--;
+            if (e->timer[i] == 0) {
+                cur = e->save[i] + 1;
+                nlvl = 1;
+                do {
+                    nlvl += (srcof[cur] == 0x28) ? 1 : 0;
+                    nlvl -= (srcof[cur] == 0x29) ? 1 : 0;
+                    cur++;
+                } while (nlvl > 0);
+            } else {
+                e->timer[i]--;
+                cur = e->save[i];
+            }
+        } else if (c == 0) {
+            i = 0;
+            e->save[0] = 0;
+            e->timer[0] = 0;
+            cur = 0;
+        }
+    }
+    e->grp = i;
 }

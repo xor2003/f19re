@@ -538,6 +538,9 @@ void  sub_14B86(int16 fd, int16 sel) { }
 struct ClipEntry { int16 x0,y0,w,h; int8 pad[0x52]; int8 flag; };
 int16 viewOriginX, viewOriginY, clipEntryCount;
 struct ClipEntry clipTable[1];
+/* stutil.c stepPanelAnim (sub_16261) deps */
+int16 *word_2170A, *word_2170C;                 /* dseg:0x170a/0x170c */
+uint8 *word_2BE50;                              /* dseg:0xbe50 */
 /* stgen.c parseWorld/exportWorldToComm globals */
 int16 groundUnitCount;
 int16 worldObjectCount;
