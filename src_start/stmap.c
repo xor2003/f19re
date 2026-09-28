@@ -188,3 +188,84 @@ void drawScorePanel(void) {
     sub_13B76(objParms, scrStr, 0x5E, 0x6C);
     objParms->f04 = saveo;
 }
+
+/* ==== seg000:0x0924 drawUnitList — per-row unit list renderer.
+ * Iterates `count` TileEntry rows; state 2 = selected row (toggle rect,
+ * sub_12754/sub_13218 redraws, icon + optional name text via the near/far
+ * word-wrap pair), state 3 kept, others cleared. ==== */
+extern int16 selRowIdx;                            /* dseg:0xc7cc */
+extern int16 flag2CA4C;                            /* dseg:0xca4c */
+extern uint8 byte_2C9E0;                           /* dseg:0xc9e0 */
+extern int16 flag2C7CE;                            /* dseg:0xc7ce */
+extern int16 selAvailTab[];                        /* dseg:0x9924 */
+extern char *namePtrTab[];                         /* dseg:0x717e */
+extern int16 typeIdxTab[];                         /* dseg:0xd2d0 */
+extern char *typeNameTab[];                        /* dseg:0x0256 */
+extern char  strB96A[];                            /* dseg:0xb96a */
+extern char  str282[];                             /* dseg:0x0282 */
+struct TileEntry {
+    int16 pad[0x10];
+    int16 x0, y0, x1, y1;
+    int16 spr1, spr2;
+    int16 f2C, f2E;
+    int8  flag;
+    int8  pad31;
+};
+struct ObjF06;
+extern int16 flag_29948;                           /* dseg:0x9948 */
+extern void drawTileIcon(struct TileEntry *t, uint16 idx, struct ObjF06 *o);
+extern void sub_12754(struct TileEntry *t, int16 i, int16 *pd);
+extern void sub_13218(struct TileEntry *t, int16 i, int16 *pd);
+extern void wrapUnitText(int16 a, char *s, uint16 w, int16 x, int16 y,
+                         int16 b);
+extern void wrapUnitTextFar(int16 a, char far *s, uint16 w, int16 x, int16 y,
+                            int16 b);
+extern void mystrcpy(char *d, const char *s);
+extern void mystrcat(char *d, char *s);
+
+void drawUnitList(struct TileEntry *tab, char far **names, int16 count,
+                  int16 outA, int16 outB, int16 *pd) {
+    char a[2], b[2], d[2], k[2];
+    int16 i, c, j;
+    char buf[0x16];
+    a[0] = 0x0D; a[1] = 0;
+    d[0] = 0x89; d[1] = 0;
+    b[0] = 0x8D; b[1] = 0;
+    k[0] = 0x80; k[1] = 0;
+    for (i = 0; i < count; i++) {
+        if (tab[i].f2E == 2) {
+            selRowIdx = i;
+            tab[i].f2E = 0;
+            if (flag2CA4C != 1 || byte_2C9E0 != 0)
+                toggleSelRect((struct SelEnt *)&tab[i], pd);
+            sub_12754(tab, i, pd);
+            sub_13218(tab, i, pd);
+            drawTileIcon(tab, i, (struct ObjF06 *)pd);
+            if (tab[i].flag & 0x40) {
+                sub_14622(pd, tab[i].pad[0xA], tab[i].pad[0xB],
+                          tab[i].pad[0xC], tab[i].pad[0xD]);
+                if (flag2C7CE == 1 && selAvailTab[i] == 1) {
+                    mystrcpy(strB96A, str282);
+                    mystrcat(strB96A, namePtrTab[i]);
+                    mystrcat(strB96A, typeNameTab[typeIdxTab[i]]);
+                    wrapUnitText(tab[i].pad[0xF], strB96A,
+                                 tab[i].pad[0xC] - tab[i].pad[0xA] - 1,
+                                 tab[i].pad[0xA], tab[i].pad[0xB],
+                                 tab[i].pad[0xE]);
+                } else {
+                    wrapUnitTextFar(tab[i].pad[0xF], names[i],
+                                    tab[i].pad[0xC] - tab[i].pad[0xA] - 1,
+                                    tab[i].pad[0xA], tab[i].pad[0xB],
+                                    tab[i].pad[0xE]);
+                }
+            }
+        } else if (tab[i].f2E != 3) {
+            tab[i].f2E = 0;
+        }
+    }
+    if (flag_29948 == 1)
+        drawRiskPanel((struct ObjF04 *)pd, 0, 0);
+    word_2CA60 = outA;
+    word_2CA64 = outB;
+}
+

@@ -620,6 +620,9 @@ int16 word_2367C;
 uint8 unitMarksOn, tileMarksOn;
 int8  tileMarkMap[4], sprParmsTab[4];
 int16 unitSprOff, gridSprOff;
+int16 siteTypeParms[9];
+uint8 siteMarksOn;
+int16 siteMarkCount, siteSprOff1, siteSprOff2;
 void *objParms, *scoreRec;
 char  str7964[4];
 uint8 drawModeSel;
@@ -638,3 +641,17 @@ void  drawMapPixel(int16 x, int16 y, int16 c) { }
 void  mystrcpy(char *d, const char *s) { }
 #endif
 void  loadWorldData(void *d, int16 s) { }
+/* stutil.c drawUnitList deps */
+int16 selRowIdx, flag2CA4C, flag2C7CE, word_2CA60, word_2CA64;
+uint8 byte_2C9E0;
+int16 selAvailTab[4], typeIdxTab[4];
+char *namePtrTab[2], *typeNameTab[2];
+char  strB96A[8], str282[4];
+void  sub_12754(void *t, int16 i, int16 *pd) { }
+void  sub_13218(void *t, int16 i, int16 *pd) { }
+#ifndef EXE_START /* src_start/stutil.c provides the real ports */
+void  wrapUnitText(int16 a, char *s, int16 w, int16 x, int16 y, int16 b) { }
+void  wrapUnitTextFar(int16 a, char far *s, int16 w, int16 x, int16 y, int16 b) { }
+#endif
+void  sub_151FE(char *d, uint8 *s, int16 n) { }        /* near copy */
+void  sub_1521C(char *d, char far *s, int16 n) { }     /* far copy */

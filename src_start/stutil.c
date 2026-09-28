@@ -340,6 +340,43 @@ void drawTileMarkers(void) {
 }
 
 
+/* ==== seg000:0xbc81 drawSiteMarkers — ring+icon for each live site entry:
+ * full-circle arc (radius = siteTypeParms[kind]<<6, color 4), then blit one
+ * of two sprite slots selected by flags & 8 (store block duplicated per
+ * arm; the blit call tail-merges). ==== */
+extern int16    siteTypeParms[];               /* dseg:0x41c8, stride 0x12 */
+extern uint8    siteMarksOn;                   /* dseg:0xc977 */
+extern int16    siteMarkCount;                 /* dseg:0xc978 */
+extern int16    siteSprOff1, siteSprOff2;      /* dseg:0x65d2/0x6692 */
+extern void drawMapArc(int16 cx, int16 cy, int16 radius, int16 color,
+                       int16 connect, int16 a1, int16 a2);
+
+void drawSiteMarkers(void) {
+    uint16 i;
+    if (siteMarksOn == 0) return;
+    for (i = 0; i < (uint16)siteMarkCount; i++) {
+        if (worldObjects[i].pad4 != 0) {
+            drawMapArc(worldObjects[i].x_coord, worldObjects[i].y_coord,
+                       siteTypeParms[worldObjects[i].pad4 * 9] << 6,
+                       4, 1, 0, 0x100);
+            if (worldObjects[i].targetFlags & 8) {
+                *(int16 *)(sprParmsTab + siteSprOff2 + 8) =
+                    mapToScreenX(worldObjects[i].x_coord) + mapClipX1 - 2;
+                *(int16 *)(sprParmsTab + siteSprOff2 + 0xA) =
+                    mapToScreenY(worldObjects[i].y_coord) + mapClipY1 - 2;
+                gfx_blitSprite(siteSprOff2);
+            } else {
+                *(int16 *)(sprParmsTab + siteSprOff1 + 8) =
+                    mapToScreenX(worldObjects[i].x_coord) + mapClipX1 - 2;
+                *(int16 *)(sprParmsTab + siteSprOff1 + 0xA) =
+                    mapToScreenY(worldObjects[i].y_coord) + mapClipY1 - 2;
+                gfx_blitSprite(siteSprOff1);
+            }
+        }
+    }
+}
+
+
 /* seg000:0x25ea — RTC sync when enabled: int 0x1a read, stash tick, then 10
  * settle ticks via sub_16208 */
 extern int16 rtcEnabled;                    /* dseg:0xbb74 */
@@ -614,5 +651,116 @@ void dispatchDrawMode(int16 *pa, int16 b, int16 c, int16 *pd,
     case 1: ovl_766(*pa, b, c, *pd, e, f, g, h); break;
     case 2: ovl_169(*pa, b, c, *pd, e, f, g, h); break;
     case 3: ovl_A65(*pa, b, c, *pd, e, f, g, h); break;
+    }
+}
+
+/* seg000:0x3d15 — word-wrap renderer for near strings: measures text char by
+ * char via the gfx setFont (char-width) slot, wraps at space/CR/LF/hyphen,
+ * copies each line to a stack buffer and draws it through the drawString slot.
+ * `o` is a byte offset into the SpriteParams pool (sprParmsTab): +8/+A are the
+ * draw position fields, +C holds the current font id (saved into `a`). */
+extern void far gfx_drawString(int16 o, char *s);   /* slot 0x05 */
+extern void     sub_151FE(char *d, uint8 *s, int16 n); /* near copy */
+extern void     sub_1521C(char *d, char far *s, int16 n); /* far copy */
+
+void wrapUnitText(int16 o, char *s, uint16 w, int16 x, int16 y, int16 dy) {
+    int16 h;
+    int16 a, d, e, i;
+    uint8 *c;
+    uint8 *b, *f;
+    int8  g;
+    char  buf[0x3E6], n[2];
+
+    f = (uint8 *)s; b = (uint8 *)s; c = (uint8 *)s;
+    a = *(int16 *)(sprParmsTab + o + 0xC);
+    *(int16 *)(sprParmsTab + o + 0xA) = y;
+    g = 1;
+    for (;;) {
+        h = d = 0;
+        while (h < w) {
+            n[0] = *c;
+            if (n[0] == 0 || n[0] == 0x0D || n[0] == 0x0A) goto disp;
+            h += gfx_setFont(*c++, a);
+            d++;
+        }
+disp:   if (h >= w) goto b1;
+        goto b0;
+        do {
+chk:        if (n[0] == 0 || n[0] == 0x0D || n[0] == 0x0A || n[0] == '-')
+                goto join;
+            if (c <= f) goto join;
+b1:         c--;
+            d--;
+b0:         n[0] = *c;
+        } while (n[0] != ' ');
+join:
+        if (*c == '-') d++;
+        if (*c == 0) g = 0;
+        if (d != 0) {
+            sub_151FE(buf, b, d);
+            buf[d] = 0;
+            *(int16 *)(sprParmsTab + o + 8) = x;
+            gfx_drawString(o, buf);
+            *(int16 *)(sprParmsTab + o + 0xA) += dy;
+            if (*c == 0x0D) *(int16 *)(sprParmsTab + o + 0xA) += 2;
+        }
+        c++;
+        b = c;
+        if (!g) break;
+    }
+}
+
+/* seg000:0x3bc4 — far-string variant of wrapUnitText. Same wrap loop, but the
+ * source is a far pointer (es: derefs), the line copy goes through sub_1521C,
+ * and the next line start skips leading spaces (`while (*b == ' ') b++`).
+ * Locals: e/v are spare slots the original frame reserved between d and f. */
+void wrapUnitTextFar(int16 o, char far *s, uint16 w, int16 x, int16 y, int16 dy) {
+    int16 h;
+    int16 a, d;
+    char far *b;
+    char far *c;
+    int16 e;
+    char far *f;
+    int16 v;
+    int8  g;
+    char  buf[0x1F4], n[2];
+
+    f = s; b = s; c = s;
+    a = *(int16 *)(sprParmsTab + o + 0xC);
+    *(int16 *)(sprParmsTab + o + 0xA) = y;
+    g = 1;
+    for (;;) {
+        h = d = 0;
+        while (h < w) {
+            n[0] = *c;
+            if (n[0] == 0 || n[0] == 0x0D || n[0] == 0x0A) goto disp;
+            h += gfx_setFont(*c++, a);
+            d++;
+        }
+disp:   if (h >= w) goto b1;
+        goto b0;
+        do {
+chk:        if (n[0] == 0 || n[0] == 0x0D || n[0] == 0x0A || n[0] == '-')
+                goto join;
+            if (c <= f) goto join;
+b1:         c--;
+            d--;
+b0:         n[0] = *c;
+        } while (n[0] != ' ');
+join:
+        if (*c == '-') d++;
+        while (*b == ' ') b++;
+        if (*c == 0) g = 0;
+        if (d != 0) {
+            sub_1521C(buf, b, d);
+            buf[d] = 0;
+            *(int16 *)(sprParmsTab + o + 8) = x;
+            gfx_drawString(o, buf);
+            *(int16 *)(sprParmsTab + o + 0xA) += dy;
+            if (*c == 0x0D) *(int16 *)(sprParmsTab + o + 0xA) += 2;
+        }
+        c++;
+        b = c;
+        if (!g) break;
     }
 }

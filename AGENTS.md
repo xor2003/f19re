@@ -42,17 +42,40 @@ map/<x>_en.map --srcdir src_<x>`):
   setTimerIrqHandler/installCBreakHandler (int21h vectors), clearRect
   (rep stosw), clipAndDrawLine/calibrateTimerSpeed/readJoyAxis (hw asm),
   strcoll/gety/move_ovlcur + all CRT.
-- src_start/ — 11 MATCH: allocBuffer (stalloc.c) cleanup (cleanup.c)
-  drawStringAt (drawstr.c) my_ltoa my_itoa (textfmt.c) rangeApprox
-  memAppend positionUnit (stgen.c — F19 FlightUnit/WorldObject/PlaneEntry
-  field offsets decoded from disasm, differ from f15se2's) loadHallfame
-  (stpilot.c — opens "Roster.Fil") drawMapLine (stmap.c) process3dg
-  (eg3dmap.c — START variant: no lod-4 bias, returns -1 on bounds-fail,
-  case4 row<<2). Left as skeleton: dos_alloc doFcbSearch (int21h),
+- src_start/ — 90 MATCH:
+  cleanup.c: cleanup
+  drawstr.c: drawStringAt drawStringFar drawStringAtFar
+  stalloc.c: allocBuffer freeBuffer
+  stfile.c: resFileOpen resFileCreate resFileClose resFileReadFar
+    resFileWrite resFileReadBlock resFileWriteBlock
+  stgen.c: rangeApprox memAppend commFetch setMoveDstComm7A doNothing
+    positionUnit calcBearing findOrPlaceItem parseWorld exportWorldToComm
+    formatGridRef formatTimeStr clampValue missionGenerate
+  stgrid.c: parseGrid replaceExtension
+  stload.c: loadSpriteScaled loadPicRes loadSpriteRes loadResSection
+  stmap.c(/Ot): mapToScreenX mapToScreenY drawMapLine drawClippedMapLine
+    drawMapPoint plotMapPoint sinMul cosMul toggleSelRect drawRiskPanel
+    rectInView shiftByMode drawScorePanel drawUnitList
+  stparse.c: parseGridTerrain parseTerrain
+  stpinp.c: saveHallfame loadHallfame
+  stterr.c: lookupGridCell
+  stutil.c(/Os): randMul mystrcpy getTimeOfDay drawStringCentered
+    showMsgWaitKey itemDistance getItemCoordStr readInputKey initGraphics
+    stringWidth drawLine drawClippedLineEx drawTileIcon mystrcat
+    selectNextObject selectNextUnit selectPrevUnit selectPrevObject
+    drawUnitMarkers drawTileMarkers drawSiteMarkers rtcSync
+    evalChoiceExpr clipEntries drawMapArc dosRead advanceBufPos
+    setViewOrigin delayTicks bufReadBytes resetTableFlags bufReadFile
+    tickEffectTable dispatchDrawMode wrapUnitText wrapUnitTextFar
+  textfmt.c: my_ltoa my_itoa
+  Left as skeleton: dos_alloc doFcbSearch (int21h),
   decodePic/showPicFile/openBlitClosePic + pic cluster, clearRect/
   clearDirtyRects (rep stosw), clipLineCohenSutherland (vector-table asm),
   readJoyAxis/routine_71/routine_100 (in/out + cli), time/abs/getche/
-  strcoll/strncmp/strncpy (CRT), installCBreakHandler.
+  strcoll/strncmp/strncpy (CRT), installCBreakHandler, jump-table patcher
+  sub_14107, reg-ABI trampolines (sub_141A3/sub_16DC2/sub_16E0C),
+  mode-parser _openfile (sub_1E7B6), CRT time cluster
+  (sub_1EFFE/sub_1EB7C), timer-port asm (sub_144F2/sub_14F8F).
 - SU.EXE — 0 C-portable: every signature match is int21h file-IO or CRT
   asm (createFile/openFile/closeFile/readFile1/setTimerIrqHandler are the
   hand-asm DS=SS family). Skeleton stays.
