@@ -1158,3 +1158,31 @@ Codegen finds:
   (double tramps), and if/else forms add dead join jmps.
 - drawstr.c is /Os (not the /Ot default): /Ot emits a relax-pad nop at
   the wrap loop head; /Os suppresses it.
+
+## 13. English END.EXE batch — file/picture I/O wrappers (0x12C6–0x212B)
+
+File/pic I/O layer split from the fused extents and ported as the thin
+C wrapper tier over the hand-asm DOS int21 primitives (openFile 0x13ae,
+createFile 0x1405, fileClose 0x145c, readFile1 0x147e, readFile2 0x14a9,
+writeFileAtRaw 0x1539 — all stay skeleton):
+
+enfile.c (/Os): loadFileSection (0x12c6), writeFileSection (0x12fe),
+  openFileWrapper/createFileWrapper/closeFileWrapper (0x1336–0x1367),
+  readFile1Wrapper/readFile2Wrapper/writeFileAtRawWrapper
+  (0x1368–0x13ad), readPicStream (0x1a3e — buffered byte reader over
+  picStreamRead with the 0x200 refill at picBufPos>0x1ff),
+  allocClearBuf (0x20fc — allocBuffer + memsetFar; map was misnamed
+  loadFileSection — renamed; it is the same alloc-clear idiom as
+  EGAME's loadFileSection but END keeps the real loadFileSection at
+  0x12c6, so the late copy got its own name).
+enaward.c (/Od): openBlitClosePic (0x15df), openDecodeClosePic
+  (0x1615), openDecodePicAt (0x164b — open+lseek(SEEK_SET)+decodePic
+  +close; sub_11615 extent split at 0x164b), loadPicFromFileAt
+  (0x15a6 — already ported).
+
+picBlit (0x1706) / decodePic (0x17e2) / the pic-stream asm internals
+(picReadBlock 0x1500, picStreamRead 0x1521, picReadDataAndMakeDict,
+picMakeDict, doPicDecode, dictionaryLookup) remain skeleton asm.
+All 14 routines MATCH; stubs.c EXE_END block updated (dosReadFar/
+openFileWrapper/closeFileWrapper removed, fileClose/picStreamRead/
+decodePic/picBufPos/picStreamBuf added; openBlitClosePic stub guarded).

@@ -332,7 +332,9 @@ void  far setupInstrumentLayoutFar(void) { }          /* sub_2208A */
 void  far copyJoystickData(uint8 far *data) { }       /* sub_22D57 */
 int16 far restoreJoystickData(uint8 far *data) { return 0; } /* sub_22D45 */
 int16 far gfx_getModecode(void) { return 0; }         /* sub_2F165 */
+#ifndef EXE_END /* real def in src_end/enaward.c */
 void  openBlitClosePic(int16 picId, int16 p) { }      /* sub_1E40A */
+#endif
 void  initMissionStrings(void) { }                    /* sub_10446 */
 void  far audio_shutdown(void) { }                    /* sub_2F223 */
 void  far audio_setup(void) { }                       /* sub_2F21E */
@@ -775,10 +777,12 @@ char  str682E[4], str6832[4], str6834[4], str6836[4], str6838[4];
 uint8 ringMode;                                        /* dseg:0x9922 */
 uint8 ringTypes[0x40];                                 /* dseg:0x3e26 */
 #ifdef EXE_END /* END-only callees (real defs live in the skeleton asm) */
-int16 dosReadFar(int16 fd, uint16 n, uint16 off, uint16 seg) { return 0; } /* sub_114A9 */
-int16 openFileWrapper(const char *name, int16 mode) { return 0; }          /* sub_11336 */
 void  seekFileAt(int16 fd, int16 off, int16 whence) { }                    /* sub_11694 */
-void  closeFileWrapper(int16 fd) { }                                       /* sub_1135A */
+void  fileClose(int16 fd) { }                                              /* 0x145c — int21/3Eh asm */
+void  picStreamRead(int16 fd) { }                                          /* 0x1521 — asm block reader */
+void  decodePic(int16 fd, int16 page) { }                                  /* 0x17e2 — asm decoder */
+int16 picBufPos;                                                           /* dseg:0x1d4c */
+uint8 picStreamBuf[4];                                                     /* dseg:0x194a */
 void  memsetFar(uint8 far *d, int16 v, uint16 n) { }                       /* sub_13982 — rep-stosb asm in skeleton */
 int16 readBiosTickLo(void) { return 0; }               /* sub_13844 */
 void  seedRandom16(int16 v) { }                        /* sub_18C84 */

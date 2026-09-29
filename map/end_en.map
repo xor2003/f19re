@@ -70,38 +70,40 @@ sub_111FF: seg000 FAR 11ff-1240 R11ff-1240
 installCBreakHandler: seg000 NEAR 1241-1263 R1241-1263 duplicate
 sub_11264: seg000 NEAR 1264-1274 R1264-1274
 sub_11275: seg000 FAR 1275-12c5 R1275-12c5
-sub_112C6: seg000 NEAR 12c6-1335 R12c6-1335
-sub_11336: seg000 NEAR 1336-1347 R1336-1347
-sub_11348: seg000 NEAR 1348-1359 R1348-1359
-sub_1135A: seg000 NEAR 135a-1367 R135a-1367
-sub_11368: seg000 NEAR 1368-137b R1368-137b
-strcoll: seg000 NEAR 137c-1393 R137c-1393
-sub_11394: seg000 NEAR 1394-13ad R1394-13ad
+loadFileSection: seg000 NEAR 12c6-12fd R12c6-12fd
+writeFileSection: seg000 NEAR 12fe-1335 R12fe-1335
+openFileWrapper: seg000 NEAR 1336-1347 R1336-1347
+createFileWrapper: seg000 NEAR 1348-1359 R1348-1359
+closeFileWrapper: seg000 NEAR 135a-1367 R135a-1367
+readFile1Wrapper: seg000 NEAR 1368-137b R1368-137b
+readFile2Wrapper: seg000 NEAR 137c-1393 R137c-1393
+writeFileAtRawWrapper: seg000 NEAR 1394-13ad R1394-13ad
 openFile: seg000 NEAR 13ae-1404 R13ae-1404 duplicate
-sub_11405: seg000 NEAR 1405-145b R1405-145b
+createFile: seg000 NEAR 1405-145b R1405-145b
 fileClose: seg000 NEAR 145c-147d R145c-147d duplicate
-sub_1147E: seg000 NEAR 147e-14a8 R147e-14a8
-sub_114A9: seg000 NEAR 14a9-14ff R14a9-14ff
-sub_11500: seg000 NEAR 1500-1520 R1500-1520
-sub_11521: seg000 NEAR 1521-1538 R1521-1538
-sub_11539: seg000 NEAR 1539-15a5 R1539-15a5
+readFile1: seg000 NEAR 147e-14a8 R147e-14a8
+readFile2: seg000 NEAR 14a9-14ff R14a9-14ff
+picReadBlock: seg000 NEAR 1500-1520 R1500-1520
+picStreamRead: seg000 NEAR 1521-1538 R1521-1538
+writeFileAtRaw: seg000 NEAR 1539-15a5 R1539-15a5
 # Routine openBlitClosePic 0000:15a6-0000:15de[000039] is a potential duplicate of routine loadPicFromFileAt 0000:05f8-0000:062f[000038], differs by 9 instructions
 loadPicFromFileAt: seg000 NEAR 15a6-15de R15a6-15de duplicate
-sub_115DF: seg000 NEAR 15df-1614 R15df-1614
-sub_11615: seg000 NEAR 1615-1693 R1615-1693
+openBlitClosePic: seg000 NEAR 15df-1614 R15df-1614
+openDecodeClosePic: seg000 NEAR 1615-164a R1615-164a
+openDecodePicAt: seg000 NEAR 164b-1693 R164b-1693
 showPicFile: seg000 NEAR 1694-1705 R1694-1705 duplicate
-sub_11706: seg000 NEAR 1706-17e1 R1706-17e1
+picBlit: seg000 NEAR 1706-17e1 R1706-17e1
 decodePic: seg000 NEAR 17e2-1849 R17e2-1849 duplicate
 sub_1184A: seg000 NEAR 184a-184e R184a-184e
 picReadDataAndMakeDict: seg000 NEAR 1876-18bc R1876-18bc duplicate
 picMakeDict: seg000 NEAR 18bd-18f2 R18bd-18f2 duplicate
 doPicDecode: seg000 NEAR 18f3-196b R18f3-196b duplicate
 dictionaryLookup: seg000 NEAR 196c-1a1d R196c-1a1d duplicate
-sub_11A3E: seg000 NEAR 1a3e-1a89 R1a3e-1a89
+readPicStream: seg000 NEAR 1a3e-1a89 R1a3e-1a89
 sub_11A8A: seg000 NEAR 1a8a-20fb R1a8a-20fb
 # Routine sub_120FC 0000:20fc-0000:212b[000030] is a potential duplicate of routine loadFileSection 0000:3104-0000:313b[000038], differs by 8 instructions
 # Routine sub_120FC 0000:20fc-0000:212b[000030] is a potential duplicate of routine loadFileSectionEx 0000:313c-0000:3173[000038], differs by 8 instructions
-loadFileSection: seg000 NEAR 20fc-212b R20fc-212b duplicate
+allocClearBuf: seg000 NEAR 20fc-212b R20fc-212b duplicate
 sub_1212C: seg000 NEAR 212c-214b R212c-214b
 sub_1214C: seg000 NEAR 214c-2191 R214c-2191
 sub_12192: seg000 NEAR 2192-27f5 R2192-27f5
