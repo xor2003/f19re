@@ -1128,3 +1128,33 @@ slot — MSC rotates it to loop head producing the inc-first layout, and
 the preceding scan loop emits top-tested (`cmp;je fwd;inc;jmp`) — the
 same source as START's verified mystrcat. `do{}while(*d++=*s++)` does
 NOT produce this (load-then-inc, bottom-test).
+
+## 12. English END.EXE batch — enmain/enworld /Od cluster + /Gs string drawing (0x398–0xA87)
+
+The early-END region is F-15 lineage from enmain.c+eninput.c+enworld.c
+(chkstk `mov ax,N; call __chkstk` frames = /Od, no /Gs) plus a /Gs string
+module. Map split + renamed at real proc boundaries (the `db` regions
+between routines were mid-function `call far` immediates, not code gaps):
+cleanup (0x398), restoreVideoMode/restoreInterrupts (empty /Od stubs
+0x3d5/0x3e6), loadWorldStrings (0x3f7), readWorldData (0x45f),
+loadWorldData (0x558), setupWorldBufPtr (0x59e), readFromWorldBuf
+(0x5c6), writeToWorldBuf (0x605 — extent resplit: 0x644+ is nullsub1),
+clearKeybuf (0x655), waitForKeyOrJoy (0x67b), waitForKeyOrJoy2 (0x702),
+then /Gs: drawStringAtPos (0x7a0), drawStringAt (0x7c6), drawFarString
+(0x7eb), drawWrappedTextFar (0x814 — F19 extra `while(*a==' ')a++`
+space-skip vs near variant), drawWrappedText (0x965), stringWidth
+(0xa88). All MATCH.
+
+Codegen finds:
+- The wait loops are `while (keybuf() != 0 && readJoy(0) == 0)` /
+  `while (kb() != 0) serviceTick()` — the &&-chain emits `J<c> next-cond;
+  JMP exit` per conjunct; the do/if/break f15 form emits inverted
+  `J<c>`-to-tramp under this /Od module and does not match.
+- Post-loop `if (keybuf() == 0) key = getkey();` is a PLAIN if — no
+  else, no goto: `J<c>` to the getkey arm and the fallthrough jmp shares
+  getkey's exit `jmp done` tail (key stays uninitialized on the
+  key-pending path — matches `mov [bp-2]` only on the getkey branch).
+  The `if(c)goto L` rewrite MSC-cond-forms into `J<c> tramp; JMP next`
+  (double tramps), and if/else forms add dead join jmps.
+- drawstr.c is /Os (not the /Ot default): /Ot emits a relax-pad nop at
+  the wrap loop head; /Os suppresses it.

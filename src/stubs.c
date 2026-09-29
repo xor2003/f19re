@@ -479,7 +479,7 @@ void  setupDac(void) { }                            /* sub_11BB4 */
 uint8 g_dacSupported;                               /* byte_2EEE4 */
 
 /* ---- satellite (SU/START/END) shared extern stubs ---- */
-#ifndef EXE_START /* src_start/cleanup.c provides the real port */
+#if !defined(EXE_START) && !defined(EXE_END) /* src_start/cleanup.c + src_end/enmain.c provide the real ports */
 void  cleanup(void) { }
 #endif
 #ifdef EXE_START /* START-only callees (real defs live in the skeleton asm) */
@@ -747,7 +747,9 @@ void  drawMapPixel(int16 x, int16 y, int16 c) { }
 #if !defined(EXE_START) && !defined(EXE_END) /* stutil.c/enstr.c provide the real ports */
 void  mystrcpy(char *d, const char *s) { }
 #endif
+#ifndef EXE_END /* src_end/enworld.c provides the real port */
 void  loadWorldData(void *d, int16 s) { }
+#endif
 /* stutil.c drawUnitList deps */
 int16 selRowIdx, flag2CA4C, flag2C7CE, word_2CA60, word_2CA64;
 uint8 byte_2C9E0;
@@ -796,7 +798,13 @@ void  drawEventSprite(int16 rec) { }
 int16 far misc_jump_5a_keybuf(void) { return 0; }
 int16 far misc_jump_5b_getkey(void) { return 0; }
 int16 far misc_jump_5d_readJoy(int16 a) { return 0; }
+void  far misc_jump_5e_clearKeyFlags(void) { }
 void  far gfx_blitSprite(int16 spr) { }
+void  intDispatch(int16 n, uint8 *a, uint8 *b) { }     /* sub_139FD */
+void  serviceTick(void) { }                          /* sub_1281B */
+void  farStrcpy(char *d, char far *s) { }            /* sub_138EC — asm in skeleton */
+void  copyBytes(char *d, char *s, int16 n) { }       /* sub_13998 — asm in skeleton */
+void  memcpyFromFar(char *d, char far *s, int16 n) { } /* sub_139B6 — asm in skeleton */
 #endif
 /* stutil.c drawStoreIcons deps */
 int16 word_298E6;                                     /* dseg:0x98e6 */

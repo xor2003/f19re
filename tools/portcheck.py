@@ -61,6 +61,9 @@ MODULE_FLAGS = {
     # EN enstr (mystrcpy..memeq): /Os — the rep-string funcs between them are
     # asm in the skeleton (orig emits rep stosb/movsb, /Oi gives repne).
     'enstr.c':    ['/AS', '/Gs', '/Os'],
+    # EN drawstr (drawString* + drawWrappedText*): /Os — /Ot emits a stray
+    # relax-pad nop at the wrap loop head (ref has none).
+    'drawstr.c':  ['/AS', '/Gs', '/Os'],
     # exe-prefixed keys disambiguate same-basename modules across srcdirs.
     # Both EN satellites' my_itoa use `for (k=5; k>0 && num[k]==0; k--)` which
     # emits a stray nop pad under /Ot but is byte-exact under /Os.

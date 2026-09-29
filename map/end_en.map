@@ -29,26 +29,26 @@ seg_stack STACK 13c8
 sub_10010: seg000 NEAR 0010-0092 R0010-0092
 # Routine sub_10328 0000:0328-0000:0397[000070] is a potential duplicate of routine initGraphics 0000:0010-0000:006b[00005c], differs by 13 instructions
 initGraphics: seg000 NEAR 0328-0397 R0328-0397 duplicate
-sub_10398: seg000 NEAR 0398-03ac R0398-03ac
-sub_103D5: seg000 NEAR 03d5-03e5 R03d5-03e5
-sub_103E6: seg000 NEAR 03e6-03f6 R03e6-03f6
-sub_103F7: seg000 NEAR 03f7-0420 R03f7-0420
+cleanup: seg000 NEAR 0398-03d4 R0398-03d4
+restoreVideoMode: seg000 NEAR 03d5-03e5 R03d5-03e5
+restoreInterrupts: seg000 NEAR 03e6-03f6 R03e6-03f6
+loadWorldStrings: seg000 NEAR 03f7-045e R03f7-045e
 # Routine readWorldData 0000:045f-0000:0557[0000f9] is a potential duplicate of routine readWorldData 0000:025c-0000:0344[0000e9], differs by 10 instructions
 readWorldData: seg000 NEAR 045f-0557 R045f-0557 duplicate
-sub_10558: seg000 NEAR 0558-059d R0558-059d
-sub_1059E: seg000 NEAR 059e-05bf R059e-05bf
-sub_105C6: seg000 NEAR 05c6-0604 R05c6-0604
-sub_10605: seg000 NEAR 0605-0654 R0605-0654
-sub_10655: seg000 NEAR 0655-066c R0655-066c
-sub_1067B: seg000 NEAR 067b-0701 R067b-0701
-sub_10702: seg000 NEAR 0702-07c5 R0702-07c5
+loadWorldData: seg000 NEAR 0558-059d R0558-059d
+setupWorldBufPtr: seg000 NEAR 059e-05c5 R059e-05c5
+readFromWorldBuf: seg000 NEAR 05c6-0604 R05c6-0604
+writeToWorldBuf: seg000 NEAR 0605-0643 R0605-0643
+nullsub1: seg000 NEAR 0644-0654 R0644-0654
+clearKeybuf: seg000 NEAR 0655-067a R0655-067a
+waitForKeyOrJoy: seg000 NEAR 067b-0701 R067b-0701
+waitForKeyOrJoy2: seg000 NEAR 0702-079e R0702-079e
+drawStringAtPos: seg000 NEAR 07a0-07c5 R07a0-07c5
 # Routine drawStringAt 0000:07c6-0000:07ea[000025] is a potential duplicate of routine drawStringAt 0000:31a7-0000:31cd[000027], differs by 1 instructions
 drawStringAt: seg000 NEAR 07c6-07ea R07c6-07ea duplicate
-sub_107EB: seg000 NEAR 07eb-091b R07eb-091b
-sub_1091D: seg000 NEAR 091d-0964 R091d-0964
-sub_10965: seg000 NEAR 0965-09c6 R0965-09c6
-sub_109C7: seg000 NEAR 09c7-09d5 R09c7-09d5
-sub_109D9: seg000 NEAR 09d9-0a82 R09d9-0a82
+drawFarString: seg000 NEAR 07eb-0813 R07eb-0813
+drawWrappedTextFar: seg000 NEAR 0814-0964 R0814-0964
+drawWrappedText: seg000 NEAR 0965-0a87 R0965-0a87
 # Routine sub_10A88 0000:0a88-0000:0acb[000044] is a potential duplicate of routine stringWidth 0000:3205-0000:3247[000043], differs by 8 instructions
 stringWidth: seg000 NEAR 0a88-0acb R0a88-0acb duplicate
 # Routine my_ltoa 0000:0acc-0000:0c02[000137] is a potential duplicate of routine my_ltoa 0000:3248-0000:3382[00013b], differs by 2 instructions
