@@ -1098,3 +1098,33 @@ sub_15B68's extent but was `/Os` in the original (shared-epilogue
 `stobjb.c` whose basename sorts right after stobj.c — the portcheck test
 exe links modules alphabetically, so it lands contiguous and the full
 5b68-61cb extent matches.
+
+## 11. English END.EXE batch — menu/debrief cluster + string helpers
+
+`src_end/enbrief.c` (`/AS /Gs /Os`): isPointInRect (0x3ff5), blinkWidget
+(0x3f60), selectMenuItem (0x3c2e, 0x332b — f15 selectMenuItem verbatim,
+a..o locals bucket-engineered into the 0x2a frame), processDebriefInput
+(0x401d, 0x48b — f15 port incl. the 12-entry `jmp cs:[bx+tab]` switch;
+map marks the table U), drawMapPixel (0x564f), mapToScreenX/Y (0x54ba/
+0x54cf). `src_end/enfile.c` (`/Os`): strcoll (0x43a4 — 4-arg forwarder to
+sub_114A9 dosRead), loadFileSection (0x413a — allocBuffer + memsetFar
+zero via a FarWords union arg). `src_end/enmain.c` (`/Od`, chkstk frame):
+initGraphics (0x0d2a — 8 dead int16 locals + driver jump-table calls).
+`src_end/enaward.c` (`/Od`): loadPicFromFileAt (0x6fd8 — open/lseek/
+close). `src_end/drawstr.c`: stringWidth (0xa88), drawStringAt, my_ltoa,
+my_itoa, allocBuffer, freeBuffer, readWorldData, plotMapPoint,
+drawClippedLine(Ex), drawFlightLine, formatFlightTime — all MATCH.
+
+`src_end/enstr.c` (`/Os`): mystrcpy (0x38ba) and mystrcat (0x3923). The
+rest of the 0x38ba-0x3b8d cluster is hand-asm — same fingerprints as the
+START twins in stutil.c: mystrlen/mystrchr preload the param into ax
+pre-loop and keep it live (no C shape reproduces this), mystrchr pushes
+si unused; strcpyToFar/farStrcpy/memsetNear/memsetFar/memcpyFromFar are
+LES/LDS+LODSB/STOSB+REP; copyBytes uses `loop`, memeq uses byte-stepped
+word cmp + `loope`. All stay skeleton. The fused map extents were split
+at real proc boundaries (mystrcpy..memeq now individual entries).
+Codegen find: `for(; (*d=*s++)!=0; d++)` puts d++ in the for-increment
+slot — MSC rotates it to loop head producing the inc-first layout, and
+the preceding scan loop emits top-tested (`cmp;je fwd;inc;jmp`) — the
+same source as START's verified mystrcat. `do{}while(*d++=*s++)` does
+NOT produce this (load-then-inc, bottom-test).

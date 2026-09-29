@@ -3,15 +3,24 @@
 
 /* MenuItem fields as END.EXE addresses them */
 typedef struct {
-    int16 pad00[4];         /* 0x00 */
+    int16 hitX1;            /* 0x00 */
+    int16 hitY1;            /* 0x02 */
+    int16 hitX2;            /* 0x04 */
+    int16 hitY2;            /* 0x06 */
     int16 colorX1;          /* 0x08 */
     int16 colorY1;          /* 0x0a */
     int16 colorX2;          /* 0x0c */
     int16 colorY2;          /* 0x0e */
-    int16 pad10;            /* 0x10 */
+    int16 colorTableIdx;    /* 0x10 */
     int16 colorPair;        /* 0x12 */
-    int16 pad14[13];        /* 0x14 */
+    int16 labelData1[5];    /* 0x14 */
+    int16 *pagePtr;         /* 0x1e */
+    int16 labelData2[4];    /* 0x20 */
+    int16 spriteNormal;     /* 0x28 */
+    int16 spriteBlink;      /* 0x2a */
+    int16 unk_2c;           /* 0x2c */
     int16 state;            /* 0x2e */
+    uint16 flags;           /* 0x30 */
 } MenuItem;
 
 #pragma pack(1)
@@ -38,10 +47,390 @@ extern void far gfx_setOvlVal1(int16 v);
 extern void far gfx_setOvlVal2(int16 v);
 extern void far gfx_nop23(void);
 extern void drawLineWrapper(void);
-extern int16 mapToScreenX(int16 v);
 extern int16 mapToScreenY(int16 v);
-extern void drawMapPixel(int16 x, int16 y, int16 color);
+extern void drawClippedLine(int16 x1, int16 y1, int16 x2, int16 y2);
 extern void mystrcpy(char *dst, const char *src);
+extern void setTimerIrqHandler(void);       /* sub_13626 — int 21/35h+25h asm */
+extern void restoreTimerIrqHandler(void);   /* sub_13664 — int 21/25h asm */
+
+uint16 cursorX, cursorY;                    /* word_237A0, word_237A6 */
+uint8 timerCounter;                         /* byte_1DF6A */
+int16 colorAnimEnabled;                     /* word_22426 */
+int16 selectedMenuItem;                     /* word_23512 */
+uint8 inputChanged;                         /* byte_22422 */
+uint8 enterPressed;                         /* byte_236AF */
+uint8 joyRepeatFlag;                        /* byte_22428 */
+
+extern void far gfx_commitPage(void);
+extern void processDebriefInput(int16 *inputState, MenuItem *item, int16 *gfxPage);
+extern void drawMenuItem(MenuItem *items, int16 index, int16 *gfxPage);
+extern void blinkWidget(MenuItem *item, int16 *gfxPage);
+
+#define MENUITEM_SELECTABLE  0x0008
+#define MENUITEM_ENABLED     0x0100
+#define MENUITEM_HAS_SPRITE  0x0800
+#define MENUITEM_SPRITE_BLINK 0x1000
+
+#define KEYCODE_ENTER      0x000d
+#define KEYCODE_ESC        0x001b
+#define KEYCODE_ALTQ       0x1000
+#define KEYCODE_LEFTARROW  0x4b00
+#define KEYCODE_RIGHTARROW 0x4d00
+#define KEYCODE_UPARROW    0x4800
+#define KEYCODE_DNARROW    0x5000
+#define JOY_DEADZONE_LO    0x4e
+#define JOY_DEADZONE_HI    0xb2
+
+struct CommDataEnd {                            /* far ptr word_23C66 */
+    int8 pad20[0x20];
+    int16 gfxInitResult;                        /* 0x20 */
+    int8 pad22[0x02];
+    int16 setupMono;                            /* 0x24 */
+    int8 pad26[0x4c];
+    int16 setupUseJoy;                          /* 0x72 */
+};
+extern struct CommDataEnd far *commData;
+
+struct BlinkSprite {
+    int16 pad00;
+    int16 srcX;                 /* +2 */
+    int16 pad04;
+    int16 pad06;
+    int16 dstX;                 /* +8 */
+    int16 dstY;                 /* +a */
+};
+struct FlightLogRec {
+    uint8 mapX, mapY;
+    int8 status;
+    int8 unitId;
+    uint8 pad4, pad5;
+};
+
+uint16 *colorTablePtr;                       /* word_22420 */
+int16 colorAnimIdx;                          /* word_22424 */
+uint8 timerCounter2;                         /* byte_1DF6C */
+uint8 timerCounter3;                         /* byte_1DF6D */
+uint8 animDone;                              /* byte_2242A */
+uint8 spriteToggle;                          /* byte_22429 */
+uint8 joyAxisX, joyAxisY;                    /* byte_1B6CE, byte_1B6CF */
+uint8 quitFlag;                              /* byte_1B6D2 */
+
+extern int16 curRecordIdx;                   /* word_22C36 */
+extern uint16 colorStyleTable[];             /* 0x41DE */
+extern struct FlightLogRec flightRecords[];  /* byte_22F14 */
+extern uint8 slotInfoTable[];                /* word_2245E */
+extern struct BlinkSprite *spriteAirBlink;   /* word_1F6E4 */
+extern struct BlinkSprite *spriteSamBlink;   /* word_1F764 */
+extern struct BlinkSprite *spriteGroundBlink;/* word_1F724 */
+extern struct BlinkSprite *spriteWaypointBlink;/* word_1F7E4 */
+
+extern void far pollJoystick(void);          /* 9C7:2F */
+extern int16 far misc_jump_5a_keybuf(void);
+extern int16 far misc_jump_5b_getkey(void);
+extern int16 far misc_jump_5d_readJoy(int16 a);
+extern void far gfx_blitSprite(struct BlinkSprite *spr);   /* 9D9:13A5 */
+extern void cleanup(void);                   /* sub_10398 */
+extern void restoreCbreakHandler(void);      /* sub_11264 */
+extern void exit(int16 code);                /* sub_18AD2 */
+extern void drawEventSprite(int16 rec);      /* sub_14DDE */
+
+/* seg000:0x3ff5 */
+int16 isPointInRect(MenuItem *p) {
+    if (p->hitX1 <= cursorX && p->hitX2 >= cursorX &&
+        p->hitY1 <= cursorY && p->hitY2 >= cursorY)
+        return 1;
+    else
+        return 0;
+}
+
+/* seg000:0x54ba */
+int16 mapToScreenX(uint8 mapCoord) {
+    return ((uint16)mapCoord << 7) / 146;
+}
+
+/* seg000:0x54cf */
+int16 mapToScreenY(uint8 mapCoord) {
+    return ((uint16)mapCoord << 7) / 0xc3;
+}
+
+/* seg000:0x564f */
+void drawMapPixel(int16 x, int16 y, int16 color) {
+    (void)color;
+    drawClippedLine(x, y, x, y);
+}
+
+/* seg000:0x0cd9 */
+void timerWait(uint16 ticks) {
+    timerCounter = 0;
+    setTimerIrqHandler();
+    while (ticks >= timerCounter)
+        ;
+    restoreTimerIrqHandler();
+}
+
+/* seg000:0x3c2e */
+int16 selectMenuItem(MenuItem *items, int16 unused, int16 itemCount, int16 *inputState, int16 *gfxPage) {
+    char p[2]; int16 a; int16 b; char c[2]; int16 d; char e[2]; int16 f;
+    int16 g; char h[2]; int16 i; char j[12]; int16 k; int16 l; int16 m; int16 n; int16 o;
+    (void)unused;
+    (void)d; (void)g; (void)j; (void)k; (void)l; (void)m; (void)n; (void)o;
+    p[0] = 0x0d; p[1] = 0;
+    e[0] = 0x89; e[1] = 0;
+    c[0] = 0x8d; c[1] = 0;
+    h[0] = 0x80; h[1] = 0;
+    gfx_commitPage();
+    colorAnimEnabled = 0;
+    i = 0;
+    while (isPointInRect(&items[i]) == 0 && i < itemCount)
+        i++;
+    joyRepeatFlag = 0;
+    for (;;) {
+        do {
+            gfx_commitPage();
+            if ((items[i].flags & MENUITEM_ENABLED) == 0) {
+                colorAnimEnabled = 1;
+            }
+            processDebriefInput(inputState, &items[i], gfxPage);
+        } while (inputChanged == 0 && enterPressed == 0);
+        if (enterPressed != 0) {
+            if (i != selectedMenuItem) {
+                i = 0;
+                while (isPointInRect(&items[i]) == 0 && i < itemCount)
+                    i++;
+            }
+            if (items[selectedMenuItem].colorTableIdx == 0) {
+                b = 0x0b;
+                a = 9;
+                gfx_switchColor(gfxPage, items[selectedMenuItem].colorX1, items[selectedMenuItem].colorY1, items[selectedMenuItem].colorX2, items[selectedMenuItem].colorY2, 0x0b, 9);
+                b = 3;
+                gfx_switchColor(gfxPage, items[selectedMenuItem].colorX1, items[selectedMenuItem].colorY1, items[selectedMenuItem].colorX2, items[selectedMenuItem].colorY2, 3, a);
+                b = 0x0d;
+                gfx_switchColor(gfxPage, items[selectedMenuItem].colorX1, items[selectedMenuItem].colorY1, items[selectedMenuItem].colorX2, items[selectedMenuItem].colorY2, 0x0d, a);
+            }
+            return i;
+        }
+        i = 0;
+        while (isPointInRect(&items[i]) == 0 && i < itemCount)
+            i++;
+        if (i != selectedMenuItem) {
+            if ((items[i].flags & MENUITEM_SELECTABLE) != 0) {
+                for (f = 0; f < itemCount; f++) {
+                    if (items[f].state != 0 &&
+                        items[i].unk_2c == items[f].unk_2c) {
+                        blinkWidget(&items[f], gfxPage);
+                    }
+                }
+                if (items[selectedMenuItem].colorTableIdx == 0) {
+                    b = 9;
+                    a = 6;
+                    gfx_switchColor(gfxPage, items[selectedMenuItem].colorX1, items[selectedMenuItem].colorY1, items[selectedMenuItem].colorX2, items[selectedMenuItem].colorY2, 9, 6);
+                    b = 3;
+                    gfx_switchColor(gfxPage, items[selectedMenuItem].colorX1, items[selectedMenuItem].colorY1, items[selectedMenuItem].colorX2, items[selectedMenuItem].colorY2, 3, a);
+                    b = 0x0d;
+                    gfx_switchColor(gfxPage, items[selectedMenuItem].colorX1, items[selectedMenuItem].colorY1, items[selectedMenuItem].colorX2, items[selectedMenuItem].colorY2, 0x0d, a);
+                    b = 0x0b;
+                    gfx_switchColor(gfxPage, items[selectedMenuItem].colorX1, items[selectedMenuItem].colorY1, items[selectedMenuItem].colorX2, items[selectedMenuItem].colorY2, 0x0b, a);
+                }
+                if (items[selectedMenuItem].colorTableIdx == 1) {
+                    b = 8;
+                    a = 7;
+                    gfx_switchColor(gfxPage, items[selectedMenuItem].colorX1, items[selectedMenuItem].colorY1, items[selectedMenuItem].colorX2, items[selectedMenuItem].colorY2, 8, 7);
+                }
+                blinkWidget(&items[i], gfxPage);
+            }
+            selectedMenuItem = i;
+            drawMenuItem(items, i, gfxPage);
+        }
+    }
+    return i;
+}
+
+/* seg000:0x401d */
+void processDebriefInput(int16 *cursorBounds, MenuItem *menuItem, int16 *gfxPage) {
+    int16 a;
+    int16 b;
+    int16 c;
+    int16 d;
+    int16 e;
+    int8 f;
+    int16 g;
+    int16 h;
+    int16 i;
+    (void)a; (void)g; (void)i;
+
+    colorTablePtr = (uint16 *)((uint16)menuItem->colorTableIdx * 14 + (int16)colorStyleTable);
+    timerCounter2 = 0;
+    d = e = 0;
+    inputChanged = enterPressed = animDone = f = 0;
+    if (joyRepeatFlag == 1) {
+        timerCounter = 0;
+        f = 1;
+    }
+
+    if (commData->setupUseJoy == 1) {
+        d = misc_jump_5d_readJoy(0);
+        e = misc_jump_5d_readJoy(1);
+        pollJoystick();
+    }
+
+    for (;;) {
+        if ((int8)misc_jump_5a_keybuf() == 0
+            || d != 0
+            || e != 0
+            || joyAxisX < JOY_DEADZONE_LO
+            || joyAxisX > JOY_DEADZONE_HI
+            || joyAxisY < JOY_DEADZONE_LO
+            || joyAxisY > JOY_DEADZONE_HI) {
+            if (f != 1)
+                goto input_done;
+        }
+        if (joyRepeatFlag == 1) {
+            if (timerCounter > 0x0f) {
+                f = 0;
+                joyRepeatFlag = 0;
+            }
+        }
+
+        if (commData->setupUseJoy == 1) {
+            d = misc_jump_5d_readJoy(0);
+            e = misc_jump_5d_readJoy(1);
+            pollJoystick();
+        }
+
+        if (quitFlag != 0) {
+            cleanup();
+            restoreCbreakHandler();
+            exit(0);
+        }
+
+        if (colorAnimEnabled == 1) {
+            if (timerCounter2 > 6) {
+                timerCounter2 = 0;
+                c = colorTablePtr[colorAnimIdx + 1] >> 4;
+                b = colorTablePtr[colorAnimIdx + 1] & 0xf;
+                gfx_switchColor(gfxPage, menuItem->colorX1, menuItem->colorY1,
+                                menuItem->colorX2, menuItem->colorY2, c, b);
+                colorAnimIdx++;
+                colorAnimIdx = (uint16)colorAnimIdx % *colorTablePtr;
+            }
+        }
+
+        if (!(menuItem->flags & MENUITEM_HAS_SPRITE)) continue;
+        if (!(menuItem->flags & MENUITEM_SPRITE_BLINK)) continue;
+        if (timerCounter3 <= 0x12) continue;
+        timerCounter3 = 0;
+        if (spriteToggle != 0) {
+            switch (flightRecords[curRecordIdx].status & 0x3f) {
+            case 1:
+            case 12:
+                spriteAirBlink->dstX = mapToScreenX(flightRecords[curRecordIdx].mapX) + mapViewX1 - 2;
+                spriteAirBlink->dstY = mapToScreenY(flightRecords[curRecordIdx].mapY) + mapViewY1 - 2;
+                if (slotInfoTable[(flightRecords[curRecordIdx].unitId & 0x7f) << 4] & 8) {
+                    spriteAirBlink->srcX = 0x11e;
+                } else {
+                    spriteAirBlink->srcX = 0x12d;
+                }
+                gfx_blitSprite(spriteAirBlink);
+                break;
+            case 2:
+                spriteSamBlink->dstX = mapToScreenX(flightRecords[curRecordIdx].mapX) + mapViewX1 - 2;
+                spriteSamBlink->dstY = mapToScreenY(flightRecords[curRecordIdx].mapY) + mapViewY1 - 2;
+                gfx_blitSprite(spriteSamBlink);
+                break;
+            case 4:
+            case 5:
+            case 6:
+            case 7:
+            case 10:
+            case 11:
+                spriteWaypointBlink->dstX = mapToScreenX(flightRecords[curRecordIdx].mapX) + mapViewX1;
+                spriteWaypointBlink->dstY = mapToScreenY(flightRecords[curRecordIdx].mapY) + mapViewY1;
+                gfx_blitSprite(spriteWaypointBlink);
+                break;
+            case 3:
+            case 8:
+                spriteGroundBlink->dstX = mapToScreenX(flightRecords[curRecordIdx].mapX) + mapViewX1 - 2;
+                spriteGroundBlink->dstY = mapToScreenY(flightRecords[curRecordIdx].mapY) + mapViewY1 - 2;
+                gfx_blitSprite(spriteGroundBlink);
+                break;
+            case 9:
+            default:
+                break;
+            }
+        } else {
+            drawEventSprite(curRecordIdx);
+        }
+        spriteToggle = (spriteToggle == 0);
+    }
+
+input_done:
+    if ((int8)misc_jump_5a_keybuf() == 0) {
+        h = misc_jump_5b_getkey();
+    } else {
+        if (d == 1) {
+            h = KEYCODE_ENTER;
+        } else if (e == 1) {
+            h = KEYCODE_ESC;
+        } else if (joyAxisX < JOY_DEADZONE_LO) {
+            h = KEYCODE_LEFTARROW;
+            joyRepeatFlag = 1;
+        } else if (joyAxisX > JOY_DEADZONE_HI) {
+            h = KEYCODE_RIGHTARROW;
+            joyRepeatFlag = 1;
+        } else if (joyAxisY < JOY_DEADZONE_LO) {
+            h = KEYCODE_UPARROW;
+            joyRepeatFlag = 1;
+        } else if (joyAxisY > JOY_DEADZONE_HI) {
+            h = KEYCODE_DNARROW;
+            joyRepeatFlag = 1;
+        }
+    }
+
+    if ((int8)h == KEYCODE_ENTER) {
+        enterPressed = 1;
+    }
+    if (h == KEYCODE_ALTQ) {
+        quitFlag = 1;
+        enterPressed = 1;
+    }
+    if (h == KEYCODE_UPARROW) {
+        cursorY -= cursorBounds[1];
+        if (cursorBounds[4] > (int16)cursorY) {
+            cursorY = cursorBounds[4];
+        }
+        inputChanged = 1;
+    }
+    if (h == KEYCODE_DNARROW) {
+        cursorY += cursorBounds[1];
+        if (cursorY > (uint16)cursorBounds[5]) {
+            cursorY = cursorBounds[5];
+        }
+        inputChanged = 1;
+    }
+    if (h == KEYCODE_RIGHTARROW) {
+        cursorX += cursorBounds[0];
+        if (cursorX > (uint16)cursorBounds[3]) {
+            cursorX = cursorBounds[3];
+        }
+        inputChanged = 1;
+    }
+    if (h == KEYCODE_LEFTARROW) {
+        cursorX -= cursorBounds[0];
+        if (cursorBounds[2] > (int16)cursorX) {
+            cursorX = cursorBounds[2];
+        }
+        if (cursorBounds[4] > (int16)cursorY) {
+            cursorX += cursorBounds[0];
+        }
+        inputChanged = 1;
+    }
+
+    if (menuItem->flags & MENUITEM_HAS_SPRITE) {
+        if (menuItem->flags & MENUITEM_SPRITE_BLINK) {
+            drawEventSprite(curRecordIdx);
+        }
+    }
+}
 
 void blinkWidget(MenuItem *item, int16 *gfxPage) {
     int16 toColor;

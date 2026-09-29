@@ -607,7 +607,7 @@ struct MissionKind missionKinds[1];
 int16 briefDepartSite, briefPatrolType;
 char  unitNameTab[1][0x20];
 char  briefTimeA[8], briefTimeB[8], briefCoord2[8];
-int16 mystrlen(char *s) { int16 n = 0; while (s[n]) n++; return n; }
+int16 mystrlen(char *s) { int16 n = 0; while (s[n]) n++; return n; } /* END's is hand-asm; skeleton provides */
 void  far gfx_commitPage(void) { }
 /* runGenerator (stgen.c) globals */
 int16 escortObj;                             /* dseg:0xbb72 */
@@ -735,12 +735,16 @@ void far ovl_169(int16 a,int16 b,int16 c,int16 d,int16 e,int16 f,int16 g,int16 h
 void far ovl_A65(int16 a,int16 b,int16 c,int16 d,int16 e,int16 f,int16 g,int16 h) {}
 int16 missionTimeFlag;                        /* word_244E4: runGenerator sets 0/1 */
 void  drawLineWrapper(void) { }
-#ifndef EXE_START /* src_start/stmap.c provides the real ports */
+#if !defined(EXE_START) && !defined(EXE_END) /* src_start/stmap.c + src_end/enbrief.c provide the real ports */
 int16 mapToScreenX(int16 v) { return v; }
+#endif
+#if !defined(EXE_START) && !defined(EXE_END) /* src_end/enbrief.c provides the real port */
 int16 mapToScreenY(int16 v) { return v; }
 #endif
+#ifndef EXE_END /* src_end/enbrief.c provides the real port */
 void  drawMapPixel(int16 x, int16 y, int16 c) { }
-#ifndef EXE_START /* src_start/stutil.c provides the real port */
+#endif
+#if !defined(EXE_START) && !defined(EXE_END) /* stutil.c/enstr.c provide the real ports */
 void  mystrcpy(char *d, const char *s) { }
 #endif
 void  loadWorldData(void *d, int16 s) { }
@@ -768,6 +772,32 @@ char  str682E[4], str6832[4], str6834[4], str6836[4], str6838[4];
 /* stutil.c drawThreatRings deps */
 uint8 ringMode;                                        /* dseg:0x9922 */
 uint8 ringTypes[0x40];                                 /* dseg:0x3e26 */
+#ifdef EXE_END /* END-only callees (real defs live in the skeleton asm) */
+int16 dosReadFar(int16 fd, uint16 n, uint16 off, uint16 seg) { return 0; } /* sub_114A9 */
+int16 openFileWrapper(const char *name, int16 mode) { return 0; }          /* sub_11336 */
+void  seekFileAt(int16 fd, int16 off, int16 whence) { }                    /* sub_11694 */
+void  closeFileWrapper(int16 fd) { }                                       /* sub_1135A */
+void  memsetFar(uint8 far *d, int16 v, uint16 n) { }                       /* sub_13982 — rep-stosb asm in skeleton */
+int16 readBiosTickLo(void) { return 0; }               /* sub_13844 */
+void  seedRandom16(int16 v) { }                        /* sub_18C84 */
+void  far gfx_getCurPage(int16 a) { }
+int16 far gfx_charWidth(int16 ch, int16 font) { return 0; }
+int16 far gfx_initDone(void) { return 0; }
+void  far gfx_setPageN(uint16 a) { }
+void  far gfx_commitPage(void) { }
+void  drawMenuItem(void *items, int16 i, int16 *p) { }
+int16 curRecordIdx;                             /* word_22C36 */
+uint16 colorStyleTable[8];                      /* 0x41DE */
+int8  flightRecords[64];                        /* byte_22F14 */
+uint8 slotInfoTable[16];                        /* word_2245E */
+int16 spriteAirBlink, spriteSamBlink, spriteGroundBlink, spriteWaypointBlink;
+void  far pollJoystick(void) { }
+void  drawEventSprite(int16 rec) { }
+int16 far misc_jump_5a_keybuf(void) { return 0; }
+int16 far misc_jump_5b_getkey(void) { return 0; }
+int16 far misc_jump_5d_readJoy(int16 a) { return 0; }
+void  far gfx_blitSprite(int16 spr) { }
+#endif
 /* stutil.c drawStoreIcons deps */
 int16 word_298E6;                                     /* dseg:0x98e6 */
 int16 word_27990[4], word_27998[4];                   /* dseg:0x7990/0x7998 */

@@ -54,7 +54,13 @@ MODULE_FLAGS = {
     # /Od prologue `mov ax,0; call __chkstk; push di; push si`
     'enbrief.c':  ['/AS', '/Gs', '/Os'],
     'enworld.c':  ['/AS', '/Od'],
+    # EN enmain/enaward: chkstk prologue (mov ax,N; call __chkstk) — no /Gs.
+    'enmain.c':   ['/AS', '/Od'],
+    'enaward.c':  ['/AS', '/Od'],
     'stalloc.c':  ['/AS', '/Gs', '/Os'],
+    # EN enstr (mystrcpy..memeq): /Os — the rep-string funcs between them are
+    # asm in the skeleton (orig emits rep stosb/movsb, /Oi gives repne).
+    'enstr.c':    ['/AS', '/Gs', '/Os'],
     # exe-prefixed keys disambiguate same-basename modules across srcdirs.
     # Both EN satellites' my_itoa use `for (k=5; k>0 && num[k]==0; k--)` which
     # emits a stray nop pad under /Ot but is byte-exact under /Os.

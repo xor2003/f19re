@@ -148,12 +148,17 @@ calibrateTimerSpeed: seg000 NEAR 3780-3814 R3780-3814 duplicate
 sub_13815: seg000 NEAR 3815-3843 R3815-3843
 sub_13844: seg000 NEAR 3844-384a R3844-384a
 sub_1384B: seg000 NEAR 384b-38b9 R384b-38b9
-sub_138BA: seg000 NEAR 38ba-38eb R38ba-38eb
-sub_138EC: seg000 NEAR 38ec-3922 R38ec-3922
-sub_13923: seg000 NEAR 3923-3981 R3923-3981
-sub_13982: seg000 NEAR 3982-3997 R3982-3997
-sub_13998: seg000 NEAR 3998-39b5 R3998-39b5
-sub_139B6: seg000 NEAR 39b6-39fc R39b6-39fc
+mystrcpy: seg000 NEAR 38ba-38d4 R38ba-38d4
+strcpyToFar: seg000 NEAR 38d5-38eb R38d5-38eb
+farStrcpy: seg000 NEAR 38ec-3906 R38ec-3906
+mystrlen: seg000 NEAR 3907-3922 R3907-3922
+mystrcat: seg000 NEAR 3923-394a R3923-394a
+mystrchr: seg000 NEAR 394b-396d R394b-396d
+memsetNear: seg000 NEAR 396e-3981 R396e-3981
+memsetFar: seg000 NEAR 3982-3997 R3982-3997
+copyBytes: seg000 NEAR 3998-39b5 R3998-39b5
+memcpyFromFar: seg000 NEAR 39b6-39d1 R39b6-39d1
+memeq: seg000 NEAR 39d2-39fc R39d2-39fc
 sub_139FD: seg000 NEAR 39fd-3a9e R39fd-3a9e
 sub_13A9F: seg000 NEAR 3a9f-3ac9 R3a9f-3ac9
 sub_13ACA: seg000 NEAR 3aca-3b11 R3aca-3b11
@@ -166,7 +171,7 @@ blinkWidget: seg000 NEAR 3f60-3ff4 R3f60-3ff4 duplicate
 # Routine sub_13FF5 0000:3ff5-0000:401c[000028] is a potential duplicate of routine isPointInRect 0000:0dcf-0000:0dfc[00002e], differs by 3 instructions
 isPointInRect: seg000 NEAR 3ff5-401c R3ff5-401c duplicate
 # Routine sub_1401D 0000:401d-0000:44a7[00048b] is a potential duplicate of routine processDebriefInput 0000:0dfd-0000:1387[00058b], differs by 171 instructions
-processDebriefInput: seg000 NEAR 401d-44a7 R401d-44a7 duplicate
+processDebriefInput: seg000 NEAR 401d-44a7 R401d-4334 U4335-434e R434f-44a7 duplicate
 sub_144A8: seg000 NEAR 44a8-4ddd R44a8-4ddd
 sub_14DDE: seg000 FAR 4dde-4f7a R4dde-4f7a
 sub_14F7B: seg000 NEAR 4f7b-52f8 R4f7b-52f8
@@ -176,7 +181,7 @@ formatFlightTime: seg000 NEAR 53d5-54b9 R53d5-54b9 duplicate
 # Routine sub_154BA 0000:54ba-0000:54ce[000015] is a potential duplicate of routine mapToScreenX 0000:24b7-0000:24cf[000019], differs by 2 instructions
 # Routine sub_154BA 0000:54ba-0000:54ce[000015] is a potential duplicate of routine mapToScreenY 0000:24d0-0000:24e8[000019], differs by 2 instructions
 mapToScreenX: seg000 NEAR 54ba-54ce R54ba-54ce duplicate
-sub_154CF: seg000 NEAR 54cf-54e3 R54cf-54e3
+mapToScreenY: seg000 NEAR 54cf-54e3 R54cf-54e3
 # Routine plotMapPoint 0000:54e4-0000:553a[000057] is a potential duplicate of routine plotMapPoint 0000:24e9-0000:253f[000057], differs by 0 instructions
 plotMapPoint: seg000 NEAR 54e4-553a R54e4-553a duplicate
 # Routine drawFlightLine 0000:553b-0000:5581[000047] is a potential duplicate of routine drawFlightLine 0000:255e-0000:25a6[000049], differs by 1 instructions
