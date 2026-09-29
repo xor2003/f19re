@@ -207,6 +207,38 @@ void timerWait(uint16 ticks) {
     restoreTimerIrqHandler();
 }
 
+/* seg000:0x3b8c */
+void processMenuItems(MenuItem *items, int16 unused, int16 itemCount, int16 cursorStartX, int16 cursorStartY, int16 *gfxPage) {
+    char p[2]; char a[2]; int16 b; char c[2]; int16 d; int16 e; char f[2];
+    int16 g; int16 h; int16 i; int16 j; int16 k; int16 l; int16 m; int16 n; int16 o;
+    int16 w;
+    register int16 *ip;
+    (void)unused;
+    (void)b; (void)e; (void)g; (void)h; (void)i; (void)j;
+    (void)k; (void)l; (void)m; (void)n; (void)o; (void)w;
+    p[0] = 0x0d; p[1] = 0;
+    c[0] = 0x89; c[1] = 0;
+    a[0] = 0x8d; a[1] = 0;
+    f[0] = 0x80; f[1] = 0;
+    d = 0;
+    goto TEST;
+    for (;;) {
+NORM:   ip = &items[d].state;
+        if (*ip != 3) *ip = 0;
+STEP:   d++;
+TEST:   if (d >= itemCount) break;
+        ip = &items[d].state;
+        if (*ip != 2) goto NORM;
+        selectedMenuItem = d;
+        *ip = 0;
+        blinkWidget(&items[d], gfxPage);
+        drawMenuItem(items, d, gfxPage);
+        goto STEP;
+    }
+    cursorX = cursorStartX;
+    cursorY = cursorStartY;
+}
+
 /* seg000:0x3c2e */
 int16 selectMenuItem(MenuItem *items, int16 unused, int16 itemCount, int16 *inputState, int16 *gfxPage) {
     char p[2]; int16 a; int16 b; char c[2]; int16 d; char e[2]; int16 f;
