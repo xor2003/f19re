@@ -791,7 +791,23 @@ int16 far gfx_charWidth(int16 ch, int16 font) { return 0; }
 int16 far gfx_initDone(void) { return 0; }
 void  far gfx_setPageN(uint16 a) { }
 void  far gfx_commitPage(void) { }
-void  drawMenuItem(void *items, int16 i, int16 *p) { }
+void  sub_10E50(int16 *page, int16 x1, int16 y1, int16 x2, int16 y2) { } /* clearRect dup — skeleton */
+int32 sub_15666(int16 n) { return 0; }            /* calcMissionScore — skeleton */
+void  sub_15D1B(void) { }                         /* event popup — skeleton */
+/* drawMenuItem (seg000:0x44a8) globals */
+int16  totalFlightRecords;
+int32  missionScore;
+uint8  ejectedFlag, popupVisible;
+int16  popupX, popupY, prevDrawX, prevDrawY;
+int16  missionResult;
+char   scoreString[128];
+int16  flightTimeTable[64];
+char  *worldStrings[16];
+int16  spriteMapArea;
+int16  worldObjects[64];
+struct { char name[0x20]; } planeArray[8];
+struct { char name[0x12]; } samWeaponTable[8];
+char   wpnNames[8][0x1a];
 int16 curRecordIdx;                             /* word_22C36 */
 uint16 colorStyleTable[8];                      /* 0x41DE */
 int8  flightRecords[64];                        /* byte_22F14 */

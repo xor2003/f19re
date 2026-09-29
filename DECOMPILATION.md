@@ -1244,3 +1244,28 @@ Two distinct map-window global families disambiguated:
   w=arg5-arg4/h=arg7-arg6 compute window width/height.
 
 All 21 enbrief.c routines MATCH; verify-exes 0 diffs on all four exes.
+
+### END.EXE drawMenuItem (seg000:0x44a8, 0x935 bytes)
+
+f15 enbrief.c `drawMenuItem` — the debrief detail panel. Type-7 items draw the
+mission-complete summary (route replay via drawFlightPath, OVERALL + MISSION
+RATING centered, ejectedFlag=1); blink items clear the event panel, print
+"MISSION EVENT" + formatted time, then a 12-way jump-table switch on
+`flightRecords[cur].status & 0x3f` builds the event string (unit/object names
+from worldObjects+worldStrings, plane names, SAM weapon names, weapon-release
+names, takeoff/landing text), PRIMARY/SECNDRY objective tags, cumulative
+rating, and the "next mission event" prompt.
+
+F19 divergences from f15: no training/career-total/summary blocks in the
+type-7 branch (ends at ejectedFlag=1), and `n = stringWidth(...)` +
+`drawStringAt(..., 0xe8+(0x57-n)/2, y)` spelled out inline (no
+drawStringCentered helper call).
+
+Frame engineering: `sub sp,0x22` — locals p/a/b/d char[2] (hash buckets
+0/1/2/4 → slots -2/-4/-6/-0a), fillers c..l (bucket 3..12) + numBuf[4]
+(-0x1e), uint16 m (-0x20) + uint16 n (-0x22). `index` is uint16 → `mul`.
+Map: renamed sub_144A8→drawMenuItem, jump table split out as U4be1-4bf8.
+stubs.c: drawMenuItem stub removed; sub_10E50/sub_15666/sub_15D1B +
+drawMenuItem globals stubbed under EXE_END.
+
+All 24 enbrief.c routines MATCH; verify-exes 0 diffs on all four exes.

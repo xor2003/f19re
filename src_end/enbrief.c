@@ -50,6 +50,12 @@ extern void drawLineWrapper(void);
 extern int16 mapToScreenY(int16 v);
 extern void drawClippedLine(int16 x1, int16 y1, int16 x2, int16 y2);
 extern void mystrcpy(char *dst, const char *src);
+extern void mystrcat(char *dst, const char *src);               /* seg000:0x3923 */
+extern void my_ltoa(int32 value, char *buf);                    /* seg000:0x0acc textfmt.c */
+extern void drawWrappedText(int16 *page, char *str, uint16 maxWidth, int16 x, int16 y, int16 lineHeight); /* seg000:0x0965 */
+extern void drawStringAt(int16 *pageNum, const char *string, int16 x, int16 y); /* seg000:0x07c6 */
+extern int16 stringWidth(int16 *item, uint8 *str);              /* seg000:0x0a88 */
+extern void far gfx_copyRect(int16 a, int16 b, int16 c, int16 d, int16 e, int16 f, int16 g, int16 h);
 extern void setTimerIrqHandler(void);       /* sub_13626 — int 21/35h+25h asm */
 extern void restoreTimerIrqHandler(void);   /* sub_13664 — int 21/25h asm */
 
@@ -63,9 +69,10 @@ uint8 joyRepeatFlag;                        /* byte_22428 */
 
 extern void far gfx_commitPage(void);
 extern void processDebriefInput(int16 *inputState, MenuItem *item, int16 *gfxPage);
-extern void drawMenuItem(MenuItem *items, int16 index, int16 *gfxPage);
+extern void drawMenuItem(const MenuItem *items, uint16 index, int16 *gfxPage);
 extern void blinkWidget(MenuItem *item, int16 *gfxPage);
 
+#define MENUITEM_TYPE_MASK   0x0007
 #define MENUITEM_SELECTABLE  0x0008
 #define MENUITEM_ENABLED     0x0100
 #define MENUITEM_HAS_SPRITE  0x0800
@@ -86,13 +93,15 @@ struct CommDataEnd {                            /* far ptr word_23C66 */
     int16 gfxInitResult;                        /* 0x20 */
     int8 pad22[0x02];
     int16 setupMono;                            /* 0x24 */
-    int8 pad26[0x0a];
+    int16 landingType;                          /* 0x26 */
+    int16 bailout;                              /* 0x28 */
+    int8 pad2a[0x06];
     int16 trainingFlag;                         /* 0x30 */
     int8 pad32[0x02];
     uint8 commFlags34;                          /* 0x34 */
     int8 pad35;
     uint16 commField36;                         /* 0x36 */
-    int8 pad38[0x3a];
+    uint16 slotWpn[29];                         /* 0x38 */
     int16 setupUseJoy;                          /* 0x72 */
 };
 extern struct CommDataEnd far *commData;
@@ -162,6 +171,36 @@ extern struct BlinkSprite *spriteAir;        /* word_1F6C4 */
 extern struct BlinkSprite *spriteGround;     /* word_1F704 */
 extern struct BlinkSprite *spriteSam;        /* word_1F744 */
 extern struct BlinkSprite *spriteWaypoint;   /* word_1F7C4 */
+
+/* drawMenuItem (seg000:0x44a8) globals */
+extern int16  totalFlightRecords;            /* word_22B10 dseg:0x9180 */
+extern int32  missionScore;                  /* dword dseg:0x9DDA */
+extern uint8  ejectedFlag;                   /* byte_23D96 dseg:0x9A06 */
+extern uint8  popupVisible;                  /* byte_23DAA dseg:0x9A1A */
+extern int16  popupX, popupY;                /* word_23E6E/70 dseg:0x9EDE/0x9EE0 */
+extern int16  prevDrawX, prevDrawY;          /* word_23D9A/23DA8 dseg:0x9A0A/0x9A18 */
+extern int16  missionResult;                 /* word_23B1C dseg:0x978C */
+extern char   scoreString[];                 /* byte_22A2E dseg:0x8C9E */
+extern int16  flightTimeTable[];             /* word_22B12 dseg:0x9182 */
+extern char  *worldStrings[];                /* dseg:0x9A22 near-ptr table */
+extern struct BlinkSprite *spriteMapArea;    /* word_?? dseg:0x58F4 */
+
+struct WorldObjEnd {                         /* dseg:0x86C6, stride 0x10 */
+    int16 unitRef;                           /* +0x00 */
+    int8  pad02[0x0c];
+    int16 objectIdx;                         /* +0x0e */
+};
+extern struct WorldObjEnd worldObjects[];
+
+struct PlaneNameEnd { char name[0x20]; };    /* dseg:0x0198, stride 0x20 */
+extern struct PlaneNameEnd planeArray[];
+struct SamNameEnd { char name[0x12]; };      /* dseg:0x03F8, stride 0x12 */
+extern struct SamNameEnd samWeaponTable[];
+extern char wpnNames[][0x1a];                /* dseg:0x0726, stride 0x1a */
+
+extern void sub_10E50(int16 *page, int16 x1, int16 y1, int16 x2, int16 y2); /* clearRect dup */
+extern int32 sub_15666(int16 n);              /* calcMissionScore — skeleton */
+extern void sub_15D1B(void);                  /* event popup — skeleton */
 
 extern void far pollJoystick(void);          /* 9C7:2F */
 extern int16 far misc_jump_5a_keybuf(void);
@@ -934,5 +973,217 @@ noRibbons:
         pilotRec->award24++;
         awardCode = 1;
         return;
+    }
+}
+
+/* ==== seg000:0x44a8 drawMenuItem — debrief detail panel. Type-7 items draw
+ * the mission-complete summary (route replay + overall rating); blink items
+ * draw the current flightRecords event text (switch on status&0x3f), the
+ * PRIMARY/SECNDRY objective tags and the cumulative rating, then the "next
+ * mission event" prompt. f15 enbrief.c drawMenuItem lineage. Locals
+ * c,e,f,g,h,i,j,k,l are unused frame fillers matching the original frame. ==== */
+void drawMenuItem(const MenuItem *items, uint16 index, int16 *gfxPage) {
+    char p[2];
+    char a[2];
+    char b[2];
+    char d[2];
+    int16 c, e, f, g, h, i, j, k, l;
+    uint16 m;
+    char numBuf[4];
+    uint16 n;
+
+    p[0] = 0x0a;
+    p[1] = 0;
+    b[0] = 0x89;
+    b[1] = 0;
+    a[0] = 0x8d;
+    a[1] = 0;
+    d[0] = 0x80;
+    d[1] = 0;
+    (void)c; (void)e; (void)f; (void)g; (void)h; (void)i; (void)j; (void)k; (void)l;
+
+    if ((items[index].flags & MENUITEM_HAS_SPRITE) != 0) {
+        if ((items[index].flags & MENUITEM_TYPE_MASK) == 7) {
+            sub_10E50(gfxPage, 0xeb, 0xa, 0x13f, 0x95);
+            gfxPage[2] = 0;
+            mystrcpy(scoreString, b);
+            mystrcat(scoreString, "Press Selector to exit Debriefing");
+            drawWrappedText(gfxPage, scoreString, 80, 240, 130, 8);
+            sub_10E50(gfxPage, 0xf0, 0x64, 0x12c, 0x7e);
+            if (popupVisible == 1) {
+                gfx_copyRect(1, 0, 0x96, 0, popupX, popupY, 0x30, 0x28);
+                popupVisible = 0;
+            }
+            curRecordIdx = 0;
+            totalFlightRecords = drawFlightPath(gfxPage, 0x270f);
+            missionScore = sub_15666(totalFlightRecords);
+            mystrcpy(scoreString, "\x8d");
+            mystrcat(scoreString, "OVERALL");
+            n = stringWidth(gfxPage, scoreString);
+            drawStringAt(gfxPage, scoreString, 0xe8 + (0x57 - n) / 2, 0x64);
+            mystrcpy(scoreString, "MISSION RATING");
+            n = stringWidth(gfxPage, scoreString);
+            drawStringAt(gfxPage, scoreString, 0xe8 + (0x57 - n) / 2, 0x6c);
+            mystrcpy(scoreString, "\x80");
+            my_ltoa(missionScore, numBuf);
+            mystrcat(scoreString, numBuf);
+            n = stringWidth(gfxPage, scoreString);
+            drawStringAt(gfxPage, scoreString, 0xe8 + (0x57 - n) / 2, 0x74);
+            ejectedFlag = 1;
+        }
+        if ((items[index].flags & MENUITEM_SPRITE_BLINK) == 0)
+            return;
+        if (ejectedFlag == 1) {
+            ejectedFlag = 0;
+            popupVisible = 0;
+            gfx_blitSprite(spriteMapArea);
+            curRecordIdx = prevDrawX = prevDrawY = 0;
+            sub_10E50(gfxPage, 0xeb, 0xa, 0x13f, 0x95);
+            missionScore = sub_15666(0x100);
+            mystrcpy(scoreString, "\x8d");
+            mystrcat(scoreString, "OVERALL");
+            n = stringWidth(gfxPage, scoreString);
+            drawStringAt(gfxPage, scoreString, 0xe8 + (0x57 - n) / 2, 0x64);
+            mystrcpy(scoreString, "MISSION RATING");
+            n = stringWidth(gfxPage, scoreString);
+            drawStringAt(gfxPage, scoreString, 0xe8 + (0x57 - n) / 2, 0x6c);
+            mystrcpy(scoreString, "\x80");
+            my_ltoa(missionScore, numBuf);
+            mystrcat(scoreString, numBuf);
+            n = stringWidth(gfxPage, scoreString);
+            drawStringAt(gfxPage, scoreString, 0xe8 + (0x57 - n) / 2, 0x74);
+        }
+        sub_10E50(gfxPage, 0xeb, 0xa, 0x13f, 0x63);
+        gfxPage[2] = 0x0d;
+        mystrcpy(scoreString, "MISSION EVENT");
+        n = stringWidth(gfxPage, scoreString);
+        drawStringAt(gfxPage, scoreString, 0xe8 + (0x57 - n) / 2, 0x14);
+        mystrcpy(scoreString, "TIME: \x80");
+        mystrcat(scoreString, formatFlightTime(flightTimeTable[curRecordIdx * 3], numBuf));
+        drawStringAt(gfxPage, scoreString, 0xf0, 0x1e);
+        m = flightRecords[curRecordIdx].unitId & 0x7f;
+        switch (flightRecords[curRecordIdx].status & 0x3f) {
+        case 1:
+        case 12:
+            if (worldObjects[m].unitRef != 0) {
+                mystrcpy(scoreString, worldStrings[worldObjects[m].unitRef]);
+                mystrcat(scoreString, " ");
+                mystrcat(scoreString, worldStrings[worldObjects[m].objectIdx & 0x7f]);
+                mystrcat(scoreString, " destroyed");
+            } else {
+                mystrcpy(scoreString, worldStrings[worldObjects[m].objectIdx & 0x7f]);
+                mystrcat(scoreString, " destroyed");
+            }
+            break;
+        case 3:
+            mystrcpy(scoreString, planeArray[m].name);
+            mystrcat(scoreString, " ");
+            mystrcat(scoreString, &planeArray[m].name[7]);
+            mystrcat(scoreString, " shot down");
+            break;
+        case 2:
+            mystrcpy(scoreString, worldStrings[m]);
+            mystrcat(scoreString, " destroyed");
+            break;
+        case 11:
+            mystrcpy(scoreString, "Cargo delivered");
+            break;
+        case 10:
+            if (worldObjects[m].unitRef != 0) {
+                mystrcpy(scoreString, worldStrings[worldObjects[m].unitRef]);
+                mystrcat(scoreString, " ");
+                mystrcat(scoreString, worldStrings[worldObjects[m].objectIdx & 0x7f]);
+                mystrcat(scoreString, " photographed");
+            } else {
+                mystrcpy(scoreString, worldStrings[worldObjects[m].objectIdx & 0x7f]);
+                mystrcat(scoreString, " photographed");
+            }
+            break;
+        case 5:
+            mystrcpy(scoreString, "Hit by ");
+            mystrcat(scoreString, samWeaponTable[m].name);
+            mystrcat(scoreString, " missile");
+            break;
+        case 7:
+            if (worldObjects[m].unitRef != 0) {
+                mystrcpy(scoreString, worldStrings[worldObjects[m].unitRef]);
+                mystrcat(scoreString, " ");
+                mystrcat(scoreString, worldStrings[worldObjects[m].objectIdx & 0x7f]);
+                mystrcat(scoreString, " Track");
+            } else {
+                mystrcpy(scoreString, worldStrings[worldObjects[m].objectIdx & 0x7f]);
+                mystrcat(scoreString, " Radar Track");
+            }
+            break;
+        case 6:
+            mystrcpy(scoreString, planeArray[m].name);
+            mystrcat(scoreString, " ");
+            mystrcat(scoreString, &planeArray[m].name[7]);
+            mystrcat(scoreString, " Visual ID");
+            break;
+        case 4:
+            mystrcpy(scoreString, wpnNames[commData->slotWpn[m]]);
+            mystrcat(scoreString, " ");
+            mystrcat(scoreString, wpnNames[commData->slotWpn[m]] + 0x0a);
+            mystrcat(scoreString, " released");
+            break;
+        case 8:
+            if (curRecordIdx == 0) {
+                mystrcpy(scoreString, "Takeoff point:");
+                if (worldObjects[targetBlock.waypointData].unitRef != 0) {
+                    mystrcat(scoreString, worldStrings[worldObjects[targetBlock.waypointData].unitRef]);
+                } else {
+                    mystrcat(scoreString, worldStrings[(uint8)worldObjects[targetBlock.waypointData].objectIdx]);
+                }
+            } else {
+                mystrcpy(scoreString, "Mission end:\n");
+                switch (commData->landingType) {
+                case 1:
+                    mystrcat(scoreString, "Crashed");
+                    break;
+                case 2:
+                    if (commData->bailout == 0 && missionResult != 0) {
+                        mystrcat(scoreString, "Good Bailout");
+                    } else if (commData->bailout == 0 && missionResult == 0) {
+                        mystrcat(scoreString, "Captured");
+                    } else {
+                        mystrcat(scoreString, "Bailed & Died");
+                    }
+                    break;
+                case 3:
+                    mystrcat(scoreString, "Good Landing");
+                    break;
+                }
+            }
+            break;
+        }
+        drawWrappedText(gfxPage, scoreString, 80, 240, 0x26, 8);
+        if ((uint8)flightRecords[curRecordIdx].status & 0x80) {
+            mystrcpy(scoreString, "\x8c" "PRIMARY OBJECTIVE");
+            n = stringWidth(gfxPage, scoreString);
+            drawStringAt(gfxPage, scoreString, 0xe8 + (0x57 - n) / 2, gfxPage[5]);
+        }
+        if ((uint8)flightRecords[curRecordIdx].status & 0x40) {
+            mystrcpy(scoreString, "\x8c" "SECNDRY OBJECTIVE");
+            n = stringWidth(gfxPage, scoreString);
+            drawStringAt(gfxPage, scoreString, 0xe8 + (0x57 - n) / 2, gfxPage[5]);
+        }
+        missionScore = sub_15666(curRecordIdx);
+        mystrcpy(scoreString, "\x8d");
+        mystrcat(scoreString, "CUMULATIVE");
+        n = stringWidth(gfxPage, scoreString);
+        drawStringAt(gfxPage, scoreString, 0xe8 + (0x57 - n) / 2, 0x46);
+        mystrcpy(scoreString, "MISSION RATING");
+        n = stringWidth(gfxPage, scoreString);
+        drawStringAt(gfxPage, scoreString, 0xe8 + (0x57 - n) / 2, 0x4e);
+        mystrcpy(scoreString, "\x80");
+        my_ltoa(missionScore, numBuf);
+        mystrcat(scoreString, numBuf);
+        n = stringWidth(gfxPage, scoreString);
+        drawStringAt(gfxPage, scoreString, 0xe8 + (0x57 - n) / 2, 0x56);
+        sub_15D1B();
+        mystrcpy(scoreString, b);
+        mystrcat(scoreString, "Press Selector for next mission event");
+        drawWrappedText(gfxPage, scoreString, 80, 240, 130, 8);
     }
 }
