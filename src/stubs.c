@@ -813,6 +813,13 @@ void  picStageRefill(void) { }                       /* sub_13238 — rep-movsw 
 void  far textOp_477(void) { }   /* overlay text ops at seg 0x91d */
 void  far textOp_762(void) { }
 void  far textOp_165(void) { }
+/* checkPromotion (seg000:0x8532) globals */
+struct PilotRecEnd far *pilotRec;                /* word_2243E */
+uint8  promoScreenOpen;                          /* byte_23784 */
+int16  promotionDone, promotionPending;          /* word_2244A / word_2244E */
+uint16 promoScoreMin[6]    = {300,1125,3000,7000,16000,27720};   /* word_20456 */
+uint16 promoAvgMin[6]      = {100,150,200,250,280,280};          /* word_20462 */
+uint16 promoMissionsMin[6] = {2,5,10,20,40,99};                  /* word_2046E */
 void  far textOp_A61(void) { }
 uint8 drawTextMode;                                  /* dseg:0x8b76 — initResultFlag lo */
 uint8 tickByte;                                      /* byte_1DF6B */

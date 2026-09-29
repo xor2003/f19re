@@ -86,10 +86,27 @@ struct CommDataEnd {                            /* far ptr word_23C66 */
     int16 gfxInitResult;                        /* 0x20 */
     int8 pad22[0x02];
     int16 setupMono;                            /* 0x24 */
-    int8 pad26[0x4c];
+    int8 pad26[0x0a];
+    int16 trainingFlag;                         /* 0x30 */
+    int8 pad32[0x40];
     int16 setupUseJoy;                          /* 0x72 */
 };
 extern struct CommDataEnd far *commData;
+
+struct PilotRecEnd {                            /* far ptr word_2243E */
+    int8  pad0[0x20];
+    uint16 rank;                                /* 0x20 */
+    int8  pad22[0x10];
+    int32 totalScore;                           /* 0x32 */
+    uint16 missionCount;                        /* 0x36 */
+};
+extern struct PilotRecEnd far *pilotRec;        /* word_2243E — init to comm+0x120e */
+extern uint8  promoScreenOpen;                  /* byte_23784 */
+extern int16  promotionDone;                    /* word_2244A */
+extern int16  promotionPending;                 /* word_2244E */
+extern uint16 promoScoreMin[];                  /* word_20456: 300,1125,3000,7000,16000,27720 */
+extern uint16 promoAvgMin[];                    /* word_20462: 100,150,200,250,280,280 */
+extern uint16 promoMissionsMin[];               /* word_2046E: 2,5,10,20,40,99 */
 
 struct BlinkSprite {
     int16 pad00;
@@ -737,4 +754,47 @@ void resetRecField9(void) {
         r = i * 0x5C + 0x295E;
         recField9[r] = 0;
     }
+}
+
+/* ==== seg000:0x8532 — promotion eligibility scan ====
+ * Scans rank thresholds top-down while i >= rank; on qualification either
+ * defers (award screen open) or commits the rank bump. Rank 5 (General)
+ * requires exactly 99 missions. The cold gate block sits in the loop's
+ * init-jump gap — reached only by backward jumps, hence the for(;;) label. */
+void checkPromotion(void) {
+    int16 i, j;
+    if (commData->trainingFlag == 1)
+        return;
+    i = 5;
+    goto test;
+    for (;;) {
+gate:
+        if (pilotRec->rank >= 5)
+            return;
+        if (promoScreenOpen != 1)
+            goto promote;
+        promotionPending = 1;
+        return;
+step:
+        i--;
+test:
+        if ((int16)pilotRec->rank <= i) {
+            if ((uint32)promoScoreMin[i] <= (uint32)pilotRec->totalScore &&
+                promoMissionsMin[i] <= pilotRec->missionCount &&
+                (uint32)pilotRec->totalScore / (uint32)pilotRec->missionCount >=
+                (uint32)promoAvgMin[i])
+                goto qual;
+            goto step;
+        }
+        return;
+    }
+qual:
+    if (pilotRec->rank != 5)
+        goto gate;
+    if (pilotRec->missionCount == 99)
+        goto promote;
+    goto gate;
+promote:
+    promotionDone = 1;
+    pilotRec->rank++;
 }
