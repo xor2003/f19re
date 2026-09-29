@@ -798,7 +798,7 @@ void  sub_15D1B(void) { }                         /* event popup — skeleton */
 int16  totalFlightRecords;
 int32  missionScore;
 uint8  ejectedFlag, popupVisible;
-int16  popupX, popupY, prevDrawX, prevDrawY;
+int16  popupX, popupY, prevDrawX, prevDrawY, lastDrawX, lastDrawY;
 int16  missionResult;
 char   scoreString[128];
 int16  flightTimeTable[64];

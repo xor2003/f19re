@@ -116,7 +116,9 @@ struct PilotRecEnd {                            /* far ptr word_2243E */
     uint16 awardPoints;                         /* 0x30 — award threshold pool */
     int32 totalScore;                           /* 0x32 */
     uint16 missionCount;                        /* 0x36 */
-    int8  pad38[0x0c];
+    int8  pad38[2];
+    uint16 isCampaignMission;                   /* 0x3a — 2 = campaign play */
+    int8  pad3c[8];
     uint16 flag44;                              /* 0x44 — training award flag */
     uint16 flag46, flag48, flag4a, flag4c;      /* 0x46-0x4c — mission ribbon flags */
 };
@@ -179,6 +181,7 @@ extern uint8  ejectedFlag;                   /* byte_23D96 dseg:0x9A06 */
 extern uint8  popupVisible;                  /* byte_23DAA dseg:0x9A1A */
 extern int16  popupX, popupY;                /* word_23E6E/70 dseg:0x9EDE/0x9EE0 */
 extern int16  prevDrawX, prevDrawY;          /* word_23D9A/23DA8 dseg:0x9A0A/0x9A18 */
+extern int16  lastDrawX, lastDrawY;          /* word_23D98/23DA4 dseg:0x9A08/0x9A14 */
 extern int16  missionResult;                 /* word_23B1C dseg:0x978C */
 extern char   scoreString[];                 /* byte_22A2E dseg:0x8C9E */
 extern int16  flightTimeTable[];             /* word_22B12 dseg:0x9182 */
@@ -1185,5 +1188,97 @@ void drawMenuItem(const MenuItem *items, uint16 index, int16 *gfxPage) {
         mystrcpy(scoreString, b);
         mystrcat(scoreString, "Press Selector for next mission event");
         drawWrappedText(gfxPage, scoreString, 80, 240, 130, 8);
+    }
+}
+
+/* sub_14F7B (seg000:0x4f7b) — animate the in-flight track in the debrief window.
+ * Same routine as f15 animateFlightPath plus the campaign-mode gate that draws
+ * track segments for EVENT_BOMB_HIT/EVENT_EJECTED records (status 7/6) when
+ * pilotRec->isCampaignMission == 2. */
+void animateFlightPath(int16 *gfxPage) {
+    char numBuf[22];
+    int16 n;
+    uint8 evt;
+
+    if (popupVisible == 1) {
+        gfx_copyRect(1, 0, 0x96, 0, popupX, popupY, 0x30, 0x28);
+        popupVisible = 0;
+    }
+top:
+    sub_10E50(gfxPage, 0xe9, 0x1e, 0x13f, 0x45);
+    drawStringAt(gfxPage, "\x80In-Flight", 0xf0, 0x26);
+loop_top:
+    if (flightRecords[++curRecordIdx].status & 0x3f) {
+        if ((flightRecords[curRecordIdx].status & 0x3f) != 9) goto gate;
+        sub_10E50(gfxPage, 0xf0, 0x1e, 0x13f, 0x25);
+        mystrcpy(scoreString, "\x8dTIME: \x80");
+        mystrcat(scoreString, formatFlightTime(flightTimeTable[curRecordIdx * 3], numBuf));
+        drawStringAt(gfxPage, scoreString, 0xf0, 0x1e);
+        gfx_setColor(0);
+        if (prevDrawX == 0 && prevDrawY == 0) {
+            drawFlightLine(flightRecords[0].mapX, flightRecords[0].mapY,
+                           flightRecords[curRecordIdx].mapX, flightRecords[curRecordIdx].mapY);
+            prevDrawX = flightRecords[curRecordIdx].mapX;
+            prevDrawY = flightRecords[curRecordIdx].mapY;
+        } else {
+            lastDrawX = flightRecords[curRecordIdx].mapX;
+            lastDrawY = flightRecords[curRecordIdx].mapY;
+            drawFlightLine(lastDrawX, lastDrawY, prevDrawX, prevDrawY);
+            prevDrawX = lastDrawX;
+            prevDrawY = lastDrawY;
+        }
+        missionScore = sub_15666(curRecordIdx);
+        mystrcpy(scoreString, "\x80");
+        my_ltoa(missionScore, numBuf);
+        mystrcat(scoreString, numBuf);
+        n = stringWidth(gfxPage, scoreString);
+        sub_10E50(gfxPage, 0xe8, 0x56, 0x13f, 0x5e);
+        drawStringAt(gfxPage, scoreString, 0xe8 + (0x57 - n) / 2, 0x56);
+        timerCounter = 0;
+wait_loop:
+        if (timerCounter <= 5) goto wait_loop;
+        goto loop_top;
+    }
+gate:
+    if (pilotRec->isCampaignMission == 2) {
+        evt = flightRecords[curRecordIdx].status & 0x3f;
+        if (evt == 7 || evt == 6) {
+            gfx_setColor(0);
+            if (prevDrawX == 0 && prevDrawY == 0) {
+                drawFlightLine(flightRecords[0].mapX, flightRecords[0].mapY,
+                               flightRecords[curRecordIdx].mapX, flightRecords[curRecordIdx].mapY);
+                prevDrawX = flightRecords[curRecordIdx].mapX;
+                prevDrawY = flightRecords[curRecordIdx].mapY;
+                goto trtail;
+            } else {
+                goto trseg;
+            }
+        }
+    }
+    goto done;
+trseg:
+    lastDrawX = flightRecords[curRecordIdx].mapX;
+    lastDrawY = flightRecords[curRecordIdx].mapY;
+    drawFlightLine(lastDrawX, lastDrawY, prevDrawX, prevDrawY);
+    prevDrawX = lastDrawX;
+    prevDrawY = lastDrawY;
+trtail:
+    goto top;
+done:
+    if (!(flightRecords[curRecordIdx].status & 0x3f)) {
+        curRecordIdx--;
+    }
+    gfx_setColor(0);
+    if (prevDrawX == 0 && prevDrawY == 0) {
+        drawFlightLine(flightRecords[0].mapX, flightRecords[0].mapY,
+                       flightRecords[curRecordIdx].mapX, flightRecords[curRecordIdx].mapY);
+        prevDrawX = flightRecords[curRecordIdx].mapX;
+        prevDrawY = flightRecords[curRecordIdx].mapY;
+    } else {
+        lastDrawX = flightRecords[curRecordIdx].mapX;
+        lastDrawY = flightRecords[curRecordIdx].mapY;
+        drawFlightLine(lastDrawX, lastDrawY, prevDrawX, prevDrawY);
+        prevDrawX = lastDrawX;
+        prevDrawY = lastDrawY;
     }
 }

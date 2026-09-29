@@ -1269,3 +1269,27 @@ stubs.c: drawMenuItem stub removed; sub_10E50/sub_15666/sub_15D1B +
 drawMenuItem globals stubbed under EXE_END.
 
 All 24 enbrief.c routines MATCH; verify-exes 0 diffs on all four exes.
+
+### END.EXE animateFlightPath (seg000:0x4f7b, 0x37d bytes)
+
+f15 enbrief.c `animateFlightPath` + the F19 campaign gate: records with
+status 7/6 under `pilotRec->isCampaignMission == 2` draw a track segment and
+loop to `top` (clearRect+title redraw); timestamp events (status 9) run the
+TIME: display + score + 5-tick wait and loop to `loop_top`; all other
+statuses fall to `done` (decrement + final segment). Frame 0x1a:
+`char numBuf[22]` (-0x16), int16 n (-0x18), uint8 evt (-0x1a).
+
+Layout: `if (status&mask) {nonempty-deferred}` (jz gate-adj;jmp
+nonempty-far) — gate is the post-if continuation textually AFTER the if,
+nonempty defers behind it; inside gate, `if (f3a==2) {evt; if(7||6)
+{track}}` uses positive-form nested ifs (jcc adj;jmp done-far). Track XY
+uses `if(==0&&==0){first;goto trtail}else{goto trseg}` with trseg/trtail
+labels textually between the else-arm and done — pushes both into the
+deferred queue after nonempty (FIFO). done emits last; its inner XY else
+stays adjacent. `flightRecords[++curRecordIdx]` gives the reg-form
+`mov ax,[idx];mov cx,6;imul cx`.
+
+Map: renamed sub_14F7B→animateFlightPath. PilotRecEnd: isCampaignMission
+carved out of pad38 at +0x3a. stubs.c: lastDrawX/lastDrawY added.
+
+All 25 enbrief.c routines MATCH; verify-exes 0 diffs on all four exes.
