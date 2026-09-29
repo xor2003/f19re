@@ -797,8 +797,9 @@ uint16 colorStyleTable[8];                      /* 0x41DE */
 int8  flightRecords[64];                        /* byte_22F14 */
 uint8 slotInfoTable[16];                        /* word_2245E */
 int16 spriteAirBlink, spriteSamBlink, spriteGroundBlink, spriteWaypointBlink;
+int16 spriteAir, spriteGround, spriteSam, spriteWaypoint;  /* normal-sprite ptrs word_1F6C4/1F704/1F744/1F7C4 */
+int16 mapWinX1, mapWinY1, mapWinX2, mapWinY2;              /* word_1DF8E/90/92/94 debrief map window */
 void  far pollJoystick(void) { }
-void  drawEventSprite(int16 rec) { }
 int16 far misc_jump_5a_keybuf(void) { return 0; }
 int16 far misc_jump_5b_getkey(void) { return 0; }
 int16 far misc_jump_5d_readJoy(int16 a) { return 0; }
@@ -807,6 +808,7 @@ void  far gfx_blitSprite(int16 spr) { }
 void  intDispatch(int16 n, uint8 *a, uint8 *b) { }     /* sub_139FD */
 void  farStrcpy(char *d, char far *s) { }            /* sub_138EC — asm in skeleton */
 void  sub_1288B(int16 recOff) { }                    /* rec-anim worker — real def in skeleton */
+int16 runMapView(int16 sel) { return 0; }            /* sub_12192 — big map dispatcher, skeleton */
 void  picStageRefill(void) { }                       /* sub_13238 — rep-movsw stage copy asm */
 void  far textOp_477(void) { }   /* overlay text ops at seg 0x91d */
 void  far textOp_762(void) { }

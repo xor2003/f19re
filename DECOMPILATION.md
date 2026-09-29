@@ -1216,3 +1216,31 @@ eval's `rp->rx`) broke the dedication: eval became `cmp [bx],ax`, arm
 x-arm — byte-exact with the original.
 
 All 8 routines MATCH; verify-exes 0 diffs on all four exes.
+
+## 15. English END.EXE batch — map-window + flight-path cluster (0x27F6–0x52F9)
+
+enbrief.c (/Gs /Os): drawMapView (0x27f6 — sets mapViewX1/mapViewY1 =
+  the big-map view origin words word_23786/88, dispatches runMapView
+  = sub_12192, returns `sel ? ... : ...` via explicit if/return — `?:`
+  emitted branchless sbb), drawEventSprite (0x4dde — 12-case jump-table
+  switch on flightRecords[i].status&0x3f, non-blink twin of
+  processDebriefInput's blink switch; `uint16 rec` param — signed gave
+  imul vs ref mul; embedded jump table marked U4f61-4f78), drawFlightPath
+  (0x52f9 — route polyline + event-sprite pass; 14 named int16 locals
+  reproducing the 0x1e frame per f15 END0.COD decls; bottom-tested loops
+  written `while ((flightRecords[++a].status & 0x3f) != 0)` with
+  `if (a > max) goto` body checks — the ++a-in-test produces the reg-form
+  `mov ax,[a]; mov cx,6; imul cx` scaling the original uses; comma-test
+  forms folded the limit check into the test region).
+
+Two distinct map-window global families disambiguated:
+- mapViewX1/mapViewY1 (word_23786/88): big-map view origin, drawMapView.
+- mapWinX1/Y1/X2/Y2 (word_1DF8E/90/92/94): debrief clip window used by
+  plotMapPoint bounds, drawClippedLine(Ex)/drawFlightLine window args,
+  and both sprite-switch origin offsets. Prior commits mislabeled the
+  1DF8E family as mapViewX1 (portcheck can't see data operands); fixed.
+- drawClippedLineEx params renamed cx1/cy1/cx2/cy2 → wx1/wx2/wy1/wy2:
+  push order 1DF8E,1DF92,1DF90,1DF94 = X1,X2,Y1,Y2, and its
+  w=arg5-arg4/h=arg7-arg6 compute window width/height.
+
+All 21 enbrief.c routines MATCH; verify-exes 0 diffs on all four exes.

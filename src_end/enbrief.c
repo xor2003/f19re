@@ -119,10 +119,15 @@ extern int16 curRecordIdx;                   /* word_22C36 */
 extern uint16 colorStyleTable[];             /* 0x41DE */
 extern struct FlightLogRec flightRecords[];  /* byte_22F14 */
 extern uint8 slotInfoTable[];                /* word_2245E */
+extern int16 mapWinX1, mapWinY1, mapWinX2, mapWinY2; /* word_1DF8E/90/92/94 debrief map window */
 extern struct BlinkSprite *spriteAirBlink;   /* word_1F6E4 */
 extern struct BlinkSprite *spriteSamBlink;   /* word_1F764 */
 extern struct BlinkSprite *spriteGroundBlink;/* word_1F724 */
 extern struct BlinkSprite *spriteWaypointBlink;/* word_1F7E4 */
+extern struct BlinkSprite *spriteAir;        /* word_1F6C4 */
+extern struct BlinkSprite *spriteGround;     /* word_1F704 */
+extern struct BlinkSprite *spriteSam;        /* word_1F744 */
+extern struct BlinkSprite *spriteWaypoint;   /* word_1F7C4 */
 
 extern void far pollJoystick(void);          /* 9C7:2F */
 extern int16 far misc_jump_5a_keybuf(void);
@@ -132,7 +137,7 @@ extern void far gfx_blitSprite(struct BlinkSprite *spr);   /* 9D9:13A5 */
 extern void cleanup(void);                   /* sub_10398 */
 extern void restoreCbreakHandler(void);      /* sub_11264 */
 extern void exit(int16 code);                /* sub_18AD2 */
-extern void drawEventSprite(int16 rec);      /* sub_14DDE */
+extern void drawEventSprite(uint16 rec);      /* sub_14DDE */
 
 /* seg000:0x3ff5 */
 int16 isPointInRect(MenuItem *p) {
@@ -323,8 +328,8 @@ void processDebriefInput(int16 *cursorBounds, MenuItem *menuItem, int16 *gfxPage
             switch (flightRecords[curRecordIdx].status & 0x3f) {
             case 1:
             case 12:
-                spriteAirBlink->dstX = mapToScreenX(flightRecords[curRecordIdx].mapX) + mapViewX1 - 2;
-                spriteAirBlink->dstY = mapToScreenY(flightRecords[curRecordIdx].mapY) + mapViewY1 - 2;
+                spriteAirBlink->dstX = mapToScreenX(flightRecords[curRecordIdx].mapX) + mapWinX1 - 2;
+                spriteAirBlink->dstY = mapToScreenY(flightRecords[curRecordIdx].mapY) + mapWinY1 - 2;
                 if (slotInfoTable[(flightRecords[curRecordIdx].unitId & 0x7f) << 4] & 8) {
                     spriteAirBlink->srcX = 0x11e;
                 } else {
@@ -333,8 +338,8 @@ void processDebriefInput(int16 *cursorBounds, MenuItem *menuItem, int16 *gfxPage
                 gfx_blitSprite(spriteAirBlink);
                 break;
             case 2:
-                spriteSamBlink->dstX = mapToScreenX(flightRecords[curRecordIdx].mapX) + mapViewX1 - 2;
-                spriteSamBlink->dstY = mapToScreenY(flightRecords[curRecordIdx].mapY) + mapViewY1 - 2;
+                spriteSamBlink->dstX = mapToScreenX(flightRecords[curRecordIdx].mapX) + mapWinX1 - 2;
+                spriteSamBlink->dstY = mapToScreenY(flightRecords[curRecordIdx].mapY) + mapWinY1 - 2;
                 gfx_blitSprite(spriteSamBlink);
                 break;
             case 4:
@@ -343,14 +348,14 @@ void processDebriefInput(int16 *cursorBounds, MenuItem *menuItem, int16 *gfxPage
             case 7:
             case 10:
             case 11:
-                spriteWaypointBlink->dstX = mapToScreenX(flightRecords[curRecordIdx].mapX) + mapViewX1;
-                spriteWaypointBlink->dstY = mapToScreenY(flightRecords[curRecordIdx].mapY) + mapViewY1;
+                spriteWaypointBlink->dstX = mapToScreenX(flightRecords[curRecordIdx].mapX) + mapWinX1;
+                spriteWaypointBlink->dstY = mapToScreenY(flightRecords[curRecordIdx].mapY) + mapWinY1;
                 gfx_blitSprite(spriteWaypointBlink);
                 break;
             case 3:
             case 8:
-                spriteGroundBlink->dstX = mapToScreenX(flightRecords[curRecordIdx].mapX) + mapViewX1 - 2;
-                spriteGroundBlink->dstY = mapToScreenY(flightRecords[curRecordIdx].mapY) + mapViewY1 - 2;
+                spriteGroundBlink->dstX = mapToScreenX(flightRecords[curRecordIdx].mapX) + mapWinX1 - 2;
+                spriteGroundBlink->dstY = mapToScreenY(flightRecords[curRecordIdx].mapY) + mapWinY1 - 2;
                 gfx_blitSprite(spriteGroundBlink);
                 break;
             case 9:
@@ -432,6 +437,49 @@ input_done:
     }
 }
 
+/* ==== seg000:0x4dde drawEventSprite — position + blit the always-on sprite
+ * for flightRecords[rec].status&0x3f into the debrief map window. Jump-table
+ * switch; the gfx_blitSprite tail is shared across cases. ==== */
+void drawEventSprite(uint16 rec) {
+    switch (flightRecords[rec].status & 0x3f) {
+    case 1:
+    case 12:
+        spriteAir->dstX = mapToScreenX(flightRecords[rec].mapX) + mapWinX1 - 2;
+        spriteAir->dstY = mapToScreenY(flightRecords[rec].mapY) + mapWinY1 - 2;
+        if (slotInfoTable[(flightRecords[curRecordIdx].unitId & 0x7f) << 4] & 8) {
+            spriteAir->srcX = 0x11e;
+        } else {
+            spriteAir->srcX = 0x12d;
+        }
+        gfx_blitSprite(spriteAir);
+        break;
+    case 2:
+        spriteSam->dstX = mapToScreenX(flightRecords[rec].mapX) + mapWinX1 - 2;
+        spriteSam->dstY = mapToScreenY(flightRecords[rec].mapY) + mapWinY1 - 2;
+        gfx_blitSprite(spriteSam);
+        break;
+    case 4:
+    case 5:
+    case 6:
+    case 7:
+    case 10:
+    case 11:
+        spriteWaypoint->dstX = mapToScreenX(flightRecords[rec].mapX) + mapWinX1;
+        spriteWaypoint->dstY = mapToScreenY(flightRecords[rec].mapY) + mapWinY1;
+        gfx_blitSprite(spriteWaypoint);
+        break;
+    case 3:
+    case 8:
+        spriteGround->dstX = mapToScreenX(flightRecords[rec].mapX) + mapWinX1 - 2;
+        spriteGround->dstY = mapToScreenY(flightRecords[rec].mapY) + mapWinY1 - 2;
+        gfx_blitSprite(spriteGround);
+        break;
+    case 9:
+    default:
+        break;
+    }
+}
+
 void blinkWidget(MenuItem *item, int16 *gfxPage) {
     int16 toColor;
     int16 fromColor;
@@ -458,20 +506,20 @@ void plotMapPoint(int16 x, int16 y, int16 color, int16 unused) {
     sx = mapToScreenX(x);
     sy = mapToScreenY(y);
     if (color != -1 &&
-        (uint16)sx >= (uint16)mapViewX1 &&
-        (uint16)sx < (uint16)mapViewX2 &&
-        (uint16)sy >= (uint16)mapViewY1 &&
-        (uint16)sy < (uint16)mapViewY2) {
+        (uint16)sx >= (uint16)mapWinX1 &&
+        (uint16)sx < (uint16)mapWinX2 &&
+        (uint16)sy >= (uint16)mapWinY1 &&
+        (uint16)sy < (uint16)mapWinY2) {
         drawMapPixel(sx, sy, color);
     }
 }
 
-void drawClippedLineEx(int16 x1, int16 y1, int16 x2, int16 y2, int16 cx1, int16 cy1, int16 cx2, int16 cy2, int16 flag) {
+void drawClippedLineEx(int16 x1, int16 y1, int16 x2, int16 y2, int16 wx1, int16 wx2, int16 wy1, int16 wy2, int16 flag) {
     int16 w, h;
     (void)flag;
-    w = cy1 - cx1;
-    h = cy2 - cx2;
-    gfx_setBlitOffset(gfx_calcRowAddr(cx1, cx2));
+    w = wx2 - wx1;
+    h = wy2 - wy1;
+    gfx_setBlitOffset(gfx_calcRowAddr(wx1, wy1));
     clipMaxX = w - 1;
     clipMaxY = h - 1;
     gfx_setOvlVal1(clipMaxY);
@@ -490,11 +538,50 @@ void drawClippedLineEx(int16 x1, int16 y1, int16 x2, int16 y2, int16 cx1, int16 
 }
 
 void drawClippedLine(int16 x1, int16 y1, int16 x2, int16 y2) {
-    drawClippedLineEx(x1, y1, x2, y2, mapViewX1, mapViewX2, mapViewY1, mapViewY2, 1);
+    drawClippedLineEx(x1, y1, x2, y2, mapWinX1, mapWinX2, mapWinY1, mapWinY2, 1);
 }
 
 void drawFlightLine(int16 p1, int16 p2, int16 p3, int16 p4) {
-    drawClippedLineEx(mapToScreenX(p1), mapToScreenY(p2), mapToScreenX(p3), mapToScreenY(p4), mapViewX1, mapViewX2, mapViewY1, mapViewY2, 1);
+    drawClippedLineEx(mapToScreenX(p1), mapToScreenY(p2), mapToScreenX(p3), mapToScreenY(p4), mapWinX1, mapWinX2, mapWinY1, mapWinY2, 1);
+}
+
+/* ==== seg000:0x52f9 drawFlightPath — draw the mission route polyline over
+ * flightRecords (loop1: lines), then the event sprites (loop2).
+ * Returns final index - 1. ==== */
+extern void far gfx_setColor(uint8 c);          /* 9D9:13F5 (slot 0x21) */
+
+uint16 drawFlightPath(int16 gfxPage, uint16 maxRecord) {
+    int16 p, a, b, c, d, e, f, g, h, i, j, k, l, m, n;
+    (void)e; (void)f; (void)g; (void)h; (void)i;
+    (void)j; (void)k; (void)l; (void)m; (void)n;
+    a = -1;
+    while ((flightRecords[++a].status & 0x3f) != 0) {
+        if ((uint16)a > maxRecord)
+            goto drawSprites;
+        gfx_setColor(0);
+        if (a == 0) {
+            plotMapPoint(flightRecords[0].mapX, flightRecords[0].mapY, 0, 0);
+            b = flightRecords[0].mapX;
+            d = flightRecords[0].mapY;
+        } else {
+            p = flightRecords[a].mapX;
+            c = flightRecords[a].mapY;
+            drawFlightLine(p, c, b, d);
+            b = p;
+            d = c;
+        }
+    }
+drawSprites:
+    a = -1;
+    while ((flightRecords[++a].status & 0x3f) != 0) {
+        if ((uint16)a > maxRecord)
+            goto done;
+        if ((flightRecords[a].status & 0x3f) != 9)
+            drawEventSprite(a);
+    }
+done:
+    a--;
+    return a;
 }
 
 char *formatFlightTime(int16 timeValue, char *buffer) {
@@ -520,6 +607,19 @@ char *formatFlightTime(int16 timeValue, char *buffer) {
     buffer[6] += seconds / 10;
     buffer[7] += seconds % 10;
     return buffer;
+}
+
+/* ==== seg000:0x27f6 — set the map view origin (screen cell col/row via
+ * mapViewX1/mapViewY1) then run the big map view dispatcher runMapView(sel);
+ * return its status as 1/0. ==== */
+extern int16 runMapView(int16 sel);                     /* 0x2192 */
+
+int16 drawMapView(int16 viewY, int16 viewX, int16 sel) {
+    mapViewX1 = viewX;
+    mapViewY1 = viewY;
+    if (runMapView(sel))
+        return 1;
+    return 0;
 }
 
 /* ==== seg000:0x281b serviceTick — every-7th-tick record animation gate.
