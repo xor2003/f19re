@@ -88,7 +88,11 @@ struct CommDataEnd {                            /* far ptr word_23C66 */
     int16 setupMono;                            /* 0x24 */
     int8 pad26[0x0a];
     int16 trainingFlag;                         /* 0x30 */
-    int8 pad32[0x40];
+    int8 pad32[0x02];
+    uint8 commFlags34;                          /* 0x34 */
+    int8 pad35;
+    uint16 commField36;                         /* 0x36 */
+    int8 pad38[0x3a];
     int16 setupUseJoy;                          /* 0x72 */
 };
 extern struct CommDataEnd far *commData;
@@ -96,14 +100,27 @@ extern struct CommDataEnd far *commData;
 struct PilotRecEnd {                            /* far ptr word_2243E */
     int8  pad0[0x20];
     uint16 rank;                                /* 0x20 */
-    int8  pad22[0x10];
+    uint16 flag22;                              /* 0x22 — one-shot award flag */
+    uint16 award24, award26, award28, award2a;  /* 0x24-0x2a — tier counters */
+    uint16 flag2c;                              /* 0x2c — 1200-pt award flag */
+    int8  pad2e[2];
+    uint16 awardPoints;                         /* 0x30 — award threshold pool */
     int32 totalScore;                           /* 0x32 */
     uint16 missionCount;                        /* 0x36 */
+    int8  pad38[0x0c];
+    uint16 flag44;                              /* 0x44 — training award flag */
+    uint16 flag46, flag48, flag4a, flag4c;      /* 0x46-0x4c — mission ribbon flags */
 };
 extern struct PilotRecEnd far *pilotRec;        /* word_2243E — init to comm+0x120e */
 extern uint8  promoScreenOpen;                  /* byte_23784 */
+extern uint8  target1Scored, target2Scored;     /* byte_237AB / byte_23B6E */
 extern int16  promotionDone;                    /* word_2244A */
 extern int16  promotionPending;                 /* word_2244E */
+extern int16  awardTrained;                     /* word_2243C */
+extern int16  award6Flag;                       /* word_22C2E */
+extern int16  missionRibbon;                    /* word_22444 */
+extern int16  awardQueued;                      /* word_22430 */
+extern int16  awardCode;                        /* word_23516 */
 extern uint16 promoScoreMin[];                  /* word_20456: 300,1125,3000,7000,16000,27720 */
 extern uint16 promoAvgMin[];                    /* word_20462: 100,150,200,250,280,280 */
 extern uint16 promoMissionsMin[];               /* word_2046E: 2,5,10,20,40,99 */
@@ -797,4 +814,93 @@ qual:
 promote:
     promotionDone = 1;
     pilotRec->rank++;
+}
+
+/* ==== seg000:0x85e3 — award/medal eligibility check ====
+ * Frameless: no locals, no args. Runs after checkPromotion in the debrief
+ * flow. Mission ribbons (5-9/10+/30-59/60+ missions) only outside training;
+ * the point-tier awards (codes 1-5) and the code-6 flag award queue via
+ * awardQueued when the promo screen is up or in training, else awardCode. */
+void checkAwardCodes(void) {
+    if (pilotRec->flag44 == 0 && commData->trainingFlag == 1 &&
+        (target1Scored == 1 || target2Scored == 1)) {
+        pilotRec->flag44 = 1;
+        awardTrained = 1;
+    }
+    if (commData->trainingFlag == 0)
+        goto ribbons;
+    goto noRibbons;
+ribbons:
+    if (pilotRec->missionCount >= 5 && pilotRec->missionCount < 10 &&
+        pilotRec->flag46 == 0) {
+        pilotRec->flag46 = 1;
+        missionRibbon = 1;
+    }
+    if (pilotRec->missionCount >= 10 && pilotRec->flag48 == 0) {
+        pilotRec->flag46 = 0;
+        pilotRec->flag48 = 1;
+        missionRibbon = 2;
+    }
+    if (pilotRec->missionCount >= 30 && pilotRec->missionCount < 60 &&
+        pilotRec->flag4a == 0) {
+        pilotRec->flag4a = 1;
+        missionRibbon = 3;
+    }
+    if (pilotRec->missionCount >= 60 && pilotRec->flag4c == 0) {
+        pilotRec->flag4a = 0;
+        pilotRec->flag4c = 1;
+        missionRibbon = 4;
+    }
+noRibbons:
+    if (pilotRec->flag22 == 0 && commData->commField36 >= 7 &&
+        (commData->commFlags34 & 8) != 0 && (commData->commFlags34 & 4) != 0) {
+        pilotRec->flag22 = 1;
+        award6Flag = 1;
+        awardCode = 6;
+    }
+    if (pilotRec->flag2c == 0 && pilotRec->awardPoints > 0x4B0) {
+        if (promoScreenOpen == 1 || commData->trainingFlag == 1) {
+            awardQueued = 5;
+            return;
+        }
+        awardCode = 5;
+        pilotRec->flag2c = 1;
+        return;
+    }
+    if (900 * pilotRec->award2a + 900 <= pilotRec->awardPoints) {
+        if (promoScreenOpen == 1 || commData->trainingFlag == 1) {
+            awardQueued = 4;
+            return;
+        }
+        pilotRec->award2a++;
+        awardCode = 4;
+        return;
+    }
+    if (600 * pilotRec->award28 + 600 <= pilotRec->awardPoints) {
+        if (promoScreenOpen == 1 || commData->trainingFlag == 1) {
+            awardQueued = 3;
+            return;
+        }
+        pilotRec->award28++;
+        awardCode = 3;
+        return;
+    }
+    if (300 * pilotRec->award26 + 300 <= pilotRec->awardPoints) {
+        if (promoScreenOpen == 1 || commData->trainingFlag == 1) {
+            awardQueued = 2;
+            return;
+        }
+        pilotRec->award26++;
+        awardCode = 2;
+        return;
+    }
+    if (pilotRec->award24 < 9 && 100 * pilotRec->award24 + 100 <= pilotRec->awardPoints) {
+        if (promoScreenOpen == 1 || commData->trainingFlag == 1) {
+            awardQueued = 1;
+            return;
+        }
+        pilotRec->award24++;
+        awardCode = 1;
+        return;
+    }
 }
