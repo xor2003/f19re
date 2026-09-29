@@ -57,8 +57,8 @@ my_ltoa: seg000 NEAR 0acc-0c02 R0acc-0c02 duplicate
 my_itoa: seg000 NEAR 0c03-0cd8 R0c03-0cd8 duplicate
 # Routine sub_10CD9 0000:0cd9-0000:0cf2[00001a] is a potential duplicate of routine timerWait 0000:2540-0000:255d[00001e], differs by 3 instructions
 timerWait: seg000 NEAR 0cd9-0cf2 R0cd9-0cf2 duplicate
-sub_10CF3: seg000 NEAR 0cf3-0cfd R0cf3-0cfd
-sub_10CFE: seg000 NEAR 0cfe-0d19 R0cfe-0d19
+seedRandom: seg000 NEAR 0cf3-0cfd R0cf3-0cfd
+randomRange: seg000 NEAR 0cfe-0d16 R0cfe-0d19
 sub_10D1A: seg000 NEAR 0d1a-0d2b R0d1a-0d2b
 clearRect: seg000 NEAR 0db2-0e4f R0db2-0e4f duplicate
 sub_10E50: seg000 NEAR 0e50-0f09 R0e50-0f09
@@ -104,14 +104,16 @@ sub_11A8A: seg000 NEAR 1a8a-20fb R1a8a-20fb
 # Routine sub_120FC 0000:20fc-0000:212b[000030] is a potential duplicate of routine loadFileSection 0000:3104-0000:313b[000038], differs by 8 instructions
 # Routine sub_120FC 0000:20fc-0000:212b[000030] is a potential duplicate of routine loadFileSectionEx 0000:313c-0000:3173[000038], differs by 8 instructions
 allocClearBuf: seg000 NEAR 20fc-212b R20fc-212b duplicate
-sub_1212C: seg000 NEAR 212c-214b R212c-214b
-sub_1214C: seg000 NEAR 214c-2191 R214c-2191
+stageAppend: seg000 NEAR 212c-214b R212c-214b
+readStageStream: seg000 NEAR 214c-2191 R214c-2191
 sub_12192: seg000 NEAR 2192-27f5 R2192-27f5
 sub_127F6: seg000 NEAR 27f6-281a R27f6-281a
-sub_1281B: seg000 NEAR 281b-2831 R281b-2831
-sub_12832: seg000 NEAR 2832-288a R2832-288a
+serviceTick: seg000 NEAR 281b-2831 R281b-2831
+tickRecords: seg000 NEAR 2832-288a R2832-288a
 sub_1288B: seg000 NEAR 288b-2cc8 R288b-2cc8
-sub_12CC9: seg000 NEAR 2cc9-2e51 R2cc9-2e51
+parseCmd: seg000 NEAR 2cc9-2d8c R2cc9-2d8c
+clearActiveInRect: seg000 NEAR 2d8d-2e26 R2d8d-2e26
+resetRecField9: seg000 NEAR 2e27-2e50 R2e27-2e50
 # Routine allocBuffer 0000:2e52-0000:2e85[000034] is a potential duplicate of routine allocBuffer 0000:0572-0000:05a5[000034], differs by 0 instructions
 allocBuffer: seg000 NEAR 2e52-2e85 R2e52-2e85 duplicate
 # Routine freeBuffer 0000:2e86-0000:2ead[000028] is a potential duplicate of routine freeBuffer 0000:05a6-0000:05cd[000028], differs by 0 instructions
@@ -125,7 +127,7 @@ sub_130BE: seg000 NEAR 30be-3110 R30be-3110
 sub_13111: seg000 NEAR 3111-3123 R3111-3123
 gety: seg000 NEAR 3125-31e6 R3125-31e6
 sub_131E7: seg000 NEAR 31e7-3237 R31e7-3237
-sub_13238: seg000 NEAR 3238-325f R3238-325f
+picStageRefill: seg000 NEAR 3238-325f R3238-325f
 sub_13260: seg000 NEAR 3260-3273 R3260-3273
 sub_13274: seg000 NEAR 3274-3334 R3274-3334
 sub_13335: seg000 NEAR 3335-3367 R3335-3367

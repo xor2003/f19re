@@ -521,3 +521,120 @@ char *formatFlightTime(int16 timeValue, char *buffer) {
     buffer[7] += seconds % 10;
     return buffer;
 }
+
+/* ==== seg000:0x281b serviceTick — every-7th-tick record animation gate.
+ * Naked fn (no bp frame): no args, no pushes. START sub_161F1 twin. ==== */
+extern uint8 tickByte;                                  /* byte_1DF6B */
+extern int16 tickArm;                                   /* word_1C6EC */
+extern void tickRecords(void);                          /* 0x2832 */
+
+void serviceTick(void) {
+    if (tickByte > 6) {
+        tickByte = 0;
+        if (tickArm != 0)
+            tickRecords();
+    }
+}
+
+/* ==== seg000:0x2832 — walk 0x5C-stride record table at dseg+0x295e;
+ * for flagged records sum bytes +8/+9, wrap >0xff by -0x100, call the
+ * per-record worker sub_1288B(recOff), store sum back at +9. ==== */
+extern uint8 recActive[];                               /* byte_19DEA = rec+0x5a */
+extern uint8 recField9[];                               /* word_19D99 = rec+9 */
+extern uint8 recField8[];                               /* word_19D98 = rec+8 */
+extern int16 recCount;                                  /* word_3CB4 */
+extern void sub_1288B(int16 recOff);
+
+void tickRecords(void) {
+    int16 rp, total, i;
+    for (i = 0; i < recCount; i++) {
+        rp = i * 0x5C + 0x295E;
+        if (recActive[rp] != 0) {
+            total = recField9[rp] + recField8[rp];
+            if (total > 0xFF)
+                total -= 0x100;
+            sub_1288B(rp);
+            recField9[rp] = (uint8)total;
+        }
+    }
+}
+
+/* ==== seg000:0x2cc9 — parse a '(…|…)'/':N' command char stream via the
+ * cursor pointer pp (read col idx, advance *pp each step).
+ * Returns 0 on ')', 1 on '|', N-1 after ':N', skips nested parens. ==== */
+int16 parseCmd(uint8 **pp, int16 idx) {
+    int8 c, ch2;
+    int16 dig, depth, i;
+    i = 0;
+    for (;;) {
+        c = (*pp)[idx];
+        (*pp)++;
+        if (c == ')')
+            return 0;
+        if (c == '|')
+            return 1;
+        if (c == ':') {
+            dig = 0;
+            goto test;
+        body:
+            if (ch2 > '9')
+                goto done;
+            dig = dig * 0xA + ch2 - '0';
+            (*pp)++;
+        test:
+            if ((ch2 = (*pp)[idx]) >= '0')
+                goto body;
+        done:
+            return dig - 1;
+        }
+        if (c != '(')
+            continue;
+        depth = 1;
+        do {
+            depth += ((*pp)[idx] == '(');
+            depth -= ((*pp)[idx] == ')');
+            (*pp)++;
+        } while (depth > 0);
+    }
+}
+
+/* ==== seg000:0x2d8d — deactivate records whose bbox intersects the
+ * (x,y,w,h) rect shifted by the map view origin ==== */
+struct MapRect {
+    int16 rx, ry, rw, rh;                       /* +0,+2,+4,+6 */
+    uint8 pad[0x52];
+    uint8 active;                               /* +0x5a */
+    uint8 padEnd;
+};
+extern struct MapRect recTable[];               /* record table at 0x295e */
+
+void clearActiveInRect(int16 x, int16 y, int16 w, int16 h) {
+    int16 c, d, e, i, xmax;
+    struct MapRect *rp;
+    x -= mapViewX1;
+    y -= mapViewY1;
+    for (i = 0; i < recCount; i++) {
+        rp = &recTable[i];
+        if (rp->rx > x)
+            xmax = recTable[i].rx;
+        else
+            xmax = x;
+        if (rp->ry > y)
+            e = rp->ry;
+        else
+            e = y;
+        d = (rp->rw + rp->rx <= x + w) ? rp->rw + rp->rx : x + w;
+        c = (rp->ry + rp->rh <= y + h) ? rp->ry + rp->rh : y + h;
+        if (xmax < d && e < c)
+            rp->active = 0;
+    }
+}
+
+/* ==== seg000:0x2e27 — clear field9 of all 30 records ==== */
+void resetRecField9(void) {
+    int16 r, i;
+    for (i = 0; i < 0x1E; i++) {
+        r = i * 0x5C + 0x295E;
+        recField9[r] = 0;
+    }
+}

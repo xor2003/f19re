@@ -25,3 +25,18 @@ void mystrcat(char *d, char *s) {         /* seg000:0x3923 */
 /* seg000:0x396e memsetNear, 0x3982 memsetFar, 0x39b6 memcpyFromFar —
  * rep-stosb/movsb asm; 0x3998 copyBytes (`loop`) and 0x39d2 memeq
  * (byte-stepped word cmp + `loope`) likewise. Skeleton. */
+
+extern int16 rand(void);                                  /* 0x8c96 — libc */
+extern void seedRandom16(int16 v);                        /* 0x8c84 — srand */
+extern int16 readBiosTickLo(void);                        /* 0x3844 */
+
+/* seg000:0x0cf3 — naked: no bp frame even under opt (same as START
+ * sub_161F1). /Gs module. */
+void seedRandom(void) {
+    seedRandom16(readBiosTickLo());
+}
+
+/* seg000:0x0cfe — (zext(maxVal) * rand()) >> 15 */
+int16 randomRange(int16 maxVal) {
+    return (int16)(((int32)(uint16)maxVal * (int32)rand()) >> 15);
+}

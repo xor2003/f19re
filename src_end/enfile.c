@@ -94,3 +94,28 @@ int16 allocClearBuf(int16 size) {
     memsetFar(dst.p, 0, size);
     return result;
 }
+
+/* seg000:0x214c — copy n bytes of the staged pic stream into dseg at dst;
+ * refills picStreamBuf (0x200) via the stage-copy asm when pos > 0x1ff. */
+extern void picStageRefill(void);              /* sub_13238 — rep-movsw asm */
+
+int16 readStageStream(uint8 *dst, int16 count) {
+    int16 i;
+    for (i = 0; i < count; i++) {
+        if (picBufPos > 0x1ff) {
+            picStageRefill();
+            picBufPos = 0;
+        }
+        *dst++ = picStreamBuf[picBufPos++];
+    }
+    return i;
+}
+
+/* seg000:0x212c — read n staged bytes at the dseg write cursor, advance it */
+int16 picStagePos;
+
+int16 stageAppend(int16 n) {
+    readStageStream((uint8 *)picStagePos, n);
+    picStagePos += n;
+    return picStagePos - n;
+}

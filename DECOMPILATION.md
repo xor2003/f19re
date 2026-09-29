@@ -1186,3 +1186,33 @@ picMakeDict, doPicDecode, dictionaryLookup) remain skeleton asm.
 All 14 routines MATCH; stubs.c EXE_END block updated (dosReadFar/
 openFileWrapper/closeFileWrapper removed, fileClose/picStreamRead/
 decodePic/picBufPos/picStreamBuf added; openBlitClosePic stub guarded).
+
+## 14. English END.EXE batch — record-table cluster (0x281B–0x2E50)
+
+enstr.c (/Gs /Os): seedRandom (0x0cf3 — naked tail-call `srand(biosTickLo)`
+  under /Gs; /Od gave it a chkstk frame), randomRange (0x0cfe —
+  `(int16)((rand() * (uint16)maxVal) >> 15)`, sar via __aNlshr; extent
+  shrunk to 0x0cfe–0x0d16, trailing pad byte belongs between extents).
+enbrief.c (/Gs /Os): serviceTick (0x281b — frameless tick-gate over
+  tickByte/tickArm, same idiom as START's sub_161F1), tickRecords
+  (0x2832 — 0x5C-stride record walk via byte-view externs), parseCmd
+  (0x2cc9 — explicit test/body/done labels so the ':' digit loop keeps
+  its `> '9'` check reading the temp memory var), clearActiveInRect
+  (0x2d8d), resetRecField9 (0x2e27). The fused sub_12CC9 extent split
+  into the three real routines.
+enfile.c (/Ot): stageAppend (0x212c), readStageStream (0x214c — second
+  buffered reader over picStageRefill = sub_13238 rep-movsw stage copy).
+drawstr.c (/Gs /Os): drawTextOp (0x2ef2 — initResultFlag==1-only guard
+  into graphics-driver text op 0x762) and drawTextModeDispatch (0x2f27 —
+  4-way switch on drawTextMode to far driver entries 0x165/0x477/0x762/
+  0xa61).
+
+clearActiveInRect detail: the rotated first conditional emitted
+`push si` + `cmp [bp+4],si` whenever the arm read `rp->f0` — MSC
+dedicates si to a field value shared between eval and arm. Writing the
+arm `xmax = recTable[i].rx` (array-indexed, different CSE key than the
+eval's `rp->rx`) broke the dedication: eval became `cmp [bx],ax`, arm
+`mov ax,[bx]; jmp` into the shared `xmax = ax` store inside the head
+x-arm — byte-exact with the original.
+
+All 8 routines MATCH; verify-exes 0 diffs on all four exes.

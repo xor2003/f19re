@@ -157,3 +157,38 @@ int16 stringWidth(int16 *item, uint8 *str) {
         n += gfx_charWidth(*cur++, font);
     return n;
 }
+
+/* seg000:0x2ef2 — guarded far call to overlay text op at 91d:0x762 */
+extern void far textOp_762(int16 *p1, int16 a2, int16 a3, int16 *p4,
+                           int16 a5, int16 a6, int16 a7, int16 a8);
+extern void far textOp_477(int16 *p1, int16 a2, int16 a3, int16 *p4,
+                           int16 a5, int16 a6, int16 a7, int16 a8);
+extern void far textOp_165(int16 *p1, int16 a2, int16 a3, int16 *p4,
+                           int16 a5, int16 a6, int16 a7, int16 a8);
+extern void far textOp_A61(int16 *p1, int16 a2, int16 a3, int16 *p4,
+                           int16 a5, int16 a6, int16 a7, int16 a8);
+extern uint8 drawTextMode;              /* dseg:0x8b76 (initResultFlag low byte) */
+
+void sub_12EF2(int16 *p1, int16 a2, int16 a3, int16 *p4,
+               int16 a5, int16 a6, int16 a7, int16 a8) {
+    if (a7 == 0)
+        return;
+    if (a8 == 0)
+        return;
+    textOp_762(p1[0], a2, a3, p4[0], a5, a6, a7, a8);
+}
+
+/* seg000:0x2f27 — dispatch one of four overlay text ops by drawTextMode */
+void sub_12F27(int16 *p1, int16 a2, int16 a3, int16 *p4,
+               int16 a5, int16 a6, int16 a7, int16 a8) {
+    if (a7 == 0)
+        return;
+    if (a8 == 0)
+        return;
+    switch (drawTextMode) {
+    case 0: textOp_477(p1[0], a2, a3, p4[0], a5, a6, a7, a8); break;
+    case 1: textOp_762(p1[0], a2, a3, p4[0], a5, a6, a7, a8); break;
+    case 2: textOp_165(p1[0], a2, a3, p4[0], a5, a6, a7, a8); break;
+    case 3: textOp_A61(p1[0], a2, a3, p4[0], a5, a6, a7, a8); break;
+    }
+}

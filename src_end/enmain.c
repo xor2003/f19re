@@ -124,7 +124,3 @@ void waitForKeyOrJoy2(void) {
     }
 }
 
-/* seg000:0x0cf3 */
-void seedRandom(void) {
-    seedRandom16(readBiosTickLo());
-}

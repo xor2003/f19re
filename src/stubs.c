@@ -805,8 +805,19 @@ int16 far misc_jump_5d_readJoy(int16 a) { return 0; }
 void  far misc_jump_5e_clearKeyFlags(void) { }
 void  far gfx_blitSprite(int16 spr) { }
 void  intDispatch(int16 n, uint8 *a, uint8 *b) { }     /* sub_139FD */
-void  serviceTick(void) { }                          /* sub_1281B */
 void  farStrcpy(char *d, char far *s) { }            /* sub_138EC — asm in skeleton */
+void  sub_1288B(int16 recOff) { }                    /* rec-anim worker — real def in skeleton */
+void  picStageRefill(void) { }                       /* sub_13238 — rep-movsw stage copy asm */
+void  far textOp_477(void) { }   /* overlay text ops at seg 0x91d */
+void  far textOp_762(void) { }
+void  far textOp_165(void) { }
+void  far textOp_A61(void) { }
+uint8 drawTextMode;                                  /* dseg:0x8b76 — initResultFlag lo */
+uint8 tickByte;                                      /* byte_1DF6B */
+int16 tickArm;                                       /* word_1C6EC */
+uint8 recActive[4], recField9[4], recField8[4];      /* byte_19DEA/word_19D99/word_19D98 field views */
+uint8 recTable[4];                                   /* 0x295e-stride-0x5c record table */
+int16 recCount;                                      /* word_3CB4 */
 void  copyBytes(char *d, char *s, int16 n) { }       /* sub_13998 — asm in skeleton */
 void  memcpyFromFar(char *d, char far *s, int16 n) { } /* sub_139B6 — asm in skeleton */
 #endif
