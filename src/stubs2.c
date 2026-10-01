@@ -26,7 +26,8 @@ int16  ribbonIcons[11][9];                      /* dseg:0x670e */
 int16  ribbonPos[11][9];                        /* dseg:0x67b0 */
 char  *malloc(int16 size) { return (char *)0; }   /* 0x8c20 */
 void   free(char *p) { }                          /* 0x8c0e */
-void  sub_1883C(void) { }                         /* landingtype-1 handler — skeleton */
+/* sub_1883C now real in src_end/enbrief.c */
+int16 *word_207B2;                              /* dseg:0x6a22 — debrief panel item */
 void  sub_10D1A(int16 seg) { }                    /* drv tbl patch — skeleton */
 int16 far gfx_getConst1(void) { return 0; }       /* 9D9:149F */
 int16 far gfx_getAuxBufSize(void) { return 0; }   /* 9D9:1445 */

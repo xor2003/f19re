@@ -68,6 +68,14 @@ uint8 enterPressed;                         /* byte_236AF */
 uint8 joyRepeatFlag;                        /* byte_22428 */
 
 extern void far gfx_commitPage(void);
+extern void far gfx_setFadeSteps(int16 n);          /* 9D9:1481 */
+extern void far gfx_waitRetrace(void);              /* 9D9:14A9 */
+extern int16 far gfx_blitToCurrent(int16 p);        /* 9D9:1440 */
+extern void far gfx_flipPage(void);                 /* 9D9:14AE */
+extern void openBlitClosePic(const char *name, int16 page); /* seg000:0x15df */
+extern void waitForKeyOrJoy(void);                  /* seg000:0x067b */
+extern int16 word_23C6C;                            /* dseg:0x9edc — debrief res page */
+extern int16 *word_207B2;                           /* dseg:0x6a22 — debrief panel item */
 extern void processDebriefInput(int16 *inputState, MenuItem *item, int16 *gfxPage);
 extern void drawMenuItem(const MenuItem *items, uint16 index, int16 *gfxPage);
 extern void blinkWidget(MenuItem *item, int16 *gfxPage);
@@ -1232,6 +1240,52 @@ noRibbons:
         awardCode = 1;
         return;
     }
+}
+
+/* ==== seg000:0x883c sub_1883C — pilot-death debrief screen (landingType 1).
+ * flag.pic + bailout-cause message, centered or wrapped. ==== */
+void sub_1883C(void) {
+    int16 p;
+    uint16 w;
+    char  msg[0xc8];
+
+    gfx_setFadeSteps(3);
+    openBlitClosePic("flag.pic", word_23C6C);
+    p = word_23C6C;
+    gfx_waitRetrace();
+    gfx_blitToCurrent(p);
+    gfx_flipPage();
+    switch (commData->bailout) {
+    case 1:
+        mystrcpy(msg, "Flying into the ground has proved to be hazardous to your health.");
+        break;
+    case 2:
+        mystrcpy(msg, "Flying into that hill has proved to be hazardous to your health.");
+        break;
+    case 3:
+        mystrcpy(msg, "Your plane crashed because the main fuel tanks were empty.");
+        break;
+    case 4:
+        mystrcpy(msg, "Your aircraft, destroyed by enemy missiles, crashed before you ejected.");
+        break;
+    case 5:
+        mystrcpy(msg, "Your plane crashed onto the runway, cartwheeled and exploded.");
+        break;
+    case 6:
+        mystrcpy(msg, "Unfortunately, your attempt to eject from the aircraft failed.");
+        break;
+    }
+    word_207B2[2] = 0xf;
+    w = stringWidth(word_207B2, msg);
+    if (w < 0x13d)
+        drawStringAt(word_207B2, msg, (0x13e - w) / 2 + 1, 0xa5);
+    else
+        drawWrappedText(word_207B2, msg, 0x12c, 0x21, 0xa, 7);
+    word_207B2[2] = 9;
+    drawStringAt(word_207B2, "Press Selector to continue", 0x64, 0xc1);
+    word_207B2[2] = 0;
+    gfx_commitPage();
+    waitForKeyOrJoy();
 }
 
 /* ==== seg000:0x44a8 drawMenuItem — debrief detail panel. Type-7 items draw
