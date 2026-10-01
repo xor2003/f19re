@@ -793,6 +793,18 @@ void  far gfx_setPageN(uint16 a) { }
 void  far gfx_commitPage(void) { }
 void  sub_10E50(int16 *page, int16 x1, int16 y1, int16 x2, int16 y2) { } /* clearRect dup — skeleton */
 void  sub_15D1B(void) { }                         /* event popup — skeleton */
+int16  far gfx_blitToCurrent(int16 p) { return 0; }   /* 9D9:1440 slot */
+/* endevt.c (seg000:5d1b-8531 debrief-event cluster + sub_10010 driver) globals */
+int16  word_18EA2;                              /* dseg:0x8ea2 — gfx init flag */
+int16  word_23C6C;                              /* dseg:0x9edc — debrief res page */
+int16  word_23C76, word_23C78, word_23C7A;      /* dseg:0x9ee6/8/a */
+int16  word_1295C;                              /* dseg:0x295c */
+int16 *word_19806;                              /* dseg:0x5806 — window struct ptr */
+int16  word_226BC;                              /* dseg:0x86bc — alloc'd seg */
+int8   byte_199F4;                              /* dseg:0x99f4 — display flag */
+int16 *word_19704;                              /* dseg:0x5704 — page/font ptr */
+int16  rankNames[8];                            /* dseg:0x56e0 — per-rank name tbl */
+int16 *word_1981E;                              /* dseg:0x57ae — window struct ptr */
 /* calcMissionScore (sub_15666) globals — award tables, counters, multipliers */
 int16  word_2387A;                              /* dseg:0x9aea — init 0x1318, theatre/weapon count */
 int16  word_22C34;                              /* dseg:0x8ea4 — visual-id count */
