@@ -25,7 +25,7 @@ int16 sub_115D0(void);
 void  sub_11C3C(int16 v);
 int16 sub_11C4E(void);
 void  pascal sub_11D56(int32 d, int32 *v);         /* *v /= d  (in-place)    */
-void  sub_11732(char *dst, int16 seg, int16 off, int16 n);  /* far copy  */
+void  sub_11732(char *dst, char far *src, int16 n);       /* far->near copy */
 void  sub_11714(char *dst, char *src, int16 n);     /* near copy              */
 
 /* ---- pen-position record arrays (dseg) ---- */
@@ -45,6 +45,67 @@ void sub_10971(int16 a, int16 b, int16 c) {
 }
 
 /* --------------------------------------------------------------------------
+ * sub_1099A — word-wrap a FAR string into lim-wide lines, printing each via
+ *   suFieldPrint.  Far-pointer twin of sub_10AEB; after locating the break it
+ *   also skips leading spaces on the line start before emitting.
+ *   0x99A-0xAEA
+ * ------------------------------------------------------------------------ */
+void sub_1099A(int16 idx, char far *str, uint16 lim, int16 penx, int16 peny, int16 dy) {
+    int16 pa;               /* fnt (font attr)        */
+    char far *wgt;          /* cur (line-start ptr)   */
+    char far *cp;           /* scan cursor            */
+    int16 cnt;              /* n (word length)        */
+    int16 dum;              /* spare / dead slot      */
+    char far *st;           /* strStart               */
+    int8  ag;               /* more flag              */
+    int16 tw;               /* width accumulator      */
+    char  buf[0x1F0];       /* wrapped line buffer    */
+    char  cch;              /* current char           */
+    st = str;
+    wgt = str;
+    cp = str;
+    pa = *(int16 *)((char *)word_12FCC + idx);
+    *(int16 *)((char *)word_12FCA + idx) = peny;
+    ag = 1;
+wrapline:
+    tw = cnt = 0;
+    while (tw < lim) {
+        cch = *cp;
+        if (cch == 0 || cch == 0x0D || cch == 0x0A) goto scanned;
+        tw += suCharWidth(*cp++, pa);
+        cnt++;
+    }
+scanned:
+    if (tw >= lim) goto backdec;
+    goto chkspace;
+    do {
+chkbrk:
+        if (cch == 0 || cch == 0x0D || cch == 0x0A || cch == 0x2D) goto worddone;
+        if (cp <= st) goto worddone;
+backdec:
+        cp--;
+        cnt--;
+chkspace:
+        cch = *cp;
+    } while (cch != 0x20);
+worddone:
+    if (*cp == 0x2D) cnt++;
+    while (*wgt == 0x20) wgt++;
+    if (*cp == 0) ag = 0;
+    if (cnt != 0) {
+        sub_11732(buf, wgt, cnt);
+        buf[cnt] = 0;
+        *(int16 *)((char *)word_12FC8 + idx) = penx;
+        suFieldPrint(idx, buf);
+        *(int16 *)((char *)word_12FCA + idx) += dy;
+        if (*cp == 0x0D) *(int16 *)((char *)word_12FCA + idx) += 2;
+    }
+    cp++;
+    wgt = cp;
+    if (ag) goto wrapline;
+}
+
+/* --------------------------------------------------------------------------
  * sub_10C0E — pixel width of a near string in field idx's font.
  *   0xC0E-0xC51
  * ------------------------------------------------------------------------ */
@@ -58,6 +119,66 @@ int16 sub_10C0E(int16 idx, uint8 *str) {
         s += suCharWidth(*p++, w);
     }
     return s;
+}
+
+/* --------------------------------------------------------------------------
+ * sub_10AEB — word-wrap a NEAR string into lim-wide lines, printing each via
+ *   suFieldPrint and advancing pen.y.  Scans a word's pixel width, backtracks
+ *   to a space/hyphen/EOL break when it overflows, emits, repeats.
+ *   0xAEB-0xC0D
+ * ------------------------------------------------------------------------ */
+void sub_10AEB(int16 idx, uint8 *str, uint16 lim, int16 penx, int16 peny, int16 dy) {
+    int16 pa;           /* fnt (font attr)        */
+    uint8 *wgt;         /* cur (line-start ptr)   */
+    uint8 *cp;          /* scan cursor            */
+    int16 cnt;          /* n (word length)        */
+    int16 dum;          /* spare / dead slot      */
+    uint8 *st;          /* strStart               */
+    int8  ag;           /* more flag              */
+    int16 tw;           /* width accumulator      */
+    char  buf[0x3E8];   /* wrapped line buffer    */
+    uint8 cch;          /* current char           */
+    st = str;
+    wgt = str;
+    cp = str;
+    pa = *(int16 *)((char *)word_12FCC + idx);
+    *(int16 *)((char *)word_12FCA + idx) = peny;
+    ag = 1;
+wrapline:
+    tw = cnt = 0;
+    while (tw < lim) {
+        cch = *cp;
+        if (cch == 0 || cch == 0x0D || cch == 0x0A) goto scanned;
+        tw += suCharWidth(*cp++, pa);
+        cnt++;
+    }
+scanned:
+    if (tw >= lim) goto backdec;
+    goto chkspace;
+    do {
+chkbrk:
+        if (cch == 0 || cch == 0x0D || cch == 0x0A || cch == 0x2D) goto worddone;
+        if (cp <= st) goto worddone;
+backdec:
+        cp--;
+        cnt--;
+chkspace:
+        cch = *cp;
+    } while (cch != 0x20);
+worddone:
+    if (*cp == 0x2D) cnt++;
+    if (*cp == 0) ag = 0;
+    if (cnt != 0) {
+        sub_11714(buf, (char *)wgt, cnt);
+        buf[cnt] = 0;
+        *(int16 *)((char *)word_12FC8 + idx) = penx;
+        suFieldPrint(idx, buf);
+        *(int16 *)((char *)word_12FCA + idx) += dy;
+        if (*cp == 0x0D) *(int16 *)((char *)word_12FCA + idx) += 2;
+    }
+    cp++;
+    wgt = cp;
+    if (ag) goto wrapline;
 }
 
 /* --------------------------------------------------------------------------

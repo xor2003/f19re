@@ -1388,3 +1388,46 @@ saves, not procs). Clean `pop si; mov sp,bp; pop bp; retn` epilogue at
 0x8531; `sub_18532` proc begins adjacent at 0x8532 — no boundary overlap.
 Candidate for skeleton (a ~10KB dispatcher is impractical to C-port
 byte-exact); left as `sub_15D1B` asm skeleton.
+
+### SU.EXE suutil.c cluster (seg000:0x971-0xe9d) — new src_su/ module, 9 MATCH
+
+First SU.EXE C ports. The fused `sub_10971` map extent (0x971-0xe9d) was
+re-split into its 9 real routines — verified byte-exact by `make
+verify-exes` after the map split (extents tile contiguously; the trailing
+`nop` folds into sub_10E84). All are the satellite's field-format /
+word-wrap / delay helper library; none are reachable by direct `call`
+(dispatched via a function-pointer table), so ada had lumped them into one
+extent. Ported in `src_su/suutil.c` (`/AS /Gs /Os`):
+
+- `sub_10971` (0971-0999) — 2-call wrapper; far call `2FC:0A3F`
+  (`suFieldPrint`) into the driver segment.
+- `sub_1099A` (099a-0aea) — FAR-pointer word-wrap (`char far*`,
+  `les bx`/`es:[bx]` reads, signed `cbw`); sibling of sub_10AEB plus an
+  extra `while(*wgt==' ')wgt++` leading-space skip and far copy
+  `sub_11732(dst,far src,n)`.
+- `sub_10AEB` (0aeb-0c0d) — near-pointer word-wrap (`uint8*`,
+  `sub ah,ah` zero-ext).
+- `sub_10C0E` (0c0e-0c51) — string pixel-width (`uint8*`).
+- `sub_10C52` (0c52-0d88) — 32-bit `long` comma-itoa via `aNlrem` +
+  `pascal sub_11D56(divisor,&val)` in-place divide.
+- `sub_10D89` (0d89-0e5e) — 16-bit `idiv` comma-itoa.
+- `sub_10E5F` (0e5f-0e78) — tick delay helper.
+- `sub_10E79` (0e79-0e83) — frameless near helper.
+- `sub_10E84` (0e84-0e9d) — regarg `_aNlshr`-backed fixed-point scale.
+
+Codegen notes for the word-wrap twins (the hard pair): the scan loop is a
+bottom-tested `while(tw<lim)` — a plain `while` won't rotate while a
+`break` is present, so the exit is written `goto scanned` which makes MSC
+rotate AND keeps `bx` cached across `cch=*cp`→`*cp++`. `lim` must be
+`uint16` (unsigned `jb`). The `scanned` tail polarity is
+`if(tw>=lim)goto backdec; goto chkspace` → `jb chkspace; jmp backdec`.
+The backtrack is `do{chkbrk;backdec;chkspace}while(cch!=0x20)` with the
+two entry gotos landing mid-body — MSC keeps `chkbrk` a separate
+memory-reading block (`cmp byte[cch]`) instead of fusing it into
+chkspace. In sub_1099A the bound check `cp<=st` on `char far*` emits only
+the offset-word `cmp` (both halves of `st` are loaded but seg is unused).
+Local frames are name-hash engineered: sub_10AEB 0x3fa frame
+(pa/wgt/cp/cnt/dum/st/ag/tw + buf,cch), sub_1099A 0x20e frame with three
+4-byte far* locals.
+
+All 9 MATCH; verify-exes 0 diffs on all four exes.

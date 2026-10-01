@@ -88,9 +88,20 @@ map/<x>_en.map --srcdir src_<x>`):
   sub_14107, reg-ABI trampolines (sub_141A3/sub_16DC2/sub_16E0C),
   mode-parser _openfile (sub_1E7B6), CRT time cluster
   (sub_1EFFE/sub_1EB7C), timer-port asm (sub_144F2/sub_14F8F).
-- SU.EXE — 0 C-portable: every signature match is int21h file-IO or CRT
-  asm (createFile/openFile/closeFile/readFile1/setTimerIrqHandler are the
-  hand-asm DS=SS family). Skeleton stays.
+- src_su/ — suutil.c 9 MATCH: the field-format/word-wrap helper cluster
+  (fused `sub_10971` extent re-split into 9: sub_10971, the far/near
+  word-wrap twins sub_1099A/sub_10AEB, string-width sub_10C0E, the
+  long/int comma-itoa sub_10C52/sub_10D89, delay sub_10E5F, frameless
+  sub_10E79, regarg-shift sub_10E84). Flags: suutil.c /AS /Gs /Os.
+  word-wrap loops match via `while`-scan + `goto scanned` and a
+  `do{chkbrk;backdec;chkspace}while(cch!=0x20)` backtrack with mid-entry
+  gotos; `lim` is `uint16` (unsigned `jb`); sub_10AEB uses `uint8*` for
+  `sub ah,ah` while sub_1099A keeps `char`/`cbw` + `les bx`/`es:[bx]`
+  far reads and an extra `while(*wgt==' ')wgt++` space-skip. `cp<=st`
+  on `char far*` emits MSC's offset-only `cmp`.
+  Everything else stays skeleton: int21h file-IO/CRT asm
+  (createFile/openFile/closeFile/readFile1/setTimerIrqHandler are the
+  hand-asm DS=SS family).
 portcheck satellite notes: modules compile with /DEXE_<EXENAME> so base
 src/ can suppress colliding defs (egmath.c rangeApprox, egtacmap.c
 drawMapLine, stubs.c cleanup are all `#ifndef EXE_START`-guarded) and
