@@ -62,13 +62,18 @@ int16 sub_17248(void)
 struct PilotRecEnd {                            /* far ptr word_2243E */
     int8  pad0[0x20];
     uint16 rank;                                /* 0x20 */
-    int8  pad22[0x0c];
+    uint16 flag22;                              /* 0x22 — purple-heart flag */
+    uint16 award24, award26, award28, award2a;  /* 0x24-0x2a — tier counters */
+    uint16 flag2c;                              /* 0x2c — 1200-pt award flag */
     uint16 bestScore;                           /* 0x2e */
     uint16 awardPoints;                         /* 0x30 */
     int32  totalScore;                          /* 0x32 */
     uint16 missionCount;                        /* 0x36 */
     uint16 field38;                             /* 0x38 — res-name tbl idx */
     uint16 field3a;                             /* 0x3a — ROE-violation class */
+    int8  pad3c[8];                             /* 0x3c-0x43 */
+    uint16 flag44;                              /* 0x44 — training award flag */
+    uint16 flag46, flag48, flag4a, flag4c;      /* 0x46-0x4c — ribbons */
 };
 extern struct PilotRecEnd far *pilotRec;        /* word_2243E */
 
@@ -845,4 +850,446 @@ void sub_16486(void)
     free(out);
     if (word_18EA2 == 1)
         freeBuffer(word_226BC);
+}
+
+extern int16  promotionPending;                 /* word_2244E */
+extern int16  awardTrained;                     /* word_2243C */
+extern int16  award6Flag;                       /* word_22C2E */
+extern int16  missionRibbon;                    /* word_22444 */
+extern int16  awardQueued;                      /* word_22430 */
+extern void   checkPromotion(void);             /* seg000:0x8532 */
+extern void   checkAwardCodes(void);            /* seg000:0x85e3 */
+extern void   timerWait(uint16 ticks);          /* seg000:0x0cd9 dup */
+extern void   clearRect(int16 *item, int16 x1, int16 y1, int16 x2, int16 y2); /* 0xdb2 */
+extern int16 *awardTextItem;                    /* dseg:0x61e6 */
+extern int16  awardStatGrid[8][45];             /* dseg:0x61e8 */
+extern int16  ribbonItems[17][15];              /* dseg:0x647c */
+extern int16 *purpleHeartSpr;                   /* dseg:0x66ae */
+extern int16 *medalSpriteTab[];                 /* dseg:0x66a2 */
+extern int16 *rankSpriteA[], *rankSpriteB[], *rankSpriteC[];  /* 0x667a/88/96 */
+extern char  *medalNames[];                     /* dseg:0x66e8 */
+extern char  *queuedAwardName[];                /* dseg:0x66f4 */
+extern char  *ribbonNames[];                    /* dseg:0x66fe */
+extern char  *newRankNames[];                   /* dseg:0x6706 */
+extern char  *nextRankNames[];                  /* dseg:0x6714 */
+extern int16  ribbonIcons[][9];                 /* dseg:0x670e */
+extern int16  ribbonPos[][9];                   /* dseg:0x67b0 */
+
+/* seg000:75bc — post-mission awards ceremony: medal.pic backdrop + ribbon
+ * sprite layout, then one text page per pending award flag (set by the
+ * checkPromotion/checkAwardCodes calls embedded in the setup). */
+void sub_175BC(void)
+{
+    char   eol[2];
+    char   pname[0x16];
+    int16  i;
+    uint16 rows[8];
+    char  *obuf;
+    char   numbuf[8];
+    char   pfx[2];
+    int16  x7;
+    char   pfxa[2];
+    char   rbuf[0x20];
+
+    if (commData->trainingFlag == 1 && target1Scored != 1 &&
+        target2Scored != 1)
+        return;
+
+    word_23C72 = allocBuffer(gfx_getBufSize());
+    eol[0] = 0xd;
+    eol[1] = 0;
+    pfxa[0] = 0x8e;
+    pfxa[1] = 0;
+    pfx[0] = 0x8f;
+    pfx[1] = 0;
+    awardStatGrid[0][0] = word_23C72;
+    awardStatGrid[0][15] = word_23C72;
+    awardStatGrid[1][15] = word_23C72;
+    awardStatGrid[2][15] = word_23C72;
+    awardStatGrid[3][15] = word_23C72;
+    awardStatGrid[4][15] = word_23C72;
+    awardStatGrid[5][15] = word_23C72;
+    awardStatGrid[6][15] = word_23C72;
+    awardStatGrid[0][30] = word_23C72;
+    awardStatGrid[1][30] = word_23C72;
+    awardStatGrid[2][30] = word_23C72;
+    awardStatGrid[3][30] = word_23C72;
+    awardStatGrid[4][30] = word_23C72;
+    awardStatGrid[5][30] = word_23C72;
+    awardStatGrid[6][30] = word_23C72;
+    awardStatGrid[1][0] = word_23C72;
+    awardStatGrid[2][0] = word_23C72;
+    awardStatGrid[3][0] = word_23C72;
+    awardStatGrid[4][0] = word_23C72;
+    awardStatGrid[5][0] = word_23C72;
+    awardStatGrid[6][0] = word_23C72;
+    awardStatGrid[7][0] = word_23C72;
+    ribbonItems[0][0] = word_23C72;
+    ribbonItems[1][0] = word_23C72;
+    ribbonItems[2][0] = word_23C72;
+    ribbonItems[3][0] = word_23C72;
+    ribbonItems[4][0] = word_23C72;
+    ribbonItems[5][0] = word_23C72;
+    ribbonItems[6][0] = word_23C72;
+    ribbonItems[7][0] = word_23C72;
+    ribbonItems[8][0] = word_23C72;
+    ribbonItems[9][0] = word_23C72;
+    ribbonItems[10][0] = word_23C72;
+    ribbonItems[11][0] = word_23C72;
+    ribbonItems[12][0] = word_23C72;
+    ribbonItems[13][0] = word_23C72;
+    ribbonItems[14][0] = word_23C72;
+    ribbonItems[15][0] = word_23C72;
+    ribbonItems[16][0] = word_23C72;
+    awardQueued = awardCode = missionRibbon = promotionDone = award6Flag =
+        awardTrained = promotionPending = 0;
+    farStrcpy(pname, (char far *)pilotRec + 2);
+    obuf = malloc(0x3e8);
+    gfx_setFadeSteps(4);
+    openBlitClosePic("medal.pic", word_23C6C);
+    gfx_setFadeSteps(5);
+    openDecodeClosePic("medal.spr", word_23C72);
+    gfx_setDac(3);
+    gfx_blitToCurrent(word_23C72);
+    gfx_blitToCurrent(word_23C6C);
+    gfx_setDac(2);
+    gfx_blitSprite(rankSpriteA[pilotRec->rank]);
+    gfx_blitSprite(rankSpriteB[pilotRec->rank]);
+    gfx_blitSprite(rankSpriteC[pilotRec->rank]);
+    mystrcpy(rbuf, (char *)rankNames[pilotRec->rank]);
+    mystrcat(rbuf, pname);
+    checkPromotion();
+    checkAwardCodes();
+    mystrcpy(obuf, rbuf);
+
+    if (awardCode != 0) {
+        mystrcat(obuf, " was");
+        if (commData->bailout != 0)
+            mystrcat(obuf, ", posthumously,");
+        mystrcat(obuf, pfxa);
+        mystrcat(obuf, " awarded ");
+        mystrcat(obuf, pfx);
+        mystrcat(obuf, "the ");
+        mystrcat(obuf, medalNames[awardCode]);
+        if (awardCode != 6 && award6Flag == 1) {
+            mystrcat(obuf, " and");
+            mystrcat(obuf, " the ");
+            mystrcat(obuf, pfxa);
+            mystrcat(obuf, "PURPLE HEART ");
+            mystrcat(obuf, pfx);
+            mystrcat(obuf, "for being wounded.  ");
+        } else {
+            mystrcat(obuf, ".  ");
+        }
+        if (stringWidth(awardTextItem, obuf) > 0x26c) {
+            awardTextItem[6] = 3;
+            awardTextItem[2] = 9;
+            drawStringAt(awardTextItem, "Press Selector to continue", 0x6e, 0xc2);
+            awardTextItem[2] = 0xf;
+            drawWrappedText(awardTextItem, obuf, 0x136, 5, 0xad, 7);
+            awardTextItem[6] = 4;
+        } else {
+            awardTextItem[2] = 9;
+            drawStringAt(awardTextItem, "Press Selector to continue", 0x64, 0xc1);
+            awardTextItem[2] = 0xf;
+            drawWrappedText(awardTextItem, obuf, 0x136, 5, 0xad, 8);
+        }
+        if (awardCode != 0) {
+            gfx_blitSprite(medalSpriteTab[awardCode]);
+            if (award6Flag == 1 && awardCode != 6) {
+                purpleHeartSpr[4] = 0xfd;
+                purpleHeartSpr[5] = 0x4e;
+            } else {
+                purpleHeartSpr[4] = 0xc5;
+                purpleHeartSpr[5] = 0x54;
+            }
+            if (award6Flag == 1)
+                gfx_blitSprite(purpleHeartSpr);
+        }
+    }
+
+    rows[0] = 0;
+    if (pilotRec->flag44 == 1)
+        rows[0]++;
+    if (pilotRec->flag46 == 1)
+        rows[0]++;
+    if (pilotRec->flag48 == 1)
+        rows[0]++;
+    if (pilotRec->flag4a == 1)
+        rows[0]++;
+    if (pilotRec->flag4c == 1)
+        rows[0]++;
+    if (pilotRec->flag22 == 1 && award6Flag == 0)
+        rows[0]++;
+    if ((pilotRec->award24 == 1 && awardCode != 1) || pilotRec->award24 > 1)
+        rows[0]++;
+    if ((pilotRec->award26 == 1 && awardCode != 2) || pilotRec->award26 > 1)
+        rows[0]++;
+    if ((pilotRec->award28 == 1 && awardCode != 3) || pilotRec->award28 > 1)
+        rows[0]++;
+    if ((pilotRec->award2a == 1 && awardCode != 4) || pilotRec->award2a > 1)
+        rows[0]++;
+    if (pilotRec->flag2c == 1 && awardCode != 5)
+        rows[0]++;
+
+    i = 0;
+    if (pilotRec->flag44 == 1) {
+        ribbonItems[6][4] = ribbonIcons[rows[0]][0];
+        ribbonItems[6][5] = ribbonPos[rows[0]][i++];
+        gfx_blitSprite(ribbonItems[6]);
+    }
+    if (pilotRec->flag46 == 1) {
+        ribbonItems[7][4] = ribbonIcons[rows[0]][i];
+        ribbonItems[7][5] = ribbonPos[rows[0]][i++];
+        gfx_blitSprite(ribbonItems[7]);
+    }
+    if (pilotRec->flag48 == 1) {
+        ribbonItems[8][4] = ribbonIcons[rows[0]][i];
+        ribbonItems[8][5] = ribbonPos[rows[0]][i++];
+        gfx_blitSprite(ribbonItems[8]);
+    }
+    if (pilotRec->flag4a == 1) {
+        ribbonItems[9][4] = ribbonIcons[rows[0]][i];
+        ribbonItems[9][5] = ribbonPos[rows[0]][i++];
+        gfx_blitSprite(ribbonItems[9]);
+    }
+    if (pilotRec->flag4c == 1) {
+        ribbonItems[10][4] = ribbonIcons[rows[0]][i];
+        ribbonItems[10][5] = ribbonPos[rows[0]][i++];
+        gfx_blitSprite(ribbonItems[10]);
+    }
+    if (pilotRec->flag22 == 1 && award6Flag == 0) {
+        ribbonItems[11][4] = ribbonIcons[rows[0]][i];
+        ribbonItems[11][5] = ribbonPos[rows[0]][i++];
+        gfx_blitSprite(ribbonItems[11]);
+    }
+    if ((pilotRec->award24 == 1 && awardCode != 1) || pilotRec->award24 > 1) {
+        ribbonItems[12][4] = ribbonIcons[rows[0]][i];
+        ribbonItems[12][5] = ribbonPos[rows[0]][i++];
+        gfx_blitSprite(ribbonItems[12]);
+    }
+    if ((pilotRec->award26 == 1 && awardCode != 2) || pilotRec->award26 > 1) {
+        ribbonItems[13][4] = ribbonIcons[rows[0]][i];
+        ribbonItems[13][5] = ribbonPos[rows[0]][i++];
+        gfx_blitSprite(ribbonItems[13]);
+    }
+    if ((pilotRec->award28 == 1 && awardCode != 3) || pilotRec->award28 > 1) {
+        ribbonItems[14][4] = ribbonIcons[rows[0]][i];
+        ribbonItems[14][5] = ribbonPos[rows[0]][i++];
+        gfx_blitSprite(ribbonItems[14]);
+    }
+    if ((pilotRec->award2a == 1 && awardCode != 4) || pilotRec->award2a > 1) {
+        ribbonItems[15][4] = ribbonIcons[rows[0]][i];
+        ribbonItems[15][5] = ribbonPos[rows[0]][i++];
+        gfx_blitSprite(ribbonItems[15]);
+    }
+    if (pilotRec->flag2c == 1 && awardCode != 5) {
+        ribbonItems[16][4] = ribbonIcons[rows[0]][i];
+        ribbonItems[16][5] = ribbonPos[rows[0]][i++];
+        gfx_blitSprite(ribbonItems[16]);
+    }
+    gfx_blitSprite(awardStatGrid[0]);
+
+    if (awardCode != 0) {
+        gfx_commitPage();
+        waitForKeyOrJoy();
+        if (commData->setupUseJoy == 1) {
+            while (misc_jump_5d_readJoy(0) != 0)
+                ;
+            timerWait(5);
+            while (misc_jump_5d_readJoy(0) != 0)
+                ;
+        }
+    }
+    clearKeybuf();
+
+    if (awardTrained == 1) {
+        awardTextItem[2] = 0;
+        clearRect(awardTextItem, 5, 0xad, 0x13c, 0xc7);
+        mystrcpy(obuf, rbuf);
+        mystrcat(obuf, " is ");
+        mystrcat(obuf, "awarded the \x8eCombat Readiness Ribbon\x8f for ");
+        mystrcat(obuf, "successfully completing this training mission.");
+        awardTextItem[2] = 9;
+        drawStringAt(awardTextItem, "Press Selector to continue", 0x64, 0xc1);
+        awardTextItem[2] = 0xf;
+        drawWrappedText(awardTextItem, obuf, 0x136, 5, 0xad, 8);
+        gfx_commitPage();
+        waitForKeyOrJoy();
+        if (commData->setupUseJoy == 1) {
+            while (misc_jump_5d_readJoy(0) != 0)
+                ;
+            timerWait(5);
+            while (misc_jump_5d_readJoy(0) != 0)
+                ;
+        }
+    }
+    clearKeybuf();
+
+    if (missionRibbon != 0) {
+        awardTextItem[2] = 0;
+        clearRect(awardTextItem, 5, 0xad, 0x13c, 0xc7);
+        mystrcpy(obuf, rbuf);
+        mystrcat(obuf, " is ");
+        if (awardCode != 0 || awardTrained == 1)
+            mystrcat(obuf, "also ");
+        mystrcat(obuf, "awarded the \x8e");
+        mystrcat(obuf, ribbonNames[missionRibbon]);
+        mystrcat(obuf, "\x8f for ");
+        my_itoa(pilotRec->missionCount, numbuf);
+        mystrcat(obuf, numbuf);
+        mystrcat(obuf, " missions.");
+        awardTextItem[2] = 9;
+        drawStringAt(awardTextItem, "Press Selector to continue", 0x64, 0xc1);
+        awardTextItem[2] = 0xf;
+        drawWrappedText(awardTextItem, obuf, 0x136, 5, 0xad, 8);
+        gfx_commitPage();
+        waitForKeyOrJoy();
+        if (commData->setupUseJoy == 1) {
+            while (misc_jump_5d_readJoy(0) != 0)
+                ;
+            timerWait(5);
+            while (misc_jump_5d_readJoy(0) != 0)
+                ;
+        }
+    }
+    clearKeybuf();
+
+    if (awardQueued != 0) {
+        awardTextItem[2] = 0;
+        clearRect(awardTextItem, 5, 0xad, 0x13c, 0xc7);
+        if (commData->trainingFlag == 1) {
+            mystrcpy(obuf, "If this had been a real mission you would have rec");
+            mystrcat(obuf, queuedAwardName[awardQueued]);
+            mystrcat(obuf, ".");
+        } else {
+            mystrcpy(obuf, "Because your capture exposed our stealth technolog");
+            mystrcat(obuf, "commander will not recommend you for the ");
+            mystrcat(obuf, queuedAwardName[awardQueued]);
+            mystrcat(obuf, ".");
+        }
+        if (stringWidth(awardTextItem, obuf) > 0x26c) {
+            awardTextItem[6] = 3;
+            awardTextItem[2] = 9;
+            drawStringAt(awardTextItem, "Press Selector to continue", 0x6e, 0xc2);
+            awardTextItem[2] = 0xf;
+            drawWrappedText(awardTextItem, obuf, 0x136, 5, 0xad, 7);
+            awardTextItem[6] = 4;
+        } else {
+            awardTextItem[2] = 9;
+            drawStringAt(awardTextItem, "Press Selector to continue", 0x64, 0xc1);
+            awardTextItem[2] = 0xf;
+            drawWrappedText(awardTextItem, obuf, 0x136, 5, 0xad, 8);
+        }
+        gfx_commitPage();
+        waitForKeyOrJoy();
+        if (commData->setupUseJoy == 1) {
+            while (misc_jump_5d_readJoy(0) != 0)
+                ;
+            timerWait(5);
+            while (misc_jump_5d_readJoy(0) != 0)
+                ;
+        }
+    }
+    clearKeybuf();
+
+    if (awardCode == 0 && promotionDone == 0 && awardTrained == 0 &&
+        missionRibbon == 0 && awardQueued == 0 && promotionPending == 0) {
+        mystrcpy(obuf, rbuf);
+        mystrcat(obuf, " remained at his present rank.  ");
+        awardTextItem[2] = 9;
+        drawStringAt(awardTextItem, "Press Selector to continue", 0x64, 0xc1);
+        awardTextItem[2] = 0xf;
+        drawWrappedText(awardTextItem, obuf, 0x136, 5, 0xad, 8);
+        gfx_commitPage();
+        waitForKeyOrJoy();
+        if (commData->setupUseJoy == 1) {
+            while (misc_jump_5d_readJoy(0) != 0)
+                ;
+            timerWait(5);
+            while (misc_jump_5d_readJoy(0) != 0)
+                ;
+        }
+    }
+
+    if (promotionDone == 1) {
+        awardTextItem[2] = 0;
+        clearRect(awardTextItem, 5, 0xad, 0x13c, 0xc7);
+        awardTextItem[2] = 9;
+        drawStringAt(awardTextItem, "Press Selector to continue", 0x64, 0xc1);
+        awardTextItem[2] = 0xf;
+        mystrcpy(obuf, "For demonstrated skill and achievment, ");
+        mystrcat(obuf, rbuf);
+        if (promotionDone == 1) {
+            mystrcat(obuf, " was ");
+            if (commData->bailout != 0)
+                mystrcat(obuf, "posthumously ");
+            mystrcat(obuf, pfxa);
+            mystrcat(obuf, "promoted ");
+            mystrcat(obuf, pfx);
+            mystrcat(obuf, "to the rank of ");
+            mystrcat(obuf, newRankNames[pilotRec->rank]);
+        }
+        gfx_blitSprite(rankSpriteA[pilotRec->rank]);
+        gfx_blitSprite(rankSpriteB[pilotRec->rank]);
+        gfx_blitSprite(rankSpriteC[pilotRec->rank]);
+        drawWrappedText(awardTextItem, obuf, 0x136, 5, 0xad, 8);
+        gfx_commitPage();
+        waitForKeyOrJoy();
+        if (commData->setupUseJoy == 1) {
+            while (misc_jump_5d_readJoy(0) != 0)
+                ;
+            timerWait(5);
+            while (misc_jump_5d_readJoy(0) != 0)
+                ;
+        }
+    }
+
+    if (promotionPending == 1) {
+        awardTextItem[2] = 0;
+        clearRect(awardTextItem, 5, 0xad, 0x13c, 0xc7);
+        mystrcpy(obuf, "The capture and public trial of ");
+        mystrcat(obuf, rbuf);
+        mystrcat(obuf, " will delay the promotion to ");
+        mystrcat(obuf, nextRankNames[pilotRec->rank]);
+        mystrcat(obuf, ".");
+        awardTextItem[2] = 9;
+        drawStringAt(awardTextItem, "Press Selector to continue", 0x64, 0xc1);
+        awardTextItem[2] = 0xf;
+        drawWrappedText(awardTextItem, obuf, 0x136, 5, 0xad, 8);
+        gfx_commitPage();
+        waitForKeyOrJoy();
+        if (commData->setupUseJoy == 1) {
+            while (misc_jump_5d_readJoy(0) != 0)
+                ;
+            timerWait(5);
+            while (misc_jump_5d_readJoy(0) != 0)
+                ;
+        }
+    }
+    clearKeybuf();
+
+    if (pilotRec->missionCount == 0x63 && commData->bailout == 0) {
+        awardTextItem[2] = 0;
+        clearRect(awardTextItem, 5, 0xad, 0x13c, 0xc7);
+        awardTextItem[2] = 9;
+        drawStringAt(awardTextItem, "Press Selector to continue", 0x64, 0xc1);
+        awardTextItem[2] = 0xf;
+        mystrcpy(obuf, "Congratulations on the successful completion of yo");
+        drawWrappedText(awardTextItem, obuf, 0x136, 5, 0xad, 8);
+        gfx_commitPage();
+        waitForKeyOrJoy();
+        if (commData->setupUseJoy == 1) {
+            while (misc_jump_5d_readJoy(0) != 0)
+                ;
+            timerWait(5);
+            while (misc_jump_5d_readJoy(0) != 0)
+                ;
+        }
+    }
+
+    if (awardCode == 6)
+        awardCode = 0;
+    free(obuf);
+    freeBuffer(word_23C72);
 }
