@@ -805,6 +805,28 @@ int8   byte_199F4;                              /* dseg:0x99f4 — display flag 
 int16 *word_19704;                              /* dseg:0x5704 — page/font ptr */
 int16  rankNames[8];                            /* dseg:0x56e0 — per-rank name tbl */
 int16 *word_1981E;                              /* dseg:0x57ae — window struct ptr */
+int16 *word_2379E;                              /* dseg:0x9a0e — debrief string-table ptr */
+int16 *word_1ED12;                              /* dseg:0x4f82 — window struct ptr */
+int16  word_1E2A4, word_1E7BA, word_1E51A;      /* random-msg table counts */
+int16  word_1E8D4, word_1EA42;                  /* random-msg table counts */
+/* sub_17334 (score-tally screen) globals */
+struct EvtItem { int16 *win; int8 pad02[0x18]; int16 page; int8 pad1c[4]; };
+struct EvtItem evtItems[12];                    /* dseg:0x58bc — word_1F64C */
+int16  menuItems[50];                           /* dseg:0x5a56 — tally menu (MenuItem[2]) */
+                    /* dseg:0x58bc — word_1F64C */
+int16 *word_1F664;                              /* dseg:0x58d4 — gfxPage */
+int16  word_1F684, word_1F6A4;                  /* dseg:0x58f4/0x5914 sprites */
+int16 *word_1F856;                              /* dseg:0x5ac6 — inputState */
+int16  word_1F858[4], word_1F860[4];            /* dseg:0x5ac8/0x5ad0 tables */
+int16  word_2377E;                              /* dseg:0x99ee */
+int8   byte_23796;                              /* dseg:0x9a06 */
+int16  word_18EA6;                              /* dseg:0x8ea6 */
+int8   byte_22450;                              /* dseg:0x86c0 — joy flag */
+uint8  byte_1DF6A;                              /* dseg:0x41da — tick countdown */
+int32  word_23B6A;                              /* dseg:0x9dda — score result */
+int16  word_22F10;                              /* dseg:0x9180 */
+int16  word_23C72;                              /* dseg:0x9ee2 — alloc'd seg */
+int16 far gfx_getBufSize(void) { return 0; }    /* 9D9:13C3 */
 /* calcMissionScore (sub_15666) globals — award tables, counters, multipliers */
 int16  word_2387A;                              /* dseg:0x9aea — init 0x1318, theatre/weapon count */
 int16  word_22C34;                              /* dseg:0x8ea4 — visual-id count */

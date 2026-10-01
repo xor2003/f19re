@@ -96,6 +96,9 @@ MODULE_FLAGS = {
     # branch-target alignment nop at the per-channel loop head that /Os
     # suppresses; routine was a separate original module from /Os enbrief.c.
     'end/enbrief2.c':  ['/AS', '/Gs', '/Ot'],
+    # EN endevt (debrief event cluster): /Os — /Ot pads the else-if chain
+    # branch targets with alignment nops the original lacks.
+    'end/endevt.c':    ['/AS', '/Gs', '/Os'],
     # EN suutil (seg000:0971-0e9d field-layout cluster): /Os — a branch-target
     # alignment nop would appear at the while(*p) loop head under /Ot.
     'su/suutil.c':     ['/AS', '/Gs', '/Os'],

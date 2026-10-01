@@ -10,7 +10,8 @@ struct CommDataEnd {                            /* far ptr word_23C66 */
     int16 setupMono;                            /* 0x24 */
     int16 landingType;                          /* 0x26 */
     int16 bailout;                              /* 0x28 */
-    int8 pad2a[0x04];
+    int8 pad2a[0x02];
+    uint16 field2c;                             /* 0x2c */
     uint16 missionTime;                         /* 0x2e */
     int16 trainingFlag;                         /* 0x30 */
     int8 pad32[0x02];
@@ -60,12 +61,265 @@ void sub_17248(void)
 struct PilotRecEnd {                            /* far ptr word_2243E */
     int8  pad0[0x20];
     uint16 rank;                                /* 0x20 */
+    int8  pad22[0x0c];
+    uint16 bestScore;                           /* 0x2e */
+    uint16 awardPoints;                         /* 0x30 */
+    int32  totalScore;                          /* 0x32 */
+    uint16 missionCount;                        /* 0x36 */
+    uint16 field38;                             /* 0x38 — res-name tbl idx */
 };
 extern struct PilotRecEnd far *pilotRec;        /* word_2243E */
 
 extern int8   byte_199F4;                       /* dseg:0x99f4 — display flag */
 extern int16 *word_19704;                       /* dseg:0x5704 — page/font ptr */
 extern int16  rankNames[];                      /* dseg:0x56e0 — per-rank name tbl */
+
+extern uint8  target1Scored, target2Scored;     /* byte_237AB / byte_23B6E */
+extern int16  promotionDone;                    /* word_2244A */
+extern int16  awardCode;                        /* word_23516 dseg:0x9786 */
+extern int16 *word_2379E;                       /* dseg:0x9a0e — string-table ptr */
+extern int16 *word_1ED12;                       /* dseg:0x4f82 — window struct ptr */
+extern int16  word_1E2A4, word_1E7BA, word_1E51A,
+              word_1E8D4, word_1EA42;           /* random-msg counts */
+extern int16  randomRange(int16 maxVal);        /* seg000:0x0cfe */
+extern void   far gfx_setDac(int16 n);          /* 9D9:14A4 */
+extern void   drawWrappedText(int16 *page, char *str, uint16 maxWidth,
+                              int16 x, int16 y, int16 lineHeight); /* 0x965 */
+
+/* MenuItem fields as END.EXE addresses them (0x32 stride) */
+typedef struct {
+    int16 hitX1, hitY1, hitX2, hitY2;           /* 0x00-0x06 */
+    int16 colorX1, colorY1, colorX2, colorY2;   /* 0x08-0x0e */
+    int16 colorTableIdx;                        /* 0x10 */
+    int16 colorPair;                            /* 0x12 */
+    int16 labelData1[5];                        /* 0x14 */
+    int16 *pagePtr;                             /* 0x1e */
+    int16 labelData2[4];                        /* 0x20 */
+    int16 spriteNormal;                         /* 0x28 */
+    int16 spriteBlink;                          /* 0x2a */
+    int16 unk_2c;                               /* 0x2c */
+    int16 state;                                /* 0x2e */
+    uint16 flags;                               /* 0x30 */
+} MenuItem;
+
+extern int16  allocBuffer(int16 seg);           /* seg000:0x2e52 */
+extern void   openDecodeClosePic(const char *name, int16 page); /* 0x1615 */
+extern void   loadPicFromFileAt();              /* 0x15a6 — called w/ 2 args */
+extern void   sub_10E50(int16 *page, int16 x1, int16 y1, int16 x2, int16 y2); /* clearRect dup */
+extern int16  far gfx_getBufSize(void);         /* 9D9:13C3 */
+extern void   far gfx_blitSprite(int16 *spr);   /* 9D9:13A5 */
+extern int16  far misc_jump_5d_readJoy(int16 a);/* 9D9:1521 */
+extern void   processMenuItems(MenuItem *items, int16 unused, int16 itemCount,
+                               int16 cursorStartX, int16 cursorStartY, int16 *gfxPage);
+extern int16  selectMenuItem(MenuItem *items, int16 unused, int16 itemCount,
+                             int16 *inputState, int16 *gfxPage);
+extern void   animateFlightPath(int16 *gfxPage);/* 0x4f7b */
+extern int32  calcMissionScore(int16 n);        /* 0x5666 */
+
+struct EvtItem {                                /* item/page recs, 0x20 stride */
+    int16 *win;                                 /* +0x00 — window ptr */
+    int8  pad02[0x18];
+    int16 page;                                 /* +0x1a */
+    int8  pad1c[4];
+};
+extern struct EvtItem evtItems[12];             /* dseg:0x58bc — word_1F64C */
+extern int16 *word_1F664;                       /* dseg:0x58d4 — gfxPage */
+extern int16  word_1F684, word_1F6A4;           /* dseg:0x58f4/0x5914 sprites */
+extern int16 *word_1F856;                       /* dseg:0x5ac6 — inputState */
+extern int16  word_1F858[];                     /* dseg:0x5ac8 — res-name tbl */
+extern int16  word_1F860[];                     /* dseg:0x5ad0 — str tbl */
+extern int16  word_2377E;                       /* dseg:0x99ee */
+extern int8   byte_23796;                       /* dseg:0x9a06 */
+extern int16  word_18EA6;                       /* dseg:0x8ea6 */
+extern int8   byte_22450;                       /* dseg:0x86c0 — joy flag */
+extern uint8  byte_1DF6A;                       /* dseg:0x41da — tick countdown */
+extern int32  word_23B6A;                       /* dseg:0x9dda — score result */
+extern int16  word_22F10;                       /* dseg:0x9180 */
+extern int16  word_23C72;                       /* dseg:0x9ee2 — alloc'd seg */
+extern MenuItem menuItems[2];                   /* dseg:0x5a56 — tally menu */
+
+/* seg000:7334 — score-tally/menu screen: alloc res page, draw item labels,
+ * menu loop driving animateFlightPath, then update pilot stats */
+void sub_17334(void)
+{
+    char  m3[2], w1[3], m2[2], z2[2];
+    int16 pos, cont, u1, y1, k3;
+
+    m3[0] = 0xd;  m3[1] = 0;
+    w1[0] = 9;    w1[1] = 0xa; w1[2] = 0;
+    m2[0] = 0x8e; m2[1] = 0;
+    z2[0] = 0x8f; z2[1] = 0;
+    gfx_setFadeSteps(9);
+    openDecodeClosePic((const char *)word_1F858[pilotRec->field38],
+                       word_23C72 = allocBuffer(gfx_getBufSize()));
+    pos = word_23C72;
+    gfx_setFadeSteps(8);
+    loadPicFromFileAt((const char *)0x5853, 1);
+    evtItems[0].page = pos;  evtItems[1].page = pos;
+    evtItems[2].page = pos;  evtItems[3].page = pos;
+    evtItems[4].page = pos;  evtItems[5].page = pos;
+    evtItems[6].page = pos;  evtItems[7].page = pos;
+    evtItems[8].page = pos;  evtItems[9].page = pos;
+    evtItems[10].page = pos; evtItems[11].page = pos;
+    gfx_waitRetrace();
+    sub_10E50(evtItems[0].win, 0, 0, 0x13f, 0xc7);
+    gfx_blitSprite((int16 *)word_1F684);
+    gfx_blitSprite((int16 *)word_1F6A4);
+    evtItems[0].win[2] = 0xc;
+    drawStringAt(evtItems[0].win, (const char *)0x585f, 0x1e, 1);
+    evtItems[0].win[2] = 0;
+    drawStringAt(evtItems[0].win, (const char *)0x5891, 0x6a, 1);
+    evtItems[0].win[2] = 6;
+    y1 = 0x96;
+    u1 = 0;
+    do {
+        drawStringAt(evtItems[0].win, (const char *)word_1F860[u1], 0xec, y1);
+        y1 += 0xa;
+        u1++;
+    } while (u1 < 2);
+    k3 = 0;
+    byte_23796 = 1;
+    word_18EA6 = 0;
+    gfx_commitPage();
+    gfx_flipPage();
+    setTimerIrqHandler();
+    cont = 1;
+    do {
+        menuItems[k3].state = 2;
+        processMenuItems(menuItems, word_2377E, 2, 0xfa,
+                         0x97 + k3 * 0xa, word_1F664);
+        k3 = selectMenuItem(menuItems, word_2377E, 2,
+                             word_1F856, word_1F664);
+        switch (k3) {
+        case 0:
+            animateFlightPath(word_1F664);
+            if (byte_22450 == 1)
+                k3 = 1;
+            break;
+        case 1:
+            cont = 0;
+            break;
+        }
+        if (commData->setupUseJoy == 1) {
+            while (misc_jump_5d_readJoy(0) != 0)
+                ;
+            byte_1DF6A = 0;
+            while (byte_1DF6A <= 5)
+                ;
+            while (misc_jump_5d_readJoy(0) != 0)
+                ;
+        }
+    } while (cont != 0);
+    restoreTimerIrqHandler();
+    word_23B6A = calcMissionScore(word_22F10);
+    if (commData->trainingFlag == 0) {
+        pilotRec->awardPoints = word_23B6A;
+        if (pilotRec->bestScore < (int16)word_23B6A)
+            pilotRec->bestScore = (int16)word_23B6A;
+        pilotRec->totalScore += word_23B6A;
+    } else
+        pilotRec->awardPoints = 0;
+    freeBuffer(word_23C72);
+}
+
+/* seg000:6076 — end-of-mission summary panel: pick picture + random message
+ * table by outcome flags, then the shared draw/input tail */
+void sub_16076(void)
+{
+    int16 a0, a1, a2, a3, a4, a5, a6;
+
+    if (commData->bailout != 0 || commData->trainingFlag == 1)
+        return;
+    gfx_setFadeSteps(0xa);
+    gfx_waitRetrace();
+    if (promotionDone == 0 && awardCode == 0 && target1Scored == 0
+        && target2Scored == 0 && pilotRec->missionCount != 0x63) {
+        openBlitClosePic((const char *)0x4eba, word_23C6C);
+        if (word_18EA2 == 1) {
+            loadFileSection((const char *)0x4ec6, word_23C78, word_23C7A);
+            word_1295C = drawMapView(0x19, 2, word_23C76);
+        }
+        gfx_blitToCurrent(word_23C6C);
+        word_2379E = (int16 *)0x4516;
+        word_1ED12[2] = 0xf;
+        drawWrappedText(word_1ED12, (char *)word_2379E[randomRange(word_1E2A4)],
+                        0x10e, 0x28, 0xa8, 8);
+    } else if ((target1Scored == 1 || target2Scored == 1)
+               && missionResult == 0 && promotionDone == 0 && awardCode == 0) {
+        openBlitClosePic((const char *)0x4ed0, word_23C6C);
+        if (word_18EA2 == 1) {
+            loadFileSection((const char *)0x4edc, word_23C78, word_23C7A);
+            word_1295C = drawMapView(0x19, 2, word_23C76);
+        }
+        gfx_blitToCurrent(word_23C6C);
+        word_2379E = (int16 *)0x4a2c;
+        word_1ED12[2] = 0xf;
+        drawWrappedText(word_1ED12, (char *)word_2379E[randomRange(word_1E7BA)],
+                        0x10e, 0x28, 0xa8, 8);
+    } else if (pilotRec->missionCount == 0x63 && pilotRec->rank == 6) {
+        openBlitClosePic((const char *)0x4ee6, word_23C6C);
+        if (word_18EA2 == 1) {
+            loadFileSection((const char *)0x4ef2, word_23C78, word_23C7A);
+            word_1295C = drawMapView(0x11, 1, word_23C76);
+        }
+        gfx_blitToCurrent(word_23C6C);
+        word_2379E = (int16 *)0x4663;
+        word_1ED12[2] = 0xf;
+        drawWrappedText(word_1ED12, (char *)*word_2379E, 0x10e, 0x28, 0xa0, 8);
+    } else if (pilotRec->missionCount == 0x63 && pilotRec->rank != 6) {
+        openBlitClosePic((const char *)0x4efc, word_23C6C);
+        if (word_18EA2 == 1) {
+            loadFileSection((const char *)0x4f08, word_23C78, word_23C7A);
+            word_1295C = drawMapView(0x11, 1, word_23C76);
+        }
+        gfx_blitToCurrent(word_23C6C);
+        word_2379E = (int16 *)0x46f6;
+        word_1ED12[2] = 0xf;
+        drawWrappedText(word_1ED12, (char *)*word_2379E, 0x10e, 0x28, 0xa0, 8);
+    } else if (promotionDone == 1 || awardCode != 0) {
+        openBlitClosePic((const char *)0x4f12, word_23C6C);
+        if (word_18EA2 == 1) {
+            loadFileSection((const char *)0x4f1e, word_23C78, word_23C7A);
+            word_1295C = drawMapView(0x11, 1, word_23C76);
+        }
+        gfx_blitToCurrent(word_23C6C);
+        word_2379E = (int16 *)0x478c;
+        word_1ED12[2] = 0xf;
+        drawWrappedText(word_1ED12, (char *)word_2379E[randomRange(word_1E51A)],
+                        0x10e, 0x28, 0xa0, 8);
+    } else if (commData->field2c < 3) {
+        openBlitClosePic((const char *)0x4f28, word_23C6C);
+        if (word_18EA2 == 1) {
+            loadFileSection((const char *)0x4f33, word_23C78, word_23C7A);
+            word_1295C = drawMapView(0x19, 1, word_23C76);
+        }
+        gfx_blitToCurrent(word_23C6C);
+        word_2379E = (int16 *)0x4b46;
+        word_1ED12[2] = 0xf;
+        drawWrappedText(word_1ED12, (char *)word_2379E[randomRange(word_1E8D4)],
+                        0x10e, 0x28, 0xa8, 8);
+    } else {
+        openBlitClosePic((const char *)0x4f3c, word_23C6C);
+        if (word_18EA2 == 1) {
+            loadFileSection((const char *)0x4f47, word_23C78, word_23C7A);
+            word_1295C = drawMapView(0x19, 1, word_23C76);
+        }
+        gfx_blitToCurrent(word_23C6C);
+        word_2379E = (int16 *)0x4cb4;
+        word_1ED12[2] = 0xf;
+        drawWrappedText(word_1ED12, (char *)word_2379E[randomRange(word_1EA42)],
+                        0x10e, 0x28, 0xa8, 8);
+    }
+    gfx_setDac(1);
+    word_1ED12[2] = 9;
+    drawStringAt(word_1ED12, (const char *)0x4f50, 0x64, 0xc1);
+    gfx_commitPage();
+    setTimerIrqHandler();
+    waitForKeyOrJoy2();
+    restoreTimerIrqHandler();
+    if (word_18EA2 == 1)
+        freeBuffer(word_226BC);
+}
 
 extern void   mystrcpy(char *dst, const char *src);             /* 0x38ba */
 extern void   mystrcat(char *dst, const char *src);             /* 0x3923 */
@@ -98,8 +352,6 @@ void sub_17094(void)
 }
 
 extern int16 *word_1981E;                       /* dseg:0x57ae — window struct ptr */
-extern void   drawWrappedText(int16 *page, char *str, uint16 maxWidth,
-                              int16 x, int16 y, int16 lineHeight); /* 0x965 */
 
 /* seg000:714c — draw wrapped mission-text panel and wait for input */
 void sub_1714C(void)
