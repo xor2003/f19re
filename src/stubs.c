@@ -792,7 +792,7 @@ int16 far gfx_initDone(void) { return 0; }
 void  far gfx_setPageN(uint16 a) { }
 void  far gfx_commitPage(void) { }
 void  sub_10E50(int16 *page, int16 x1, int16 y1, int16 x2, int16 y2) { } /* clearRect dup — skeleton */
-void  sub_15D1B(void) { }                         /* event popup — skeleton */
+/* sub_15D1B now real in src_end/endevt.c */
 int16  far gfx_blitToCurrent(int16 p) { return 0; }   /* 9D9:1440 slot */
 /* endevt.c (seg000:5d1b-8531 debrief-event cluster + sub_10010 driver) globals */
 int16  word_18EA2;                              /* dseg:0x8ea2 — gfx init flag */

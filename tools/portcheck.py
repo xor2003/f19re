@@ -239,6 +239,10 @@ def main():
     if os.path.exists(stubs_src):
         # kvikdos writes DOS mtimes — always rebuild (cheap)
         kvikdos(['C:\\bin\\CL.EXE', '/AS'] + exedef + ['/c', 'D:\\STUBS.C'])
+    stubs2_src = os.path.join(ROOT, 'src', 'stubs2.c')
+    if os.path.exists(stubs2_src):
+        kvikdos(['C:\\bin\\CL.EXE', '/AS'] + exedef + ['/c', 'D:\\STUBS2.C'])
+        linkobjs.append('C:\\bin\\STUBS2.OBJ')
 
     model = 'S'
     for f in flags:

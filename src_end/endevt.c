@@ -49,13 +49,14 @@ extern int16  far gfx_blitToCurrent(int16 p);   /* 9D9:1440 */
 extern void   far gfx_commitPage(void);         /* 9D9:14E0 */
 extern void   far gfx_flipPage(void);           /* 9D9:14AE */
 
-/* seg000:7248 — missionResult = terrain type at the aircraft's grid tile */
-void sub_17248(void)
+/* seg000:7248 — missionResult = terrain type at the aircraft's grid tile;
+ * returns it (the sub_10010 dispatch tests ax). */
+int16 sub_17248(void)
 {
     int16 tx, ty;
     tx = commData->posX >> 11;
     ty = commData->posY >> 11;
-    missionResult = gridFlags[ty][tx] & 3;
+    return (missionResult = gridFlags[ty][tx] & 3);
 }
 
 struct PilotRecEnd {                            /* far ptr word_2243E */
@@ -407,4 +408,119 @@ void sub_17280(void)
     restoreTimerIrqHandler();
     if (word_18EA2 == 1)
         freeBuffer(word_226BC);
+}
+
+/* ==== seg000:5d1b — debrief map event popup: erase the previous icon, remap
+ * flightRecords[cur]'s status to an icon kind, clamp the popup into the map
+ * window quadrants, then blit the icon sprite. Called from drawMenuItem. ==== */
+struct FlightLogRec {
+    uint8 mapX, mapY;
+    int8  status;
+    int8  unitId;
+    uint8 pad4, pad5;
+};
+extern struct FlightLogRec flightRecords[];      /* byte_22F14 */
+extern int16  mapToScreenX(int16 v);             /* seg000:0x54ba */
+extern int16  mapToScreenY(int16 v);             /* seg000:0x54cf */
+extern int16  mapWinX1, mapWinY1;                /* word_1DF8E/90 */
+extern uint8  popupVisible;                      /* byte_237AA dseg:0x9a1a */
+extern int16  popupX, popupY;                    /* word_23C6E/70 */
+extern uint8  slotInfoTable[];                   /* word_2245E */
+extern int16  word_1E25C[], word_1E280[];        /* icon param tables */
+struct UnitInfo { int16 w0; int16 pad02[8]; };
+extern struct UnitInfo word_22A12[];             /* dseg:0x8c82 — 0x12 stride */
+struct OrdType  { int16 f0; int16 pad02[5]; };
+extern struct OrdType  word_1AAD8[];             /* dseg:0x0d48 — 0xc stride */
+extern void   far gfx_copyRect(int16 a, int16 b, int16 c, int16 d,
+                               int16 e, int16 f, int16 g, int16 h); /* 9D9:1422 */
+
+void sub_15D1B(void)
+{
+    int16  n;
+    uint16 m;
+
+    if (popupVisible == 1) {
+        gfx_copyRect(1, 0, 0x96, 0, popupX, popupY, 0x30, 0x28);
+        popupVisible = 0;
+    }
+    n = flightRecords[word_18EA6].status & 0x3f;
+    switch (n) {
+    case 1:
+        if (slotInfoTable[(flightRecords[word_18EA6].unitId & 0x7f) << 4] & 8)
+            n = 0xf;
+        else
+            n = 0;
+        break;
+    case 2:
+    case 12:
+        n = 2;
+        break;
+    case 3:
+        n = 1;
+        break;
+    case 4:
+        n = 6;
+        break;
+    case 5:
+        n = 3;
+        break;
+    case 6:
+        n = 4;
+        break;
+    case 7:
+        n = 5;
+        break;
+    case 8:
+        if (word_18EA6 == 0) {
+            n = 8;
+        } else if (commData->landingType == 3) {
+            byte_23796 = 1;
+            n = 7;
+        } else if (commData->landingType == 1) {
+            byte_23796 = 1;
+            n = 0xe;
+        } else if (missionResult == 0) {
+            byte_23796 = 1;
+            n = 0xb;
+        } else {
+            byte_23796 = 1;
+            n = 0xd;
+        }
+        break;
+    case 9:
+        break;
+    case 10:
+        n = 0xa;
+        break;
+    case 11:
+        if (flightRecords[word_18EA6].status & 0x80) {
+            m = 0;
+        } else if (flightRecords[word_18EA6].status & 0x40) {
+            m = 1;
+        }
+        if (word_1AAD8[word_22A12[m].w0].f0 == 3)
+            n = 9;
+        else
+            n = 0xc;
+        break;
+    }
+    if (mapToScreenX(flightRecords[word_18EA6].mapX) + mapWinX1 < 0x73 &&
+        mapToScreenY(flightRecords[word_18EA6].mapY) + mapWinY1 < 0x59) {
+        popupX = mapToScreenX(flightRecords[word_18EA6].mapX) + mapWinX1 + 0xa;
+        popupY = mapToScreenY(flightRecords[word_18EA6].mapY) + mapWinY1 + 0xa;
+    } else if (mapToScreenX(flightRecords[word_18EA6].mapX) + mapWinX1 >= 0x73 &&
+               mapToScreenY(flightRecords[word_18EA6].mapY) + mapWinY1 < 0x59) {
+        popupX = mapToScreenX(flightRecords[word_18EA6].mapX) + mapWinX1 - 0x3a;
+        popupY = mapToScreenY(flightRecords[word_18EA6].mapY) + mapWinY1 + 0xa;
+    } else if (mapToScreenX(flightRecords[word_18EA6].mapX) + mapWinX1 >= 0x73 &&
+               mapToScreenY(flightRecords[word_18EA6].mapY) + mapWinY1 >= 0x59) {
+        popupX = mapToScreenX(flightRecords[word_18EA6].mapX) + mapWinX1 - 0x3a;
+        popupY = mapToScreenY(flightRecords[word_18EA6].mapY) + mapWinY1 - 0x28;
+    } else {
+        popupX = mapToScreenX(flightRecords[word_18EA6].mapX) + mapWinX1 + 0xa;
+        popupY = mapToScreenY(flightRecords[word_18EA6].mapY) + mapWinY1 - 0x28;
+    }
+    gfx_copyRect(0, popupX, popupY, 1, 0, 0x96, 0x30, 0x28);
+    gfx_copyRect(1, word_1E280[n], word_1E25C[n], 0, popupX, popupY, 0x30, 0x28);
+    popupVisible = 1;
 }
