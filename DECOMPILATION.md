@@ -1318,3 +1318,34 @@ a backward `goto` won't fold, so a forward `goto unauth_fw` tramp folds to
 Map: renamed sub_15666→calcMissionScore.
 
 All 26 enbrief.c routines MATCH; verify-exes 0 diffs on all four exes.
+
+### END.EXE tickRecAnim (seg000:0x288b, 0x43e bytes)
+
+The record-animation DSL interpreter — `tickRecords` calls it once per active
+record per tick. Runs the record's bytecode script (`strOff`) until a sprite
+draws, then saves `chanIdx` and returns. Opcodes: digit-runs set
+`repeat[chan]`; `:` skips a digit run; `<`/`>`/`^`/`_` wrap-adjust the panning
+counters `cntA`/`cntB` against `maxA`/`maxB`; `A`–`Z` blit a sprite tile —
+one clipped `sub_12F27` when `cntA|cntB == 0`, else a 2x2 panning tile of four
+`sub_12F27`s offset by `cntA`/`cntB`; `(` pushes the channel and picks a
+`(alt|alt:N|…)` weighted alternative via `parseCmd` + `randomRange%count`;
+`)`/`|` pop back to the saved `strPos` while a repeat remains, else depth-scan
+to the matching `)`; `\0` resets to channel 0. Record is a packed `AnimRec`
+(0x5C stride) reached via `recOff` byte offset; fields `repeat[]`/`strPos[]`
+are `chni`-indexed byte arrays.
+
+Layout: three codegen idioms drove the match. (1) The letter range check is
+`jge`/`jle` continue-on-true + far `jmp groupops` — only produced when the
+letter body is the INLINE then-arm of `if(opb>='A'&&opb<='Z'){...}` and the
+~0x180-byte draw region pushes `groupops` past ±127 so `jl`/`jg` can't reach.
+(2) The four blits' last call shares `loc_12B94`'s `push word_1BAD4;call` tail
+with the single-blit arm via a `goto drawdone` merge-skip. (3) The `)`-pop is
+`if(repeat[chni]==0){skip}else{pop}` — `jne` targets the forward pop block and
+the `==0` then-arm reuses `si=chni+recOff` for `strPos[chni]` (`[si+0x17]`),
+while the `)`-scan is `depth += (strm[sp]=='(')` (a `strm+sp` temp read twice,
+NOT a mutating `strm+=sp`). Local-name buckets: `num opb chni sp fn depth strm
+tmpf dnf accb` + byte `nxt` land the 11-word frame.
+
+Map: renamed sub_1288B→tickRecAnim.
+
+All 27 enbrief.c routines MATCH; verify-exes 0 diffs on all four exes.

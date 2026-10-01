@@ -854,7 +854,10 @@ void  far misc_jump_5e_clearKeyFlags(void) { }
 void  far gfx_blitSprite(int16 spr) { }
 void  intDispatch(int16 n, uint8 *a, uint8 *b) { }     /* sub_139FD */
 void  farStrcpy(char *d, char far *s) { }            /* sub_138EC — asm in skeleton */
-void  sub_1288B(int16 recOff) { }                    /* rec-anim worker — real def in skeleton */
+/* tickRecAnim record-anim DSL globals — shared words (record fields are struct members) */
+int16 word_23786, word_23788;                    /* map scroll X/Y */
+int16 word_1BAD2, word_1BAD4;                    /* sprite slots A/B */
+int16 word_22F0A;                                /* shared DSL cursor */
 int16 runMapView(int16 sel) { return 0; }            /* sub_12192 — big map dispatcher, skeleton */
 void  picStageRefill(void) { }                       /* sub_13238 — rep-movsw stage copy asm */
 void  far textOp_477(void) { }   /* overlay text ops at seg 0x91d */

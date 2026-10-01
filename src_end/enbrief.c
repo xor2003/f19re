@@ -785,12 +785,227 @@ void serviceTick(void) {
 
 /* ==== seg000:0x2832 — walk 0x5C-stride record table at dseg+0x295e;
  * for flagged records sum bytes +8/+9, wrap >0xff by -0x100, call the
- * per-record worker sub_1288B(recOff), store sum back at +9. ==== */
+ * per-record worker tickRecAnim(recOff), store sum back at +9. ==== */
 extern uint8 recActive[];                               /* byte_19DEA = rec+0x5a */
 extern uint8 recField9[];                               /* word_19D99 = rec+9 */
 extern uint8 recField8[];                               /* word_19D98 = rec+8 */
 extern int16 recCount;                                  /* word_3CB4 */
-extern void sub_1288B(int16 recOff);
+
+/* ==== seg000:0x288b — per-record animation worker ====
+ * Interprets the record's text-DSL sprite script (word_19DE8 = rec+0x58 is the
+ * script's dseg offset) one opcode per call.  A channel stack is threaded
+ * through byte index rec+0xC: per channel a strPos (byte_19DA7 = rec+0x17) and
+ * a repeat counter (byte_19D9D = rec+0xD).  Opcodes: a digit-run stores N-1
+ * into the channel's repeat counter; '<' '>' wrap-adjust frame counter cntA
+ * (word_19D9A = rec+0xA) against maxA (word_19D94 = rec+4), '^' '_' do the same
+ * for cntB/maxB (rec+0xB / rec+6); 'A'..'Z' draw the frame (op&0x1f)-1 via
+ * sub_12F27 — one clipped blit when both counters are 0 else a 2x2 panning
+ * tile offset by cntA/cntB; '(' opens a '(alt|alt:N|…)' weighted-random group
+ * (channel push + parseCmd scan + randomRange%count + forward re-scan),
+ * ')' / '|' pop back to the saved strPos while a repeat remains else skip to
+ * the matching ')'.  Returns after one draw (doneFlag) or group re-entry. ==== */
+/* record fields as tickRecAnim addresses them (recOff = record byte offset) */
+#pragma pack(1)
+struct AnimRec {
+    int16 posX;             /* +0x00 word_19D90 */
+    int16 posY;             /* +0x02 seg_19D92 */
+    int16 maxA;             /* +0x04 word_19D94 counter-A wrap max */
+    int16 maxB;             /* +0x06 word_19D96 counter-B wrap max */
+    int16 field8;           /* +0x08 word_19D98 — used by tickRecords */
+    uint8 cntA;             /* +0x0A word_19D9A frame counter A */
+    uint8 cntB;             /* +0x0B word_19D9B frame counter B */
+    uint8 chanIdx;          /* +0x0C word_19D9C channel index */
+    uint8 repeat[10];       /* +0x0D byte_19D9D repeat counter[channel] */
+    uint8 strPos[11];       /* +0x17 byte_19DA7 strPos[channel] */
+    int16 frameW[18];       /* +0x22 word_19DB2 frame word table */
+    uint8 frameB[18];       /* +0x46 byte_19DD6 frame byte table */
+    int16 strOff;           /* +0x58 word_19DE8 DSL script offset */
+    uint8 active;           /* +0x5A byte_19DEA */
+    uint8 pad5b;
+};
+#pragma pack()
+extern int16  word_23786;      /* map scroll X */
+extern int16  word_23788;      /* map scroll Y */
+extern int16  word_1BAD2;      /* sprite slot A (draw op src) */
+extern int16  word_1BAD4;      /* sprite slot B (draw op dst) */
+extern int16  word_22F0A;      /* shared DSL cursor (parseCmd *pp) */
+extern void   sub_12F27(int16 *p1, int16 a2, int16 a3, int16 *p4,
+                        int16 a5, int16 a6, int16 a7, int16 a8);
+extern int16  randomRange(int16 maxVal);
+extern int16  parseCmd(uint8 **pp, int16 idx);
+
+void tickRecAnim(struct AnimRec *recOff) {
+    /* local names chosen so MSC's name-hash slot order matches the ref frame */
+    int16 num, opb, chni, sp, fn, depth, tmpf, dnf, accb;
+    uint8 nxt;
+    uint8 *strm;
+
+    dnf = 0;
+    strm = (uint8 *)recOff->strOff;
+    chni = recOff->chanIdx;
+    if (recOff->repeat[chni] != 0) {
+        sp = recOff->strPos[chni];
+        recOff->repeat[chni]--;
+    } else {
+        sp = recOff->strPos[chni] + 1;
+    }
+    goto looptest;
+
+    for (;;) {
+readop:                                     /* loc_128D0 */
+        opb = strm[sp++];
+    if (opb >= '0' && opb <= '9') {
+        num = opb - '0';
+        goto digpeek;                       /* loc_12915 */
+digbody:                                    /* loc_128F2 — accumulate a digit */
+        if (nxt > '9')
+            goto digdone;
+        num = num * 10 + strm[sp++] - '0';
+digpeek:                                    /* loc_12915 — peek next char */
+        nxt = strm[sp];
+        if (nxt >= '0')
+            goto digbody;
+digdone:                                    /* loc_12924 */
+        recOff->repeat[chni] = num - 1;
+        goto looptest;
+    }
+
+coloncheck:                                 /* loc_12935 */
+    if (opb == ':') {
+colonpeek:                                  /* loc_1293B — ':' skips a digit run */
+        nxt = strm[sp];
+        if (nxt < '0')
+            goto looptest;
+        if (nxt > '9')
+            goto looptest;
+        sp++;                               /* loc_12954 */
+        goto colonpeek;
+    }
+    else
+        goto coldispatch;                   /* loc_12959 */
+
+coldispatch:                                /* loc_12959 — <>^_ counter ops */
+    if (opb == '<' || opb == '>' || opb == '^' || opb == '_') {
+        switch (opb) {                      /* loc_12974 — re-dispatch */
+        case '>':                           /* loc_1298E */
+            recOff->cntA--;
+            if (recOff->cntA == 0xFF)
+                recOff->cntA = recOff->maxA - 1;
+            goto looptest;
+        case '<':                           /* loc_129AD */
+            recOff->cntA++;
+            if (recOff->cntA == recOff->maxA)
+                recOff->cntA = 0;
+            goto looptest;
+        case '_':                           /* loc_129C9 */
+            recOff->cntB--;
+            if (recOff->cntB == 0xFF)
+                recOff->cntB = recOff->maxB - 1;
+            goto looptest;
+        case '^':                           /* loc_129E8 */
+            recOff->cntB++;
+            if (recOff->cntB == recOff->maxB)
+                recOff->cntB = 0;
+            goto looptest;
+        }
+        goto looptest;                      /* loc_12CB1 via 298B */
+    }
+    goto lettercheck;                       /* loc_12A04 */
+
+lettercheck:                                /* loc_12A04 — 'A'..'Z' */
+    if (opb >= 'A' && opb <= 'Z') {
+        fn = (opb & 0x1F) - 1;
+        if ((recOff->cntA | recOff->cntB) == 0) {
+            /* loc_12A31 — single clipped blit (base pos, full extent) */
+            sub_12F27((int16 *)word_1BAD4, recOff->frameW[fn],
+                      recOff->frameB[fn], (int16 *)word_1BAD2,
+                      recOff->posX + word_23786,
+                      recOff->posY + word_23788,
+                      recOff->maxA, recOff->maxB);
+        } else {
+            /* loc_12A5B — 2x2 panning tile */
+            sub_12F27((int16 *)word_1BAD4, recOff->frameW[fn],
+                      recOff->frameB[fn], (int16 *)word_1BAD2,
+                      recOff->maxA + recOff->posX + word_23786 - recOff->cntA,
+                      recOff->posY + recOff->maxB + word_23788 - recOff->cntB,
+                      recOff->cntA, recOff->cntB);
+            /* loc_12AA7 */
+            sub_12F27((int16 *)word_1BAD4, recOff->frameW[fn] + recOff->cntA,
+                      recOff->frameB[fn], (int16 *)word_1BAD2,
+                      recOff->posX + word_23786,
+                      recOff->posY + recOff->maxB + word_23788 - recOff->cntB,
+                      recOff->maxA - recOff->cntA, recOff->cntB);
+            /* loc_12B0F */
+            sub_12F27((int16 *)word_1BAD4, recOff->frameW[fn],
+                      recOff->frameB[fn] + recOff->cntB, (int16 *)word_1BAD2,
+                      recOff->maxA + recOff->posX + word_23786 - recOff->cntA,
+                      recOff->posY + word_23788,
+                      recOff->cntA, recOff->maxB - recOff->cntB);
+            /* loc_12B52 — shared 'push word_1BAD4; call' tail for loc_12A31 */
+            sub_12F27((int16 *)word_1BAD4, recOff->frameW[fn] + recOff->cntA,
+                      recOff->frameB[fn] + recOff->cntB, (int16 *)word_1BAD2,
+                      recOff->posX + word_23786,
+                      recOff->posY + word_23788,
+                      recOff->maxA - recOff->cntA, recOff->maxB - recOff->cntB);
+        }
+        recOff->strPos[chni] = sp - 1;      /* 2B9E — save pos, done */
+        dnf = 1;
+        goto looptest;
+    }
+    /* loc_12BB4 — group ops: ( ) | \0 */
+    if (opb == '(') {                       /* loc_12BBA — open random group */
+        recOff->strPos[chni++] = sp - 1;
+        accb = 1;
+        word_22F0A = sp;
+grp_count:                                  /* loc_12BD6 — count alternatives */
+        fn = parseCmd((uint8 **)&word_22F0A, (int16)strm);
+        accb += fn;
+        if (fn != 0)
+            goto grp_count;
+        accb = randomRange(-1) % accb;      /* pick weighted index */
+        word_22F0A = sp;
+        goto grp_test;
+grp_skip:                                   /* loc_12C08 — walk to chosen alt */
+        accb -= parseCmd((uint8 **)&word_22F0A, (int16)strm);
+grp_test:                                   /* loc_12C18 */
+        if (accb > 0)
+            goto grp_skip;
+        sp = word_22F0A;
+        goto looptest;
+    }
+    if (opb == '|' || opb == ')') {         /* loc_12C30 — pop channel */
+        chni--;
+        if (recOff->repeat[chni] == 0) {    /* ==0 — skip to matching ')' */
+            sp = recOff->strPos[chni] + 1;
+            depth = 1;
+            do {                            /* loc_12C4D */
+                depth += (strm[sp] == '(');
+                depth -= (strm[sp] == ')');
+                sp++;
+            } while (depth > 0);
+            goto looptest;
+        }
+        /* loc_12C7C — still repeating */
+        recOff->repeat[chni]--;
+        sp = recOff->strPos[chni];
+        goto looptest;
+    }
+    if (opb == 0) {                         /* loc_12C93 — end of script */
+        chni = 0;
+        recOff->strPos[0] = 0;
+        recOff->repeat[0] = 0;
+        sp = 0;
+        goto looptest;
+    }
+    goto looptest;
+
+looptest:                                   /* loc_12CB1 */
+        if (dnf != 0)
+            break;
+        goto readop;
+    }
+    recOff->chanIdx = chni;                 /* loc_12CBA */
+}
 
 void tickRecords(void) {
     int16 rp, total, i;
@@ -800,7 +1015,7 @@ void tickRecords(void) {
             total = recField9[rp] + recField8[rp];
             if (total > 0xFF)
                 total -= 0x100;
-            sub_1288B(rp);
+            tickRecAnim((struct AnimRec *)rp);
             recField9[rp] = (uint8)total;
         }
     }
