@@ -1349,3 +1349,31 @@ tmpf dnf accb` + byte `nxt` land the 11-word frame.
 Map: renamed sub_1288B→tickRecAnim.
 
 All 27 enbrief.c routines MATCH; verify-exes 0 diffs on all four exes.
+
+### END.EXE loadMapView (seg000:0x1a8a, 0x671 bytes) — new module enbrief2.c
+
+The map-view resource loader, called from `runMapView` (sub_12192). Clears
+init flags, builds the 200-entry scanline→plane-offset LUT `word_2351E`
+(`(i/4)*0xA0 + (i&3)<<13`), opens the PIC stream (`openFileWrapper` +
+`picStreamRead`), pulls a resource block via `sub_120FC(0xFFFFL)` (a long arg —
+`mov ax,0xffff; sub dx,dx; push dx; push ax`), and conditionally calls the far
+gfx-driver slot `9D9:13FF` (`gfx_drvMode`) when `initResultFlag==2`. Then reads
+a 0x20-byte header and nibble-expands it into four 16-entry palette tables
+(`byte_2089D/AD/BD/CD`), reads the record count/w/h, and fills all `AnimRec`
+records (0x5C stride @0x295E) plus a parallel `ChanRec` array (0x49 stride
+@0x3426) — record headers 0xB bytes, `strOff` set by the script-append helper
+`sub_11A1C`, per-channel 7-byte records. A bit-pack decode merges packed values
+into `word_1BAE0`/`word_1BAE2`; finally a `switch(initResultFlag)` writes the
+display-seg slots (`word_1BAD0/1BACE/1BAD2/1BAD4`) and calls the mode blitters
+(`sub_133BA/133BD/133EC/13436`).
+
+Module split: the routine is byte-exact only under `/Ot` — ref emits a
+branch-target alignment `nop` at the per-channel loop head (`loc_11C36`,
+even-aligned by pad) that `/Os` suppresses. The rest of enbrief.c is genuinely
+`/Os`, so loadMapView lives in a separately-flagged `src_end/enbrief2.c`
+(`/AS /Gs /Ot`, MODULE_FLAGS `end/enbrief2.c`) — it was a different original
+module. `sub_11A1C` (1a1c-1a3d) is an unmapped code island (no proc label), so
+it stays a callee stub. Map: renamed sub_11A8A→loadMapView.
+
+All 27 enbrief.c + 1 enbrief2.c routines MATCH; verify-exes 0 diffs on all
+four exes.

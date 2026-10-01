@@ -856,8 +856,30 @@ void  intDispatch(int16 n, uint8 *a, uint8 *b) { }     /* sub_139FD */
 void  farStrcpy(char *d, char far *s) { }            /* sub_138EC — asm in skeleton */
 /* tickRecAnim record-anim DSL globals — shared words (record fields are struct members) */
 int16 word_23786, word_23788;                    /* map scroll X/Y */
-int16 word_1BAD2, word_1BAD4;                    /* sprite slots A/B */
 int16 word_22F0A;                                /* shared DSL cursor */
+/* loadMapView map-view resource loader — palette/record/table setup globals */
+int16 *word_1BAD2, *word_1BAD4;                  /* sprite/display-seg slot ptrs */
+int16 word_1BADE, word_1BADC, word_1BADA;        /* init flags/accumulators */
+uint8 byte_1C6E0, byte_1C6E1, byte_1C6E2, byte_1C6E3,
+      byte_1C6E4, byte_1C6E5, byte_1C6E6;        /* anim state flags */
+uint8 *word_1C6E8, *word_1C6EA;                  /* pic stream buffers (0x2150/0x2550) */
+int16 word_23C62;                                /* pic stream handle */
+int16 word_2244C, word_23C7C;                    /* alloc'd base / +0x800 shadow */
+int16 word_1BA9E, word_1BA92;                    /* gfx page copies */
+int16 *word_1BAD0, *word_1BACE;                  /* display-seg slot ptrs */
+int16 word_1DA44, word_1DA46, word_1DA48;        /* stream-read dims (record count, w/h) */
+int16 word_2351E[200];                           /* scanline→plane-offset LUT */
+uint8 byte_2089D[16], byte_208AD[16],
+      byte_208BD[16], byte_208CD[16];            /* 4 nibble-expanded palette tables */
+int16 word_1BAE0[256], word_1BAE2[256];          /* packed channel word arrays */
+/* loadMapView callees — not yet ported (asm skeleton in the real exe) */
+int16 sub_11A1C(int16 count, int16 fd) { return 0; }
+void  sub_12FE8(int16 a, int16 b, int16 c, int16 d) { }
+void  sub_133BA(int16 a,int16 b,int16 c,int16 d,int16 e,int16 f) { }
+void  sub_133BD(int16 a,int16 b,int16 c,int16 d,int16 e,int16 f) { }
+void  sub_133EC(int16 a,int16 b,int16 c,int16 d,int16 e,int16 f) { }
+void  sub_13436(int16 a,int16 b,int16 c,int16 d,int16 e,int16 f) { }
+void  far gfx_drvMode(void) { }                       /* 9D9:13FF driver slot */
 int16 runMapView(int16 sel) { return 0; }            /* sub_12192 — big map dispatcher, skeleton */
 void  picStageRefill(void) { }                       /* sub_13238 — rep-movsw stage copy asm */
 void  far textOp_477(void) { }   /* overlay text ops at seg 0x91d */

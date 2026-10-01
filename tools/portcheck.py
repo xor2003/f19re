@@ -92,6 +92,10 @@ MODULE_FLAGS = {
     # EN stload: no /Gs — loadResSection prologue is `mov ax,2; call __chkstk`
     'start/stload.c':  ['/AS', '/Od'],
     'end/textfmt.c':   ['/AS', '/Gs', '/Os'],
+    # EN enbrief2 (sub_11A8A map-view resource loader): /Ot — ref emits a
+    # branch-target alignment nop at the per-channel loop head that /Os
+    # suppresses; routine was a separate original module from /Os enbrief.c.
+    'end/enbrief2.c':  ['/AS', '/Gs', '/Ot'],
 }
 DEFAULT_FLAGS = ['/AS', '/Gs', '/Ot']
 

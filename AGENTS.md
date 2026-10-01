@@ -30,12 +30,16 @@ EN satellite C ports (all verified vs $(F19EN)/<X>.EXE + map/<x>_en.map
 via `portcheck.py --exe /home/xor/games/f19/F19/<X>.EXE --map
 map/<x>_en.map --srcdir src_<x>`):
 
-- src_end/ — 13 MATCH: allocBuffer freeBuffer (stalloc.c) blinkWidget
-  plotMapPoint drawClippedLine drawClippedLineEx drawFlightLine
-  formatFlightTime calcMissionScore (enbrief.c) drawStringAt (drawstr.c)
-  my_ltoa my_itoa (textfmt.c) readWorldData (enworld.c). Flags: enbrief/
-  stalloc /Gs /Os,
+- src_end/ — enbrief.c 27 MATCH + enbrief2.c 1 MATCH (loadMapView, the
+  0x671 map-view resource loader: scanline LUT + PIC palette nibble-expand
+  + AnimRec/ChanRec record fill + mode setup), plus drawstr/stalloc/
+  textfmt/enworld/enfile/enmain/enaward/enstr helpers (allocBuffer
+  freeBuffer drawStringAt my_ltoa my_itoa readWorldData strcoll
+  loadFileSection initGraphics loadPicFromFileAt mystrcpy mystrcat ...).
+  Flags: enbrief/stalloc /Gs /Os,
   enworld /Od (unconditional chkstk+push di,si prologue), textfmt /Os.
+  enbrief2.c /Gs /Ot — loadMapView emits a branch-target alignment nop
+  that /Os suppresses; separate original module from /Os enbrief.c.
   Left as skeleton: dos_alloc/dos_free/openFile/closeFile/fileClose/
   createFile family (int21h hand-asm), pic-decode cluster (decodePic
   showPicFile doPicDecode picMakeDict picReadDataAndMakeDict

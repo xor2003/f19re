@@ -811,7 +811,8 @@ struct AnimRec {
     int16 posY;             /* +0x02 seg_19D92 */
     int16 maxA;             /* +0x04 word_19D94 counter-A wrap max */
     int16 maxB;             /* +0x06 word_19D96 counter-B wrap max */
-    int16 field8;           /* +0x08 word_19D98 — used by tickRecords */
+    uint8 field8;           /* +0x08 word_19D98 — used by tickRecords */
+    uint8 field9;           /* +0x09 word_19D99 — used by tickRecords */
     uint8 cntA;             /* +0x0A word_19D9A frame counter A */
     uint8 cntB;             /* +0x0B word_19D9B frame counter B */
     uint8 chanIdx;          /* +0x0C word_19D9C channel index */
@@ -826,8 +827,8 @@ struct AnimRec {
 #pragma pack()
 extern int16  word_23786;      /* map scroll X */
 extern int16  word_23788;      /* map scroll Y */
-extern int16  word_1BAD2;      /* sprite slot A (draw op src) */
-extern int16  word_1BAD4;      /* sprite slot B (draw op dst) */
+extern int16 *word_1BAD2;      /* sprite slot A (draw op src) — a seg-slot ptr */
+extern int16 *word_1BAD4;      /* sprite slot B (draw op dst) — a seg-slot ptr */
 extern int16  word_22F0A;      /* shared DSL cursor (parseCmd *pp) */
 extern void   sub_12F27(int16 *p1, int16 a2, int16 a3, int16 *p4,
                         int16 a5, int16 a6, int16 a7, int16 a8);
@@ -1767,3 +1768,4 @@ int32 calcMissionScore(int16 param)
         score = score * 11 / 8;
     return score;
 }
+
