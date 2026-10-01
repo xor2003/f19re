@@ -912,3 +912,22 @@ int16 word_298E6;                                     /* dseg:0x98e6 */
 int16 word_27990[4], word_27998[4];                   /* dseg:0x7990/0x7998 */
 int16 far gfx_getVal(void) { return 0; }              /* slot 0x4e */
 void  far gfx_setDac(int16 n) { }                     /* slot 0x44 */
+
+#ifdef EXE_SU /* SU-only callees (real defs live in the skeleton asm) */
+/* seg000:0971-0e9d field-layout cluster deps */
+void  far suFieldPrint(int16 field, char *text) { }      /* 2FC:0A3F */
+int16 far suCharWidth(int16 ch, int16 font) { return 0; }/* 2FC:0B11 */
+void  sub_11668(char *buf, int16 a, int16 b) { }
+void  sub_113B2(void) { }
+void  sub_113F0(void) { }
+int16 sub_115D0(void) { return 0; }
+void  sub_11C3C(int16 v) { }
+int16 sub_11C4E(void) { return 0; }
+void  pascal sub_11D56(int32 d, int32 *v) { }
+void  sub_11732(char *dst, int16 seg, int16 off, int16 n) { }
+void  sub_11714(char *dst, char *src, int16 n) { }
+int16 word_12FC8[8];                                   /* pen.x  dseg */
+int16 word_12FCA[8];                                   /* pen.y  dseg */
+int16 word_12FCC[8];                                   /* font   dseg */
+uint8 byte_138C0;                                      /* tick counter */
+#endif
