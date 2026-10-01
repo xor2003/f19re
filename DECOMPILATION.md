@@ -1293,3 +1293,28 @@ Map: renamed sub_14F7B→animateFlightPath. PilotRecEnd: isCampaignMission
 carved out of pad38 at +0x3a. stubs.c: lastDrawX/lastDrawY added.
 
 All 25 enbrief.c routines MATCH; verify-exes 0 diffs on all four exes.
+
+### END.EXE calcMissionScore (seg000:0x5666, 0x6b4 bytes)
+
+f15 enbrief.c `calcMissionScore` — walks `flightRecords[]` per kill event,
+dispatching on `unitTypeTable[unitId&0x7f]` flag bits (0x40 friendly, 0x80
+civilian, 0x20...) and `flightRecords[i].status` (0x80 primary target,
+0x40 secondary) to award awardPrim/awardSec/awardFriendly/awardCivilian/
+awardUnit, bumping ms_airKilled/ms_groundKilled/ms_friendly*/ms_civilian/
+ms_unauth*. Trailing block applies multTheater/multMission/multDiff/multUnk
+`score = tab[*] * score / 8` then result modifiers. `score`/`ms_*` reach
+locals/globals; award arrays indexed by `pilotRec->isCampaignMission` (+0x3a).
+
+Layout: the case-1 ground dispatch drives three MSC idioms at once.
+(1) `awardSec[1]` must OWN the shared `cwd;add;adc` tail so the armed arm
+merges BACKWARD into it — done by making awardSec a real `goto award_sec`
+label (early emission pass) rather than a fallthrough arm. (2) armed is the
+in-flow warm arm (`mov bx,es:[bx+58]` head); `score_unarmed` is a deferred
+goto-only label so its head emits `les bx,pilotRec`. (3) awardUnit's
+`awardUnitChk<0` must reach the shared `unauth_ground_inc` block as `jl` —
+a backward `goto` won't fold, so a forward `goto unauth_fw` tramp folds to
+`jl`, and `unauth_fw:` `goto`s back to the labeled increment.
+
+Map: renamed sub_15666→calcMissionScore.
+
+All 26 enbrief.c routines MATCH; verify-exes 0 diffs on all four exes.

@@ -95,7 +95,8 @@ struct CommDataEnd {                            /* far ptr word_23C66 */
     int16 setupMono;                            /* 0x24 */
     int16 landingType;                          /* 0x26 */
     int16 bailout;                              /* 0x28 */
-    int8 pad2a[0x06];
+    int8 pad2a[0x04];
+    uint16 missionTime;                         /* 0x2e */
     int16 trainingFlag;                         /* 0x30 */
     int8 pad32[0x02];
     uint8 commFlags34;                          /* 0x34 */
@@ -116,9 +117,10 @@ struct PilotRecEnd {                            /* far ptr word_2243E */
     uint16 awardPoints;                         /* 0x30 — award threshold pool */
     int32 totalScore;                           /* 0x32 */
     uint16 missionCount;                        /* 0x36 */
-    int8  pad38[2];
+    uint16 multTheater;                         /* 0x38 — post-mission multiplier indices */
     uint16 isCampaignMission;                   /* 0x3a — 2 = campaign play */
-    int8  pad3c[8];
+    uint16 multMission, multDiff, multUnk;      /* 0x3c-0x40 */
+    int8  pad42[2];
     uint16 flag44;                              /* 0x44 — training award flag */
     uint16 flag46, flag48, flag4a, flag4c;      /* 0x46-0x4c — mission ribbon flags */
 };
@@ -164,6 +166,43 @@ extern int16 curRecordIdx;                   /* word_22C36 */
 extern uint16 colorStyleTable[];             /* 0x41DE */
 extern struct FlightLogRec flightRecords[];  /* byte_22F14 */
 extern uint8 slotInfoTable[];                /* word_2245E */
+
+/* calcMissionScore externs — score counters, award tables, multipliers */
+extern int16  word_2387A;                    /* dseg:0x9aea — init 0x1318 */
+extern int16  word_22C34;                    /* dseg:0x8ea4 — visual-id count */
+extern int16  word_2379C;                    /* dseg:0x9a0c — radar-id count */
+extern uint8  ms_groundKilled;               /* byte_2351A */
+extern uint8  ms_friendlyGnd;                /* byte_2351B */
+extern uint8  ms_civilian;                 /* byte_23785 */
+extern uint8  ms_airKilled;                  /* byte_22451 */
+extern uint8  ms_friendlyAir;                /* byte_22452 */
+extern uint8  ms_unauthGround;               /* byte_22F0E */
+extern uint8  ms_unauthAir;                  /* byte_23716 */
+extern int8   unitTypeTable[];               /* byte_2371A */
+extern uint8  samFlagTab[];                  /* byte_19DF2 */
+extern uint8  gridFlags[][16];               /* byte_2290A */
+struct PlaneObjEnd { int16 validFlag; int8 pad02[0x1e]; }; /* word_19F40, stride 0x20 */
+extern struct PlaneObjEnd planeObjects[];
+extern int16  awardPrim[];                   /* word_1DF96 — primary-target table */
+extern int16  awardSec[];                    /* word_1DF9C — secondary-target table */
+extern int16  awardVisId[];                  /* word_1DFA0 — visual-id award */
+extern int16  awardArmedGnd[];               /* word_1DFA6 — armed ground unit */
+extern int16  awardUnitChk[];                /* word_1DFAC — unauth-unit check */
+extern int16  awardCivilian[];               /* word_1DFB2 */
+extern int16  awardUnarmedGnd[];             /* word_1DFB8 — unarmed ground unit */
+extern int16  awardFriendlyGnd[];            /* word_1DFBE — friendly fire (negative) */
+extern int16  awardRadarId[];                /* word_1DFC4 — radar-id award */
+extern int16  award423a[];                   /* word_1DFCA — SAM kill, flagged site */
+extern int16  award4240[];                   /* word_1DFD0 — SAM kill, other site */
+extern int16  award4246[];                   /* word_1DFD6 — SAM kill, empty site */
+extern int16  award424c[];                   /* word_1DFDC — friendly air (negative) */
+extern int16  award4252[];                   /* word_1DFE2 — unauthorized air kill */
+extern int16  awardUnit[][16];               /* word_1DFE8 — per-unit award matrix */
+extern int16  multTheater[];              /* word_1E048 */
+extern int16  multMission[];              /* word_1E052 */
+extern int16  multDiff[];                 /* word_1E05A */
+extern int16  multUnk[];                  /* word_1E062 */
+extern int16  multResult[];                  /* word_1E068 — mission-result multiplier */
 extern int16 mapWinX1, mapWinY1, mapWinX2, mapWinY2; /* word_1DF8E/90/92/94 debrief map window */
 extern struct BlinkSprite *spriteAirBlink;   /* word_1F6E4 */
 extern struct BlinkSprite *spriteSamBlink;   /* word_1F764 */
@@ -202,7 +241,7 @@ extern struct SamNameEnd samWeaponTable[];
 extern char wpnNames[][0x1a];                /* dseg:0x0726, stride 0x1a */
 
 extern void sub_10E50(int16 *page, int16 x1, int16 y1, int16 x2, int16 y2); /* clearRect dup */
-extern int32 sub_15666(int16 n);              /* calcMissionScore — skeleton */
+extern int32 calcMissionScore(int16 n);              /* calcMissionScore — skeleton */
 extern void sub_15D1B(void);                  /* event popup — skeleton */
 
 extern void far pollJoystick(void);          /* 9C7:2F */
@@ -1019,7 +1058,7 @@ void drawMenuItem(const MenuItem *items, uint16 index, int16 *gfxPage) {
             }
             curRecordIdx = 0;
             totalFlightRecords = drawFlightPath(gfxPage, 0x270f);
-            missionScore = sub_15666(totalFlightRecords);
+            missionScore = calcMissionScore(totalFlightRecords);
             mystrcpy(scoreString, "\x8d");
             mystrcat(scoreString, "OVERALL");
             n = stringWidth(gfxPage, scoreString);
@@ -1042,7 +1081,7 @@ void drawMenuItem(const MenuItem *items, uint16 index, int16 *gfxPage) {
             gfx_blitSprite(spriteMapArea);
             curRecordIdx = prevDrawX = prevDrawY = 0;
             sub_10E50(gfxPage, 0xeb, 0xa, 0x13f, 0x95);
-            missionScore = sub_15666(0x100);
+            missionScore = calcMissionScore(0x100);
             mystrcpy(scoreString, "\x8d");
             mystrcat(scoreString, "OVERALL");
             n = stringWidth(gfxPage, scoreString);
@@ -1171,7 +1210,7 @@ void drawMenuItem(const MenuItem *items, uint16 index, int16 *gfxPage) {
             n = stringWidth(gfxPage, scoreString);
             drawStringAt(gfxPage, scoreString, 0xe8 + (0x57 - n) / 2, gfxPage[5]);
         }
-        missionScore = sub_15666(curRecordIdx);
+        missionScore = calcMissionScore(curRecordIdx);
         mystrcpy(scoreString, "\x8d");
         mystrcat(scoreString, "CUMULATIVE");
         n = stringWidth(gfxPage, scoreString);
@@ -1227,7 +1266,7 @@ loop_top:
             prevDrawX = lastDrawX;
             prevDrawY = lastDrawY;
         }
-        missionScore = sub_15666(curRecordIdx);
+        missionScore = calcMissionScore(curRecordIdx);
         mystrcpy(scoreString, "\x80");
         my_ltoa(missionScore, numBuf);
         mystrcat(scoreString, numBuf);
@@ -1281,4 +1320,235 @@ done:
         prevDrawX = lastDrawX;
         prevDrawY = lastDrawY;
     }
+}
+
+/*
+ * calcMissionScore
+ *
+ * Walks the flight log, accumulates a 32-bit score and updates the
+ * mission-statistic counters.  The armed/unarmed ground- and air-unit
+ * arms are deliberately shaped with labels and gotos so MSC 5.1 emits the
+ * original dispatch topology: the armed arm jumps into the shared
+ * score-add tail (loc_15814) and the award-unit arm jumps back into the
+ * shared unauthorized-ground increment (loc_158AB).
+ */
+int32 calcMissionScore(int16 param)
+{
+    int16 unitId;
+    int32 score;
+    uint16 i;
+    int16 cnt, ejected;
+
+    word_2387A = 0x1318;
+    word_22C34 = word_2379C = 0;
+    ms_unauthAir = ms_unauthGround = ms_airKilled = ms_groundKilled =
+        ms_friendlyAir = ms_friendlyGnd = ms_civilian = target1Scored = target2Scored = 0;
+    cnt = 0;
+    ejected = 0;
+    score = 0;
+
+    for (i = 0;
+         i <= (uint16)param && flightRecords[i].status != 0;
+         i++) {
+        unitId = flightRecords[i].unitId;
+        switch (flightRecords[i].status & 0x3f) {
+        case 8:                                             /* bailout/landing */
+            if (score < 0)
+                score = 0;
+            if (i != 0)
+                ejected = 1;
+            break;
+        case 10:
+            if (flightRecords[i].status & 0x80) {           /* primary target */
+                score += awardPrim[pilotRec->isCampaignMission];
+                target1Scored = 1;
+                if (target2Scored == 1) {
+                    score -= awardSec[0];
+                    score += awardSec[1];
+                }
+            } else if (flightRecords[i].status & 0x40) {    /* secondary target */
+                score += awardSec[target1Scored];
+                target2Scored = 1;
+            }
+            break;
+        case 11:
+            if (flightRecords[i].status & 0x80) {
+                score += awardPrim[pilotRec->isCampaignMission];
+                target1Scored = 1;
+                if (target2Scored == 1) {
+                    score -= awardSec[0];
+                    score += awardSec[1];
+                }
+            } else if (flightRecords[i].status & 0x40) {
+                score += awardSec[target1Scored];
+                target2Scored = 1;
+            }
+            break;
+        case 9:                                             /* waypoint visit */
+            if (gridFlags[flightRecords[i].mapY >> 4]
+                         [flightRecords[i].mapX >> 4] & 3)
+                break;
+            if (pilotRec->isCampaignMission == 0) {
+                score += 1;
+            } else if (pilotRec->isCampaignMission == 1) {
+                cnt++;
+                if ((cnt & 3) == 0)
+                    score += 1;
+            }
+            break;
+        case 1:
+        case 12:                                            /* ground-unit kill */
+            if (*(int16 *)&slotInfoTable[unitId * 16] & 0x1000) {
+                word_22C34--;
+                score -= awardVisId[pilotRec->isCampaignMission];
+            }
+            if (flightRecords[i].status & 0x80) {
+                score += awardPrim[pilotRec->isCampaignMission];
+                target1Scored = 1;
+                if (target2Scored == 1)
+                    goto award_sec;
+                ms_groundKilled++;
+                break;
+        award_sec:
+                score -= awardSec[0];
+                score += awardSec[1];
+                ms_groundKilled++;
+            } else if (flightRecords[i].status & 0x40) {
+                score += awardSec[target1Scored];
+                target2Scored = 1;
+                ms_groundKilled++;
+            } else {
+                if (unitTypeTable[unitId & 0x7f] & 0x40) {
+                    score += awardFriendlyGnd[pilotRec->isCampaignMission];
+                    ms_friendlyGnd++;
+                } else if (!(*(int16 *)&slotInfoTable[unitId * 16] & 0x500)) {
+                    if (*(int16 *)&slotInfoTable[unitId * 16] & 0x1000) {
+                        if (pilotRec->isCampaignMission == 0)
+                            goto score_armed;
+                    }
+                    if (pilotRec->isCampaignMission != 0) {
+                score_armed:
+                        score += awardArmedGnd[pilotRec->isCampaignMission];
+                        ms_groundKilled++;
+                        break;
+                    } else {
+                        goto score_unarmed;
+                    }
+                score_unarmed:
+                        score += awardUnarmedGnd[pilotRec->isCampaignMission];
+                        if (awardUnarmedGnd[pilotRec->isCampaignMission] != 0) {
+                    unauth_ground_inc:
+                            ms_unauthGround++;
+                        }
+                        break;
+                } else {
+                    score += awardFriendlyGnd[pilotRec->isCampaignMission];
+                    ms_friendlyGnd++;
+                }
+            }
+            break;
+        case 3:                                             /* air-unit kill */
+            if (unitId & 0x80) {
+                word_2379C--;
+                score -= awardRadarId[pilotRec->isCampaignMission];
+            }
+            if (flightRecords[i].status & 0x80) {
+                score += awardPrim[pilotRec->isCampaignMission];
+                target1Scored = 1;
+                if (target2Scored == 1) {
+                    score -= awardSec[0];
+                    score += awardSec[1];
+                    ms_airKilled++;
+                    break;
+                }
+                ms_airKilled++;
+                break;
+            } else if (flightRecords[i].status & 0x40) {
+                score += awardSec[target1Scored];
+                target2Scored = 1;
+                ms_airKilled++;
+                break;
+            } else {
+                if (planeObjects[unitId & 0x7f].validFlag == -1) {
+                    score += award424c[pilotRec->isCampaignMission];
+                    ms_friendlyAir++;
+                    break;
+                }
+                if (unitId & 0x80) {
+                    if (pilotRec->isCampaignMission == 0)
+                        goto score_samchk;
+                }
+                if (pilotRec->isCampaignMission != 0) {
+            score_samchk:
+                    if (planeObjects[unitId & 0x7f].validFlag == 0)
+                        score += award4246[pilotRec->isCampaignMission];
+                    else if (samFlagTab[planeObjects[unitId & 0x7f].validFlag * 0x0e] & 4)
+                        score += award423a[pilotRec->isCampaignMission];
+                    else
+                        score += award4240[pilotRec->isCampaignMission];
+                    ms_airKilled++;
+                    break;
+                } else {
+            score_uair:
+                    score += award4252[pilotRec->isCampaignMission];
+                    ms_unauthAir++;
+                    break;
+                }
+            }
+            break;
+        case 2:                                             /* ground target */
+            if (flightRecords[i].status & 0x80) {
+                score += awardPrim[pilotRec->isCampaignMission];
+                target1Scored = 1;
+                ms_groundKilled++;
+            } else if (flightRecords[i].status & 0x40) {
+                score += awardSec[pilotRec->isCampaignMission];
+                target2Scored = 1;
+                ms_groundKilled++;
+            } else {
+                if (unitTypeTable[unitId & 0x7f] & 0x40) {
+                    score += awardFriendlyGnd[pilotRec->isCampaignMission];
+                    ms_friendlyGnd++;
+                } else if (gridFlags[flightRecords[i].mapY >> 4]
+                                       [flightRecords[i].mapX >> 4] & 3) {
+                    score += awardFriendlyGnd[pilotRec->isCampaignMission];
+                    ms_friendlyGnd++;
+                } else if (unitTypeTable[unitId & 0x7f] & 0x80) {
+                    score += awardCivilian[pilotRec->isCampaignMission];
+                    ms_civilian++;
+                } else {
+                    score += awardUnit[pilotRec->isCampaignMission][unitTypeTable[unitId & 0x7f] & 0xf];
+                    if (awardUnitChk[pilotRec->isCampaignMission] < 0)
+                        goto unauth_fw;
+                    ms_groundKilled++;
+                    break;
+                unauth_fw:
+                    goto unauth_ground_inc;
+                }
+            }
+            break;
+        case 7:                                             /* visual id bonus */
+            word_22C34++;
+            score += awardVisId[pilotRec->isCampaignMission];
+            break;
+        case 6:                                             /* radar id bonus */
+            word_2379C++;
+            score += awardRadarId[pilotRec->isCampaignMission];
+            break;
+        }
+    }
+
+    score = multTheater[pilotRec->multTheater] * score / 8;
+    score = multMission[pilotRec->multMission] * score / 8;
+    score = multDiff[pilotRec->multDiff] * score / 8;
+    score = multUnk[pilotRec->multUnk] * score / 8;
+    if (ejected == 1 && commData->landingType == 2)
+        score = multResult[missionResult] * score / 8;
+    if (commData->missionTime >= 0x1b58 && commData->missionTime < 0x2328)
+        score = score * 9 / 8;
+    if (commData->missionTime >= 0x2328 && commData->missionTime < 0x2cec)
+        score = score * 10 / 8;
+    if (commData->missionTime >= 0x2cec)
+        score = score * 11 / 8;
+    return score;
 }

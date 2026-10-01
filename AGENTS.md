@@ -30,10 +30,11 @@ EN satellite C ports (all verified vs $(F19EN)/<X>.EXE + map/<x>_en.map
 via `portcheck.py --exe /home/xor/games/f19/F19/<X>.EXE --map
 map/<x>_en.map --srcdir src_<x>`):
 
-- src_end/ — 12 MATCH: allocBuffer freeBuffer (stalloc.c) blinkWidget
+- src_end/ — 13 MATCH: allocBuffer freeBuffer (stalloc.c) blinkWidget
   plotMapPoint drawClippedLine drawClippedLineEx drawFlightLine
-  formatFlightTime (enbrief.c) drawStringAt (drawstr.c) my_ltoa my_itoa
-  (textfmt.c) readWorldData (enworld.c). Flags: enbrief/stalloc /Gs /Os,
+  formatFlightTime calcMissionScore (enbrief.c) drawStringAt (drawstr.c)
+  my_ltoa my_itoa (textfmt.c) readWorldData (enworld.c). Flags: enbrief/
+  stalloc /Gs /Os,
   enworld /Od (unconditional chkstk+push di,si prologue), textfmt /Os.
   Left as skeleton: dos_alloc/dos_free/openFile/closeFile/fileClose/
   createFile family (int21h hand-asm), pic-decode cluster (decodePic
@@ -183,6 +184,21 @@ mzmap (jump-table headers, no call-reachable exports).
   CONT:` — the shared `goto CONT` tail forces a backward tail-merge and ARM
   emits after the continuation jump. Plain `if/else` or `?:` keep arms inline.
   Used in renderHudFrame (egtacmap.c); same pattern drives computeBearing.
+- Shared `cwd;add;adc` tail-merge picks ONE canonical owner; competing `+=`
+  arms emit `jmp` to it. The owner is whichever block MSC lowers first in
+  block-emission order: a real `goto`-label arm emits in the early pass, a
+  `$JCC` cold arm emits last and MERGES. To make a `score +=` arm own the
+  tail (and force a competing arm to `jmp` BACKWARD into it), give the owner
+  arm a real `goto` label (`if (cond) goto SEC; ... SEC:`). Armed/cold arms
+  that merely fall through merge forward. calcMissionScore awardSec/armed.
+- `goto` to a FORWARD label folds into `jcc label` (jump-threading); `goto`
+  to a BACKWARD cold block stays an unconditional `jmp` guarded by the
+  inverted `jnotcc +skip`. To get `jcc` reaching a distant shared block,
+  `goto` a forward tramp label that then `goto`s the far target:
+  `if (x<0) goto FW; stmt; break; FW: goto FAR;` → `jl FW; jmp cont; FW: jmp
+  FAR`. A named label that's only `goto`'d emits as a deferred block whose
+  head reloads the far pointer (`les bx`) — needed for cold dispatch targets.
+  calcMissionScore awardUnit armed/unarmed dispatch.
 - `v = *p++` emits `add [p],2` EAGERLY then `mov ax,[bx]` reading the
   stale cached pointer — not `mov` then `add`. Mixing `p[-k]` reads (bx
   reloads) with `*p++` writes reproduces sliding-window decoders.

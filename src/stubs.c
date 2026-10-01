@@ -792,8 +792,39 @@ int16 far gfx_initDone(void) { return 0; }
 void  far gfx_setPageN(uint16 a) { }
 void  far gfx_commitPage(void) { }
 void  sub_10E50(int16 *page, int16 x1, int16 y1, int16 x2, int16 y2) { } /* clearRect dup — skeleton */
-int32 sub_15666(int16 n) { return 0; }            /* calcMissionScore — skeleton */
 void  sub_15D1B(void) { }                         /* event popup — skeleton */
+/* calcMissionScore (sub_15666) globals — award tables, counters, multipliers */
+int16  word_2387A;                              /* dseg:0x9aea — init 0x1318, theatre/weapon count */
+int16  word_22C34;                              /* dseg:0x8ea4 — visual-id count */
+int16  word_2379C;                              /* dseg:0x9a0c — radar-id count */
+uint8  ms_groundKilled;                         /* dseg:0x978a */
+uint8  ms_friendlyGnd;                          /* dseg:0x978b */
+uint8  ms_civilian;                             /* dseg:0x99f5 */
+uint8  ms_airKilled;                            /* dseg:0x86c1 */
+uint8  ms_friendlyAir;                          /* dseg:0x86c2 */
+uint8  ms_unauthGround;                         /* dseg:0x917e */
+uint8  ms_unauthAir;                            /* dseg:0x9986 */
+int16  awardPrim[8];                            /* dseg:0x4206 primary-hit award */
+int16  awardSec[8];                             /* dseg:0x420c secondary-hit award */
+int16  awardVisId[8];                           /* dseg:0x4210 visual-id award */
+int16  awardArmedGnd[8];                        /* dseg:0x4216 */
+int16  awardUnitChk[8];                         /* dseg:0x421c unit-type check table */
+int16  awardCivilian[8];                        /* dseg:0x4222 */
+int16  awardUnarmedGnd[8];                      /* dseg:0x4228 */
+int16  awardFriendlyGnd[8];                     /* dseg:0x422e */
+int16  awardRadarId[8];                         /* dseg:0x4234 */
+int16  award423a[8], award4240[8], award4246[8], award424c[8], award4252[8];
+int16  awardUnit[8][16];                        /* dseg:0x4258 2-D per-unit award */
+int16  multTheater[8];                          /* dseg:0x42b8 */
+int16  multMission[8];                          /* dseg:0x42c2 */
+int16  multDiff[8];                             /* dseg:0x42ca */
+int16  multUnk[8];                              /* dseg:0x42d2 */
+int16  multResult[8];                           /* dseg:0x42d8 */
+uint8  gridFlags[256];                          /* debrief grid-terrain flags */
+int8   unitTypeTable[128];                      /* unitId -> type flags byte */
+struct PlaneObjEnd { int16 validFlag; int8 pad02[0x1e]; };  /* 0x20-stride unit object */
+struct PlaneObjEnd planeObjects[16];            /* obj flag at dseg:0x1b0-base */
+uint8  samFlagTab[1024];                        /* SAM-type flags, unitFlag*0xe index */
 /* drawMenuItem (seg000:0x44a8) globals */
 int16  totalFlightRecords;
 int32  missionScore;
