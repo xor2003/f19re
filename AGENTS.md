@@ -65,7 +65,8 @@ map/<x>_en.map --srcdir src_<x>`):
   stobjb.c(/Os): sub_161A4
   stmap.c(/Ot): mapToScreenX mapToScreenY drawMapLine drawClippedMapLine
     drawMapPoint plotMapPoint sinMul cosMul toggleSelRect drawRiskPanel
-    rectInView shiftByMode drawScorePanel drawUnitList
+    rectInView shiftByMode drawScorePanel drawUnitList sub_10AE8
+  stmain.c(/Ot): sub_10810 sub_108B7
   stparse.c: parseGridTerrain parseTerrain
   stpinp.c: saveHallfame loadHallfame pilotNameInput
   stterr.c: lookupGridCell

@@ -1431,3 +1431,19 @@ Local frames are name-hash engineered: sub_10AEB 0x3fa frame
 4-byte far* locals.
 
 All 9 MATCH; verify-exes 0 diffs on all four exes.
+
+START.EXE `sub_10AE8` (0ae8-12a7, 1984B) — the interactive row-selection
+widget — MATCH in src_start/stmap.c (`/Ot` default). Its map extent
+absorbed the three ada pseudo-routines `sub_10F43`/`sub_10FEE`/`sub_11000`:
+those are alternate entries landing mid-instruction inside the shared
+tail (`push word [bp-4]`'s `FC` disp byte doubles as `cld` for the 0xf43
+entry; `0C FF` at 0x1000 is `or al,0xFF`). Skeleton labels still come from
+the lst, so the merged extent rebuilds byte-exact. Loop shape: the three
+`rectInView` scans are rotated loops — `init; goto T; BODY{cmp;inc}; T:
+call` — expressed as explicit `goto` since neither `while` nor `for`
+produced MSC's body-over-test layout here. The phase-2 redraw arm under
+`flag2CA4C==1 && byte_2C9E0==1` has FOUR bc7 panel calls (9,5 / 3,5 /
+0xD,5 / 0xB,5), asymmetric with the byte_2C970 path's (0xB,5 / 3 / 0xD /
+9). `tools/portcheck.py` tail restored (was truncated mid-comment by an
+ENOSPC write in commit 9ba4047) + `os.rename`→`shutil.move` for the
+cross-fs build dir and KV_SCRATCH mount option kept.

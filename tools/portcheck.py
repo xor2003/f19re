@@ -15,6 +15,7 @@ Steps:
 """
 import os
 import re
+import shutil
 import struct
 import subprocess
 import sys
@@ -155,14 +156,13 @@ def kvikdos(args, extra_srcdir=None):
            '--env=PATH=C:\\bin;C:\\BBIN',
            '--env=TMP=%s' % ('G:\\' if scratch else 'D:\\'),
            '--drive=E']
-    if extra_srcdir:
-        cmd += ['--mount=F:%s/' % os.path.abspath(extra_srcdir)]
     # KV_SCRATCH=/path mounts scratch space as G: and retargets TMP there,
     # for when ROOT's filesystem (D:/E: drives) is full.
-    scratch = os.environ.get('KV_SCRATCH')
     if scratch:
         os.makedirs(scratch, exist_ok=True)
         cmd += ['--mount=G:%s/' % scratch]
+    if extra_srcdir:
+        cmd += ['--mount=F:%s/' % os.path.abspath(extra_srcdir)]
     return subprocess.run(cmd + args)
 
 
@@ -282,8 +282,8 @@ def main():
     # tidy: move the stray objs out of the compiler dir
     for mod in modules:
         modbase = os.path.splitext(mod)[0].upper()[:8]
-        os.rename(os.path.join(MSC, 'bin', modbase + '.OBJ'),
-                  os.path.join(BUILD, modbase.lower() + '.obj'))
+        shutil.move(os.path.join(MSC, 'bin', modbase + '.OBJ'),
+                    os.path.join(BUILD, modbase.lower() + '.obj'))
 
     def find_out(ext):
         for cand in os.listdir(BUILD):
@@ -356,4 +356,25 @@ def main():
                     # depends on the function's offset in the final exe), and
                     # code-location lookups that fail only because the test
                     # exe has no equivalent routine for an original thunk
-       
+                    # (under --nocall the callee isn't verified anyway)
+                    if prev_conflict or 'nop' in ln:
+                        allowed += 1
+                    elif 'Unable to find a match for location' in ln:
+                        allowed += 1
+                        unresolved += 1
+                prev_conflict = ('offset mapping' in ln and 'collid' in ln)
+            if errors == allowed:
+                ok = True
+                if unresolved:
+                    print(f'  note: {unresolved} unmapped call target(s) tolerated')
+        print(f'{name}: {"MATCH" if ok else "MISMATCH"}'
+              f'  ({os.path.basename(src)} @0x{tgt:x} vs ref 0x{ext[0]:x}-0x{ext[1]:x})')
+        if not ok:
+            print('  ' + ' '.join(cmd))
+            print('\n'.join('  ' + l for l in r.stdout.splitlines()[:25]))
+            rc = 1
+    sys.exit(rc)
+
+
+if __name__ == '__main__':
+    main()

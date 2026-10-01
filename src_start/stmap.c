@@ -269,3 +269,203 @@ void drawUnitList(struct TileEntry *tab, char far **names, int16 count,
     word_2CA64 = outB;
 }
 
+
+/* ==== seg000:0x0AE8 sub_10AE8 — interactive row-select widget.
+ * Companion to drawUnitList: after it renders the rows, this polls input
+ * (ovlCall_c8a + sub_11366), repaints selection panels, and returns the
+ * picked row (OR'd with 0x200 when byte_27E5A is set). ==== */
+struct SelRow {
+    int16 pad[4];                /* 0x00..0x07 hit-test rect */
+    int16 rx0, ry0, rx1, ry1;    /* 0x08..0x0e inner rect */
+    int16 mode;                  /* 0x10 */
+    int16 pad2;                  /* 0x12 */
+    int16 x0, y0, x1, y1;        /* 0x14..0x1a text rect */
+    int16 spr1, spr2;            /* 0x1c,0x1e */
+    int16 pad3[6];               /* 0x20..0x2a */
+    int16 f2C, f2E;              /* 0x2c group tag / 0x2e state */
+    union { int16 w; int8 b; } flag;  /* 0x30 */
+};
+extern void sub_11366(int16 v, struct SelRow *r, int16 *pd);
+extern void drawLine(int16 x0, int16 y0, int16 x1, int16 y1, int16 c);
+extern void far ovlCall_b9f(int16 v);
+extern void far ovlCall_c8a(void);
+extern void far ovlCall_bc7(int16 *pd, int16 x0, int16 y0, int16 x1,
+                            int16 y1, int16 m, int16 n);
+extern int16 word_27E56;
+extern uint8 byte_27E52, byte_27E58, byte_27E5A;
+extern uint8 byte_2C970, byte_298F7;
+
+int16 sub_10AE8(struct SelRow *tab, char far **names, int16 count,
+                int16 a4, int16 *pd, int16 a6) {
+    char a[2];  int16 b;    int16 c;
+    char d[2];  int16 e;    char f[2];
+    int16 g;    int16 h;    char i[2];
+    int16 j;    int8  typ;  char  buf[0x16];
+
+    a[0] = 0x0D; a[1] = 0;
+    f[0] = 0x89; f[1] = 0;
+    d[0] = 0x8D; d[1] = 0;
+    i[0] = 0x80; i[1] = 0;
+    ovlCall_c8a();
+    word_27E56 = 0;
+    j = 0;
+    goto L1t;
+L1b:
+    if (j >= count)
+        goto L1d;
+    j++;
+L1t:
+    if (!rectInView((uint16 *)&tab[j]))
+        goto L1b;
+L1d:
+    byte_27E58 = 0;
+    for (;;) {
+        ovlCall_c8a();
+        if (!(tab[j].flag.w & 0x100))
+            word_27E56 = 1;
+        sub_11366(a4, &tab[j], pd);
+        if (byte_27E52 == 0 && byte_2C970 == 0)
+            continue;
+        if (byte_2C970 != 0) {
+            if (j != selRowIdx) {
+                j = 0;
+                goto L2t;
+L2b:
+                if (j >= count)
+                    goto L2d;
+                j++;
+L2t:
+                if (!rectInView((uint16 *)&tab[j]))
+                    goto L2b;
+L2d: ;
+            }
+            if (tab[selRowIdx].mode == 0) {
+                c = 0xB; b = 9;
+                ovlCall_bc7(pd, tab[selRowIdx].rx0, tab[selRowIdx].ry0,
+                            tab[selRowIdx].rx1, tab[selRowIdx].ry1, c, b);
+                c = 3;
+                ovlCall_bc7(pd, tab[selRowIdx].rx0, tab[selRowIdx].ry0,
+                            tab[selRowIdx].rx1, tab[selRowIdx].ry1, c, b);
+                c = 0xD;
+                ovlCall_bc7(pd, tab[selRowIdx].rx0, tab[selRowIdx].ry0,
+                            tab[selRowIdx].rx1, tab[selRowIdx].ry1, c, b);
+            }
+            if (flag2CA4C == 1 && byte_2C9E0 == 1) {
+                c = 0xB; b = 5;
+                ovlCall_bc7(pd, tab[selRowIdx].rx0, tab[selRowIdx].ry0,
+                            tab[selRowIdx].rx1, tab[selRowIdx].ry1, c, b);
+                c = 3;
+                ovlCall_bc7(pd, tab[selRowIdx].rx0, tab[selRowIdx].ry0,
+                            tab[selRowIdx].rx1, tab[selRowIdx].ry1, c, b);
+                c = 0xD;
+                ovlCall_bc7(pd, tab[selRowIdx].rx0, tab[selRowIdx].ry0,
+                            tab[selRowIdx].rx1, tab[selRowIdx].ry1, c, b);
+                c = 9;
+                ovlCall_bc7(pd, tab[selRowIdx].rx0, tab[selRowIdx].ry0,
+                            tab[selRowIdx].rx1, tab[selRowIdx].ry1, c, b);
+            } else if (flag2CA4C == 1 && byte_2C9E0 == 0) {
+                ovlCall_b9f(0xF);
+                drawLine(tab[selRowIdx].rx0 - 1, tab[selRowIdx].ry0 - 1,
+                         tab[selRowIdx].rx1 + 1, tab[selRowIdx].ry0 - 1, 0xF);
+                drawLine(tab[selRowIdx].rx1 + 1, tab[selRowIdx].ry0 - 1,
+                         tab[selRowIdx].rx1 + 1, tab[selRowIdx].ry1 + 1, 0xF);
+                drawLine(tab[selRowIdx].rx1 + 1, tab[selRowIdx].ry1 + 1,
+                         tab[selRowIdx].rx0 - 1, tab[selRowIdx].ry1 + 1, 0xF);
+                drawLine(tab[selRowIdx].rx0 - 1, tab[selRowIdx].ry1 + 1,
+                         tab[selRowIdx].rx0 - 1, tab[selRowIdx].ry0, 0xF);
+            }
+            if (byte_27E5A == 1)
+                ((int8 *)&j)[1] |= 2;
+            return j;
+        }
+        j = 0;
+        goto L3t;
+L3b:
+        if (j >= count)
+            goto L3d;
+        j++;
+L3t:
+        if (!rectInView((uint16 *)&tab[j]))
+            goto L3b;
+L3d:
+        if (j == selRowIdx) {
+            typ = tab[j].flag.b & 7;
+            if (typ != 2 && typ != 3 && typ != 4)
+                continue;
+        }
+        if (flag_29948 == 1)
+            drawRiskPanel((struct ObjF04 *)pd, a6, j);
+        if (tab[j].flag.b & 8) {
+            for (g = 0; g < count; g++) {
+                if (tab[g].f2E != 0 && tab[g].f2C == tab[j].f2C)
+                    toggleSelRect((struct SelEnt *)&tab[g], pd);
+            }
+            if (tab[selRowIdx].mode == 0 && flag2CA4C == 0) {
+                c = 9; b = 6;
+                ovlCall_bc7(pd, tab[selRowIdx].rx0, tab[selRowIdx].ry0,
+                            tab[selRowIdx].rx1, tab[selRowIdx].ry1, c, b);
+                c = 3;
+                ovlCall_bc7(pd, tab[selRowIdx].rx0, tab[selRowIdx].ry0,
+                            tab[selRowIdx].rx1, tab[selRowIdx].ry1, c, b);
+                c = 0xD;
+                ovlCall_bc7(pd, tab[selRowIdx].rx0, tab[selRowIdx].ry0,
+                            tab[selRowIdx].rx1, tab[selRowIdx].ry1, c, b);
+                c = 0xB;
+                ovlCall_bc7(pd, tab[selRowIdx].rx0, tab[selRowIdx].ry0,
+                            tab[selRowIdx].rx1, tab[selRowIdx].ry1, c, b);
+            }
+            if (tab[selRowIdx].mode == 1) {
+                c = 8; b = 7;
+                ovlCall_bc7(pd, tab[selRowIdx].rx0, tab[selRowIdx].ry0,
+                            tab[selRowIdx].rx1, tab[selRowIdx].ry1, c, b);
+            }
+            if (flag2CA4C == 1 && byte_2C9E0 == 1) {
+                c = 9; b = 5;
+                ovlCall_bc7(pd, tab[selRowIdx].rx0, tab[selRowIdx].ry0,
+                            tab[selRowIdx].rx1, tab[selRowIdx].ry1, c, b);
+                c = 3;
+                ovlCall_bc7(pd, tab[selRowIdx].rx0, tab[selRowIdx].ry0,
+                            tab[selRowIdx].rx1, tab[selRowIdx].ry1, c, b);
+                c = 0xD;
+                ovlCall_bc7(pd, tab[selRowIdx].rx0, tab[selRowIdx].ry0,
+                            tab[selRowIdx].rx1, tab[selRowIdx].ry1, c, b);
+                c = 0xB;
+                ovlCall_bc7(pd, tab[selRowIdx].rx0, tab[selRowIdx].ry0,
+                            tab[selRowIdx].rx1, tab[selRowIdx].ry1, c, b);
+            } else if (flag2CA4C == 1 && byte_2C9E0 == 0) {
+                ovlCall_b9f(0xF);
+                drawLine(tab[selRowIdx].rx0 - 1, tab[selRowIdx].ry0 - 1,
+                         tab[selRowIdx].rx1 + 1, tab[selRowIdx].ry0 - 1, 0xF);
+                drawLine(tab[selRowIdx].rx1 + 1, tab[selRowIdx].ry0 - 1,
+                         tab[selRowIdx].rx1 + 1, tab[selRowIdx].ry1 + 1, 0xF);
+                drawLine(tab[selRowIdx].rx1 + 1, tab[selRowIdx].ry1 + 1,
+                         tab[selRowIdx].rx0 - 1, tab[selRowIdx].ry1 + 1, 0xF);
+                drawLine(tab[selRowIdx].rx0 - 1, tab[selRowIdx].ry1 + 1,
+                         tab[selRowIdx].rx0 - 1, tab[selRowIdx].ry0, 0xF);
+            }
+            if (flag2CA4C != 1 || byte_2C9E0 != 0)
+                toggleSelRect((struct SelEnt *)&tab[j], pd);
+        }
+        selRowIdx = j;
+        if (tab[j].flag.b & 0x40) {
+            sub_14622(pd, tab[j].x0, tab[j].y0, tab[j].x1, tab[j].y1);
+            if (flag2C7CE == 1 && selAvailTab[j] == 1) {
+                sub_15120(strB96A, typeNameTab[typeIdxTab[j]]);
+                wrapUnitText(tab[j].spr2, strB96A,
+                             tab[j].x1 - tab[j].x0 - 1, tab[j].x0,
+                             tab[j].y0 + (j == 0xC ? 0x28 : 0), tab[j].spr1);
+            } else if (flag2C7CE == 1 && byte_298F7 == 1 && j == 0x10) {
+                wrapUnitTextFar(tab[j].spr2, names[0x13],
+                                tab[j].x1 - tab[j].x0 - 1, tab[j].x0,
+                                tab[j].y0, tab[j].spr1);
+            } else {
+                wrapUnitTextFar(tab[j].spr2, names[j],
+                                tab[j].x1 - tab[j].x0 - 1, tab[j].x0,
+                                tab[j].y0, tab[j].spr1);
+            }
+        }
+        drawTileIcon((struct TileEntry *)tab, j, (struct ObjF06 *)pd);
+        sub_13218((struct TileEntry *)tab, j, pd);
+        sub_12754((struct TileEntry *)tab, j, pd);
+    }
+}

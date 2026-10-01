@@ -657,7 +657,9 @@ int16 *word_26480, *word_263C6;              /* page record handles */
 int16 word_2A0C4;                            /* rtc-bail arg */
 void  sub_13B50(int16 *p, struct MenuRow r, int16 c, int16 d) { }
 void  sub_10924(char *s, int16 t, int16 n, int16 a, int16 b, int16 *p, int16 f) { }
+#ifndef EXE_START /* src_start/stmap.c provides the real port */
 int16 sub_10AE8(char *s, int16 t, int16 n, int16 *sp, int16 *p, int16 f) { return 0; }
+#endif
 void  sub_125EA(void) { }
 void  sub_14584(void *o, int16 a, int16 b, int16 c, int16 d) { }
 void  sub_14A5F(char *s, int16 v) { }
@@ -757,6 +759,12 @@ uint8 byte_2C9E0;
 int16 selAvailTab[4], typeIdxTab[4];
 char *namePtrTab[2], *typeNameTab[2];
 char  strB96A[8], str282[4];
+/* stmap.c sub_10AE8 deps */
+int16 word_27E56;
+uint8 byte_27E52, byte_27E58, byte_27E5A;
+uint8 byte_2C970, byte_298F7;
+void  sub_11366(int16 v, void *r, int16 *pd) { }
+void  far ovlCall_b9f(int16 v) { }             /* overlay 1000:0b9f */
 #ifndef EXE_START /* src_start/stpanel.c provides the real port */
 void  sub_12754(void *t, int16 i, int16 *pd) { }
 #endif
