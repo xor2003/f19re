@@ -1377,3 +1377,14 @@ it stays a callee stub. Map: renamed sub_11A8A→loadMapView.
 
 All 27 enbrief.c + 1 enbrief2.c routines MATCH; verify-exes 0 diffs on all
 four exes.
+
+### END.EXE sub_15D1B extent check (seg000:0x5d1b-0x8531, 0x2816 bytes)
+
+Verified the map extent is REAL: `sub_15D1B` is a single monolithic proc
+(~10KB) — the END debrief/campaign mega-dispatcher (170 `call sub_13923`,
+97 `call far`, 18 `sub_138BA`, …). No embedded `db`/`dw` data and no
+swallowed sub-prologues inside (the 9 mid-range `push bp` are register
+saves, not procs). Clean `pop si; mov sp,bp; pop bp; retn` epilogue at
+0x8531; `sub_18532` proc begins adjacent at 0x8532 — no boundary overlap.
+Candidate for skeleton (a ~10KB dispatcher is impractical to C-port
+byte-exact); left as `sub_15D1B` asm skeleton.
