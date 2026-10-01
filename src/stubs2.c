@@ -8,8 +8,11 @@ int16  word_23C66, word_23C68;                  /* dseg:0x9ed6/8 — commData ha
 int16  word_2243E, word_22440;                  /* dseg:0x86ae/b0 — pilotRec halves */
 int8   byte_1D6CE, byte_1D6CF, byte_1D6D2;      /* dseg:0x193e/0x193f/0x1942 */
 int8   byte_22F08;                              /* dseg:0x9178 */
-void  sub_16486(void) { }                         /* event renderer — skeleton */
+/* sub_16486 now real in src_end/endevt.c */
 void  sub_175BC(void) { }                         /* event renderer — skeleton */
+int16 *word_1F426;                              /* dseg:0x5696 — eval panel ptr */
+char  *malloc(int16 size) { return (char *)0; }   /* 0x8c20 */
+void   free(char *p) { }                          /* 0x8c0e */
 void  sub_1883C(void) { }                         /* landingtype-1 handler — skeleton */
 void  sub_10D1A(int16 seg) { }                    /* drv tbl patch — skeleton */
 int16 far gfx_getConst1(void) { return 0; }       /* 9D9:149F */

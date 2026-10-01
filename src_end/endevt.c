@@ -68,6 +68,7 @@ struct PilotRecEnd {                            /* far ptr word_2243E */
     int32  totalScore;                          /* 0x32 */
     uint16 missionCount;                        /* 0x36 */
     uint16 field38;                             /* 0x38 — res-name tbl idx */
+    uint16 field3a;                             /* 0x3a — ROE-violation class */
 };
 extern struct PilotRecEnd far *pilotRec;        /* word_2243E */
 
@@ -523,4 +524,325 @@ void sub_15D1B(void)
     gfx_copyRect(0, popupX, popupY, 1, 0, 0x96, 0x30, 0x28);
     gfx_copyRect(1, word_1E280[n], word_1E25C[n], 0, popupX, popupY, 0x30, 0x28);
     popupVisible = 1;
+}
+
+/* seg000:0x6486 — mission-evaluation narrative: grave/bad/good pic, then the
+ * after-action text assembled into a malloc'd scratch buffer. */
+extern int16  my_itoa(int16 value, char *buf);           /* seg000:0x0c03 */
+extern int16 *word_1F426;                                /* dseg:0x5696 — eval panel */
+extern uint8  ms_airKilled, ms_friendlyAir;              /* byte_22451 / byte_22452 */
+extern uint8  ms_groundKilled, ms_friendlyGnd;           /* byte_2351A / byte_2351B */
+extern uint8  ms_unauthGround, ms_unauthAir;             /* byte_22F0E / byte_23716 */
+extern uint8  ms_civilian;                             /* byte_23785 */
+extern char  *malloc(int16 size);                        /* seg000:0x8c20 */
+extern void   free(char *p);                             /* seg000:0x8c0e */
+
+void sub_16486(void)
+{
+    char    eol[2];                          /* "\r" */
+    char    pname[0x20];                     /* pilot name */
+    char   *out;                             /* scratch text */
+    char    numstr[0x10];                    /* itoa/ltoa scratch */
+    char    nbuf[2];                         /* 0x8f tag */
+    char    rankname[0x38];                  /* rank + name */
+    char    pfx[2];                         /* 0x8e tag */
+    register uint16 kills;
+
+    eol[0] = 0xd;  eol[1] = 0;
+    pfx[0] = 0x8e; pfx[1] = 0;
+    nbuf[0] = 0x8f; nbuf[1] = 0;
+    farStrcpy(pname, (char far *)pilotRec + 2);
+    out = malloc(0x3e8);
+    word_23B6A = calcMissionScore(0x100);
+
+    if (commData->bailout != 0 && commData->trainingFlag == 0) {
+        gfx_setFadeSteps(8);
+        openBlitClosePic("grave.pic", word_23C6C);
+        if (word_18EA2 == 1) {
+            loadFileSection("gravec.pak", word_23C78, word_23C7A);
+            word_1295C = drawMapView(0x21, 0x5e, word_23C76);
+        }
+    }
+    if ((commData->bailout == 0 && target1Scored == 0 && target2Scored == 0)
+        || (commData->bailout != 0 && commData->trainingFlag == 1)) {
+        gfx_setFadeSteps(9);
+        openBlitClosePic("bad.pic", word_23C6C);
+        if (word_18EA2 == 1) {
+            loadFileSection("badc.pak", word_23C78, word_23C7A);
+            word_1295C = drawMapView(3, 0xe, word_23C76);
+        }
+    }
+    if (commData->bailout == 0 && (target1Scored == 1 || target2Scored == 1)) {
+        gfx_setFadeSteps(9);
+        openBlitClosePic("good.pic", word_23C6C);
+        if (word_18EA2 == 1) {
+            loadFileSection("goodc.pak", word_23C78, word_23C7A);
+            word_1295C = drawMapView(3, 0x20, word_23C76);
+        }
+    }
+    gfx_waitRetrace();
+    gfx_blitToCurrent(word_23C6C);
+    gfx_flipPage();
+    word_1F426[2] = 9;
+    drawStringAt(word_1F426, "Press Selector to continue", 0x50, 0xc0);
+    mystrcpy(rankname, (const char *)rankNames[pilotRec->rank]);
+    mystrcat(rankname, pname);
+
+    if (commData->bailout != 0 && commData->trainingFlag == 1) {
+        mystrcpy(out, "If this had been an actual combat mission, ");
+        mystrcat(out, rankname);
+        mystrcat(out, " would now be dead");
+        if (target1Scored == 1 || target2Scored == 1) {
+            mystrcat(out, ", but the ");
+            mystrcat(out, pfx);
+            if (target1Scored == 1 && target2Scored == 1)
+                mystrcat(out, "primary and secondary targets were ");
+            else if (target1Scored == 1)
+                mystrcat(out, "primary target was ");
+            else
+                mystrcat(out, "secondary target was ");
+            mystrcat(out, "successfully destroyed.  ");
+        } else {
+            mystrcat(out, " and the ");
+            mystrcat(out, pfx);
+            mystrcat(out, "primary target remains intact.  ");
+        }
+        mystrcat(out, nbuf);
+    } else if (commData->bailout != 0) {
+        mystrcpy(out, rankname);
+        if (target1Scored == 1 || target2Scored == 1) {
+            mystrcat(out, " was killed in action ");
+            mystrcat(out, pfx);
+            mystrcat(out, "after accomplishing his mission.  ");
+        } else {
+            mystrcat(out, " died in the line of duty, ");
+            mystrcat(out, pfx);
+            mystrcat(out, "mission incomplete.  ");
+        }
+        mystrcat(out, nbuf);
+    } else if (commData->landingType != 1 && missionResult == 0) {
+        mystrcpy(out, "After an embarrassing international incident, ");
+        mystrcat(out, rankname);
+        mystrcat(out, " returned to his squadron.  ");
+        if (target1Scored == 1 || target2Scored == 1) {
+            mystrcat(out, pfx);
+            mystrcat(out, "Destroying the ");
+            if (target1Scored == 1 && target2Scored == 1)
+                mystrcat(out, "primary and secondary targets ");
+            else if (target1Scored == 1)
+                mystrcat(out, "primary objective ");
+            else
+                mystrcat(out, "secondary target ");
+            mystrcat(out, nbuf);
+            mystrcat(out, "helped calm the squadron commander.  ");
+        } else {
+            mystrcat(out, "The squadron commander was not pleased that the ");
+            mystrcat(out, pfx);
+            mystrcat(out, "primary target remains intact.  ");
+            mystrcat(out, nbuf);
+        }
+    } else if (commData->landingType == 2 && missionResult != 0) {
+        mystrcpy(out, rankname);
+        if (target1Scored == 1 || target2Scored == 1) {
+            mystrcat(out, " survived ejection after ");
+            mystrcat(out, pfx);
+            mystrcat(out, "successfully achieving his ");
+            if (target1Scored == 1 && target2Scored == 1)
+                mystrcat(out, "primary and secondary objectives.  ");
+            else if (target1Scored == 1)
+                mystrcat(out, "primary objective.  ");
+            else
+                mystrcat(out, "secondary objective.  ");
+        } else {
+            mystrcat(out, " survived ejection but ");
+            mystrcat(out, pfx);
+            mystrcat(out, "failed to accomplish the mission.  ");
+        }
+        mystrcat(out, nbuf);
+    } else if (commData->landingType == 3) {
+        mystrcpy(out, rankname);
+        if (target1Scored == 1 || target2Scored == 1) {
+            mystrcat(out, " landed safely and ");
+            mystrcat(out, pfx);
+            mystrcat(out, "accomplished his ");
+            if (target1Scored == 1 && target2Scored == 1)
+                mystrcat(out, "primary and secondary mission!  ");
+            else if (target1Scored == 1)
+                mystrcat(out, "primary mission!  ");
+            else
+                mystrcat(out, "secondary mission!  ");
+        } else {
+            mystrcat(out, " landed safely but ");
+            mystrcat(out, pfx);
+            mystrcat(out, "failed to accomplish his assigned objective.  ");
+        }
+        mystrcat(out, nbuf);
+    }
+    mystrcat(out, eol);
+
+    mystrcat(out, "The ");
+    mystrcat(out, pfx);
+    mystrcat(out, "performance rating ");
+    mystrcat(out, nbuf);
+    mystrcat(out, "for this mission was ");
+    mystrcat(out, pfx);
+    my_ltoa(word_23B6A, numstr);
+    mystrcat(out, numstr);
+    mystrcat(out, nbuf);
+    if (commData->trainingFlag == 0)
+        mystrcat(out, ".  ");
+    else
+        mystrcat(out, ", but will not be recorded as this was a training flight.");
+    mystrcat(out, eol);
+
+    kills = ms_airKilled + ms_unauthAir;
+    if (kills != 0) {
+        if (kills > 1 && kills < 12) {
+            my_itoa(kills, numstr);
+            mystrcat(out, pfx);
+            mystrcat(out, numstr);
+            mystrcat(out, " enemy aircraft ");
+            mystrcat(out, nbuf);
+            mystrcat(out, "were ");
+            mystrcat(out, pfx);
+            mystrcat(out, "shot down.  ");
+            mystrcat(out, nbuf);
+        } else if (ms_airKilled + ms_unauthAir >= 12) {
+            mystrcat(out, "In a rare display of dogfighting skills, ");
+            my_itoa(ms_airKilled + ms_unauthAir, numstr);
+            mystrcat(out, pfx);
+            mystrcat(out, numstr);
+            mystrcat(out, " enemy aircraft ");
+            mystrcat(out, nbuf);
+            mystrcat(out, "were ");
+            mystrcat(out, pfx);
+            mystrcat(out, "shot down! ");
+            mystrcat(out, nbuf);
+        } else if (ms_airKilled + ms_unauthAir == 1) {
+            mystrcat(out, pfx);
+            mystrcat(out, "One enemy plane ");
+            mystrcat(out, nbuf);
+            mystrcat(out, "was ");
+            mystrcat(out, pfx);
+            mystrcat(out, "shot down.  ");
+            mystrcat(out, nbuf);
+        }
+    }
+    mystrcat(out, eol);
+
+    kills = ms_groundKilled + ms_unauthGround;
+    if (kills != 0) {
+        if (kills == 1) {
+            mystrcat(out, pfx);
+            mystrcat(out, "One enemy ground target ");
+            mystrcat(out, nbuf);
+            mystrcat(out, "was ");
+        } else {
+            my_itoa(ms_groundKilled + ms_unauthGround, numstr);
+            mystrcat(out, pfx);
+            mystrcat(out, numstr);
+            mystrcat(out, " enemy ground installations ");
+            mystrcat(out, nbuf);
+            mystrcat(out, "were ");
+        }
+        mystrcat(out, pfx);
+        mystrcat(out, "destroyed.  ");
+        mystrcat(out, nbuf);
+    }
+    mystrcat(out, eol);
+
+    if (pilotRec->field3a == 0
+        && (ms_civilian != 0 || ms_unauthGround + ms_unauthAir != 0)) {
+        mystrcat(out, "In ");
+        mystrcat(out, pfx);
+        mystrcat(out, "violation ");
+        mystrcat(out, nbuf);
+        mystrcat(out, "of your ");
+        mystrcat(out, pfx);
+        mystrcat(out, "Rules Of Engagement, ");
+        if (ms_civilian != 0 && ms_unauthGround + ms_unauthAir != 0) {
+            my_itoa(ms_civilian, numstr);
+            mystrcat(out, numstr);
+            mystrcat(out, " civilian and ");
+            my_itoa(ms_unauthGround + ms_unauthAir, numstr);
+            mystrcat(out, numstr);
+            mystrcat(out, " unauthorized military ");
+        } else if (ms_civilian != 0) {
+            my_itoa(ms_civilian, numstr);
+            mystrcat(out, numstr);
+            mystrcat(out, " civilian ");
+        } else {
+            my_itoa(ms_unauthGround + ms_unauthAir, numstr);
+            mystrcat(out, numstr);
+            mystrcat(out, " unauthorized military ");
+        }
+        if (ms_civilian + ms_unauthGround + ms_unauthAir > 1) {
+            mystrcat(out, "targets ");
+            mystrcat(out, nbuf);
+            mystrcat(out, "were ");
+        } else {
+            mystrcat(out, "target ");
+            mystrcat(out, nbuf);
+            mystrcat(out, "was ");
+        }
+        mystrcat(out, pfx);
+        mystrcat(out, "destroyed.");
+    }
+    mystrcat(out, eol);
+
+    if (pilotRec->field3a == 1 && ms_civilian != 0) {
+        mystrcat(out, "In ");
+        mystrcat(out, pfx);
+        mystrcat(out, "violation ");
+        mystrcat(out, nbuf);
+        mystrcat(out, "of your ");
+        mystrcat(out, pfx);
+        mystrcat(out, "Rules Of Engagement, ");
+        my_itoa(ms_civilian, numstr);
+        mystrcat(out, numstr);
+        mystrcat(out, " civilian ");
+        if (ms_civilian > 1) {
+            mystrcat(out, "targets ");
+            mystrcat(out, nbuf);
+            mystrcat(out, "were ");
+        } else {
+            mystrcat(out, "target ");
+            mystrcat(out, nbuf);
+            mystrcat(out, "was ");
+        }
+        mystrcat(out, pfx);
+        mystrcat(out, "destroyed.");
+    }
+    mystrcat(out, eol);
+
+    if (ms_friendlyAir != 0 || ms_friendlyGnd != 0) {
+        mystrcat(out, pfx);
+        mystrcat(out, "Friendly forces ");
+        mystrcat(out, nbuf);
+        mystrcat(out, "are ");
+        mystrcat(out, pfx);
+        mystrcat(out, "outraged by ");
+        mystrcat(out, nbuf);
+        mystrcat(out, "the ");
+        mystrcat(out, pfx);
+        mystrcat(out, "attack ");
+        mystrcat(out, nbuf);
+        mystrcat(out, "and destruction of their ");
+        if (ms_friendlyAir != 0 && ms_friendlyGnd != 0)
+            mystrcat(out, "aircraft and installations.  ");
+        else if (ms_friendlyAir != 0)
+            mystrcat(out, "aircraft.  ");
+        else
+            mystrcat(out, "installations.  ");
+    }
+
+    word_1F426[2] = 0xf;
+    drawWrappedText(word_1F426, out, 0x12c, 0xa, 0x49, 8);
+    gfx_commitPage();
+    setTimerIrqHandler();
+    waitForKeyOrJoy2();
+    restoreTimerIrqHandler();
+    free(out);
+    if (word_18EA2 == 1)
+        freeBuffer(word_226BC);
 }
