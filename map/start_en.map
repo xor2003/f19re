@@ -26,14 +26,15 @@ seg_stack STACK 1d30
 # assembly - routine was written in assembly, don't include in comparisons by default
 # duplicate - routine is a duplicate of another
 #
-sub_10010: seg000 NEAR 0010-006b R0010-006b
+sub_10010: seg000 NEAR 0010-080f R0010-063d U063e-065b R065c-080f
+sub_10810: seg000 NEAR 0810-0826 R0810-0826
 # Routine sub_10827 0000:0827-0000:0881[00005b] is a potential duplicate of routine initGraphics 0000:0484-0000:04f4[000071], differs by 10 instructions
 initGraphics: seg000 NEAR 0827-0881 R0827-0881 duplicate
 # Routine cleanup 0000:0882-0000:08b4[000033] is a potential duplicate of routine cleanup 0000:3924-0000:3956[000033], differs by 0 instructions
 cleanup: seg000 NEAR 0882-08b4 R0882-08b4 duplicate
 sub_108B5: seg000 NEAR 08b5-08b5 R08b5-08b5
 sub_108B6: seg000 NEAR 08b6-08b6 R08b6-08b6
-sub_108B7: seg000 NEAR 08b7-08b8 R08b7-08b8
+sub_108B7: seg000 NEAR 08b7-08c7 R08b7-08c7
 # Routine sub_108C8 0000:08c8-0000:0923[00005c] is a potential duplicate of routine readInputKey 0000:1ce2-0000:1d4f[00006e], differs by 6 instructions
 readInputKey: seg000 NEAR 08c8-0923 R08c8-0923 duplicate
 drawUnitList: seg000 NEAR 0924-0ae7 R0924-0ae7

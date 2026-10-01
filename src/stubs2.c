@@ -1,6 +1,9 @@
-/* stubs.c overflow — second unit (MSC heap limit) */
+/* stubs.c overflow — second unit (MSC heap limit). All contents are
+ * END-side dseg globals/stubs; guard for EXE_END so satellite builds of
+ * START/SU don't link the ~2.5KB of END BSS (small-model 64K data cap). */
 #include "inttype.h"
 
+#ifdef EXE_END
 int16  word_1E25C[16], word_1E280[16];          /* dseg:0x44cc/0x44f0 — icon params */
 struct { int16 w0; int16 pad[8]; } word_22A12[8] = {0};	/* dseg:0x8c82 */
 int16  word_1AAD8[64];                          /* dseg:0x0d48 */
@@ -32,3 +35,4 @@ void  sub_10D1A(int16 seg) { }                    /* drv tbl patch — skeleton 
 int16 far gfx_getConst1(void) { return 0; }       /* 9D9:149F */
 int16 far gfx_getAuxBufSize(void) { return 0; }   /* 9D9:1445 */
 void  far joyTableSetup(char far *p) { }          /* 9C7:0109 */
+#endif /* EXE_END */

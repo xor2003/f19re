@@ -110,3 +110,5 @@ void  sub_16D90(int16 a, int16 b, int16 c, int16 d, int16 e, int16 f) { }
 void  sub_16DC2(int16 a, int16 b, int16 c, int16 d, int16 e, int16 f) { }
 void  sub_16E0C(int16 a, int16 b, int16 c, int16 d, int16 e, int16 f) { }
 void  far ovlCall_ba9(void) { }             /* overlay 1000:0ba9 */
+int16 far ovlCall_cbc(void) { return 0; }   /* overlay 1000:0cbc */
+void  far ovlCall_cc1(void) { }             /* overlay 1000:0cc1 */

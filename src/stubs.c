@@ -599,7 +599,6 @@ int8  gamePhase;
 char *wldNameTab[8];
 uint8 siteNameData[0x10], siteObjData[0x10];
 char far *briefTextP;
-void  sub_108B7(void) { }
 char *sub_17558(int16 n, char *b, int16 t) { return b; }
 /* printObjective (stutil.c) globals */
 struct BriefTarget { int16 f[5]; char coord[6]; int16 dist; };
