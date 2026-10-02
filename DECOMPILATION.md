@@ -1482,3 +1482,33 @@ Notable codegen idioms:
   `(int16)`-cast.
 - The view arg is `int16 *` ([+0]xStep,[+1]yStep,[+2]xLo,[+3]xHi,
   [+4]yClamp,[+5]yMax); the sub_10AE8 call site casts `(int16 *)a4`.
+
+### START.EXE `sub_10010` (0010-080f, ~2KB) — START.EXE main, MATCH in src_start/stmain.c
+
+The program entry: IACA comm-block probe (far ptrs `*0x4F0/0x4F2/0x4F4`),
+overlay-slot patching (sub_14107 x3), graphics init, title16/credit16/adv
+splash sequence, a 4-way memory-tier fit (`word_2C7D4` = 0/1/2 chosen by
+free-paragraph checks vs `(bs<<2)/16 + (m6*3)/16 + 0x11E9*m4` style int32
+expressions — emitted via the _aNllsh/_aNldiv/_aNulmul helpers), a
+switch dispatch into per-tier alloc bodies, then the `byte_2C160` menu
+state machine (15-entry jump table → 12 `call; jmp cont` case stubs +
+shared `=0xC` default), the `commData->f72==1` overlay pump
+(`while(ovlCall_ccb(0));delayTicks(5);while(ovlCall_ccb(0));sub_10810()`),
+and the `objectActive[]` random-flag init loop. Notable idioms:
+
+- `x = 0; f(path, x += 0, seg)` — the `+= 0` defeats MSC's
+  store-then-fold so the arg emits `push word [x]` after
+  `mov word [x],0` (same trick as stutil.c's `d += 0` slot reload).
+  All `resFileReadBlock("Clipc.pak", word_2D2CA += 0, word_2D2CC)`-style
+  fresh-store args need it.
+- The tier dispatch is `switch (word_2C7D4)` INSIDE `if
+  (commData->f70 == 0)` — cases 0/1/2 with a `tier_alloc:` label; the
+  `f70 != 0` path jumps straight past the switch to the menu head.
+- Menu loop is `while (byte_2C160 != 0x15 && byte_2C160 != 0xC)` — the
+  `&&` pair emits the ref's `jne;jmp` exit; explicit `goto` exits made a
+  `jz`+tramp instead. Dispatch is a real `switch` (15-slot jump table).
+- Object loop: `==2` arm is a deferred block, `==3` arm inline — opposite
+  `randMul(9)` senses (store when `<=6` vs `>6`).
+- Module flag is /Os: /Ot pads the deferred splash-skip arm's odd branch
+  target with a nop. `ovlCall_cbc` is `int16`-returning here (`or ax,ax`
+  poll test) though stmap.c uses the same symbol as `int8`.

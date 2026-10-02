@@ -119,3 +119,31 @@ uint16 word_27E54;                          /* cycle index */
 uint8  byte_27E59;                          /* blink phase */
 uint8  byte_216AA, byte_216AB;              /* joystick axis centers */
 uint8  byte_20A1D;                          /* anim tick counter (0xa1d) */
+/* stmain.c sub_10010 (main driver) deps */
+int16 word_200E6;                           /* screen buffer offset */
+int16 word_298E0;                           /* tier-1 buf seg */
+int16 far *word_298EC;                      /* far ptr → gfx vector slot */
+
+int16 word_2BB74;                           /* aux-table tier flag */
+uint8 byte_2BE4E;                           /* keyboard-status copy */
+uint8 byte_2C7D6, byte_2C7D7;               /* buffer-clear flags */
+uint8 byte_2CE26;
+int16 word_2D2C4;                           /* tier-1 buf seg */
+int16 word_2D2CE, word_2D2F6, word_2D2F8;   /* pak file far bufs */
+void  sub_14107(int16 v) { }                /* overlay slot patcher (skeleton) */
+int16 sub_1E1EC(void) { return 0; }         /* key-waiting check (int21 0Bh) */
+void  sub_1CBD8(void) { }                   /* mode-2 screen (map gap) */
+void  sub_1CE56(void) { }                   /* mode-6 screen (map gap) */
+int16 far ovlF43_a(int16 v) { return v; }   /* overlay 0f43:0x0a */
+void  far ovlF43_10d(int16 v) { }           /* overlay 0f43:0x10d */
+void  far ovlFee_fd(int8 far *p) { }        /* overlay 0fee:0xfd */
+void  far ovlCall_c71(int16 a, int16 b) { } /* overlay 1000:0c71 */
+void  far ovlCall_cf3(void) { }             /* overlay 1000:0cf3 */
+void  far ovlCall_cee(void) { }             /* overlay 1000:0cee */
+int16 far ovlCall_bef(void) { return 0; }   /* overlay 1000:0bef buf size */
+void  far ovlCall_c2b(int16 v) { }          /* overlay 1000:0c2b res-set sel */
+void  far ovlCall_cfd(void) { }             /* overlay 1000:0cfd */
+int16 far ovlCall_b6d(void) { return 0; }   /* overlay 1000:0b6d size */
+int16 far ovlCall_c49(void) { return 0; }   /* overlay 1000:0c49 aux size */
+int16 far ovlCall_bf4(void) { return 0; }   /* overlay 1000:0bf4 free paras */
+void  far ovlCall_cd0(void) { }             /* overlay 1000:0cd0 */

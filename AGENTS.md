@@ -67,7 +67,10 @@ map/<x>_en.map --srcdir src_<x>`):
     drawMapPoint plotMapPoint sinMul cosMul toggleSelRect drawRiskPanel
     rectInView shiftByMode drawScorePanel drawUnitList sub_10AE8
     sub_11366
-  stmain.c(/Ot): sub_10810 sub_108B7
+  stmain.c(/Os): sub_10010 (START main: comm-block + overlay-slot setup,
+    title/credit/adv splash, 4-way memory-tier switch, byte_2C160 menu
+    state machine, object init) sub_10810 sub_108B7 (+ empty retn slots
+    sub_108B5/sub_108B6/sub_14CCA)
   stparse.c: parseGridTerrain parseTerrain
   stpinp.c: saveHallfame loadHallfame pilotNameInput
   stterr.c: lookupGridCell

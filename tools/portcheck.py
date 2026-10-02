@@ -90,6 +90,9 @@ MODULE_FLAGS = {
     # epilogue tail (jmp over sub ax,ax); /Ot inlines per-return epilogues.
     'start/stobjb.c':  ['/AS', '/Gs', '/Os'],
     'start/stgen.c':   ['/AS', '/Gs', '/Ot'],
+    # EN stmain (sub_10010 START main + sub_108B7 settle-poll): /Os — /Ot
+    # pads the deferred splash-skip arm (odd branch target) with a nop.
+    'start/stmain.c':  ['/AS', '/Gs', '/Os'],
     # EN stload: no /Gs — loadResSection prologue is `mov ax,2; call __chkstk`
     'start/stload.c':  ['/AS', '/Od'],
     'end/textfmt.c':   ['/AS', '/Gs', '/Os'],
