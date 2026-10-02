@@ -108,9 +108,10 @@ verify-drivers: drivers
 #
 ENEXES := su_en start_en end_en egame_en
 define ENEXE_RULE
-$(BUILDDIR)/$(1).exe $(BUILDDIR)/$(1).obj $(BUILDDIR)/$(1).asm &: tools/asmfix.py tools/exe2asm.py map/$(1).map lst/$(1)_ada.lst | $(BUILDDIR)
+$(BUILDDIR)/$(1).exe $(BUILDDIR)/$(1).obj $(BUILDDIR)/$(1).asm &: tools/asmfix.py tools/exe2asm.py tools/mzhdrfix.py map/$(1).map lst/$(1)_ada.lst | $(BUILDDIR)
 	python3 tools/asmfix.py $(call ENPATH,$(1)) map/$(1).map \
 	    $(BUILDDIR)/$(1).asm --lst lst/$(1)_ada.lst --tool exe2asm.py --build $(BUILDDIR)
+	python3 tools/mzhdrfix.py $(call ENPATH,$(1)) $(BUILDDIR)/$(1).exe
 endef
 ENPATH_su_en := $(F19EN)/SU.EXE
 ENPATH_start_en := $(F19EN)/START.EXE
