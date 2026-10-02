@@ -549,3 +549,12 @@ are `part_boundary_mismatch` artifacts of the extra prologue load.
   or `off` locals give `bx`/`sub sp,2` instead. Byte-exact unreachable.
   Z3: 18 proven, 1 part mis-paired by the comparator (contents agree),
   2 boundary refusals.
+
+RUNNABLE-EXE NOTE: `verify-exes`/portcheck compare LOAD IMAGES only. The
+rebuilt `build/*_en.exe` differ from the originals in the MZ header —
+e_crlc relocation table (orig has ~33-276 seg-fixup entries, our link
+emits 1), plus e_minalloc/e_ss/e_sp packing. An ungrafted rebuilt exe
+hangs in DOSBox (unfixed far refs). To make a runnable artifact, copy
+the original's reloc entries + runtime header fields (minalloc, ss, sp,
+cs, ip) into the rebuilt header — e.g. table at lfarlc=0x1c, cparhdr
+sized to fit. The bytes DOS actually executes are 100% identical.
