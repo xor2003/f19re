@@ -763,7 +763,9 @@ char  strB96A[8], str282[4];
 int16 word_27E56;
 uint8 byte_27E52, byte_27E58, byte_27E5A;
 uint8 byte_2C970, byte_298F7;
+#ifndef EXE_START /* src_start/stmap.c provides the real port */
 void  sub_11366(int16 v, void *r, int16 *pd) { }
+#endif
 void  far ovlCall_b9f(int16 v) { }             /* overlay 1000:0b9f */
 #ifndef EXE_START /* src_start/stpanel.c provides the real port */
 void  sub_12754(void *t, int16 i, int16 *pd) { }

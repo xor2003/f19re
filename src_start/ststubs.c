@@ -110,5 +110,12 @@ void  sub_16D90(int16 a, int16 b, int16 c, int16 d, int16 e, int16 f) { }
 void  sub_16DC2(int16 a, int16 b, int16 c, int16 d, int16 e, int16 f) { }
 void  sub_16E0C(int16 a, int16 b, int16 c, int16 d, int16 e, int16 f) { }
 void  far ovlCall_ba9(void) { }             /* overlay 1000:0ba9 */
-int16 far ovlCall_cbc(void) { return 0; }   /* overlay 1000:0cbc */
-void  far ovlCall_cc1(void) { }             /* overlay 1000:0cc1 */
+int8  far ovlCall_cbc(void) { return 0; }   /* overlay 1000:0cbc key-ready (al) */
+int16 far ovlCall_cc1(void) { return 0; }   /* overlay 1000:0cc1 */
+void  far ovlFee_23(void) { }               /* overlay 0fee:0x23 joy settle */
+/* stmap.c sub_11366 deps */
+uint16 *word_27E50;                         /* palette-cycle table ptr */
+uint16 word_27E54;                          /* cycle index */
+uint8  byte_27E59;                          /* blink phase */
+uint8  byte_216AA, byte_216AB;              /* joystick axis centers */
+uint8  byte_20A1D;                          /* anim tick counter (0xa1d) */

@@ -1447,3 +1447,38 @@ produced MSC's body-over-test layout here. The phase-2 redraw arm under
 9). `tools/portcheck.py` tail restored (was truncated mid-comment by an
 ENOSPC write in commit 9ba4047) + `os.rename`→`shutil.move` for the
 cross-fs build dir and KV_SCRATCH mount option kept.
+
+START.EXE `sub_11366` (1366-25e9, 0x1284B) — the row-select input +
+animation pump `sub_10AE8` calls per row — MATCH in src_start/stmap.c.
+The map extent was 1366-1415 (ada stopped at the first `ret` after the
+init block); the real body runs to 0x25e9 and the unowned 1415-25e9 gap
+was absorbed (rtcSync starts at 0x25ea). Poll loop:
+`while ((ovlCall_cbc()!=0 && joy0==0 && joy1==0 && 0x4E<=joyX<=0xB2 &&
+0x4E<=joyY<=0xB2) || holdFlag==1)` — `ovlCall_cbc` returns `int8` (its
+result is tested with `or al,al`, not `or ax,ax`). Frame is 15 slots;
+bp-0x12/-0x18 are dead (hash-bucket padding). `SelRow` needed the
+sprite-pointer fields split out of `pad3`: `sprA`/`sprB` at +0x28/+0x2a.
+Notable codegen idioms:
+- `byte_27E59 = (byte_27E59 == 0)` on a `uint8` emits the branchless
+  `cmp byte[x],1; sbb ax,ax; neg ax` — MSC normalizes unsigned `==0` to
+  `<1`. Written `x < 1` it emits a `jnb/mov/jmp` branch instead.
+- Two-constant selects like `sprB[1] = (fl & 8) ? 0x11E : 0x12D` must be
+  `if/else` — the original emits per-arm `mov word[bx+2],imm`; the `?:`
+  merges to `mov ax,imm / mov [bx+2],ax`.
+- `word_27E54 = (uint16)word_27E54 % *word_27E50` — the cast makes MSC
+  emit `mov ax,[idx]; sub dx,dx; mov bx,[ptr]; div word[bx]`
+  (dividend-first); without it the pointer load leads.
+- The UP-arrow clamp `word_2CA64 <= view[4]-view[1]` materializes the
+  shared diff as `mov ax,[bx+8]; sub ax,[bx+2]; mov si,ax` then
+  `cmp [ca64],si; jg`. Plain CSE gives si-direct; `(v=e)` inside the
+  `<=` operand gives ax-park but flips the compare to `cmp si,[mem]`.
+  Working shape: `register int16 h` declared inside the `if (i==0x4800)`
+  block (confines si to that scope — a function-scope decl steals si
+  from the border-flash temps) and the conjunct `((h = e) || 1)` — the
+  folded `||1` keeps the assignment in value context (ax→si park) while
+  the compare reads `h` as a plain variable (mem-LHS `cmp`).
+- `word_2CA60/2CA64` are `uint16` for rectInView's unsigned tests, but
+  this routine's clamps are signed (`jg`/`jng`) — all its uses here are
+  `(int16)`-cast.
+- The view arg is `int16 *` ([+0]xStep,[+1]yStep,[+2]xLo,[+3]xHi,
+  [+4]yClamp,[+5]yMax); the sub_10AE8 call site casts `(int16 *)a4`.

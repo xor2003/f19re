@@ -47,7 +47,7 @@ map/<x>_en.map --srcdir src_<x>`):
   setTimerIrqHandler/installCBreakHandler (int21h vectors), clearRect
   (rep stosw), clipAndDrawLine/calibrateTimerSpeed/readJoyAxis (hw asm),
   strcoll/gety/move_ovlcur + all CRT.
-- src_start/ — 145 MATCH:
+- src_start/ — 146 MATCH:
   cleanup.c: cleanup
   drawstr.c: drawStringAt drawStringFar drawStringAtFar
   stalloc.c: allocBuffer freeBuffer
@@ -66,6 +66,7 @@ map/<x>_en.map --srcdir src_<x>`):
   stmap.c(/Ot): mapToScreenX mapToScreenY drawMapLine drawClippedMapLine
     drawMapPoint plotMapPoint sinMul cosMul toggleSelRect drawRiskPanel
     rectInView shiftByMode drawScorePanel drawUnitList sub_10AE8
+    sub_11366
   stmain.c(/Ot): sub_10810 sub_108B7
   stparse.c: parseGridTerrain parseTerrain
   stpinp.c: saveHallfame loadHallfame pilotNameInput

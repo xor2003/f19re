@@ -281,11 +281,12 @@ struct SelRow {
     int16 pad2;                  /* 0x12 */
     int16 x0, y0, x1, y1;        /* 0x14..0x1a text rect */
     int16 spr1, spr2;            /* 0x1c,0x1e */
-    int16 pad3[6];               /* 0x20..0x2a */
+    int16 pad3[4];               /* 0x20..0x27 */
+    int16 *sprA, *sprB;          /* 0x28,0x2a blink-phase sprite records */
     int16 f2C, f2E;              /* 0x2c group tag / 0x2e state */
     union { int16 w; int8 b; } flag;  /* 0x30 */
 };
-extern void sub_11366(int16 v, struct SelRow *r, int16 *pd);
+extern void sub_11366(int16 *view, struct SelRow *r, int16 *pd);
 extern void drawLine(int16 x0, int16 y0, int16 x1, int16 y1, int16 c);
 extern void far ovlCall_b9f(int16 v);
 extern void far ovlCall_c8a(void);
@@ -323,7 +324,7 @@ L1d:
         ovlCall_c8a();
         if (!(tab[j].flag.w & 0x100))
             word_27E56 = 1;
-        sub_11366(a4, &tab[j], pd);
+        sub_11366((int16 *)a4, &tab[j], pd);
         if (byte_27E52 == 0 && byte_2C970 == 0)
             continue;
         if (byte_2C970 != 0) {
@@ -467,5 +468,567 @@ L3d:
         drawTileIcon((struct TileEntry *)tab, j, (struct ObjF06 *)pd);
         sub_13218((struct TileEntry *)tab, j, pd);
         sub_12754((struct TileEntry *)tab, j, pd);
+    }
+}
+
+
+/* ==== seg000:0x1366 sub_11366 — row-select input/animation pump.
+ * Polls keyboard + joystick while blinking the selected row (palette-cycle
+ * or border flash by flag2CA4C/byte_2C9E0), animates per-row-type markers
+ * (unit icon, threat ring, site radius, tile radar sweep, waypoint labels),
+ * then dispatches ENTER/ESC/arrow keys (scrolling the view window via
+ * word_2CA60/64 or cycling object selection) and redraws the markers. ==== */
+typedef struct {                            /* worldObjects: stride 0x10 */
+    int16 x_coord, y_coord;                 /* 0x00, 0x02 */
+    int16 pad4;                             /* 0x04 */
+    int16 targetFlags;                      /* 0x06 */
+    int16 pad8[4];                          /* 0x08 */
+} WorldObject;
+extern WorldObject worldObjects[];          /* dseg:0xb390 */
+typedef struct { int16 f0, f1;              /* ringTypes: dseg:0x3e26 stride 0xe */
+                 uint8 flag, padT[9]; } RingType;
+extern RingType ringTypes[];
+extern int16   siteTypeParms[];             /* dseg:0x41c8, stride 0x12 */
+extern int8    tileMarkMap[];               /* dseg:0xb842, 16x16 bit 0x10 */
+extern int8    objectActive[];              /* dseg:0x2d278 */
+extern int16   word_2C968, word_2C144;      /* obj/sel cursor indices */
+extern uint8   unitMarksOn, tileMarksOn, siteMarksOn, ringMode;
+extern uint8   byte_216AA, byte_216AB;      /* joystick axis centers */
+extern uint8   byte_27E59;                  /* blink phase flag */
+extern uint8   byte_20A1A, byte_20A1D;      /* dseg:0xa1a/0xa1d timers */
+extern uint8   blinkTimer;                  /* dseg:0xa1c */
+extern uint8   byte_212BA, byte_2D06B;      /* cbreak / exit flags */
+extern int16   word_2B38A;                  /* roster-active flag */
+extern int16   flag_29948;                  /* rtc-enabled flag */
+extern uint16 *word_27E50;                  /* cycle table ptr (dseg:0x266+) */
+extern uint16  word_27E54;                  /* cycle index */
+extern int16   pathWpA, pathWpB, pathWpC, pathWpD; /* dseg:0xb94a/48/5a/5c */
+struct CommJoy { int8 pad[0x72]; int16 joyPresent; };
+extern struct CommJoy far *commData;        /* far ptr dseg:0xd066 */
+extern int8  far ovlCall_cbc(void);         /* overlay 1000:0cbc key-ready (al) */
+extern int16 far ovlCall_cc1(void);         /* overlay 1000:0cc1 getch */
+extern int16 far ovlCall_ccb(int16 v);      /* overlay 1000:0ccb joy btn */
+extern void  far ovlFee_23(void);           /* overlay 0fee:0x23 joy settle */
+extern void  far ovlCall_b4f(int16 spr);    /* overlay 1000:0b4f sprite blit */
+extern void drawMapArc(int16 cx, int16 cy, int16 radius, int16 color,
+                       int16 connect, int16 a1, int16 a2);
+extern void drawStringAt(int16 *pageNum, const char *string, int16 x, int16 y);
+extern void rtcSync(void);                  /* seg000:0x25ea */
+extern void sub_161F1(void);                /* seg000:0x61f1 frame tick */
+extern void cleanup(void);                  /* seg000:0x0882 */
+extern void sub_146E3(void);                /* seg000:0x46e3 restoreCbreak */
+extern void sub_1DCAC(int16 a);             /* seg000:0xdcac exit */
+extern void selectNextObject(void);
+extern void selectPrevObject(void);
+extern void selectNextUnit(void);
+extern void selectPrevUnit(void);
+
+void sub_11366(int16 *view, struct SelRow *row, int16 *pd) {
+    int16 p;                                /* -0x02 arc color */
+    int16 a;                                /* -0x04 lo nibble */
+    int16 b;                                /* -0x06 hi nibble */
+    int16 c;                                /* -0x08 joy0 */
+    int16 d;                                /* -0x0A joy1 */
+    uint8 e;                                /* -0x0C hold flag */
+    uint16 f;                               /* -0x0E radar outer */
+    uint16 g;                               /* -0x10 radar inner */
+    int16 h;                                /* -0x12 */
+    int16 i;                                /* -0x14 key */
+    int16 j;                                /* -0x16 objCursor */
+    int16 k;                                /* -0x18 */
+    int16 l;                                /* -0x1A border color */
+    int16 m;                                /* -0x1C selCursor */
+    int8  n;                                /* -0x1E row type */
+
+    word_27E50 = (uint16 *)(row->mode * 14 + 0x266);
+    blinkTimer = 0;
+    c = d = 0;
+    byte_27E52 = byte_2C970 = byte_27E5A = e = 0;
+    if (byte_27E58 == 1) {
+        byte_20A1A = 0;
+        e = 1;
+    }
+    if (commData->joyPresent == 1) {
+        c = ovlCall_ccb(0);
+        d = ovlCall_ccb(1);
+        ovlFee_23();
+    }
+    while ((ovlCall_cbc() != 0 && c == 0 && d == 0 &&
+            byte_216AA >= 0x4E && byte_216AA <= 0xB2 &&
+            byte_216AB >= 0x4E && byte_216AB <= 0xB2) || e == 1) {
+        if (byte_27E58 == 1 && byte_20A1A > 0xF) {
+            e = 0;
+            byte_27E58 = 0;
+        }
+        if (commData->joyPresent == 1) {
+            c = ovlCall_ccb(0);
+            d = ovlCall_ccb(1);
+            ovlFee_23();
+        }
+        if (byte_212BA != 0) {
+            if (word_2B38A == 1) {
+                byte_2C970 = 1;
+                return;
+            }
+            cleanup();
+            sub_146E3();
+            sub_1DCAC(0);
+        }
+        if (word_27E56 == 1 && blinkTimer > 6) {
+            blinkTimer = 0;
+            if (flag2CA4C == 1 && byte_2C9E0 == 0) {
+                if (byte_27E59 != 0)
+                    l = 0;
+                else
+                    l = 0xF;
+                byte_27E59 = (byte_27E59 == 0);
+                drawLine(row->rx0 - 1, row->ry0 - 1, row->rx1 + 1,
+                         row->ry0 - 1, l);
+                drawLine(row->rx1 + 1, row->ry0 - 1, row->rx1 + 1,
+                         row->ry1 + 1, l);
+                drawLine(row->rx1 + 1, row->ry1 + 1, row->rx0 - 1,
+                         row->ry1 + 1, l);
+                drawLine(row->rx0 - 1, row->ry1 + 1, row->rx0 - 1,
+                         row->ry0, l);
+            } else {
+                b = word_27E50[word_27E54 + 1] >> 4;
+                a = word_27E50[word_27E54 + 1] & 0xF;
+                ovlCall_bc7(pd, row->rx0, row->ry0, row->rx1, row->ry1, b, a);
+                word_27E54++;
+                word_27E54 = (uint16)word_27E54 % *word_27E50;
+            }
+        }
+        if ((row->flag.b & 0x10) && byte_20A1D > 0x12) {
+            byte_20A1D = 0;
+            if ((row->flag.b & 7) == 4 && unitMarksOn == 1) {
+                if (byte_27E59 != 0) {
+                    row->sprB[4] = mapToScreenX(worldObjects[word_2C144].x_coord)
+                                   + mapClipX1 - 2;
+                    row->sprB[5] = mapToScreenY(worldObjects[word_2C144].y_coord)
+                                   + mapClipY1 - 2;
+                    ovlCall_b4f((int16)row->sprB);
+                } else {
+                    row->sprA[4] = mapToScreenX(worldObjects[word_2C144].x_coord)
+                                   + mapClipX1 - 2;
+                    row->sprA[5] = mapToScreenY(worldObjects[word_2C144].y_coord)
+                                   + mapClipY1 - 2;
+                    ovlCall_b4f((int16)row->sprA);
+                }
+            }
+            if ((row->flag.b & 7) == 2 && ringMode != 0) {
+                if (byte_27E59 != 0) {
+                    row->sprB[4] = mapToScreenX(worldObjects[word_2C968].x_coord)
+                                   + mapClipX1 - 2;
+                    row->sprB[5] = mapToScreenY(worldObjects[word_2C968].y_coord)
+                                   + mapClipY1 - 2;
+                    if (worldObjects[word_2C968].targetFlags & 8)
+                        row->sprB[1] = 0x11E;
+                    else
+                        row->sprB[1] = 0x12D;
+                    ovlCall_b4f((int16)row->sprB);
+                    if (ringTypes[worldObjects[word_2C968].pad4].flag & 1) {
+                        if (ringMode == 1)
+                            drawMapArc(worldObjects[word_2C968].x_coord,
+                                worldObjects[word_2C968].y_coord,
+                                (ringTypes[worldObjects[word_2C968].pad4].f0 *
+                                 ringTypes[worldObjects[word_2C968].pad4].f1)
+                                / 16 << 6, 0xF, 1, 0, 0x100);
+                        else
+                            drawMapArc(worldObjects[word_2C968].x_coord,
+                                worldObjects[word_2C968].y_coord,
+                                ringTypes[worldObjects[word_2C968].pad4].f0 << 6,
+                                0xF, 1, 0, 0x100);
+                    } else {
+                        if (ringMode == 1)
+                            drawMapArc(worldObjects[word_2C968].x_coord,
+                                worldObjects[word_2C968].y_coord,
+                                (ringTypes[worldObjects[word_2C968].pad4].f0 *
+                                 ringTypes[worldObjects[word_2C968].pad4].f1)
+                                / 16 << 6, 0xF, 0, 0, 0x100);
+                        else
+                            drawMapArc(worldObjects[word_2C968].x_coord,
+                                worldObjects[word_2C968].y_coord,
+                                ringTypes[worldObjects[word_2C968].pad4].f0 << 6,
+                                0xF, 0, 0, 0x100);
+                    }
+                } else {
+                    row->sprA[4] = mapToScreenX(worldObjects[word_2C968].x_coord)
+                                   + mapClipX1 - 2;
+                    row->sprA[5] = mapToScreenY(worldObjects[word_2C968].y_coord)
+                                   + mapClipY1 - 2;
+                    if (worldObjects[word_2C968].targetFlags & 8)
+                        row->sprA[1] = 0x11E;
+                    else
+                        row->sprA[1] = 0x12D;
+                    ovlCall_b4f((int16)row->sprA);
+                    if (ringTypes[worldObjects[word_2C968].pad4].flag & 1) {
+                        if (ringMode == 1)
+                            drawMapArc(worldObjects[word_2C968].x_coord,
+                                worldObjects[word_2C968].y_coord,
+                                (ringTypes[worldObjects[word_2C968].pad4].f0 *
+                                 ringTypes[worldObjects[word_2C968].pad4].f1)
+                                / 16 << 6, 1, 1, 0, 0x100);
+                        else
+                            drawMapArc(worldObjects[word_2C968].x_coord,
+                                worldObjects[word_2C968].y_coord,
+                                ringTypes[worldObjects[word_2C968].pad4].f0 << 6,
+                                1, 1, 0, 0x100);
+                    } else {
+                        if (ringMode == 1)
+                            drawMapArc(worldObjects[word_2C968].x_coord,
+                                worldObjects[word_2C968].y_coord,
+                                (ringTypes[worldObjects[word_2C968].pad4].f0 *
+                                 ringTypes[worldObjects[word_2C968].pad4].f1)
+                                / 16 << 6, 0, 0, 0, 0x100);
+                        else
+                            drawMapArc(worldObjects[word_2C968].x_coord,
+                                worldObjects[word_2C968].y_coord,
+                                ringTypes[worldObjects[word_2C968].pad4].f0 << 6,
+                                0, 0, 0, 0x100);
+                    }
+                }
+            }
+            if ((row->flag.b & 7) == 3 && siteMarksOn == 1) {
+                if (byte_27E59 != 0) {
+                    row->sprB[4] = mapToScreenX(worldObjects[word_2C968].x_coord)
+                                   + mapClipX1 - 2;
+                    row->sprB[5] = mapToScreenY(worldObjects[word_2C968].y_coord)
+                                   + mapClipY1 - 2;
+                    if (worldObjects[word_2C968].targetFlags & 8)
+                        row->sprB[1] = 0x11E;
+                    else
+                        row->sprB[1] = 0x12D;
+                    ovlCall_b4f((int16)row->sprB);
+                    drawMapArc(worldObjects[word_2C968].x_coord,
+                               worldObjects[word_2C968].y_coord,
+                               siteTypeParms[worldObjects[word_2C968].pad4 * 9]
+                               << 6, 0xF, 1, 0, 0x100);
+                } else {
+                    row->sprA[4] = mapToScreenX(worldObjects[word_2C968].x_coord)
+                                   + mapClipX1 - 2;
+                    row->sprA[5] = mapToScreenY(worldObjects[word_2C968].y_coord)
+                                   + mapClipY1 - 2;
+                    if (worldObjects[word_2C968].targetFlags & 8)
+                        row->sprA[1] = 0x11E;
+                    else
+                        row->sprA[1] = 0x12D;
+                    ovlCall_b4f((int16)row->sprA);
+                    drawMapArc(worldObjects[word_2C968].x_coord,
+                               worldObjects[word_2C968].y_coord,
+                               siteTypeParms[worldObjects[word_2C968].pad4 * 9]
+                               << 6, 4, 1, 0, 0x100);
+                }
+            }
+            if ((row->flag.b & 7) == 6 && tileMarksOn == 1) {
+                if (byte_27E59 != 0) {
+                    for (f = 0; f < 16; f++)
+                        for (g = 0; g < 16; g++)
+                            if (tileMarkMap[f + g * 16] & 0x10) {
+                                row->sprB[4] = mapToScreenX(f * 0x7FF)
+                                               + mapClipX1;
+                                row->sprB[5] = mapToScreenY(g * 0x7FF)
+                                               + mapClipY1;
+                                ovlCall_b4f((int16)row->sprB);
+                            }
+                } else {
+                    for (f = 0; f < 16; f++)
+                        for (g = 0; g < 16; g++)
+                            if (tileMarkMap[f + g * 16] & 0x10) {
+                                row->sprA[4] = mapToScreenX(f * 0x7FF)
+                                               + mapClipX1;
+                                row->sprA[5] = mapToScreenY(g * 0x7FF)
+                                               + mapClipY1;
+                                ovlCall_b4f((int16)row->sprA);
+                            }
+                }
+            }
+            if ((row->flag.b & 7) == 1) {
+                if (byte_27E59 != 0)
+                    pd[2] = 0xF;
+                else
+                    pd[2] = 1;
+                drawStringAt(pd, "P",
+                    mapToScreenX(worldObjects[pathWpB].x_coord) + mapClipX1,
+                    mapToScreenY(worldObjects[pathWpB].y_coord - 2)
+                    + mapClipY1);
+                drawStringAt(pd, "S",
+                    mapToScreenX(worldObjects[pathWpC].x_coord) + mapClipX1,
+                    mapToScreenY(worldObjects[pathWpC].y_coord - 2)
+                    + mapClipY1);
+            }
+            if ((row->flag.b & 7) == 5) {
+                if (byte_27E59 != 0) {
+                    pd[2] = 0xF;
+                    plotMapPoint(worldObjects[pathWpA].x_coord,
+                                 worldObjects[pathWpA].y_coord, 0xF, 0);
+                    drawMapLine(worldObjects[pathWpA].x_coord,
+                                worldObjects[pathWpA].y_coord,
+                                worldObjects[pathWpB].x_coord,
+                                worldObjects[pathWpB].y_coord);
+                    drawMapLine(worldObjects[pathWpB].x_coord,
+                                worldObjects[pathWpB].y_coord,
+                                worldObjects[pathWpC].x_coord,
+                                worldObjects[pathWpC].y_coord);
+                    drawMapLine(worldObjects[pathWpC].x_coord,
+                                worldObjects[pathWpC].y_coord,
+                                worldObjects[pathWpD].x_coord,
+                                worldObjects[pathWpD].y_coord);
+                    pd[2] = 0xF;
+                    if (pathWpA == pathWpD)
+                        drawStringAt(pd, "T,L",
+                            mapToScreenX(worldObjects[pathWpA].x_coord)
+                            + mapClipX1,
+                            mapToScreenY(worldObjects[pathWpA].y_coord - 2)
+                            + mapClipY1);
+                    else {
+                        drawStringAt(pd, "T",
+                            mapToScreenX(worldObjects[pathWpA].x_coord)
+                            + mapClipX1,
+                            mapToScreenY(worldObjects[pathWpA].y_coord - 2)
+                            + mapClipY1);
+                        drawStringAt(pd, "L",
+                            mapToScreenX(worldObjects[pathWpD].x_coord)
+                            + mapClipX1,
+                            mapToScreenY(worldObjects[pathWpD].y_coord - 2)
+                            + mapClipY1);
+                    }
+                } else {
+                    pd[2] = 0;
+                    plotMapPoint(worldObjects[pathWpA].x_coord,
+                                 worldObjects[pathWpA].y_coord, 0xF, 0);
+                    drawMapLine(worldObjects[pathWpA].x_coord,
+                                worldObjects[pathWpA].y_coord,
+                                worldObjects[pathWpB].x_coord,
+                                worldObjects[pathWpB].y_coord);
+                    drawMapLine(worldObjects[pathWpB].x_coord,
+                                worldObjects[pathWpB].y_coord,
+                                worldObjects[pathWpC].x_coord,
+                                worldObjects[pathWpC].y_coord);
+                    drawMapLine(worldObjects[pathWpC].x_coord,
+                                worldObjects[pathWpC].y_coord,
+                                worldObjects[pathWpD].x_coord,
+                                worldObjects[pathWpD].y_coord);
+                    pd[2] = 1;
+                    if (pathWpA == pathWpD)
+                        drawStringAt(pd, "T,L",
+                            mapToScreenX(worldObjects[pathWpA].x_coord)
+                            + mapClipX1,
+                            mapToScreenY(worldObjects[pathWpA].y_coord - 2)
+                            + mapClipY1);
+                    else {
+                        drawStringAt(pd, "T",
+                            mapToScreenX(worldObjects[pathWpA].x_coord)
+                            + mapClipX1,
+                            mapToScreenY(worldObjects[pathWpA].y_coord - 2)
+                            + mapClipY1);
+                        drawStringAt(pd, "L",
+                            mapToScreenX(worldObjects[pathWpD].x_coord)
+                            + mapClipX1,
+                            mapToScreenY(worldObjects[pathWpD].y_coord - 2)
+                            + mapClipY1);
+                    }
+                }
+            }
+            byte_27E59 = (byte_27E59 == 0);
+        }
+        sub_161F1();
+    }
+    if (ovlCall_cbc() == 0)
+        i = ovlCall_cc1();
+    else if (c == 1)
+        i = 0x0D;
+    else if (d == 1)
+        i = 0x1B;
+    else if (byte_216AA < 0x4E) {
+        i = 0x4B00;
+        byte_27E58 = 1;
+    } else if (byte_216AA > 0xB2) {
+        i = 0x4D00;
+        byte_27E58 = 1;
+    } else if (byte_216AB < 0x4E) {
+        i = 0x4800;
+        byte_27E58 = 1;
+    } else if (byte_216AB > 0xB2) {
+        i = 0x5000;
+        byte_27E58 = 1;
+    }
+    j = word_2C968;
+    m = word_2C144;
+    if ((int8)i == 0x0D)
+        byte_2C970 = 1;
+    if (i == 0x1000) {
+        byte_212BA = 1;
+        byte_2C970 = 1;
+        byte_2D06B = 1;
+    }
+    if ((int8)i == 0x1B && (row->flag.w & 0x200)) {
+        byte_2C970 = 1;
+        byte_27E5A = 1;
+    }
+    if (i == 0x4800) {          /* UP */
+        register int16 h;
+        word_2CA64 -= view[1];
+        if (flag2C7CE == 1 && view[3] == (int16)word_2CA60 &&
+            ((h = view[4] - view[1]) || 1) && (int16)word_2CA64 <= h)
+            word_2CA64 = h;
+        else if (view[4] > (int16)word_2CA64)
+            word_2CA64 = view[4];
+        byte_27E52 = 1;
+        if (flag_29948 == 1)
+            rtcSync();
+    }
+    if (i == 0x5000) {          /* DOWN */
+        word_2CA64 += view[1];
+        if (view[5] < word_2CA64)
+            word_2CA64 = view[5];
+        byte_27E52 = 1;
+        if (flag_29948 == 1)
+            rtcSync();
+    }
+    if (i == 0x4D00) {          /* RIGHT */
+        n = row->flag.b & 7;
+        if (n == 2 || n == 3)
+            selectNextObject();
+        else if ((row->flag.b & 7) == 4)
+            selectNextUnit();
+        else {
+            word_2CA60 += view[0];
+            if (view[3] < word_2CA60)
+                word_2CA60 = view[3];
+        }
+        byte_27E52 = 1;
+    }
+    if (i == 0x4B00) {          /* LEFT */
+        n = row->flag.b & 7;
+        if (n == 2 || n == 3)
+            selectPrevObject();
+        else if ((row->flag.b & 7) == 4)
+            selectPrevUnit();
+        else {
+            word_2CA60 -= view[0];
+            if (view[2] > (int16)word_2CA60)
+                word_2CA60 = view[2];
+            if (view[4] > (int16)word_2CA64)
+                word_2CA60 += view[0];
+        }
+        byte_27E52 = 1;
+    }
+    if (row->flag.b & 0x10) {
+        if ((row->flag.b & 7) == 4 && unitMarksOn == 1) {
+            row->sprA[4] = mapToScreenX(worldObjects[m].x_coord)
+                           + mapClipX1 - 2;
+            row->sprA[5] = mapToScreenY(worldObjects[m].y_coord)
+                           + mapClipY1 - 2;
+            ovlCall_b4f((int16)row->sprA);
+        }
+        if ((row->flag.b & 7) == 2 && ringMode != 0) {
+            row->sprA[4] = mapToScreenX(worldObjects[j].x_coord)
+                           + mapClipX1 - 2;
+            row->sprA[5] = mapToScreenY(worldObjects[j].y_coord)
+                           + mapClipY1 - 2;
+            if (worldObjects[j].targetFlags & 8)
+                row->sprA[1] = 0x11E;
+            else
+                row->sprA[1] = 0x12D;
+            ovlCall_b4f((int16)row->sprA);
+            if (ringTypes[worldObjects[j].pad4].flag & 1) {
+                if ((uint8)objectActive[j] > 1)
+                    p = 0xF;
+                else
+                    p = 1;
+                if (ringMode == 1)
+                    drawMapArc(worldObjects[j].x_coord,
+                               worldObjects[j].y_coord,
+                               (ringTypes[worldObjects[j].pad4].f0 *
+                                ringTypes[worldObjects[j].pad4].f1) / 16 << 6,
+                               p, 1, 0, 0x100);
+                else
+                    drawMapArc(worldObjects[j].x_coord,
+                               worldObjects[j].y_coord,
+                               ringTypes[worldObjects[j].pad4].f0 << 6,
+                               p, 1, 0, 0x100);
+            } else {
+                if ((uint8)objectActive[j] > 1)
+                    p = 0xF;
+                else
+                    p = 0;
+                if (ringMode == 1)
+                    drawMapArc(worldObjects[j].x_coord,
+                               worldObjects[j].y_coord,
+                               (ringTypes[worldObjects[j].pad4].f0 *
+                                ringTypes[worldObjects[j].pad4].f1) / 16 << 6,
+                               p, 0, 0, 0x100);
+                else
+                    drawMapArc(worldObjects[j].x_coord,
+                               worldObjects[j].y_coord,
+                               ringTypes[worldObjects[j].pad4].f0 << 6,
+                               p, 0, 0, 0x100);
+            }
+        }
+        if ((row->flag.b & 7) == 3 && siteMarksOn == 1) {
+            row->sprA[4] = mapToScreenX(worldObjects[j].x_coord)
+                           + mapClipX1 - 2;
+            row->sprA[5] = mapToScreenY(worldObjects[j].y_coord)
+                           + mapClipY1 - 2;
+            if (worldObjects[j].targetFlags & 8)
+                row->sprA[1] = 0x11E;
+            else
+                row->sprA[1] = 0x12D;
+            ovlCall_b4f((int16)row->sprA);
+            drawMapArc(worldObjects[j].x_coord, worldObjects[j].y_coord,
+                       siteTypeParms[worldObjects[j].pad4 * 9] << 6,
+                       4, 1, 0, 0x100);
+        }
+        if ((row->flag.b & 7) == 1) {
+            pd[2] = 1;
+            drawStringAt(pd, "P",
+                mapToScreenX(worldObjects[pathWpB].x_coord) + mapClipX1,
+                mapToScreenY(worldObjects[pathWpB].y_coord - 2) + mapClipY1);
+            drawStringAt(pd, "S",
+                mapToScreenX(worldObjects[pathWpC].x_coord) + mapClipX1,
+                mapToScreenY(worldObjects[pathWpC].y_coord - 2) + mapClipY1);
+        }
+        if ((row->flag.b & 7) == 6 && tileMarksOn == 1) {
+            for (f = 0; f < 16; f++)
+                for (g = 0; g < 16; g++)
+                    if (tileMarkMap[f + g * 16] & 0x10) {
+                        row->sprA[4] = mapToScreenX(f * 0x7FF) + mapClipX1;
+                        row->sprA[5] = mapToScreenY(g * 0x7FF) + mapClipY1;
+                        ovlCall_b4f((int16)row->sprA);
+                    }
+        }
+        if ((row->flag.b & 7) == 5) {
+            pd[2] = 0;
+            plotMapPoint(worldObjects[pathWpA].x_coord,
+                         worldObjects[pathWpA].y_coord, 0xF, 0);
+            drawMapLine(worldObjects[pathWpA].x_coord,
+                        worldObjects[pathWpA].y_coord,
+                        worldObjects[pathWpB].x_coord,
+                        worldObjects[pathWpB].y_coord);
+            drawMapLine(worldObjects[pathWpB].x_coord,
+                        worldObjects[pathWpB].y_coord,
+                        worldObjects[pathWpC].x_coord,
+                        worldObjects[pathWpC].y_coord);
+            drawMapLine(worldObjects[pathWpC].x_coord,
+                        worldObjects[pathWpC].y_coord,
+                        worldObjects[pathWpD].x_coord,
+                        worldObjects[pathWpD].y_coord);
+            pd[2] = 1;
+            if (pathWpA == pathWpD)
+                drawStringAt(pd, "T,L",
+                    mapToScreenX(worldObjects[pathWpA].x_coord) + mapClipX1,
+                    mapToScreenY(worldObjects[pathWpA].y_coord - 2)
+                    + mapClipY1);
+            else {
+                drawStringAt(pd, "T",
+                    mapToScreenX(worldObjects[pathWpA].x_coord) + mapClipX1,
+                    mapToScreenY(worldObjects[pathWpA].y_coord - 2)
+                    + mapClipY1);
+                drawStringAt(pd, "L",
+                    mapToScreenX(worldObjects[pathWpD].x_coord) + mapClipX1,
+                    mapToScreenY(worldObjects[pathWpD].y_coord - 2)
+                    + mapClipY1);
+            }
+        }
     }
 }
