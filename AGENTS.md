@@ -156,7 +156,11 @@ mzmap (jump-table headers, no call-reachable exports).
    replays routines under ~/vextest dosunit real16 — original EXE vs the
    portcheck test-EXE — comparing regs/flags/observed memory. Specs in
    dosunit/*.json declare per-side dseg cell patches, far-ptr targets,
-   observations and code ranges; 128 math/format vectors currently AGREE.
+   observations and code ranges; 347 math/format vectors (190 egame_math +
+   157 start_math, normal + edge inputs) currently AGREE — including two
+   signedRatio16 zero-divisor vectors where both sides fault int 0
+   (AGREE-FAULT, faithful). Edge coverage pinned MSC-16-bit quirks like
+   abs(-0x8000) staying negative (isqrt/rangeApprox/signedRatio16).
    stubs.c supplies real sine/fixedMulQ14 (asm-faithful) so test-EXEs
    exercise true math.
 

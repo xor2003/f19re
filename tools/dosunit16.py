@@ -249,10 +249,17 @@ def main():
         o_regs = ' '.join(f"{k}={o['registers'].get(k)}" for k in want)
         c_regs = ' '.join(f"{k}={c['registers'].get(k)}" for k in want)
         if o['status'] != 'returned' or c['status'] != 'returned':
-            verdict = 'INCOMPLETE'
             detail = (o['status'], o.get('detail', ''),
                       c['status'], c.get('detail', ''))
-            n_inc += 1
+            if (o['status'] == c['status']
+                    and o.get('detail', '') == c.get('detail', '')):
+                # both sides fault identically (e.g. signedRatio16 int 0 on a
+                # zero divisor) — faithful behavior, count as agreement
+                verdict = 'AGREE-FAULT'
+                n_agree += 1
+            else:
+                verdict = 'INCOMPLETE'
+                n_inc += 1
         else:
             regs_ok = all(o['registers'].get(k) == c['registers'].get(k)
                           for k in want)
