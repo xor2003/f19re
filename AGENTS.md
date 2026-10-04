@@ -152,6 +152,13 @@ mzmap (jump-table headers, no call-reachable exports).
 3. Verify: `python3 tools/portcheck.py src/x.c name [extra /flags]`.
    MATCH = instruction stream identical modulo call targets, literals, and
    data-segment offsets.
+4. Behavioral check: `python3 tools/dosunit16.py dosunit/<spec>.json`
+   replays routines under ~/vextest dosunit real16 — original EXE vs the
+   portcheck test-EXE — comparing regs/flags/observed memory. Specs in
+   dosunit/*.json declare per-side dseg cell patches, far-ptr targets,
+   observations and code ranges; 128 math/format vectors currently AGREE.
+   stubs.c supplies real sine/fixedMulQ14 (asm-faithful) so test-EXEs
+   exercise true math.
 
 ## MSC 5.1 codegen facts (F19)
 
