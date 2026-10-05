@@ -188,16 +188,21 @@ def main():
     os.chdir(ROOT)
     spec_path = os.path.abspath(sys.argv[1])
     cases = json.load(open(spec_path))
-    manifest = {'oracle_load_segment': u16hex(LOAD),
-                'candidate_load_segment': u16hex(LOAD),
-                'vectors': []}
     srcs = {}
-    oracle_exe = cand_exe = None
-    code_o, code_c = set(), set()
     problems = []
+    # replay-real16 takes a single --oracle-exe/--candidate-exe pair per run,
+    # so group cases by exe pair and emit one manifest per group — otherwise
+    # every vector would execute against the last case's candidate binary.
+    groups = {}          # (oracle_exe, cand_exe) -> manifest
+    order = []
     for case in cases:
-        oracle_exe = case['oracle_exe']
-        cand_exe = case['cand_exe']
+        key = (case['oracle_exe'], case['cand_exe'])
+        if key not in groups:
+            groups[key] = {'oracle_load_segment': u16hex(LOAD),
+                           'candidate_load_segment': u16hex(LOAD),
+                           'vectors': [], 'code_o': set(), 'code_c': set()}
+            order.append(key)
+        grp = groups[key]
         f_o = routine_extent(case['fn'], case['oracle_map']) \
             if case.get('oracle_off') is None else case['oracle_off']
         if f_o is None:
@@ -209,36 +214,49 @@ def main():
             problems.append(f"{case['fn']}: _{case['fn']} not in {case['cand_map']}")
             continue
         case['oracle_off'], case['cand_off'] = f_o, f_c
-        problems += run_case(case, manifest['vectors'], srcs)
+        problems += run_case(case, grp['vectors'], srcs)
         for rng in case.get('code_o', []):
-            code_o.add((LOAD * 16 + int(str(rng[0]), 0), int(str(rng[1]), 0)))
+            grp['code_o'].add(
+                (LOAD * 16 + int(str(rng[0]), 0), int(str(rng[1]), 0)))
         for rng in case.get('code_c', []):
-            code_c.add((LOAD * 16 + int(str(rng[0]), 0), int(str(rng[1]), 0)))
-    if code_o:
-        manifest['oracle_code_ranges'] = [
-            {'address': a, 'size': s} for a, s in sorted(code_o)]
-    if code_c:
-        manifest['candidate_code_ranges'] = [
-            {'address': a, 'size': s} for a, s in sorted(code_c)]
+            grp['code_c'].add(
+                (LOAD * 16 + int(str(rng[0]), 0), int(str(rng[1]), 0)))
     for p in problems:
         print('SKIP', p)
 
-    vec_path = spec_path.replace('.json', '') + '.vectors.json'
-    out_path = spec_path.replace('.json', '') + '.out.json'
-    oracle_exe = oracle_exe if oracle_exe.startswith('/') else os.path.join(ROOT, oracle_exe)
-    cand_exe = cand_exe if cand_exe.startswith('/') else os.path.join(ROOT, cand_exe)
-    json.dump(manifest, open(vec_path, 'w'), indent=1)
-
-    cmd = [VPY, '-m', 'tools.dosunit.dosunit', 'replay-real16',
-           '--oracle-exe', oracle_exe, '--candidate-exe', cand_exe,
-           '--vectors', vec_path, '--out', out_path,
-           '--instruction-limit', '200000']
-    r = subprocess.run(cmd, cwd=VEXTEST, capture_output=True, text=True,
-                       timeout=600)
-    if r.returncode not in (0, 1, 2) or not os.path.exists(out_path):
-        print('dosunit failed:', r.stdout[-500:], r.stderr[-500:])
-        return 1
-    rep = json.load(open(out_path))
+    stem = spec_path.replace('.json', '')
+    results = []
+    for gi, key in enumerate(order):
+        manifest = {'oracle_load_segment': u16hex(LOAD),
+                    'candidate_load_segment': u16hex(LOAD),
+                    'vectors': groups[key]['vectors']}
+        if groups[key]['code_o']:
+            manifest['oracle_code_ranges'] = [
+                {'address': a, 'size': s}
+                for a, s in sorted(groups[key]['code_o'])]
+        if groups[key]['code_c']:
+            manifest['candidate_code_ranges'] = [
+                {'address': a, 'size': s}
+                for a, s in sorted(groups[key]['code_c'])]
+        vec_path = f'{stem}.g{gi}.vectors.json'
+        out_path = f'{stem}.g{gi}.out.json'
+        oracle_exe, cand_exe = key
+        if not oracle_exe.startswith('/'):
+            oracle_exe = os.path.join(ROOT, oracle_exe)
+        if not cand_exe.startswith('/'):
+            cand_exe = os.path.join(ROOT, cand_exe)
+        json.dump(manifest, open(vec_path, 'w'), indent=1)
+        cmd = [VPY, '-m', 'tools.dosunit.dosunit', 'replay-real16',
+               '--oracle-exe', oracle_exe, '--candidate-exe', cand_exe,
+               '--vectors', vec_path, '--out', out_path,
+               '--instruction-limit', '200000']
+        r = subprocess.run(cmd, cwd=VEXTEST, capture_output=True, text=True,
+                           timeout=600)
+        if r.returncode not in (0, 1, 2) or not os.path.exists(out_path):
+            print('dosunit failed:', r.stdout[-500:], r.stderr[-500:])
+            return 1
+        results += json.load(open(out_path))['results']
+    rep = {'results': results}
     print(f"{'vector':34s} {'oracle':>24s} {'cand':>24s} verdict")
     n_agree = n_diff = n_inc = 0
     for res in rep['results']:
