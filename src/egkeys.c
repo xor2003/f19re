@@ -52,10 +52,10 @@ void recalcTimeScale(void) {
 
 /* ==== seg000:0xdfb4 ==== */
 extern char colorLut[];               /* byte-ramp LUT @0x9E8 */
-extern int16 g_lodDistBase;           /* word_2F870 */
-extern int16 g_lodDistScale;          /* word_2F872 */
-extern int16 g_lodDistNear;           /* word_2F874 */
-extern int16 g_lodDistFar;            /* word_2F876 */
+#define g_lodDistBase  (*(int16 *)(colorLut + 0x18))
+#define g_lodDistScale (*(int16 *)(colorLut + 0x1A))
+#define g_lodDistNear  (*(int16 *)(colorLut + 0x1C))
+#define g_lodDistFar   (*(int16 *)(colorLut + 0x1E))
 extern int16 g_detailLevel;           /* word_354BC */
 
 void setupLodDistances(void) {

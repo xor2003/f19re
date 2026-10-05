@@ -133,8 +133,11 @@ CodeMap::CodeMap(const std::string &path, const Word loadSegment, const Type typ
     ScanQueue sq{Address{loadSegment, 0}, mapSize, {}};
     // mark all code locations
     for (const Routine &r : routines) {
-        for (const Block &rb : r.reachable) sq.setRoutineIdx(rb.begin.toLinear(), rb.size(), VISITED_ID);
-        for (const Block &ub : r.unreachable) sq.setRoutineIdx(ub.begin.toLinear(), ub.size(), VISITED_ID);
+        if (ida) sq.setRoutineIdx(r.extents.begin.toLinear(), r.extents.size(), VISITED_ID);
+        else {
+            for (const Block &rb : r.reachable) sq.setRoutineIdx(rb.begin.toLinear(), rb.size(), VISITED_ID);
+            for (const Block &ub : r.unreachable) sq.setRoutineIdx(ub.begin.toLinear(), ub.size(), VISITED_ID);
+        }
     }
     // rebuild the unclaimed blocks
     blocksFromQueue(sq, true);
@@ -385,8 +388,8 @@ std::string CodeMap::varString(const Variable &v, const Word reloc) const {
 void CodeMap::order() {
     debug("Recalculating routine extents and sorting map");
     // TODO: coalesce adjacent blocks, see routine_35 of hello.exe: 1415-14f7 R1412-1414 R1415-14f7
-    for (auto &r : routines) 
-        r.recalculateExtents();
+    for (auto &r : routines)
+        if (!ida) r.recalculateExtents();
     // before sorting, set default data segment to the first one if not explicitly specified
     const Segment defSeg = defaultSegment();
     if (defSeg.type != Segment::SEG_DATA) {
@@ -739,6 +742,11 @@ void CodeMap::loadFromMapFile(const std::string &path, const Word reloc) {
             }
         } // iterate over tokens in a routine definition
         if (r.extents.isValid()) {
+            // imported listings (IDA) declare proc extents without block
+            // reachability annotations; treat the whole extent as reachable
+            // so the routine can be compared
+            if (r.reachable.empty() && r.unreachable.empty())
+                r.reachable.push_back(r.extents);
             debug("routine: "s + r.dump());
             if (r.external && r.detached) throw LogicError("Routine " + r.name + " has invalid tags: external and detached");
             if (r.complete + r.ignore + r.assembly > 1) throw LogicError("Routine " + r.name + " has invalid tags: only one of complete, ignore/detached and assembly allowed at a time");
@@ -972,6 +980,14 @@ void CodeMap::loadFromIdaFile(const std::string &path, const Word reloc) {
             if (globalPos != 0) globalPos += PARAGRAPH_SIZE - (globalPos % PARAGRAPH_SIZE);
             Address segAddr{globalPos};
             segAddr.normalize();
+            // IDA names segments 'seg' + hex of their base paragraph, which
+            // recovers the true base even for byte-aligned segments the
+            // paragraph-rounded guess above gets wrong
+            static const regex SEGNAME_RE{"^seg([0-9a-fA-F]+)$"};
+            smatch segMatch;
+            if (regex_match(nameStr, segMatch, SEGNAME_RE)) {
+                segAddr.segment = static_cast<Word>(stoi(segMatch[1].str(), nullptr, 16));
+            }
             segAddr.segment += reloc;
             curSegment = Segment{nameStr, segType, segAddr.segment};
             PARSE_DEBUG("\tinitialized new segment at address " + hexVal(curSegment.address) + ", globalPos=" + hexVal(globalPos));

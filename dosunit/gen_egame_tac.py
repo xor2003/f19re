@@ -51,7 +51,7 @@ O = {
 }
 
 # candidate's (aircraftModels - world3dData) seg004 offset delta vs oracle 0x7530
-CAND_3D_BASE = 0x49D4          # lea ax,[bx+49D4h] in _shapeDataOffset
+CAND_3D_BASE = 0x4A28          # lea ax,[bx+4A28h] in _shapeDataOffset
 ORCL_3D_BASE = 0x7530          # lea ax,word_36220[bx] in sub_1D0A8
 IDX_BIAS = (ORCL_3D_BASE - CAND_3D_BASE) & 0xFFFF   # cand idxTab needs +this
 

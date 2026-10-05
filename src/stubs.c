@@ -303,7 +303,8 @@ int16 FAR misc_readJoystick(int16 a) { return 0; }
 void FAR audio_playSound(int16 a) {}
 void FAR audio_engineDroneOn(void) {}
 int16 g_engineThrust;                   /* word_33588 */
-int16 g_lodDistBase, g_lodDistScale, g_lodDistNear, g_lodDistFar;  /* word_2F870..876 */
+/* lodDist* cells alias colorLut+0x18..0x1E in the original (lodTab[4..7]);
+   macros in egkeys.c provide the names - these bytes live in colorLut. */
 int16 g_particles[32];                  /* @0x5260 struct Particle[8] ring */
 int16 g_smokeSourceIdx, g_smokeParticleSlot;  /* word_343BE / word_34110 */
 int16 g_maneuverTable[3*8*8];             /* @0x52A2 — [skill][relBearing][aspect] */

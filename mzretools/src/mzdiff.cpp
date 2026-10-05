@@ -124,7 +124,7 @@ Executable loadExe(const string &spec, const string &mapSpec, const Word segment
     static const regex 
         OFFSET_RE{"([xa-fA-F0-9]+)(-([xa-fA-F0-9]+))?"},
         HEXASTR_RE{"\\[([?a-fA-F0-9]+)\\]"},
-        ROUTINENAME_RE{"([_a-zA-Z0-9]+)"};
+        ROUTINENAME_RE{"([_a-zA-Z0-9@$?]+)"};
     smatch match;
     if (regex_match(entry, match, OFFSET_RE)) {
         if (!match[1].str().empty()) {

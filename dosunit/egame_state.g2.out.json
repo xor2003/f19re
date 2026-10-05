@@ -1,0 +1,3365 @@
+{
+  "inputs": {
+    "candidate": {
+      "image": {
+        "bss_size": 34672,
+        "code_ranges": [
+          {
+            "address": "0x10000",
+            "size": 62912
+          }
+        ],
+        "code_scope": "declared",
+        "file_sha256": "8c96c257a8d0269cd3ef04f41810a2f0051b750961c1ac6346e9548503d28bae",
+        "image_sha256": "c169337118b74aa9d1c345b78127738838756afd2bfd72de3635111936344aa4",
+        "image_size": 66821,
+        "load_segment": "0x1000",
+        "reloc_sha256": "29bd358be072d444c78eb1f9ec5d11e4ddeee05f66c08f2e2fdbc1185f378a37"
+      },
+      "path": "/home/xor/games/f19ru/F19/build/EGFRAME.EXE",
+      "sha256": "8c96c257a8d0269cd3ef04f41810a2f0051b750961c1ac6346e9548503d28bae"
+    },
+    "oracle": {
+      "image": {
+        "bss_size": 16624,
+        "code_ranges": [
+          {
+            "address": "0x10000",
+            "size": 64896
+          }
+        ],
+        "code_scope": "declared",
+        "file_sha256": "66fdad8c063ab1afef206108518165cefe16e3d311a409084ad86bcfb388fd4b",
+        "image_sha256": "27d5cddb6167780a448bcbf8ebefb702e1695d503c7281c356e0c854f564412b",
+        "image_size": 152240,
+        "load_segment": "0x1000",
+        "reloc_sha256": "f1aa9549424e7c3d82a632113f9c8e92b3bde99d6ecd4a538e406ef47347967e"
+      },
+      "path": "/home/xor/games/f19/F19/EGAME.EXE",
+      "sha256": "66fdad8c063ab1afef206108518165cefe16e3d311a409084ad86bcfb388fd4b"
+    }
+  },
+  "instruction_limit": 200000,
+  "policy": {
+    "a20": "enabled",
+    "high_half_default": "zero",
+    "initial_memory": "mapped pages start zero; relocated image, patches and caller frame are applied in order",
+    "initial_registers": "absent integer registers, high halves and non-CS segments start zero; flags default to 0x2",
+    "instruction_model": "Unicorn x86 real mode, integer observations; unsupported effects refuse",
+    "max_observation_bytes": 65536,
+    "max_patch_bytes": 65536,
+    "straddle": "linear_continue"
+  },
+  "proof_status": "not_established_by_execution",
+  "results": [
+    {
+      "candidate": {
+        "detail": "",
+        "effective_flags_mask": "0x8d5",
+        "events": [],
+        "instructions": 12,
+        "observations": [
+          {
+            "bytes": "0000",
+            "linear": "0x6551e"
+          },
+          {
+            "bytes": "ffff",
+            "linear": "0x6437a"
+          },
+          {
+            "bytes": "5555",
+            "linear": "0x68872"
+          },
+          {
+            "bytes": "5555",
+            "linear": "0x607c6"
+          },
+          {
+            "bytes": "5655",
+            "linear": "0x68896"
+          },
+          {
+            "bytes": "5655",
+            "linear": "0x607ea"
+          },
+          {
+            "bytes": "5755",
+            "linear": "0x688ba"
+          },
+          {
+            "bytes": "5755",
+            "linear": "0x6080e"
+          },
+          {
+            "bytes": "5855",
+            "linear": "0x688de"
+          },
+          {
+            "bytes": "5855",
+            "linear": "0x60832"
+          },
+          {
+            "bytes": "5955",
+            "linear": "0x68902"
+          },
+          {
+            "bytes": "5955",
+            "linear": "0x60856"
+          }
+        ],
+        "registers": {
+          "ax": "0x0",
+          "bp": "0x0",
+          "bx": "0x0",
+          "cs": "0xff0",
+          "cx": "0x0",
+          "di": "0x0",
+          "ds": "0x6000",
+          "dx": "0x0",
+          "eax": "0x0",
+          "ebp": "0x0",
+          "ebx": "0x0",
+          "ecx": "0x0",
+          "edi": "0x0",
+          "edx": "0x0",
+          "eflags": "0x246",
+          "es": "0x6000",
+          "esi": "0x0",
+          "esp": "0xf002",
+          "flags": "0x246",
+          "fs": "0x0",
+          "gs": "0x0",
+          "ip": "0x4",
+          "si": "0x0",
+          "sp": "0xf002",
+          "ss": "0x4000"
+        },
+        "status": "returned",
+        "writes": [
+          {
+            "bytes": "00000000",
+            "linear": "0x4effc"
+          },
+          {
+            "bytes": "ffff",
+            "linear": "0x6437a"
+          }
+        ]
+      },
+      "comparison": {
+        "flags_mask": "0x8d5",
+        "observables": [
+          "ax",
+          "bx",
+          "cx",
+          "dx",
+          "si",
+          "di",
+          "bp",
+          "sp",
+          "cs",
+          "ds",
+          "es",
+          "ss",
+          "fs",
+          "gs",
+          "ip",
+          "eflags",
+          "eax",
+          "ebx",
+          "ecx",
+          "edx",
+          "esi",
+          "edi",
+          "ebp",
+          "esp"
+        ],
+        "observables_source": "default",
+        "reason": "declared observations diverge"
+      },
+      "id": "resetSimObjectLocks#0",
+      "initial_state": {
+        "candidate_entry": {
+          "offset": "0x706f",
+          "segment": "0xff0"
+        },
+        "frame": {
+          "kind": "near16",
+          "target": {
+            "offset": "0x4",
+            "segment": "0xff0"
+          }
+        },
+        "high_halves": {},
+        "memory": [
+          {
+            "bytes": "0000",
+            "offset": "0x9670",
+            "segment": "0x6000"
+          },
+          {
+            "bytes": "0000",
+            "offset": "0x7a4",
+            "segment": "0x6000"
+          },
+          {
+            "bytes": "5555",
+            "offset": "0x8872",
+            "segment": "0x6000"
+          },
+          {
+            "bytes": "5555",
+            "offset": "0x7c6",
+            "segment": "0x6000"
+          },
+          {
+            "bytes": "5655",
+            "offset": "0x8896",
+            "segment": "0x6000"
+          },
+          {
+            "bytes": "5655",
+            "offset": "0x7ea",
+            "segment": "0x6000"
+          },
+          {
+            "bytes": "5755",
+            "offset": "0x88ba",
+            "segment": "0x6000"
+          },
+          {
+            "bytes": "5755",
+            "offset": "0x80e",
+            "segment": "0x6000"
+          },
+          {
+            "bytes": "5855",
+            "offset": "0x88de",
+            "segment": "0x6000"
+          },
+          {
+            "bytes": "5855",
+            "offset": "0x832",
+            "segment": "0x6000"
+          },
+          {
+            "bytes": "5955",
+            "offset": "0x8902",
+            "segment": "0x6000"
+          },
+          {
+            "bytes": "5955",
+            "offset": "0x856",
+            "segment": "0x6000"
+          }
+        ],
+        "observations": [
+          {
+            "offset": "0x551e",
+            "segment": "0x6000",
+            "size": 2
+          },
+          {
+            "offset": "0x437a",
+            "segment": "0x6000",
+            "size": 2
+          },
+          {
+            "offset": "0x8872",
+            "segment": "0x6000",
+            "size": 2
+          },
+          {
+            "offset": "0x7c6",
+            "segment": "0x6000",
+            "size": 2
+          },
+          {
+            "offset": "0x8896",
+            "segment": "0x6000",
+            "size": 2
+          },
+          {
+            "offset": "0x7ea",
+            "segment": "0x6000",
+            "size": 2
+          },
+          {
+            "offset": "0x88ba",
+            "segment": "0x6000",
+            "size": 2
+          },
+          {
+            "offset": "0x80e",
+            "segment": "0x6000",
+            "size": 2
+          },
+          {
+            "offset": "0x88de",
+            "segment": "0x6000",
+            "size": 2
+          },
+          {
+            "offset": "0x832",
+            "segment": "0x6000",
+            "size": 2
+          },
+          {
+            "offset": "0x8902",
+            "segment": "0x6000",
+            "size": 2
+          },
+          {
+            "offset": "0x856",
+            "segment": "0x6000",
+            "size": 2
+          }
+        ],
+        "oracle_entry": {
+          "offset": "0x4b66",
+          "segment": "0xff0"
+        },
+        "registers": {
+          "bp": "0x0",
+          "di": "0x0",
+          "flags": "0x202",
+          "si": "0x0",
+          "sp": "0xf000"
+        },
+        "segments": {
+          "ds": "0x6000",
+          "es": "0x6000",
+          "ss": "0x4000"
+        }
+      },
+      "oracle": {
+        "detail": "",
+        "effective_flags_mask": "0x8d5",
+        "events": [],
+        "instructions": 12,
+        "observations": [
+          {
+            "bytes": "ffff",
+            "linear": "0x6551e"
+          },
+          {
+            "bytes": "0000",
+            "linear": "0x6437a"
+          },
+          {
+            "bytes": "5555",
+            "linear": "0x68872"
+          },
+          {
+            "bytes": "5555",
+            "linear": "0x607c6"
+          },
+          {
+            "bytes": "5655",
+            "linear": "0x68896"
+          },
+          {
+            "bytes": "5655",
+            "linear": "0x607ea"
+          },
+          {
+            "bytes": "5755",
+            "linear": "0x688ba"
+          },
+          {
+            "bytes": "5755",
+            "linear": "0x6080e"
+          },
+          {
+            "bytes": "5855",
+            "linear": "0x688de"
+          },
+          {
+            "bytes": "5855",
+            "linear": "0x60832"
+          },
+          {
+            "bytes": "5955",
+            "linear": "0x68902"
+          },
+          {
+            "bytes": "5955",
+            "linear": "0x60856"
+          }
+        ],
+        "registers": {
+          "ax": "0x0",
+          "bp": "0x0",
+          "bx": "0x0",
+          "cs": "0xff0",
+          "cx": "0x0",
+          "di": "0x0",
+          "ds": "0x6000",
+          "dx": "0x0",
+          "eax": "0x0",
+          "ebp": "0x0",
+          "ebx": "0x0",
+          "ecx": "0x0",
+          "edi": "0x0",
+          "edx": "0x0",
+          "eflags": "0x246",
+          "es": "0x6000",
+          "esi": "0x0",
+          "esp": "0xf002",
+          "flags": "0x246",
+          "fs": "0x0",
+          "gs": "0x0",
+          "ip": "0x4",
+          "si": "0x0",
+          "sp": "0xf002",
+          "ss": "0x4000"
+        },
+        "status": "returned",
+        "writes": [
+          {
+            "bytes": "00000000",
+            "linear": "0x4effc"
+          },
+          {
+            "bytes": "ffff",
+            "linear": "0x6551e"
+          }
+        ]
+      },
+      "status": "mismatched"
+    },
+    {
+      "candidate": {
+        "detail": "",
+        "effective_flags_mask": "0x8d5",
+        "events": [],
+        "instructions": 20,
+        "observations": [
+          {
+            "bytes": "0000",
+            "linear": "0x6551e"
+          },
+          {
+            "bytes": "ffff",
+            "linear": "0x6437a"
+          },
+          {
+            "bytes": "5555",
+            "linear": "0x68872"
+          },
+          {
+            "bytes": "ffff",
+            "linear": "0x607c6"
+          },
+          {
+            "bytes": "5655",
+            "linear": "0x68896"
+          },
+          {
+            "bytes": "5655",
+            "linear": "0x607ea"
+          },
+          {
+            "bytes": "5755",
+            "linear": "0x688ba"
+          },
+          {
+            "bytes": "5755",
+            "linear": "0x6080e"
+          },
+          {
+            "bytes": "5855",
+            "linear": "0x688de"
+          },
+          {
+            "bytes": "5855",
+            "linear": "0x60832"
+          },
+          {
+            "bytes": "5955",
+            "linear": "0x68902"
+          },
+          {
+            "bytes": "5955",
+            "linear": "0x60856"
+          }
+        ],
+        "registers": {
+          "ax": "0x1",
+          "bp": "0x0",
+          "bx": "0x0",
+          "cs": "0xff0",
+          "cx": "0x0",
+          "di": "0x0",
+          "ds": "0x6000",
+          "dx": "0x0",
+          "eax": "0x1",
+          "ebp": "0x0",
+          "ebx": "0x0",
+          "ecx": "0x0",
+          "edi": "0x0",
+          "edx": "0x0",
+          "eflags": "0x246",
+          "es": "0x6000",
+          "esi": "0x0",
+          "esp": "0xf002",
+          "flags": "0x246",
+          "fs": "0x0",
+          "gs": "0x0",
+          "ip": "0x4",
+          "si": "0x0",
+          "sp": "0xf002",
+          "ss": "0x4000"
+        },
+        "status": "returned",
+        "writes": [
+          {
+            "bytes": "01000000",
+            "linear": "0x4effc"
+          },
+          {
+            "bytes": "ffff",
+            "linear": "0x607c6"
+          },
+          {
+            "bytes": "ffff",
+            "linear": "0x6437a"
+          }
+        ]
+      },
+      "comparison": {
+        "flags_mask": "0x8d5",
+        "observables": [
+          "ax",
+          "bx",
+          "cx",
+          "dx",
+          "si",
+          "di",
+          "bp",
+          "sp",
+          "cs",
+          "ds",
+          "es",
+          "ss",
+          "fs",
+          "gs",
+          "ip",
+          "eflags",
+          "eax",
+          "ebx",
+          "ecx",
+          "edx",
+          "esi",
+          "edi",
+          "ebp",
+          "esp"
+        ],
+        "observables_source": "default",
+        "reason": "declared observations diverge"
+      },
+      "id": "resetSimObjectLocks#1",
+      "initial_state": {
+        "candidate_entry": {
+          "offset": "0x706f",
+          "segment": "0xff0"
+        },
+        "frame": {
+          "kind": "near16",
+          "target": {
+            "offset": "0x4",
+            "segment": "0xff0"
+          }
+        },
+        "high_halves": {},
+        "memory": [
+          {
+            "bytes": "0100",
+            "offset": "0x9670",
+            "segment": "0x6000"
+          },
+          {
+            "bytes": "0100",
+            "offset": "0x7a4",
+            "segment": "0x6000"
+          },
+          {
+            "bytes": "5555",
+            "offset": "0x8872",
+            "segment": "0x6000"
+          },
+          {
+            "bytes": "5555",
+            "offset": "0x7c6",
+            "segment": "0x6000"
+          },
+          {
+            "bytes": "5655",
+            "offset": "0x8896",
+            "segment": "0x6000"
+          },
+          {
+            "bytes": "5655",
+            "offset": "0x7ea",
+            "segment": "0x6000"
+          },
+          {
+            "bytes": "5755",
+            "offset": "0x88ba",
+            "segment": "0x6000"
+          },
+          {
+            "bytes": "5755",
+            "offset": "0x80e",
+            "segment": "0x6000"
+          },
+          {
+            "bytes": "5855",
+            "offset": "0x88de",
+            "segment": "0x6000"
+          },
+          {
+            "bytes": "5855",
+            "offset": "0x832",
+            "segment": "0x6000"
+          },
+          {
+            "bytes": "5955",
+            "offset": "0x8902",
+            "segment": "0x6000"
+          },
+          {
+            "bytes": "5955",
+            "offset": "0x856",
+            "segment": "0x6000"
+          }
+        ],
+        "observations": [
+          {
+            "offset": "0x551e",
+            "segment": "0x6000",
+            "size": 2
+          },
+          {
+            "offset": "0x437a",
+            "segment": "0x6000",
+            "size": 2
+          },
+          {
+            "offset": "0x8872",
+            "segment": "0x6000",
+            "size": 2
+          },
+          {
+            "offset": "0x7c6",
+            "segment": "0x6000",
+            "size": 2
+          },
+          {
+            "offset": "0x8896",
+            "segment": "0x6000",
+            "size": 2
+          },
+          {
+            "offset": "0x7ea",
+            "segment": "0x6000",
+            "size": 2
+          },
+          {
+            "offset": "0x88ba",
+            "segment": "0x6000",
+            "size": 2
+          },
+          {
+            "offset": "0x80e",
+            "segment": "0x6000",
+            "size": 2
+          },
+          {
+            "offset": "0x88de",
+            "segment": "0x6000",
+            "size": 2
+          },
+          {
+            "offset": "0x832",
+            "segment": "0x6000",
+            "size": 2
+          },
+          {
+            "offset": "0x8902",
+            "segment": "0x6000",
+            "size": 2
+          },
+          {
+            "offset": "0x856",
+            "segment": "0x6000",
+            "size": 2
+          }
+        ],
+        "oracle_entry": {
+          "offset": "0x4b66",
+          "segment": "0xff0"
+        },
+        "registers": {
+          "bp": "0x0",
+          "di": "0x0",
+          "flags": "0x202",
+          "si": "0x0",
+          "sp": "0xf000"
+        },
+        "segments": {
+          "ds": "0x6000",
+          "es": "0x6000",
+          "ss": "0x4000"
+        }
+      },
+      "oracle": {
+        "detail": "",
+        "effective_flags_mask": "0x8d5",
+        "events": [],
+        "instructions": 20,
+        "observations": [
+          {
+            "bytes": "ffff",
+            "linear": "0x6551e"
+          },
+          {
+            "bytes": "0000",
+            "linear": "0x6437a"
+          },
+          {
+            "bytes": "ffff",
+            "linear": "0x68872"
+          },
+          {
+            "bytes": "5555",
+            "linear": "0x607c6"
+          },
+          {
+            "bytes": "5655",
+            "linear": "0x68896"
+          },
+          {
+            "bytes": "5655",
+            "linear": "0x607ea"
+          },
+          {
+            "bytes": "5755",
+            "linear": "0x688ba"
+          },
+          {
+            "bytes": "5755",
+            "linear": "0x6080e"
+          },
+          {
+            "bytes": "5855",
+            "linear": "0x688de"
+          },
+          {
+            "bytes": "5855",
+            "linear": "0x60832"
+          },
+          {
+            "bytes": "5955",
+            "linear": "0x68902"
+          },
+          {
+            "bytes": "5955",
+            "linear": "0x60856"
+          }
+        ],
+        "registers": {
+          "ax": "0x1",
+          "bp": "0x0",
+          "bx": "0x0",
+          "cs": "0xff0",
+          "cx": "0x0",
+          "di": "0x0",
+          "ds": "0x6000",
+          "dx": "0x0",
+          "eax": "0x1",
+          "ebp": "0x0",
+          "ebx": "0x0",
+          "ecx": "0x0",
+          "edi": "0x0",
+          "edx": "0x0",
+          "eflags": "0x246",
+          "es": "0x6000",
+          "esi": "0x0",
+          "esp": "0xf002",
+          "flags": "0x246",
+          "fs": "0x0",
+          "gs": "0x0",
+          "ip": "0x4",
+          "si": "0x0",
+          "sp": "0xf002",
+          "ss": "0x4000"
+        },
+        "status": "returned",
+        "writes": [
+          {
+            "bytes": "01000000",
+            "linear": "0x4effc"
+          },
+          {
+            "bytes": "ffff",
+            "linear": "0x6551e"
+          },
+          {
+            "bytes": "ffff",
+            "linear": "0x68872"
+          }
+        ]
+      },
+      "status": "mismatched"
+    },
+    {
+      "candidate": {
+        "detail": "",
+        "effective_flags_mask": "0x8d5",
+        "events": [],
+        "instructions": 36,
+        "observations": [
+          {
+            "bytes": "0000",
+            "linear": "0x6551e"
+          },
+          {
+            "bytes": "ffff",
+            "linear": "0x6437a"
+          },
+          {
+            "bytes": "5555",
+            "linear": "0x68872"
+          },
+          {
+            "bytes": "ffff",
+            "linear": "0x607c6"
+          },
+          {
+            "bytes": "5655",
+            "linear": "0x68896"
+          },
+          {
+            "bytes": "ffff",
+            "linear": "0x607ea"
+          },
+          {
+            "bytes": "5755",
+            "linear": "0x688ba"
+          },
+          {
+            "bytes": "ffff",
+            "linear": "0x6080e"
+          },
+          {
+            "bytes": "5855",
+            "linear": "0x688de"
+          },
+          {
+            "bytes": "5855",
+            "linear": "0x60832"
+          },
+          {
+            "bytes": "5955",
+            "linear": "0x68902"
+          },
+          {
+            "bytes": "5955",
+            "linear": "0x60856"
+          }
+        ],
+        "registers": {
+          "ax": "0x3",
+          "bp": "0x0",
+          "bx": "0x48",
+          "cs": "0xff0",
+          "cx": "0x0",
+          "di": "0x0",
+          "ds": "0x6000",
+          "dx": "0x0",
+          "eax": "0x3",
+          "ebp": "0x0",
+          "ebx": "0x48",
+          "ecx": "0x0",
+          "edi": "0x0",
+          "edx": "0x0",
+          "eflags": "0x246",
+          "es": "0x6000",
+          "esi": "0x0",
+          "esp": "0xf002",
+          "flags": "0x246",
+          "fs": "0x0",
+          "gs": "0x0",
+          "ip": "0x4",
+          "si": "0x0",
+          "sp": "0xf002",
+          "ss": "0x4000"
+        },
+        "status": "returned",
+        "writes": [
+          {
+            "bytes": "03000000",
+            "linear": "0x4effc"
+          },
+          {
+            "bytes": "ffff",
+            "linear": "0x607c6"
+          },
+          {
+            "bytes": "ffff",
+            "linear": "0x607ea"
+          },
+          {
+            "bytes": "ffff",
+            "linear": "0x6080e"
+          },
+          {
+            "bytes": "ffff",
+            "linear": "0x6437a"
+          }
+        ]
+      },
+      "comparison": {
+        "flags_mask": "0x8d5",
+        "observables": [
+          "ax",
+          "bx",
+          "cx",
+          "dx",
+          "si",
+          "di",
+          "bp",
+          "sp",
+          "cs",
+          "ds",
+          "es",
+          "ss",
+          "fs",
+          "gs",
+          "ip",
+          "eflags",
+          "eax",
+          "ebx",
+          "ecx",
+          "edx",
+          "esi",
+          "edi",
+          "ebp",
+          "esp"
+        ],
+        "observables_source": "default",
+        "reason": "declared observations diverge"
+      },
+      "id": "resetSimObjectLocks#2",
+      "initial_state": {
+        "candidate_entry": {
+          "offset": "0x706f",
+          "segment": "0xff0"
+        },
+        "frame": {
+          "kind": "near16",
+          "target": {
+            "offset": "0x4",
+            "segment": "0xff0"
+          }
+        },
+        "high_halves": {},
+        "memory": [
+          {
+            "bytes": "0300",
+            "offset": "0x9670",
+            "segment": "0x6000"
+          },
+          {
+            "bytes": "0300",
+            "offset": "0x7a4",
+            "segment": "0x6000"
+          },
+          {
+            "bytes": "5555",
+            "offset": "0x8872",
+            "segment": "0x6000"
+          },
+          {
+            "bytes": "5555",
+            "offset": "0x7c6",
+            "segment": "0x6000"
+          },
+          {
+            "bytes": "5655",
+            "offset": "0x8896",
+            "segment": "0x6000"
+          },
+          {
+            "bytes": "5655",
+            "offset": "0x7ea",
+            "segment": "0x6000"
+          },
+          {
+            "bytes": "5755",
+            "offset": "0x88ba",
+            "segment": "0x6000"
+          },
+          {
+            "bytes": "5755",
+            "offset": "0x80e",
+            "segment": "0x6000"
+          },
+          {
+            "bytes": "5855",
+            "offset": "0x88de",
+            "segment": "0x6000"
+          },
+          {
+            "bytes": "5855",
+            "offset": "0x832",
+            "segment": "0x6000"
+          },
+          {
+            "bytes": "5955",
+            "offset": "0x8902",
+            "segment": "0x6000"
+          },
+          {
+            "bytes": "5955",
+            "offset": "0x856",
+            "segment": "0x6000"
+          }
+        ],
+        "observations": [
+          {
+            "offset": "0x551e",
+            "segment": "0x6000",
+            "size": 2
+          },
+          {
+            "offset": "0x437a",
+            "segment": "0x6000",
+            "size": 2
+          },
+          {
+            "offset": "0x8872",
+            "segment": "0x6000",
+            "size": 2
+          },
+          {
+            "offset": "0x7c6",
+            "segment": "0x6000",
+            "size": 2
+          },
+          {
+            "offset": "0x8896",
+            "segment": "0x6000",
+            "size": 2
+          },
+          {
+            "offset": "0x7ea",
+            "segment": "0x6000",
+            "size": 2
+          },
+          {
+            "offset": "0x88ba",
+            "segment": "0x6000",
+            "size": 2
+          },
+          {
+            "offset": "0x80e",
+            "segment": "0x6000",
+            "size": 2
+          },
+          {
+            "offset": "0x88de",
+            "segment": "0x6000",
+            "size": 2
+          },
+          {
+            "offset": "0x832",
+            "segment": "0x6000",
+            "size": 2
+          },
+          {
+            "offset": "0x8902",
+            "segment": "0x6000",
+            "size": 2
+          },
+          {
+            "offset": "0x856",
+            "segment": "0x6000",
+            "size": 2
+          }
+        ],
+        "oracle_entry": {
+          "offset": "0x4b66",
+          "segment": "0xff0"
+        },
+        "registers": {
+          "bp": "0x0",
+          "di": "0x0",
+          "flags": "0x202",
+          "si": "0x0",
+          "sp": "0xf000"
+        },
+        "segments": {
+          "ds": "0x6000",
+          "es": "0x6000",
+          "ss": "0x4000"
+        }
+      },
+      "oracle": {
+        "detail": "",
+        "effective_flags_mask": "0x8d5",
+        "events": [],
+        "instructions": 36,
+        "observations": [
+          {
+            "bytes": "ffff",
+            "linear": "0x6551e"
+          },
+          {
+            "bytes": "0000",
+            "linear": "0x6437a"
+          },
+          {
+            "bytes": "ffff",
+            "linear": "0x68872"
+          },
+          {
+            "bytes": "5555",
+            "linear": "0x607c6"
+          },
+          {
+            "bytes": "ffff",
+            "linear": "0x68896"
+          },
+          {
+            "bytes": "5655",
+            "linear": "0x607ea"
+          },
+          {
+            "bytes": "ffff",
+            "linear": "0x688ba"
+          },
+          {
+            "bytes": "5755",
+            "linear": "0x6080e"
+          },
+          {
+            "bytes": "5855",
+            "linear": "0x688de"
+          },
+          {
+            "bytes": "5855",
+            "linear": "0x60832"
+          },
+          {
+            "bytes": "5955",
+            "linear": "0x68902"
+          },
+          {
+            "bytes": "5955",
+            "linear": "0x60856"
+          }
+        ],
+        "registers": {
+          "ax": "0x3",
+          "bp": "0x0",
+          "bx": "0x48",
+          "cs": "0xff0",
+          "cx": "0x0",
+          "di": "0x0",
+          "ds": "0x6000",
+          "dx": "0x0",
+          "eax": "0x3",
+          "ebp": "0x0",
+          "ebx": "0x48",
+          "ecx": "0x0",
+          "edi": "0x0",
+          "edx": "0x0",
+          "eflags": "0x246",
+          "es": "0x6000",
+          "esi": "0x0",
+          "esp": "0xf002",
+          "flags": "0x246",
+          "fs": "0x0",
+          "gs": "0x0",
+          "ip": "0x4",
+          "si": "0x0",
+          "sp": "0xf002",
+          "ss": "0x4000"
+        },
+        "status": "returned",
+        "writes": [
+          {
+            "bytes": "03000000",
+            "linear": "0x4effc"
+          },
+          {
+            "bytes": "ffff",
+            "linear": "0x6551e"
+          },
+          {
+            "bytes": "ffff",
+            "linear": "0x68872"
+          },
+          {
+            "bytes": "ffff",
+            "linear": "0x68896"
+          },
+          {
+            "bytes": "ffff",
+            "linear": "0x688ba"
+          }
+        ]
+      },
+      "status": "mismatched"
+    },
+    {
+      "candidate": {
+        "detail": "",
+        "effective_flags_mask": "0x8d5",
+        "events": [],
+        "instructions": 52,
+        "observations": [
+          {
+            "bytes": "0000",
+            "linear": "0x6551e"
+          },
+          {
+            "bytes": "ffff",
+            "linear": "0x6437a"
+          },
+          {
+            "bytes": "5555",
+            "linear": "0x68872"
+          },
+          {
+            "bytes": "ffff",
+            "linear": "0x607c6"
+          },
+          {
+            "bytes": "5655",
+            "linear": "0x68896"
+          },
+          {
+            "bytes": "ffff",
+            "linear": "0x607ea"
+          },
+          {
+            "bytes": "5755",
+            "linear": "0x688ba"
+          },
+          {
+            "bytes": "ffff",
+            "linear": "0x6080e"
+          },
+          {
+            "bytes": "5855",
+            "linear": "0x688de"
+          },
+          {
+            "bytes": "ffff",
+            "linear": "0x60832"
+          },
+          {
+            "bytes": "5955",
+            "linear": "0x68902"
+          },
+          {
+            "bytes": "ffff",
+            "linear": "0x60856"
+          }
+        ],
+        "registers": {
+          "ax": "0x5",
+          "bp": "0x0",
+          "bx": "0x90",
+          "cs": "0xff0",
+          "cx": "0x0",
+          "di": "0x0",
+          "ds": "0x6000",
+          "dx": "0x0",
+          "eax": "0x5",
+          "ebp": "0x0",
+          "ebx": "0x90",
+          "ecx": "0x0",
+          "edi": "0x0",
+          "edx": "0x0",
+          "eflags": "0x246",
+          "es": "0x6000",
+          "esi": "0x0",
+          "esp": "0xf002",
+          "flags": "0x246",
+          "fs": "0x0",
+          "gs": "0x0",
+          "ip": "0x4",
+          "si": "0x0",
+          "sp": "0xf002",
+          "ss": "0x4000"
+        },
+        "status": "returned",
+        "writes": [
+          {
+            "bytes": "05000000",
+            "linear": "0x4effc"
+          },
+          {
+            "bytes": "ffff",
+            "linear": "0x607c6"
+          },
+          {
+            "bytes": "ffff",
+            "linear": "0x607ea"
+          },
+          {
+            "bytes": "ffff",
+            "linear": "0x6080e"
+          },
+          {
+            "bytes": "ffff",
+            "linear": "0x60832"
+          },
+          {
+            "bytes": "ffff",
+            "linear": "0x60856"
+          },
+          {
+            "bytes": "ffff",
+            "linear": "0x6437a"
+          }
+        ]
+      },
+      "comparison": {
+        "flags_mask": "0x8d5",
+        "observables": [
+          "ax",
+          "bx",
+          "cx",
+          "dx",
+          "si",
+          "di",
+          "bp",
+          "sp",
+          "cs",
+          "ds",
+          "es",
+          "ss",
+          "fs",
+          "gs",
+          "ip",
+          "eflags",
+          "eax",
+          "ebx",
+          "ecx",
+          "edx",
+          "esi",
+          "edi",
+          "ebp",
+          "esp"
+        ],
+        "observables_source": "default",
+        "reason": "declared observations diverge"
+      },
+      "id": "resetSimObjectLocks#3",
+      "initial_state": {
+        "candidate_entry": {
+          "offset": "0x706f",
+          "segment": "0xff0"
+        },
+        "frame": {
+          "kind": "near16",
+          "target": {
+            "offset": "0x4",
+            "segment": "0xff0"
+          }
+        },
+        "high_halves": {},
+        "memory": [
+          {
+            "bytes": "0500",
+            "offset": "0x9670",
+            "segment": "0x6000"
+          },
+          {
+            "bytes": "0500",
+            "offset": "0x7a4",
+            "segment": "0x6000"
+          },
+          {
+            "bytes": "5555",
+            "offset": "0x8872",
+            "segment": "0x6000"
+          },
+          {
+            "bytes": "5555",
+            "offset": "0x7c6",
+            "segment": "0x6000"
+          },
+          {
+            "bytes": "5655",
+            "offset": "0x8896",
+            "segment": "0x6000"
+          },
+          {
+            "bytes": "5655",
+            "offset": "0x7ea",
+            "segment": "0x6000"
+          },
+          {
+            "bytes": "5755",
+            "offset": "0x88ba",
+            "segment": "0x6000"
+          },
+          {
+            "bytes": "5755",
+            "offset": "0x80e",
+            "segment": "0x6000"
+          },
+          {
+            "bytes": "5855",
+            "offset": "0x88de",
+            "segment": "0x6000"
+          },
+          {
+            "bytes": "5855",
+            "offset": "0x832",
+            "segment": "0x6000"
+          },
+          {
+            "bytes": "5955",
+            "offset": "0x8902",
+            "segment": "0x6000"
+          },
+          {
+            "bytes": "5955",
+            "offset": "0x856",
+            "segment": "0x6000"
+          }
+        ],
+        "observations": [
+          {
+            "offset": "0x551e",
+            "segment": "0x6000",
+            "size": 2
+          },
+          {
+            "offset": "0x437a",
+            "segment": "0x6000",
+            "size": 2
+          },
+          {
+            "offset": "0x8872",
+            "segment": "0x6000",
+            "size": 2
+          },
+          {
+            "offset": "0x7c6",
+            "segment": "0x6000",
+            "size": 2
+          },
+          {
+            "offset": "0x8896",
+            "segment": "0x6000",
+            "size": 2
+          },
+          {
+            "offset": "0x7ea",
+            "segment": "0x6000",
+            "size": 2
+          },
+          {
+            "offset": "0x88ba",
+            "segment": "0x6000",
+            "size": 2
+          },
+          {
+            "offset": "0x80e",
+            "segment": "0x6000",
+            "size": 2
+          },
+          {
+            "offset": "0x88de",
+            "segment": "0x6000",
+            "size": 2
+          },
+          {
+            "offset": "0x832",
+            "segment": "0x6000",
+            "size": 2
+          },
+          {
+            "offset": "0x8902",
+            "segment": "0x6000",
+            "size": 2
+          },
+          {
+            "offset": "0x856",
+            "segment": "0x6000",
+            "size": 2
+          }
+        ],
+        "oracle_entry": {
+          "offset": "0x4b66",
+          "segment": "0xff0"
+        },
+        "registers": {
+          "bp": "0x0",
+          "di": "0x0",
+          "flags": "0x202",
+          "si": "0x0",
+          "sp": "0xf000"
+        },
+        "segments": {
+          "ds": "0x6000",
+          "es": "0x6000",
+          "ss": "0x4000"
+        }
+      },
+      "oracle": {
+        "detail": "",
+        "effective_flags_mask": "0x8d5",
+        "events": [],
+        "instructions": 52,
+        "observations": [
+          {
+            "bytes": "ffff",
+            "linear": "0x6551e"
+          },
+          {
+            "bytes": "0000",
+            "linear": "0x6437a"
+          },
+          {
+            "bytes": "ffff",
+            "linear": "0x68872"
+          },
+          {
+            "bytes": "5555",
+            "linear": "0x607c6"
+          },
+          {
+            "bytes": "ffff",
+            "linear": "0x68896"
+          },
+          {
+            "bytes": "5655",
+            "linear": "0x607ea"
+          },
+          {
+            "bytes": "ffff",
+            "linear": "0x688ba"
+          },
+          {
+            "bytes": "5755",
+            "linear": "0x6080e"
+          },
+          {
+            "bytes": "ffff",
+            "linear": "0x688de"
+          },
+          {
+            "bytes": "5855",
+            "linear": "0x60832"
+          },
+          {
+            "bytes": "ffff",
+            "linear": "0x68902"
+          },
+          {
+            "bytes": "5955",
+            "linear": "0x60856"
+          }
+        ],
+        "registers": {
+          "ax": "0x5",
+          "bp": "0x0",
+          "bx": "0x90",
+          "cs": "0xff0",
+          "cx": "0x0",
+          "di": "0x0",
+          "ds": "0x6000",
+          "dx": "0x0",
+          "eax": "0x5",
+          "ebp": "0x0",
+          "ebx": "0x90",
+          "ecx": "0x0",
+          "edi": "0x0",
+          "edx": "0x0",
+          "eflags": "0x246",
+          "es": "0x6000",
+          "esi": "0x0",
+          "esp": "0xf002",
+          "flags": "0x246",
+          "fs": "0x0",
+          "gs": "0x0",
+          "ip": "0x4",
+          "si": "0x0",
+          "sp": "0xf002",
+          "ss": "0x4000"
+        },
+        "status": "returned",
+        "writes": [
+          {
+            "bytes": "05000000",
+            "linear": "0x4effc"
+          },
+          {
+            "bytes": "ffff",
+            "linear": "0x6551e"
+          },
+          {
+            "bytes": "ffff",
+            "linear": "0x68872"
+          },
+          {
+            "bytes": "ffff",
+            "linear": "0x68896"
+          },
+          {
+            "bytes": "ffff",
+            "linear": "0x688ba"
+          },
+          {
+            "bytes": "ffff",
+            "linear": "0x688de"
+          },
+          {
+            "bytes": "ffff",
+            "linear": "0x68902"
+          }
+        ]
+      },
+      "status": "mismatched"
+    },
+    {
+      "candidate": {
+        "detail": "",
+        "effective_flags_mask": "0x8d5",
+        "events": [],
+        "instructions": 40,
+        "observations": [
+          {
+            "bytes": "0000",
+            "linear": "0x64ece"
+          },
+          {
+            "bytes": "0000",
+            "linear": "0x60f5c"
+          },
+          {
+            "bytes": "0000",
+            "linear": "0x695be"
+          },
+          {
+            "bytes": "0000",
+            "linear": "0x6596c"
+          },
+          {
+            "bytes": "00000000000000000000000000000000",
+            "linear": "0x64edc"
+          },
+          {
+            "bytes": "09000000090000000900000009000000",
+            "linear": "0x651c2"
+          },
+          {
+            "bytes": "0000",
+            "linear": "0x64eec"
+          },
+          {
+            "bytes": "e803",
+            "linear": "0x656fa"
+          },
+          {
+            "bytes": "0000",
+            "linear": "0x64ed0"
+          },
+          {
+            "bytes": "8813",
+            "linear": "0x652ec"
+          }
+        ],
+        "registers": {
+          "ax": "0x0",
+          "bp": "0x0",
+          "bx": "0xc",
+          "cs": "0xff0",
+          "cx": "0x0",
+          "di": "0x0",
+          "ds": "0x6000",
+          "dx": "0x0",
+          "eax": "0x0",
+          "ebp": "0x0",
+          "ebx": "0xc",
+          "ecx": "0x0",
+          "edi": "0x0",
+          "edx": "0x0",
+          "eflags": "0x246",
+          "es": "0x6000",
+          "esi": "0x0",
+          "esp": "0xf002",
+          "flags": "0x246",
+          "fs": "0x0",
+          "gs": "0x0",
+          "ip": "0x4",
+          "si": "0x0",
+          "sp": "0xf002",
+          "ss": "0x4000"
+        },
+        "status": "returned",
+        "writes": [
+          {
+            "bytes": "04000000",
+            "linear": "0x4effc"
+          },
+          {
+            "bytes": "0000",
+            "linear": "0x60f5c"
+          },
+          {
+            "bytes": "0900",
+            "linear": "0x651c2"
+          },
+          {
+            "bytes": "0900",
+            "linear": "0x651c6"
+          },
+          {
+            "bytes": "0900",
+            "linear": "0x651ca"
+          },
+          {
+            "bytes": "0900",
+            "linear": "0x651ce"
+          },
+          {
+            "bytes": "8813",
+            "linear": "0x652ec"
+          },
+          {
+            "bytes": "e803",
+            "linear": "0x656fa"
+          },
+          {
+            "bytes": "0000",
+            "linear": "0x6596c"
+          }
+        ]
+      },
+      "comparison": {
+        "flags_mask": "0x8d5",
+        "observables": [
+          "ax",
+          "bx",
+          "cx",
+          "dx",
+          "si",
+          "di",
+          "bp",
+          "sp",
+          "cs",
+          "ds",
+          "es",
+          "ss",
+          "fs",
+          "gs",
+          "ip",
+          "eflags",
+          "eax",
+          "ebx",
+          "ecx",
+          "edx",
+          "esi",
+          "edi",
+          "ebp",
+          "esp"
+        ],
+        "observables_source": "default",
+        "reason": "declared observations diverge"
+      },
+      "id": "initWeaponLoadout#0",
+      "initial_state": {
+        "candidate_entry": {
+          "offset": "0x709f",
+          "segment": "0xff0"
+        },
+        "frame": {
+          "kind": "near16",
+          "target": {
+            "offset": "0x4",
+            "segment": "0xff0"
+          }
+        },
+        "high_halves": {},
+        "memory": [],
+        "observations": [
+          {
+            "offset": "0x4ece",
+            "segment": "0x6000",
+            "size": 2
+          },
+          {
+            "offset": "0xf5c",
+            "segment": "0x6000",
+            "size": 2
+          },
+          {
+            "offset": "0x95be",
+            "segment": "0x6000",
+            "size": 2
+          },
+          {
+            "offset": "0x596c",
+            "segment": "0x6000",
+            "size": 2
+          },
+          {
+            "offset": "0x4edc",
+            "segment": "0x6000",
+            "size": 16
+          },
+          {
+            "offset": "0x51c2",
+            "segment": "0x6000",
+            "size": 16
+          },
+          {
+            "offset": "0x4eec",
+            "segment": "0x6000",
+            "size": 2
+          },
+          {
+            "offset": "0x56fa",
+            "segment": "0x6000",
+            "size": 2
+          },
+          {
+            "offset": "0x4ed0",
+            "segment": "0x6000",
+            "size": 2
+          },
+          {
+            "offset": "0x52ec",
+            "segment": "0x6000",
+            "size": 2
+          }
+        ],
+        "oracle_entry": {
+          "offset": "0x4b96",
+          "segment": "0xff0"
+        },
+        "registers": {
+          "bp": "0x0",
+          "di": "0x0",
+          "flags": "0x202",
+          "si": "0x0",
+          "sp": "0xf000"
+        },
+        "segments": {
+          "ds": "0x6000",
+          "es": "0x6000",
+          "ss": "0x4000"
+        }
+      },
+      "oracle": {
+        "detail": "",
+        "effective_flags_mask": "0x8d5",
+        "events": [],
+        "instructions": 40,
+        "observations": [
+          {
+            "bytes": "0000",
+            "linear": "0x64ece"
+          },
+          {
+            "bytes": "0000",
+            "linear": "0x60f5c"
+          },
+          {
+            "bytes": "0000",
+            "linear": "0x695be"
+          },
+          {
+            "bytes": "0000",
+            "linear": "0x6596c"
+          },
+          {
+            "bytes": "09000000090000000900000009000000",
+            "linear": "0x64edc"
+          },
+          {
+            "bytes": "00000000000000000000000000000000",
+            "linear": "0x651c2"
+          },
+          {
+            "bytes": "e803",
+            "linear": "0x64eec"
+          },
+          {
+            "bytes": "0000",
+            "linear": "0x656fa"
+          },
+          {
+            "bytes": "8813",
+            "linear": "0x64ed0"
+          },
+          {
+            "bytes": "0000",
+            "linear": "0x652ec"
+          }
+        ],
+        "registers": {
+          "ax": "0x0",
+          "bp": "0x0",
+          "bx": "0xc",
+          "cs": "0xff0",
+          "cx": "0x0",
+          "di": "0x0",
+          "ds": "0x6000",
+          "dx": "0x0",
+          "eax": "0x0",
+          "ebp": "0x0",
+          "ebx": "0xc",
+          "ecx": "0x0",
+          "edi": "0x0",
+          "edx": "0x0",
+          "eflags": "0x246",
+          "es": "0x6000",
+          "esi": "0x0",
+          "esp": "0xf002",
+          "flags": "0x246",
+          "fs": "0x0",
+          "gs": "0x0",
+          "ip": "0x4",
+          "si": "0x0",
+          "sp": "0xf002",
+          "ss": "0x4000"
+        },
+        "status": "returned",
+        "writes": [
+          {
+            "bytes": "04000000",
+            "linear": "0x4effc"
+          },
+          {
+            "bytes": "00008813",
+            "linear": "0x64ece"
+          },
+          {
+            "bytes": "0900",
+            "linear": "0x64edc"
+          },
+          {
+            "bytes": "0900",
+            "linear": "0x64ee0"
+          },
+          {
+            "bytes": "0900",
+            "linear": "0x64ee4"
+          },
+          {
+            "bytes": "0900",
+            "linear": "0x64ee8"
+          },
+          {
+            "bytes": "e803",
+            "linear": "0x64eec"
+          },
+          {
+            "bytes": "0000",
+            "linear": "0x695be"
+          }
+        ]
+      },
+      "status": "mismatched"
+    },
+    {
+      "candidate": {
+        "detail": "",
+        "effective_flags_mask": "0x8d5",
+        "events": [],
+        "instructions": 97,
+        "observations": [
+          {
+            "bytes": "000000000000000000000000000000000000",
+            "linear": "0x609ec"
+          },
+          {
+            "bytes": "20004000800000010002000400060010050d",
+            "linear": "0x65d26"
+          }
+        ],
+        "registers": {
+          "ax": "0xd05",
+          "bp": "0x0",
+          "bx": "0xa",
+          "cs": "0xff0",
+          "cx": "0x5",
+          "di": "0x0",
+          "ds": "0x6000",
+          "dx": "0x0",
+          "eax": "0xd05",
+          "ebp": "0x0",
+          "ebx": "0xa",
+          "ecx": "0x5",
+          "edi": "0x0",
+          "edx": "0x0",
+          "eflags": "0x206",
+          "es": "0x6000",
+          "esi": "0x0",
+          "esp": "0xf002",
+          "flags": "0x206",
+          "fs": "0x0",
+          "gs": "0x0",
+          "ip": "0x4",
+          "si": "0x0",
+          "sp": "0xf002",
+          "ss": "0x4000"
+        },
+        "status": "returned",
+        "writes": [
+          {
+            "bytes": "feefe275000800100f2706000000",
+            "linear": "0x4eff2"
+          },
+          {
+            "bytes": "20004000800000010002000400060010050d",
+            "linear": "0x65d26"
+          }
+        ]
+      },
+      "comparison": {
+        "flags_mask": "0x8d5",
+        "observables": [
+          "ax",
+          "bx",
+          "cx",
+          "dx",
+          "si",
+          "di",
+          "bp",
+          "sp",
+          "cs",
+          "ds",
+          "es",
+          "ss",
+          "fs",
+          "gs",
+          "ip",
+          "eflags",
+          "eax",
+          "ebx",
+          "ecx",
+          "edx",
+          "esi",
+          "edi",
+          "ebp",
+          "esp"
+        ],
+        "observables_source": "default",
+        "reason": "declared observations diverge"
+      },
+      "id": "setupLodDistances#0",
+      "initial_state": {
+        "candidate_entry": {
+          "offset": "0x759e",
+          "segment": "0xff0"
+        },
+        "frame": {
+          "kind": "near16",
+          "target": {
+            "offset": "0x4",
+            "segment": "0xff0"
+          }
+        },
+        "high_halves": {},
+        "memory": [
+          {
+            "bytes": "00",
+            "offset": "0x662c",
+            "segment": "0x6000"
+          },
+          {
+            "bytes": "00",
+            "offset": "0x56f6",
+            "segment": "0x6000"
+          }
+        ],
+        "observations": [
+          {
+            "offset": "0x9ec",
+            "segment": "0x6000",
+            "size": 18
+          },
+          {
+            "offset": "0x5d26",
+            "segment": "0x6000",
+            "size": 18
+          }
+        ],
+        "oracle_entry": {
+          "offset": "0xdf40",
+          "segment": "0xff0"
+        },
+        "registers": {
+          "bp": "0x0",
+          "di": "0x0",
+          "flags": "0x202",
+          "si": "0x0",
+          "sp": "0xf000"
+        },
+        "segments": {
+          "ds": "0x6000",
+          "es": "0x6000",
+          "ss": "0x4000"
+        }
+      },
+      "oracle": {
+        "detail": "",
+        "effective_flags_mask": "0x8d5",
+        "events": [],
+        "instructions": 97,
+        "observations": [
+          {
+            "bytes": "20004000800000010002000400060010050d",
+            "linear": "0x609ec"
+          },
+          {
+            "bytes": "000000000000000000000000000000000000",
+            "linear": "0x65d26"
+          }
+        ],
+        "registers": {
+          "ax": "0xd05",
+          "bp": "0x0",
+          "bx": "0xa",
+          "cs": "0xff0",
+          "cx": "0x5",
+          "di": "0x0",
+          "ds": "0x6000",
+          "dx": "0x0",
+          "eax": "0xd05",
+          "ebp": "0x0",
+          "ebx": "0xa",
+          "ecx": "0x5",
+          "edi": "0x0",
+          "edx": "0x0",
+          "eflags": "0x206",
+          "es": "0x6000",
+          "esi": "0x0",
+          "esp": "0xf002",
+          "flags": "0x206",
+          "fs": "0x0",
+          "gs": "0x0",
+          "ip": "0x4",
+          "si": "0x0",
+          "sp": "0xf002",
+          "ss": "0x4000"
+        },
+        "status": "returned",
+        "writes": [
+          {
+            "bytes": "feef84df000800100f2706000000",
+            "linear": "0x4eff2"
+          },
+          {
+            "bytes": "20004000800000010002000400060010050d",
+            "linear": "0x609ec"
+          }
+        ]
+      },
+      "status": "mismatched"
+    },
+    {
+      "candidate": {
+        "detail": "",
+        "effective_flags_mask": "0x8d5",
+        "events": [],
+        "instructions": 96,
+        "observations": [
+          {
+            "bytes": "000000000000000000000000000000000000",
+            "linear": "0x609ec"
+          },
+          {
+            "bytes": "400080000001000200040008000c00100a1a",
+            "linear": "0x65d26"
+          }
+        ],
+        "registers": {
+          "ax": "0x1a0a",
+          "bp": "0x0",
+          "bx": "0xa",
+          "cs": "0xff0",
+          "cx": "0x6",
+          "di": "0x0",
+          "ds": "0x6000",
+          "dx": "0x0",
+          "eax": "0x1a0a",
+          "ebp": "0x0",
+          "ebx": "0xa",
+          "ecx": "0x6",
+          "edi": "0x0",
+          "edx": "0x0",
+          "eflags": "0x206",
+          "es": "0x6000",
+          "esi": "0x0",
+          "esp": "0xf002",
+          "flags": "0x206",
+          "fs": "0x0",
+          "gs": "0x0",
+          "ip": "0x4",
+          "si": "0x0",
+          "sp": "0xf002",
+          "ss": "0x4000"
+        },
+        "status": "returned",
+        "writes": [
+          {
+            "bytes": "feefe275001000100f2706000000",
+            "linear": "0x4eff2"
+          },
+          {
+            "bytes": "400080000001000200040008000c00100a1a",
+            "linear": "0x65d26"
+          }
+        ]
+      },
+      "comparison": {
+        "flags_mask": "0x8d5",
+        "observables": [
+          "ax",
+          "bx",
+          "cx",
+          "dx",
+          "si",
+          "di",
+          "bp",
+          "sp",
+          "cs",
+          "ds",
+          "es",
+          "ss",
+          "fs",
+          "gs",
+          "ip",
+          "eflags",
+          "eax",
+          "ebx",
+          "ecx",
+          "edx",
+          "esi",
+          "edi",
+          "ebp",
+          "esp"
+        ],
+        "observables_source": "default",
+        "reason": "declared observations diverge"
+      },
+      "id": "setupLodDistances#1",
+      "initial_state": {
+        "candidate_entry": {
+          "offset": "0x759e",
+          "segment": "0xff0"
+        },
+        "frame": {
+          "kind": "near16",
+          "target": {
+            "offset": "0x4",
+            "segment": "0xff0"
+          }
+        },
+        "high_halves": {},
+        "memory": [
+          {
+            "bytes": "01",
+            "offset": "0x662c",
+            "segment": "0x6000"
+          },
+          {
+            "bytes": "01",
+            "offset": "0x56f6",
+            "segment": "0x6000"
+          }
+        ],
+        "observations": [
+          {
+            "offset": "0x9ec",
+            "segment": "0x6000",
+            "size": 18
+          },
+          {
+            "offset": "0x5d26",
+            "segment": "0x6000",
+            "size": 18
+          }
+        ],
+        "oracle_entry": {
+          "offset": "0xdf40",
+          "segment": "0xff0"
+        },
+        "registers": {
+          "bp": "0x0",
+          "di": "0x0",
+          "flags": "0x202",
+          "si": "0x0",
+          "sp": "0xf000"
+        },
+        "segments": {
+          "ds": "0x6000",
+          "es": "0x6000",
+          "ss": "0x4000"
+        }
+      },
+      "oracle": {
+        "detail": "",
+        "effective_flags_mask": "0x8d5",
+        "events": [],
+        "instructions": 96,
+        "observations": [
+          {
+            "bytes": "400080000001000200040008000c00100a1a",
+            "linear": "0x609ec"
+          },
+          {
+            "bytes": "000000000000000000000000000000000000",
+            "linear": "0x65d26"
+          }
+        ],
+        "registers": {
+          "ax": "0x1a0a",
+          "bp": "0x0",
+          "bx": "0xa",
+          "cs": "0xff0",
+          "cx": "0x6",
+          "di": "0x0",
+          "ds": "0x6000",
+          "dx": "0x0",
+          "eax": "0x1a0a",
+          "ebp": "0x0",
+          "ebx": "0xa",
+          "ecx": "0x6",
+          "edi": "0x0",
+          "edx": "0x0",
+          "eflags": "0x206",
+          "es": "0x6000",
+          "esi": "0x0",
+          "esp": "0xf002",
+          "flags": "0x206",
+          "fs": "0x0",
+          "gs": "0x0",
+          "ip": "0x4",
+          "si": "0x0",
+          "sp": "0xf002",
+          "ss": "0x4000"
+        },
+        "status": "returned",
+        "writes": [
+          {
+            "bytes": "feef84df001000100f2706000000",
+            "linear": "0x4eff2"
+          },
+          {
+            "bytes": "400080000001000200040008000c00100a1a",
+            "linear": "0x609ec"
+          }
+        ]
+      },
+      "status": "mismatched"
+    },
+    {
+      "candidate": {
+        "detail": "",
+        "effective_flags_mask": "0x8d5",
+        "events": [],
+        "instructions": 93,
+        "observations": [
+          {
+            "bytes": "000000000000000000000000000000000000",
+            "linear": "0x609ec"
+          },
+          {
+            "bytes": "00010002000400080010002000300f271434",
+            "linear": "0x65d26"
+          }
+        ],
+        "registers": {
+          "ax": "0x3414",
+          "bp": "0x0",
+          "bx": "0xa",
+          "cs": "0xff0",
+          "cx": "0x8",
+          "di": "0x0",
+          "ds": "0x6000",
+          "dx": "0x0",
+          "eax": "0x3414",
+          "ebp": "0x0",
+          "ebx": "0xa",
+          "ecx": "0x8",
+          "edi": "0x0",
+          "edx": "0x0",
+          "eflags": "0x216",
+          "es": "0x6000",
+          "esi": "0x0",
+          "esp": "0xf002",
+          "flags": "0x216",
+          "fs": "0x0",
+          "gs": "0x0",
+          "ip": "0x4",
+          "si": "0x0",
+          "sp": "0xf002",
+          "ss": "0x4000"
+        },
+        "status": "returned",
+        "writes": [
+          {
+            "bytes": "feefe275004000100f2706000000",
+            "linear": "0x4eff2"
+          },
+          {
+            "bytes": "00010002000400080010002000300f271434",
+            "linear": "0x65d26"
+          }
+        ]
+      },
+      "comparison": {
+        "flags_mask": "0x8d5",
+        "observables": [
+          "ax",
+          "bx",
+          "cx",
+          "dx",
+          "si",
+          "di",
+          "bp",
+          "sp",
+          "cs",
+          "ds",
+          "es",
+          "ss",
+          "fs",
+          "gs",
+          "ip",
+          "eflags",
+          "eax",
+          "ebx",
+          "ecx",
+          "edx",
+          "esi",
+          "edi",
+          "ebp",
+          "esp"
+        ],
+        "observables_source": "default",
+        "reason": "declared observations diverge"
+      },
+      "id": "setupLodDistances#2",
+      "initial_state": {
+        "candidate_entry": {
+          "offset": "0x759e",
+          "segment": "0xff0"
+        },
+        "frame": {
+          "kind": "near16",
+          "target": {
+            "offset": "0x4",
+            "segment": "0xff0"
+          }
+        },
+        "high_halves": {},
+        "memory": [
+          {
+            "bytes": "03",
+            "offset": "0x662c",
+            "segment": "0x6000"
+          },
+          {
+            "bytes": "03",
+            "offset": "0x56f6",
+            "segment": "0x6000"
+          }
+        ],
+        "observations": [
+          {
+            "offset": "0x9ec",
+            "segment": "0x6000",
+            "size": 18
+          },
+          {
+            "offset": "0x5d26",
+            "segment": "0x6000",
+            "size": 18
+          }
+        ],
+        "oracle_entry": {
+          "offset": "0xdf40",
+          "segment": "0xff0"
+        },
+        "registers": {
+          "bp": "0x0",
+          "di": "0x0",
+          "flags": "0x202",
+          "si": "0x0",
+          "sp": "0xf000"
+        },
+        "segments": {
+          "ds": "0x6000",
+          "es": "0x6000",
+          "ss": "0x4000"
+        }
+      },
+      "oracle": {
+        "detail": "",
+        "effective_flags_mask": "0x8d5",
+        "events": [],
+        "instructions": 93,
+        "observations": [
+          {
+            "bytes": "00010002000400080010002000300f271434",
+            "linear": "0x609ec"
+          },
+          {
+            "bytes": "000000000000000000000000000000000000",
+            "linear": "0x65d26"
+          }
+        ],
+        "registers": {
+          "ax": "0x3414",
+          "bp": "0x0",
+          "bx": "0xa",
+          "cs": "0xff0",
+          "cx": "0x8",
+          "di": "0x0",
+          "ds": "0x6000",
+          "dx": "0x0",
+          "eax": "0x3414",
+          "ebp": "0x0",
+          "ebx": "0xa",
+          "ecx": "0x8",
+          "edi": "0x0",
+          "edx": "0x0",
+          "eflags": "0x216",
+          "es": "0x6000",
+          "esi": "0x0",
+          "esp": "0xf002",
+          "flags": "0x216",
+          "fs": "0x0",
+          "gs": "0x0",
+          "ip": "0x4",
+          "si": "0x0",
+          "sp": "0xf002",
+          "ss": "0x4000"
+        },
+        "status": "returned",
+        "writes": [
+          {
+            "bytes": "feef84df004000100f2706000000",
+            "linear": "0x4eff2"
+          },
+          {
+            "bytes": "00010002000400080010002000300f271434",
+            "linear": "0x609ec"
+          }
+        ]
+      },
+      "status": "mismatched"
+    },
+    {
+      "candidate": {
+        "detail": "",
+        "effective_flags_mask": "0x8d5",
+        "events": [],
+        "instructions": 97,
+        "observations": [
+          {
+            "bytes": "000000000000000000000000000000000000",
+            "linear": "0x609ec"
+          },
+          {
+            "bytes": "00040008001000200040008000c000101e4e",
+            "linear": "0x65d26"
+          }
+        ],
+        "registers": {
+          "ax": "0x4e1e",
+          "bp": "0x0",
+          "bx": "0xa",
+          "cs": "0xff0",
+          "cx": "0xa",
+          "di": "0x0",
+          "ds": "0x6000",
+          "dx": "0x0",
+          "eax": "0x4e1e",
+          "ebp": "0x0",
+          "ebx": "0xa",
+          "ecx": "0xa",
+          "edi": "0x0",
+          "edx": "0x0",
+          "eflags": "0x206",
+          "es": "0x6000",
+          "esi": "0x0",
+          "esp": "0xf002",
+          "flags": "0x206",
+          "fs": "0x0",
+          "gs": "0x0",
+          "ip": "0x4",
+          "si": "0x0",
+          "sp": "0xf002",
+          "ss": "0x4000"
+        },
+        "status": "returned",
+        "writes": [
+          {
+            "bytes": "feefe275000000100f2706000000",
+            "linear": "0x4eff2"
+          },
+          {
+            "bytes": "00040008001000200040008000c000101e4e",
+            "linear": "0x65d26"
+          }
+        ]
+      },
+      "comparison": {
+        "flags_mask": "0x8d5",
+        "observables": [
+          "ax",
+          "bx",
+          "cx",
+          "dx",
+          "si",
+          "di",
+          "bp",
+          "sp",
+          "cs",
+          "ds",
+          "es",
+          "ss",
+          "fs",
+          "gs",
+          "ip",
+          "eflags",
+          "eax",
+          "ebx",
+          "ecx",
+          "edx",
+          "esi",
+          "edi",
+          "ebp",
+          "esp"
+        ],
+        "observables_source": "default",
+        "reason": "declared observations diverge"
+      },
+      "id": "setupLodDistances#3",
+      "initial_state": {
+        "candidate_entry": {
+          "offset": "0x759e",
+          "segment": "0xff0"
+        },
+        "frame": {
+          "kind": "near16",
+          "target": {
+            "offset": "0x4",
+            "segment": "0xff0"
+          }
+        },
+        "high_halves": {},
+        "memory": [
+          {
+            "bytes": "05",
+            "offset": "0x662c",
+            "segment": "0x6000"
+          },
+          {
+            "bytes": "05",
+            "offset": "0x56f6",
+            "segment": "0x6000"
+          }
+        ],
+        "observations": [
+          {
+            "offset": "0x9ec",
+            "segment": "0x6000",
+            "size": 18
+          },
+          {
+            "offset": "0x5d26",
+            "segment": "0x6000",
+            "size": 18
+          }
+        ],
+        "oracle_entry": {
+          "offset": "0xdf40",
+          "segment": "0xff0"
+        },
+        "registers": {
+          "bp": "0x0",
+          "di": "0x0",
+          "flags": "0x202",
+          "si": "0x0",
+          "sp": "0xf000"
+        },
+        "segments": {
+          "ds": "0x6000",
+          "es": "0x6000",
+          "ss": "0x4000"
+        }
+      },
+      "oracle": {
+        "detail": "",
+        "effective_flags_mask": "0x8d5",
+        "events": [],
+        "instructions": 97,
+        "observations": [
+          {
+            "bytes": "00040008001000200040008000c000101e4e",
+            "linear": "0x609ec"
+          },
+          {
+            "bytes": "000000000000000000000000000000000000",
+            "linear": "0x65d26"
+          }
+        ],
+        "registers": {
+          "ax": "0x4e1e",
+          "bp": "0x0",
+          "bx": "0xa",
+          "cs": "0xff0",
+          "cx": "0xa",
+          "di": "0x0",
+          "ds": "0x6000",
+          "dx": "0x0",
+          "eax": "0x4e1e",
+          "ebp": "0x0",
+          "ebx": "0xa",
+          "ecx": "0xa",
+          "edi": "0x0",
+          "edx": "0x0",
+          "eflags": "0x206",
+          "es": "0x6000",
+          "esi": "0x0",
+          "esp": "0xf002",
+          "flags": "0x206",
+          "fs": "0x0",
+          "gs": "0x0",
+          "ip": "0x4",
+          "si": "0x0",
+          "sp": "0xf002",
+          "ss": "0x4000"
+        },
+        "status": "returned",
+        "writes": [
+          {
+            "bytes": "feef84df000000100f2706000000",
+            "linear": "0x4eff2"
+          },
+          {
+            "bytes": "00040008001000200040008000c000101e4e",
+            "linear": "0x609ec"
+          }
+        ]
+      },
+      "status": "mismatched"
+    },
+    {
+      "candidate": {
+        "detail": "",
+        "effective_flags_mask": "0x8d5",
+        "events": [],
+        "instructions": 97,
+        "observations": [
+          {
+            "bytes": "000000000000000000000000000000000000",
+            "linear": "0x609ec"
+          },
+          {
+            "bytes": "004000800000000000000000000000103282",
+            "linear": "0x65d26"
+          }
+        ],
+        "registers": {
+          "ax": "0x8232",
+          "bp": "0x0",
+          "bx": "0xa",
+          "cs": "0xff0",
+          "cx": "0xe",
+          "di": "0x0",
+          "ds": "0x6000",
+          "dx": "0x0",
+          "eax": "0x8232",
+          "ebp": "0x0",
+          "ebx": "0xa",
+          "ecx": "0xe",
+          "edi": "0x0",
+          "edx": "0x0",
+          "eflags": "0xa92",
+          "es": "0x6000",
+          "esi": "0x0",
+          "esp": "0xf002",
+          "flags": "0xa92",
+          "fs": "0x0",
+          "gs": "0x0",
+          "ip": "0x4",
+          "si": "0x0",
+          "sp": "0xf002",
+          "ss": "0x4000"
+        },
+        "status": "returned",
+        "writes": [
+          {
+            "bytes": "feefe275000000100f2706000000",
+            "linear": "0x4eff2"
+          },
+          {
+            "bytes": "004000800000000000000000000000103282",
+            "linear": "0x65d26"
+          }
+        ]
+      },
+      "comparison": {
+        "flags_mask": "0x8d5",
+        "observables": [
+          "ax",
+          "bx",
+          "cx",
+          "dx",
+          "si",
+          "di",
+          "bp",
+          "sp",
+          "cs",
+          "ds",
+          "es",
+          "ss",
+          "fs",
+          "gs",
+          "ip",
+          "eflags",
+          "eax",
+          "ebx",
+          "ecx",
+          "edx",
+          "esi",
+          "edi",
+          "ebp",
+          "esp"
+        ],
+        "observables_source": "default",
+        "reason": "declared observations diverge"
+      },
+      "id": "setupLodDistances#4",
+      "initial_state": {
+        "candidate_entry": {
+          "offset": "0x759e",
+          "segment": "0xff0"
+        },
+        "frame": {
+          "kind": "near16",
+          "target": {
+            "offset": "0x4",
+            "segment": "0xff0"
+          }
+        },
+        "high_halves": {},
+        "memory": [
+          {
+            "bytes": "09",
+            "offset": "0x662c",
+            "segment": "0x6000"
+          },
+          {
+            "bytes": "09",
+            "offset": "0x56f6",
+            "segment": "0x6000"
+          }
+        ],
+        "observations": [
+          {
+            "offset": "0x9ec",
+            "segment": "0x6000",
+            "size": 18
+          },
+          {
+            "offset": "0x5d26",
+            "segment": "0x6000",
+            "size": 18
+          }
+        ],
+        "oracle_entry": {
+          "offset": "0xdf40",
+          "segment": "0xff0"
+        },
+        "registers": {
+          "bp": "0x0",
+          "di": "0x0",
+          "flags": "0x202",
+          "si": "0x0",
+          "sp": "0xf000"
+        },
+        "segments": {
+          "ds": "0x6000",
+          "es": "0x6000",
+          "ss": "0x4000"
+        }
+      },
+      "oracle": {
+        "detail": "",
+        "effective_flags_mask": "0x8d5",
+        "events": [],
+        "instructions": 97,
+        "observations": [
+          {
+            "bytes": "004000800000000000000000000000103282",
+            "linear": "0x609ec"
+          },
+          {
+            "bytes": "000000000000000000000000000000000000",
+            "linear": "0x65d26"
+          }
+        ],
+        "registers": {
+          "ax": "0x8232",
+          "bp": "0x0",
+          "bx": "0xa",
+          "cs": "0xff0",
+          "cx": "0xe",
+          "di": "0x0",
+          "ds": "0x6000",
+          "dx": "0x0",
+          "eax": "0x8232",
+          "ebp": "0x0",
+          "ebx": "0xa",
+          "ecx": "0xe",
+          "edi": "0x0",
+          "edx": "0x0",
+          "eflags": "0xa92",
+          "es": "0x6000",
+          "esi": "0x0",
+          "esp": "0xf002",
+          "flags": "0xa92",
+          "fs": "0x0",
+          "gs": "0x0",
+          "ip": "0x4",
+          "si": "0x0",
+          "sp": "0xf002",
+          "ss": "0x4000"
+        },
+        "status": "returned",
+        "writes": [
+          {
+            "bytes": "feef84df000000100f2706000000",
+            "linear": "0x4eff2"
+          },
+          {
+            "bytes": "004000800000000000000000000000103282",
+            "linear": "0x609ec"
+          }
+        ]
+      },
+      "status": "mismatched"
+    },
+    {
+      "candidate": {
+        "detail": "",
+        "effective_flags_mask": "0x8d5",
+        "events": [],
+        "instructions": 97,
+        "observations": [
+          {
+            "bytes": "000000000000000000000000000000000000",
+            "linear": "0x609ec"
+          },
+          {
+            "bytes": "000020004000800000010002000300108082",
+            "linear": "0x65d26"
+          }
+        ],
+        "registers": {
+          "ax": "0x8280",
+          "bp": "0x0",
+          "bx": "0xa",
+          "cs": "0xff0",
+          "cx": "0x84",
+          "di": "0x0",
+          "ds": "0x6000",
+          "dx": "0x6",
+          "eax": "0x8280",
+          "ebp": "0x0",
+          "ebx": "0xa",
+          "ecx": "0x84",
+          "edi": "0x0",
+          "edx": "0x6",
+          "eflags": "0xa92",
+          "es": "0x6000",
+          "esi": "0x0",
+          "esp": "0xf002",
+          "flags": "0xa92",
+          "fs": "0x0",
+          "gs": "0x0",
+          "ip": "0x4",
+          "si": "0x0",
+          "sp": "0xf002",
+          "ss": "0x4000"
+        },
+        "status": "returned",
+        "writes": [
+          {
+            "bytes": "feefe275000400100f2706000000",
+            "linear": "0x4eff2"
+          },
+          {
+            "bytes": "000020004000800000010002000300108082",
+            "linear": "0x65d26"
+          }
+        ]
+      },
+      "comparison": {
+        "flags_mask": "0x8d5",
+        "observables": [
+          "ax",
+          "bx",
+          "cx",
+          "dx",
+          "si",
+          "di",
+          "bp",
+          "sp",
+          "cs",
+          "ds",
+          "es",
+          "ss",
+          "fs",
+          "gs",
+          "ip",
+          "eflags",
+          "eax",
+          "ebx",
+          "ecx",
+          "edx",
+          "esi",
+          "edi",
+          "ebp",
+          "esp"
+        ],
+        "observables_source": "default",
+        "reason": "declared observations diverge"
+      },
+      "id": "setupLodDistances#5",
+      "initial_state": {
+        "candidate_entry": {
+          "offset": "0x759e",
+          "segment": "0xff0"
+        },
+        "frame": {
+          "kind": "near16",
+          "target": {
+            "offset": "0x4",
+            "segment": "0xff0"
+          }
+        },
+        "high_halves": {},
+        "memory": [
+          {
+            "bytes": "7f",
+            "offset": "0x662c",
+            "segment": "0x6000"
+          },
+          {
+            "bytes": "7f",
+            "offset": "0x56f6",
+            "segment": "0x6000"
+          }
+        ],
+        "observations": [
+          {
+            "offset": "0x9ec",
+            "segment": "0x6000",
+            "size": 18
+          },
+          {
+            "offset": "0x5d26",
+            "segment": "0x6000",
+            "size": 18
+          }
+        ],
+        "oracle_entry": {
+          "offset": "0xdf40",
+          "segment": "0xff0"
+        },
+        "registers": {
+          "bp": "0x0",
+          "di": "0x0",
+          "flags": "0x202",
+          "si": "0x0",
+          "sp": "0xf000"
+        },
+        "segments": {
+          "ds": "0x6000",
+          "es": "0x6000",
+          "ss": "0x4000"
+        }
+      },
+      "oracle": {
+        "detail": "",
+        "effective_flags_mask": "0x8d5",
+        "events": [],
+        "instructions": 97,
+        "observations": [
+          {
+            "bytes": "000020004000800000010002000300108082",
+            "linear": "0x609ec"
+          },
+          {
+            "bytes": "000000000000000000000000000000000000",
+            "linear": "0x65d26"
+          }
+        ],
+        "registers": {
+          "ax": "0x8280",
+          "bp": "0x0",
+          "bx": "0xa",
+          "cs": "0xff0",
+          "cx": "0x84",
+          "di": "0x0",
+          "ds": "0x6000",
+          "dx": "0x6",
+          "eax": "0x8280",
+          "ebp": "0x0",
+          "ebx": "0xa",
+          "ecx": "0x84",
+          "edi": "0x0",
+          "edx": "0x6",
+          "eflags": "0xa92",
+          "es": "0x6000",
+          "esi": "0x0",
+          "esp": "0xf002",
+          "flags": "0xa92",
+          "fs": "0x0",
+          "gs": "0x0",
+          "ip": "0x4",
+          "si": "0x0",
+          "sp": "0xf002",
+          "ss": "0x4000"
+        },
+        "status": "returned",
+        "writes": [
+          {
+            "bytes": "feef84df000400100f2706000000",
+            "linear": "0x4eff2"
+          },
+          {
+            "bytes": "000020004000800000010002000300108082",
+            "linear": "0x609ec"
+          }
+        ]
+      },
+      "status": "mismatched"
+    },
+    {
+      "candidate": {
+        "detail": "",
+        "effective_flags_mask": "0x8d5",
+        "events": [],
+        "instructions": 97,
+        "observations": [
+          {
+            "bytes": "000000000000000000000000000000000000",
+            "linear": "0x609ec"
+          },
+          {
+            "bytes": "000020004000800000010002000300100005",
+            "linear": "0x65d26"
+          }
+        ],
+        "registers": {
+          "ax": "0x500",
+          "bp": "0x0",
+          "bx": "0xa",
+          "cs": "0xff0",
+          "cx": "0x4",
+          "di": "0x0",
+          "ds": "0x6000",
+          "dx": "0xc",
+          "eax": "0x500",
+          "ebp": "0x0",
+          "ebx": "0xa",
+          "ecx": "0x4",
+          "edi": "0x0",
+          "edx": "0xc",
+          "eflags": "0x217",
+          "es": "0x6000",
+          "esi": "0x0",
+          "esp": "0xf002",
+          "flags": "0x217",
+          "fs": "0x0",
+          "gs": "0x0",
+          "ip": "0x4",
+          "si": "0x0",
+          "sp": "0xf002",
+          "ss": "0x4000"
+        },
+        "status": "returned",
+        "writes": [
+          {
+            "bytes": "feefe275000400100f2706000000",
+            "linear": "0x4eff2"
+          },
+          {
+            "bytes": "000020004000800000010002000300100005",
+            "linear": "0x65d26"
+          }
+        ]
+      },
+      "comparison": {
+        "flags_mask": "0x8d5",
+        "observables": [
+          "ax",
+          "bx",
+          "cx",
+          "dx",
+          "si",
+          "di",
+          "bp",
+          "sp",
+          "cs",
+          "ds",
+          "es",
+          "ss",
+          "fs",
+          "gs",
+          "ip",
+          "eflags",
+          "eax",
+          "ebx",
+          "ecx",
+          "edx",
+          "esi",
+          "edi",
+          "ebp",
+          "esp"
+        ],
+        "observables_source": "default",
+        "reason": "declared observations diverge"
+      },
+      "id": "setupLodDistances#6",
+      "initial_state": {
+        "candidate_entry": {
+          "offset": "0x759e",
+          "segment": "0xff0"
+        },
+        "frame": {
+          "kind": "near16",
+          "target": {
+            "offset": "0x4",
+            "segment": "0xff0"
+          }
+        },
+        "high_halves": {},
+        "memory": [
+          {
+            "bytes": "ff",
+            "offset": "0x662c",
+            "segment": "0x6000"
+          },
+          {
+            "bytes": "ff",
+            "offset": "0x56f6",
+            "segment": "0x6000"
+          }
+        ],
+        "observations": [
+          {
+            "offset": "0x9ec",
+            "segment": "0x6000",
+            "size": 18
+          },
+          {
+            "offset": "0x5d26",
+            "segment": "0x6000",
+            "size": 18
+          }
+        ],
+        "oracle_entry": {
+          "offset": "0xdf40",
+          "segment": "0xff0"
+        },
+        "registers": {
+          "bp": "0x0",
+          "di": "0x0",
+          "flags": "0x202",
+          "si": "0x0",
+          "sp": "0xf000"
+        },
+        "segments": {
+          "ds": "0x6000",
+          "es": "0x6000",
+          "ss": "0x4000"
+        }
+      },
+      "oracle": {
+        "detail": "",
+        "effective_flags_mask": "0x8d5",
+        "events": [],
+        "instructions": 97,
+        "observations": [
+          {
+            "bytes": "000020004000800000010002000300100005",
+            "linear": "0x609ec"
+          },
+          {
+            "bytes": "000000000000000000000000000000000000",
+            "linear": "0x65d26"
+          }
+        ],
+        "registers": {
+          "ax": "0x500",
+          "bp": "0x0",
+          "bx": "0xa",
+          "cs": "0xff0",
+          "cx": "0x4",
+          "di": "0x0",
+          "ds": "0x6000",
+          "dx": "0xc",
+          "eax": "0x500",
+          "ebp": "0x0",
+          "ebx": "0xa",
+          "ecx": "0x4",
+          "edi": "0x0",
+          "edx": "0xc",
+          "eflags": "0x217",
+          "es": "0x6000",
+          "esi": "0x0",
+          "esp": "0xf002",
+          "flags": "0x217",
+          "fs": "0x0",
+          "gs": "0x0",
+          "ip": "0x4",
+          "si": "0x0",
+          "sp": "0xf002",
+          "ss": "0x4000"
+        },
+        "status": "returned",
+        "writes": [
+          {
+            "bytes": "feef84df000400100f2706000000",
+            "linear": "0x4eff2"
+          },
+          {
+            "bytes": "000020004000800000010002000300100005",
+            "linear": "0x609ec"
+          }
+        ]
+      },
+      "status": "mismatched"
+    }
+  ],
+  "schema": "dosunit.real16_replay.v1",
+  "scope": "declared concrete vectors on relocated MZ images; segmented registers and caller frames are explicit; agreement is test evidence only and never a semantic proof",
+  "summary": {
+    "agreed": 0,
+    "incomplete": 0,
+    "mismatched": 12,
+    "total": 12
+  }
+}
