@@ -79,6 +79,19 @@ def public_offset(name, linkmap_path):
     return None
 
 
+def map_dgrp(linkmap_path):
+    """image offset of DGROUP from an MSC LINK .MAP, or None (routine maps)."""
+    try:
+        with open(linkmap_path, errors='replace') as f:
+            for line in f:
+                m = re.match(r'\s*([0-9A-Fa-f]+):0\s+DGROUP', line)
+                if m:
+                    return int(m.group(1), 16) * 16
+    except OSError:
+        pass
+    return None
+
+
 def u16hex(v):
     return hex(v & 0xFFFF)
 
@@ -213,6 +226,13 @@ def main():
         if f_c is None:
             problems.append(f"{case['fn']}: _{case['fn']} not in {case['cand_map']}")
             continue
+        # For test-exe candidates the LINK map is ground truth: refresh the
+        # dgrp base (used by size-pull patches) and the code window — spec
+        # copies of these values go stale on every test-exe relink.
+        cd = map_dgrp(os.path.join(ROOT, case['cand_map']))
+        if cd is not None:
+            case['cand_dgrp'] = cd
+            case['code_c'] = [[0, cd]]
         case['oracle_off'], case['cand_off'] = f_o, f_c
         problems += run_case(case, grp['vectors'], srcs)
         for rng in case.get('code_o', []):
@@ -246,6 +266,8 @@ def main():
         if not cand_exe.startswith('/'):
             cand_exe = os.path.join(ROOT, cand_exe)
         json.dump(manifest, open(vec_path, 'w'), indent=1)
+        if os.path.exists(out_path):
+            os.remove(out_path)     # a failed replay must not surface stale results
         cmd = [VPY, '-m', 'tools.dosunit.dosunit', 'replay-real16',
                '--oracle-exe', oracle_exe, '--candidate-exe', cand_exe,
                '--vectors', vec_path, '--out', out_path,

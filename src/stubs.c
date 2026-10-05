@@ -244,7 +244,11 @@ int16 g_planeCount = 0;
 int16 g_targetEntityCount = 0;
 int16 g_planeScanCount = 0;
 int16 g_groundUnitCount = 0;
-int16 g_simObjects[4] = {0};
+#if defined(EXE_START) || defined(EXE_END) || defined(EXE_SU)
+int16 g_simObjects[4] = {0};      /* SimObject stream is EGAME-side only */
+#else
+int16 g_simObjects[0x480] = {0};  /* 36B SimObject records, streamed by moveStuff */
+#endif
 int8 g_tileKillTally[0x64] = {0};
 int8 g_stringPool[0x2EE] = {0};
 int8 g_mapCellFlags[0x100] = {0};
@@ -286,7 +290,12 @@ int16 g_storeDefCount;                /* word_3838E — number of g_storeDefs en
 int16 g_selGridX, g_selGridY, g_selTileId;  /* word_36F3A/3C/46 — store-query cache */
 int16 g_selStoreState;                /* word_343BE — store-selection state */
 struct { int16 mapX,mapY,u4,type,ttl,uA; } mapEvents[4];
+#if defined(EXE_START) || defined(EXE_END) || defined(EXE_SU)
 void appendMapEvent(int16 a, int16 b) {}
+#else
+void recordFrame(int16 a, int16 b);    /* egframe.c: replay-log writer (sub_14B40) */
+void appendMapEvent(int16 a, int16 b) { recordFrame(a, b); }
+#endif
 
 void refreshActivePanel(int16 a) {}
 

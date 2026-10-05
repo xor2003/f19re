@@ -7,9 +7,10 @@
 #   Patches land in BOTH guests' shared scratch DS, so oracle and candidate
 #   patch ranges must never overlap -> patch only the elements a vector reads.
 #   Oracle cells >= dseg 0x6600 are BSS -> explicit bytes, never size-pulls.
-import sys, os, struct
+import sys, os, re, struct
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))) + '/tools')
 from duspec import emit, cand_off
+import capstone
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 EG = 'EGAME'
@@ -18,6 +19,18 @@ def c(mapname, sym):
     v = cand_off(os.path.join(ROOT, 'build/%s.MAP' % mapname), sym)
     assert v is not None, sym
     return v
+
+def lea_base(mapname, fn):
+    """imm of `lea ax,[bx+imm]` inside fn — the cand's 3D-table base moves
+    with every test-exe relink, so derive it from the current build."""
+    data = open(os.path.join(ROOT, 'build/%s.EXE' % mapname), 'rb').read()
+    hdr = struct.unpack('<H', data[8:10])[0] * 16
+    off = c(mapname, fn)
+    md = capstone.Cs(capstone.CS_ARCH_X86, capstone.CS_MODE_16)
+    for i in md.disasm(data[hdr + off:hdr + off + 0x80], off):
+        if i.mnemonic == 'lea' and 'bx +' in i.op_str:
+            return int(re.search(r'0x[0-9a-f]+', i.op_str).group(0), 16)
+    raise AssertionError(mapname + '/' + fn + ': no lea bx+imm')
 
 TG = 'EGTARGET'; TM = 'EGTACMAP'
 C = {
@@ -51,7 +64,7 @@ O = {
 }
 
 # candidate's (aircraftModels - world3dData) seg004 offset delta vs oracle 0x7530
-CAND_3D_BASE = 0x4A28          # lea ax,[bx+4A28h] in _shapeDataOffset
+CAND_3D_BASE = lea_base(TG, 'shapeDataOffset')  # lea ax,[bx+BASE] in the cand
 ORCL_3D_BASE = 0x7530          # lea ax,word_36220[bx] in sub_1D0A8
 IDX_BIAS = (ORCL_3D_BASE - CAND_3D_BASE) & 0xFFFF   # cand idxTab needs +this
 

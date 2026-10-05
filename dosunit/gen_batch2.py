@@ -10,9 +10,13 @@ synthetic bytes patched at both offsets. Cross-segment far pointers
 """
 import json
 import os
+import re
 import struct
+import sys
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.insert(0, os.path.join(ROOT, 'tools'))
+from duspec import cand_off, cand_dgrp, rand_seed_cell, arg_lit_off
 EN = '/home/xor/games/f19/F19'
 
 
@@ -30,6 +34,20 @@ def w16(v):
     return struct.pack('<H', v & 0xFFFF)
 
 
+def c(mappath, sym):
+    """_sym -> dseg off in an MSC LINK map — survives test-exe relinks."""
+    v = cand_off(os.path.join(ROOT, mappath), sym)
+    assert v is not None, (mappath, sym)
+    return v
+
+
+def dg(mappath):
+    """(cand_dgrp, code_c) for a module test exe, derived from its MAP."""
+    d = cand_dgrp(os.path.join(ROOT, mappath))
+    assert d is not None, mappath
+    return d, [[0, d]]
+
+
 START_O = EN + '/START.EXE'
 START_OM = 'map/start_en.map'
 STUTIL = 'build/STUTIL.EXE'
@@ -40,10 +58,18 @@ EG3DMAP = 'build/EG3DMAP.EXE'
 EG3DMAP_M = 'build/EG3DMAP.MAP'
 EGUI = 'build/EGUI.EXE'
 EGUI_M = 'build/EGUI.MAP'
+EGMATH_M = 'build/EGMATH.MAP'
 
 # oracle dgroup image offsets: START dseg@0x10000, EGAME Data1@0x1ecf0
 START_DGRP = 0x10000
 EGAME_DGRP = 0x1ECF0
+
+# candidate dgrp/code windows — derived from each module's LINK map so a
+# stubs/layout relink never silently invalidates a spec
+DG_STUTIL, CODE_STUTIL = dg(STUTIL_M)
+DG_3DMAP, CODE_3DMAP = dg(EG3DMAP_M)
+DG_EGUI, CODE_EGUI = dg(EGUI_M)
+DG_EGMATH, CODE_EGMATH = dg(EGMATH_M)
 
 
 def cell(pairs, ob, cb, data):
@@ -59,15 +85,21 @@ def ramp(n, mod=256, seed=1):
 # ---------------------------------------------------------------- START util
 start = []
 
+# cand rngState cell + the theater-name literal pushed by formatGridRef
+# (first `mov ax,imm; push ax` src arg of its mystrcpy call) — both move
+# with test-exe relinks
+RNG_S = c(STUTIL_M, 'rngState')
+TH_LIT = arg_lit_off('STUTIL', 'formatGridRef', 'mystrcpy', 0, 1)
+
 # srand(seed): writes rngState dword (o:0x7A50 c:0xB000)
 start.append({
     'fn': 'srand', 'oracle_exe': START_O, 'oracle_map': START_OM,
     'oracle_off': 0xe29e, 'oracle_dgrp': START_DGRP,
-    'cand_exe': STUTIL, 'cand_map': STUTIL_M, 'cand_dgrp': 0xe170,
+    'cand_exe': STUTIL, 'cand_map': STUTIL_M, 'cand_dgrp': DG_STUTIL,
     'ds': '0x2000',
-    'observe': [{'o_off': '0x7a50', 'c_off': '0xb002', 'size': 4}],
+    'observe': [{'o_off': '0x7a50', 'c_off': hex(RNG_S), 'size': 4}],
     'check_regs': [],
-    'code_o': [[0, 0x10000]], 'code_c': [[0, 0xe170]],
+    'code_o': [[0, 0x10000]], 'code_c': CODE_STUTIL,
     'vectors': [[0], [1], [0x7fff], [-1], [-32768], [0x1234], [0x4000]],
 })
 
@@ -75,12 +107,12 @@ start.append({
 start.append({
     'fn': 'rand', 'oracle_exe': START_O, 'oracle_map': START_OM,
     'oracle_off': 0xe2b0, 'oracle_dgrp': START_DGRP,
-    'cand_exe': STUTIL, 'cand_map': STUTIL_M, 'cand_dgrp': 0xe170,
+    'cand_exe': STUTIL, 'cand_map': STUTIL_M, 'cand_dgrp': DG_STUTIL,
     'ds': '0x2000',
-    'observe': [{'o_off': '0x7a50', 'c_off': '0xb002', 'size': 4}],
-    'code_o': [[0, 0x10000]], 'code_c': [[0, 0xe170]],
+    'observe': [{'o_off': '0x7a50', 'c_off': hex(RNG_S), 'size': 4}],
+    'code_o': [[0, 0x10000]], 'code_c': CODE_STUTIL,
     'vectors': [
-        {'args': [], 'patches': [cell(None, 0x7a50, 0xb002, struct.pack('<I', s))]}
+        {'args': [], 'patches': [cell(None, 0x7a50, RNG_S, struct.pack('<I', s))]}
         for s in (0, 1, 0x12345678, 0xffffffff, 0x7fffffff, 0x0000ffff,
                   0xdeadbeef, 0x00008000)
     ],
@@ -90,12 +122,12 @@ start.append({
 start.append({
     'fn': 'randMul', 'oracle_exe': START_O, 'oracle_map': START_OM,
     'oracle_off': 0x40ae, 'oracle_dgrp': START_DGRP,
-    'cand_exe': STUTIL, 'cand_map': STUTIL_M, 'cand_dgrp': 0xe170,
+    'cand_exe': STUTIL, 'cand_map': STUTIL_M, 'cand_dgrp': DG_STUTIL,
     'ds': '0x2000',
-    'observe': [{'o_off': '0x7a50', 'c_off': '0xb002', 'size': 4}],
-    'code_o': [[0, 0x10000]], 'code_c': [[0, 0xe170]],
+    'observe': [{'o_off': '0x7a50', 'c_off': hex(RNG_S), 'size': 4}],
+    'code_o': [[0, 0x10000]], 'code_c': CODE_STUTIL,
     'vectors': [
-        {'args': [a], 'patches': [cell(None, 0x7a50, 0xb002, struct.pack('<I', s))]}
+        {'args': [a], 'patches': [cell(None, 0x7a50, RNG_S, struct.pack('<I', s))]}
         for s, a in ((1, 0), (1, 1), (1, 5), (1, 100), (1, 0x7fff),
                      (1, 0x8000), (1, 0xffff), (0x12345678, 10),
                      (0x12345678, 0x7fff), (0x12345678, -1),
@@ -108,11 +140,11 @@ strs = ['', 'A', 'TD74', 'HELLO WORLD', 'x' * 40, 'abc.def', 'a:b|c']
 start.append({
     'fn': 'mystrcpy', 'oracle_exe': START_O, 'oracle_map': START_OM,
     'oracle_off': 0x5120, 'oracle_dgrp': START_DGRP,
-    'cand_exe': STUTIL, 'cand_map': STUTIL_M, 'cand_dgrp': 0xe170,
+    'cand_exe': STUTIL, 'cand_map': STUTIL_M, 'cand_dgrp': DG_STUTIL,
     'ds': '0x2000',
     'observe': [{'off': '0xe200', 'size': 48}],
     'check_regs': [],
-    'code_o': [[0, 0x10000]], 'code_c': [[0, 0xe170]],
+    'code_o': [[0, 0x10000]], 'code_c': CODE_STUTIL,
     'vectors': [
         {'args': [0xe200, 0xe100],
          'patches': [{'off': '0xe100', 'bytes': s.encode().hex() + '00'}]}
@@ -124,11 +156,11 @@ start.append({
 start.append({
     'fn': 'my_itoa', 'oracle_exe': START_O, 'oracle_map': START_OM,
     'oracle_off': 0x3fb3, 'oracle_dgrp': START_DGRP,
-    'cand_exe': STUTIL, 'cand_map': STUTIL_M, 'cand_dgrp': 0xe170,
+    'cand_exe': STUTIL, 'cand_map': STUTIL_M, 'cand_dgrp': DG_STUTIL,
     'ds': '0x2000',
     'observe': [{'off': '0xe300', 'size': 12}],
     'check_regs': [],
-    'code_o': [[0, 0x10000]], 'code_c': [[0, 0xe170]],
+    'code_o': [[0, 0x10000]], 'code_c': CODE_STUTIL,
     'vectors': [
         {'args': [v, 0xe300]} for v in
         (0, 1, 9, 10, 99, 100, 999, 1000, 9999, 10000, 12345, 32767,
@@ -143,11 +175,11 @@ lvals = [0, 1, 9, 99, 999, 1000, 9999, 10000, 99999, 100000, 999999,
 start.append({
     'fn': 'my_ltoa', 'oracle_exe': START_O, 'oracle_map': START_OM,
     'oracle_off': 0x3e7c, 'oracle_dgrp': START_DGRP,
-    'cand_exe': STUTIL, 'cand_map': STUTIL_M, 'cand_dgrp': 0xe170,
+    'cand_exe': STUTIL, 'cand_map': STUTIL_M, 'cand_dgrp': DG_STUTIL,
     'ds': '0x2000',
     'observe': [{'off': '0xe340', 'size': 16}],
     'check_regs': [],
-    'code_o': [[0, 0x10000]], 'code_c': [[0, 0xe170]],
+    'code_o': [[0, 0x10000]], 'code_c': CODE_STUTIL,
     'vectors': [
         {'args': [v & 0xffff, (v >> 16) & 0xffff, 0xe340]} for v in lvals
     ],
@@ -161,10 +193,10 @@ streams = [
 start.append({
     'fn': 'evalChoiceExpr', 'oracle_exe': START_O, 'oracle_map': START_OM,
     'oracle_off': 0x669f, 'oracle_dgrp': START_DGRP,
-    'cand_exe': STUTIL, 'cand_map': STUTIL_M, 'cand_dgrp': 0xe170,
+    'cand_exe': STUTIL, 'cand_map': STUTIL_M, 'cand_dgrp': DG_STUTIL,
     'ds': '0x2000',
     'observe': [{'off': '0xe000', 'size': 2}],
-    'code_o': [[0, 0x10000]], 'code_c': [[0, 0xe170]],
+    'code_o': [[0, 0x10000]], 'code_c': CODE_STUTIL,
     'vectors': [
         {'args': [0xe000, 0],
          'patches': [{'off': '0xe000', 'bytes': '00e1'},
@@ -182,13 +214,13 @@ start.append({
 def gridpatches():
     # 8 words incl. trailing real data so OOB level reads are equal
     dims8 = img(START_O)[START_DGRP + 0x3bb4:START_DGRP + 0x3bb4 + 16]
-    pats = [cell(None, 0x3bb4, 0xb780, dims8)]
+    pats = [cell(None, 0x3bb4, c(STUTIL_M, 'gridLevelSize'), dims8)]
     # oracle (off,size) vs candidate off — L4 16B, L3 256B, L2/L1/L0 512B
-    for o_off, c_off, sz, mod in ((0xb374, 0x8a86, 16, 29),
-                                (0xa4c8, 0x8aa0, 256, 29),
-                                (0xa2c6, 0x8ca4, 512, 29),
-                                (0x9b54, 0x8eaa, 512, 29),
-                                (0x994e, 0x9454, 512, 29)):
+    for o_off, c_off, sz, mod in ((0xb374, c(STUTIL_M, 'gridBuf1'), 16, 29),
+                                (0xa4c8, c(STUTIL_M, 'gridBuf2'), 256, 29),
+                                (0xa2c6, c(STUTIL_M, 'gridBuf3'), 512, 29),
+                                (0x9b54, c(STUTIL_M, 'gridBuf4'), 512, 29),
+                                (0x994e, c(STUTIL_M, 'gridBuf5'), 512, 29)):
         pats.append(cell(None, o_off, c_off, ramp(sz, mod)))
     return pats
 
@@ -217,10 +249,10 @@ lv += [
 start.append({
     'fn': 'lookupGridCell', 'oracle_exe': START_O, 'oracle_map': START_OM,
     'oracle_off': 0x70e0, 'oracle_dgrp': START_DGRP,
-    'cand_exe': STUTIL, 'cand_map': STUTIL_M, 'cand_dgrp': 0xe170,
+    'cand_exe': STUTIL, 'cand_map': STUTIL_M, 'cand_dgrp': DG_STUTIL,
     'ds': '0x2000',
     'patches': gridpatches(),
-    'code_o': [[0, 0x10000]], 'code_c': [[0, 0xe170]],
+    'code_o': [[0, 0x10000]], 'code_c': CODE_STUTIL,
     'vectors': lv,
 })
 
@@ -233,11 +265,11 @@ rep = [
 start.append({
     'fn': 'replaceExtension', 'oracle_exe': START_O, 'oracle_map': START_OM,
     'oracle_off': 0x7534, 'oracle_dgrp': START_DGRP,
-    'cand_exe': STUTIL, 'cand_map': STUTIL_M, 'cand_dgrp': 0xe170,
+    'cand_exe': STUTIL, 'cand_map': STUTIL_M, 'cand_dgrp': DG_STUTIL,
     'ds': '0x2000',
     'observe': [{'off': '0xe400', 'size': 40}],
     'check_regs': [],
-    'code_o': [[0, 0x10000]], 'code_c': [[0, 0xe170]],
+    'code_o': [[0, 0x10000]], 'code_c': CODE_STUTIL,
     'vectors': [
         {'args': [0xe400, 0xe500],
          'patches': [{'off': '0xe400', 'bytes': p.encode().hex() + '00'},
@@ -264,27 +296,28 @@ for i, th in ((0, 0), (1, 1), (2, 2), (3, 3), (4, 0), (5, 2), (0, 3), (2, 1)):
 start.append({
     'fn': 'getItemCoordStr', 'oracle_exe': START_O, 'oracle_map': START_OM,
     'oracle_off': 0x8d74, 'oracle_dgrp': START_DGRP,
-    'cand_exe': STUTIL, 'cand_map': STUTIL_M, 'cand_dgrp': 0xe170,
+    'cand_exe': STUTIL, 'cand_map': STUTIL_M, 'cand_dgrp': DG_STUTIL,
     'ds': '0x2000',
     'check_regs': [],
     'patches': [
-        cell(None, 0x991c, 0xb4e8, b'\x00\x00\x00\x70'),   # gameData = 7000:0
-        cell(None, 0xb390, 0xc908, wo),                    # worldObjects
-        {'c_off': '0x88', 'size': 26},                     # theater table consts
+        cell(None, 0x991c, c(STUTIL_M, 'gameData'), b'\x00\x00\x00\x70'),   # gameData = 7000:0
+        cell(None, 0xb390, c(STUTIL_M, 'worldObjects'), wo),                    # worldObjects
+        {'c_off': hex(TH_LIT), 'size': 26},                # theater name literals
     ],
-    'observe': [{'o_off': '0x98cc', 'c_off': '0xb53c', 'size': 8}],
-    'code_o': [[0, 0x10000]], 'code_c': [[0, 0xe170]],
+    'observe': [{'o_off': '0x98cc', 'c_off': hex(c(STUTIL_M, 'bufCoordStr')), 'size': 8}],
+    'code_o': [[0, 0x10000]], 'code_c': CODE_STUTIL,
     'vectors': gics,
 })
 
 # ------------------------------------------------------------- EGAME 3D map
 e3d = []
+M = EG3DMAP_M
 pure = lambda fn, off, vals: {
     'fn': fn, 'oracle_exe': EGAME_O, 'oracle_map': EGAME_OM,
     'oracle_off': off, 'oracle_dgrp': EGAME_DGRP,
-    'cand_exe': EG3DMAP, 'cand_map': EG3DMAP_M, 'cand_dgrp': 0xf5c0,
+    'cand_exe': EG3DMAP, 'cand_map': EG3DMAP_M, 'cand_dgrp': DG_3DMAP,
     'ds': '0x6000',
-    'code_o': [[0, 0xfd80]], 'code_c': [[0, 0xf5c0]],
+    'code_o': [[0, 0xfd80]], 'code_c': CODE_3DMAP,
     'vectors': [[v] for v in vals],
 }
 e3d.append(pure('aspectScaleY', 0x19c8,
@@ -293,13 +326,13 @@ e3d.append(pure('aspectScaleY', 0x19c8,
 
 # worldToTileIndex(wX,wY,&col,&row): out ptrs at ds:0xf000/0xf002
 # oracle cells: viewCX 0x9a38 viewCY2 0x65c4 orgX 0x6326 orgY 0x6328 tileSz 0x6322
-# cand cells:  0x6338 0x4a32 0x51c2 0x51f4 0x4610
+# cand cells resolved by symbol: g_viewCenterX/g_viewCenterY2/g_mapOriginX/Y/g_tileWorldSize
 def w2t_patches(vcx, vcy, ox, oy, tsz):
-    return [cell(None, 0x9a38, 0x6338, w16(vcx)),
-            cell(None, 0x65c4, 0x4a32, w16(vcy)),
-            cell(None, 0x6326, 0x51c2, w16(ox)),
-            cell(None, 0x6328, 0x51f4, w16(oy)),
-            cell(None, 0x6322, 0x4610, w16(tsz))]
+    return [cell(None, 0x9a38, c(M, 'g_viewCenterX'), w16(vcx)),
+            cell(None, 0x65c4, c(M, 'g_viewCenterY2'), w16(vcy)),
+            cell(None, 0x6326, c(M, 'g_mapOriginX'), w16(ox)),
+            cell(None, 0x6328, c(M, 'g_mapOriginY'), w16(oy)),
+            cell(None, 0x6322, c(M, 'g_tileWorldSize'), w16(tsz))]
 
 w2t = []
 geo = (0x4000, 0x2000, 0x1000, 0x800, 0x400)   # vcx vcy orgx orgy tsz=1024
@@ -318,11 +351,11 @@ w2t.append({'args': [0, 0, 0xf000, 0xf002],
 e3d.append({
     'fn': 'worldToTileIndex', 'oracle_exe': EGAME_O, 'oracle_map': EGAME_OM,
     'oracle_off': 0x173a, 'oracle_dgrp': EGAME_DGRP,
-    'cand_exe': EG3DMAP, 'cand_map': EG3DMAP_M, 'cand_dgrp': 0xf5c0,
+    'cand_exe': EG3DMAP, 'cand_map': EG3DMAP_M, 'cand_dgrp': DG_3DMAP,
     'ds': '0x6000',
     'observe': [{'off': '0xf000', 'size': 4}],
     'check_regs': [],
-    'code_o': [[0, 0xfd80]], 'code_c': [[0, 0xf5c0]],
+    'code_o': [[0, 0xfd80]], 'code_c': CODE_3DMAP,
     'vectors': w2t,
 })
 
@@ -330,9 +363,9 @@ e3d.append({
 # c:0x5b4a/0x5c8e) + tileGridDim (o:0x6324 c:0x57e4)
 def ctb_patches(vcx, vcy, ox, oy, tsz, cx, cy, dim):
     return w2t_patches(vcx, vcy, ox, oy, tsz) + [
-        cell(None, 0x3b83, 0x5b4a, w16(cx)),
-        cell(None, 0x3b85, 0x5c8e, w16(cy)),
-        cell(None, 0x6324, 0x57e4, w16(dim))]
+        cell(None, 0x3b83, c(M, 'g_clipMaxX'), w16(cx)),
+        cell(None, 0x3b85, c(M, 'g_clipMaxY'), w16(cy)),
+        cell(None, 0x6324, c(M, 'g_tileGridDim'), w16(dim))]
 
 ctb = []
 for cx, cy, dim in [(319, 199, 16), (319, 199, 4), (0, 0, 16), (319, 199, 1),
@@ -346,11 +379,11 @@ ctb.append({'args': [0xf000, 0xf002, 0xf004, 0xf006],   # negative view origin
 e3d.append({
     'fn': 'computeTileBounds', 'oracle_exe': EGAME_O, 'oracle_map': EGAME_OM,
     'oracle_off': 0x16de, 'oracle_dgrp': EGAME_DGRP,
-    'cand_exe': EG3DMAP, 'cand_map': EG3DMAP_M, 'cand_dgrp': 0xf5c0,
+    'cand_exe': EG3DMAP, 'cand_map': EG3DMAP_M, 'cand_dgrp': DG_3DMAP,
     'ds': '0x6000',
     'observe': [{'off': '0xf000', 'size': 8}],
     'check_regs': [],
-    'code_o': [[0, 0xfd80]], 'code_c': [[0, 0xf5c0]],
+    'code_o': [[0, 0xfd80]], 'code_c': CODE_3DMAP,
     'vectors': ctb,
 })
 
@@ -361,27 +394,27 @@ def te(lod, sub, tx, ty, val):
                        ty & 0xff, val & 0xffff, 0)
 
 pool3 = te(2, 0, 5, 6, 0x1111) + te(1, 7, 9, 2, 0x2222) + te(2, 0, 5, 6, 0x3333)
-lte_patches = [cell(None, 0x664a, 0x4506, w16(3)),
-               cell(None, 0x8b38, 0x8e2e, pool3)]
+lte_patches = [cell(None, 0x664a, c(M, 'g_tileEntryCount'), w16(3)),
+               cell(None, 0x8b38, c(M, 'g_dynTileEntries'), pool3)]
 lte = []
 for lod, sub, tx, ty in [(2, 0, 5, 6), (1, 7, 9, 2), (2, 0, 5, 7), (0, 0, 0, 0),
                          (2, 0, 5, 6), (4, 0, 0, 0), (2, 1, 5, 6),
                          (0x102, 0, 5, 6), (-1, 0, 5, 6)]:
     lte.append({'args': [lod, sub, tx, ty], 'patches': lte_patches})
 lte.append({'args': [2, 0, 5, 6],
-            'patches': [cell(None, 0x664a, 0x4506, w16(0))]})  # empty pool
+            'patches': [cell(None, 0x664a, c(M, 'g_tileEntryCount'), w16(0))]})  # empty pool
 lte.append({'args': [1, 7, 9, 2],
-            'patches': [cell(None, 0x664a, 0x4506, w16(1)),
-                        cell(None, 0x8b38, 0x8e2e, pool3)]})  # count<pool
+            'patches': [cell(None, 0x664a, c(M, 'g_tileEntryCount'), w16(1)),
+                        cell(None, 0x8b38, c(M, 'g_dynTileEntries'), pool3)]})  # count<pool
 lte.append({'args': [2, 0, 5, 6],
-            'patches': [cell(None, 0x664a, 0x4506, w16(-1))]})  # neg count
+            'patches': [cell(None, 0x664a, c(M, 'g_tileEntryCount'), w16(-1))]})  # neg count
 e3d.append({
     'fn': 'lookupTileEntry', 'oracle_exe': EGAME_O, 'oracle_map': EGAME_OM,
     'oracle_off': 0x130c, 'oracle_dgrp': EGAME_DGRP,
-    'cand_exe': EG3DMAP, 'cand_map': EG3DMAP_M, 'cand_dgrp': 0xf5c0,
+    'cand_exe': EG3DMAP, 'cand_map': EG3DMAP_M, 'cand_dgrp': DG_3DMAP,
     'ds': '0x6000',
-    'observe': [{'o_off': '0x6320', 'c_off': '0x8d18', 'size': 2}],
-    'code_o': [[0, 0xfd80]], 'code_c': [[0, 0xf5c0]],
+    'observe': [{'o_off': '0x6320', 'c_off': hex(c(M, 'g_tileEntryIdx')), 'size': 2}],
+    'code_o': [[0, 0xfd80]], 'code_c': CODE_3DMAP,
     'vectors': lte,
 })
 
@@ -400,20 +433,20 @@ def atvec(count, value, tag):
     return {'args': [0xf100, value, tag],
             'patches': [{'off': '0xf100', 'bytes': bytes(rec).hex()},
                         {'off': '0xf200', 'bytes': bytes(ent).hex()},
-                        cell(None, 0x664a, 0x4506, w16(count)),
-                        cell(None, 0x8b38, 0x8e2e, bytes(64).hex())]}
+                        cell(None, 0x664a, c(M, 'g_tileEntryCount'), w16(count)),
+                        cell(None, 0x8b38, c(M, 'g_dynTileEntries'), bytes(64).hex())]}
 
 e3d.append({
     'fn': 'addTileEntry', 'oracle_exe': EGAME_O, 'oracle_map': EGAME_OM,
     'oracle_off': 0x12ca, 'oracle_dgrp': EGAME_DGRP,
-    'cand_exe': EG3DMAP, 'cand_map': EG3DMAP_M, 'cand_dgrp': 0xf5c0,
+    'cand_exe': EG3DMAP, 'cand_map': EG3DMAP_M, 'cand_dgrp': DG_3DMAP,
     'ds': '0x6000',
     'observe': [{'off': '0xf100', 'size': 0x16},
                 {'off': '0xf206', 'size': 1},
-                {'o_off': '0x8b30', 'c_off': '0x8e26', 'size': 24},
-                {'o_off': '0x664a', 'c_off': '0x4506', 'size': 2}],
+                {'o_off': '0x8b30', 'c_off': hex(c(M, 'g_dynTileEntries') - 8), 'size': 24},
+                {'o_off': '0x664a', 'c_off': hex(c(M, 'g_tileEntryCount')), 'size': 2}],
     'check_regs': [],
-    'code_o': [[0, 0xfd80]], 'code_c': [[0, 0xf5c0]],
+    'code_o': [[0, 0xfd80]], 'code_c': CODE_3DMAP,
     'vectors': [atvec(0, 0x1234, 1), atvec(1, -1, 0), atvec(3, 0x7fff, 0x80),
                 atvec(7, 0, 0xff), atvec(-1, 0x1111, 2)],
 })
@@ -425,29 +458,31 @@ e3d.append({
 # cand bufs:   0x539c        0x598c        0x5a90        0x5b04        0x5b56
 #              dims @0x63d8
 def p3dg_patches():
-    p = [cell(None, 0x5ea, 0x63d8, struct.pack('<8H', 1024, 256, 64, 16, 8,
+    p = [cell(None, 0x5ea, c(M, 'g_lodGridDim'), struct.pack('<8H', 1024, 256, 64, 16, 8,
                                               0, 0, 0))]
-    for o_off, c_off, sz in ((0x7f50, 0x539c, 64), (0x6eae, 0x598c, 256),
-                             (0x6c58, 0x5a90, 64), (0x6852, 0x5b04, 64),
-                             (0x664c, 0x5b56, 64)):
+    for o_off, c_off, sz in ((0x7f50, c(M, 'g_topLodGrid'), 64),
+                             (0x6eae, c(M, 'buf1_3dg'), 256),
+                             (0x6c58, c(M, 'buf2_3dg'), 64),
+                             (0x6852, c(M, 'buf3_3dg'), 64),
+                             (0x664c, c(M, 'buf4_3dg'), 64)):
         p.append(cell(None, o_off, c_off, ramp(sz, 4)))
     return p
 
 p3v = []
-for lod, c, r in [(4, 0, 0), (4, 5, 5), (4, 6, 6), (4, -3, -3), (4, 3, 7),
+for lod, col_, r in [(4, 0, 0), (4, 5, 5), (4, 6, 6), (4, -3, -3), (4, 3, 7),
                   (3, 0, 0), (3, 15, 15), (3, 16, 0), (3, -1, 5),
                   (2, 0, 0), (2, 63, 63), (2, 64, 0), (2, 1, 2), (2, -4, 0),
                   (1, 0, 0), (1, 255, 255), (1, 100, 200),
                   (0, 0, 0), (0, 1023, 1023), (0, 517, 93),
                   (5, 0, 0), (6, 0, 0), (-1, 0, 0)]:
-    p3v.append({'args': [lod, c, r]})
+    p3v.append({'args': [lod, col_, r]})
 e3d.append({
     'fn': 'process3dg', 'oracle_exe': EGAME_O, 'oracle_map': EGAME_OM,
     'oracle_off': 0x988, 'oracle_dgrp': EGAME_DGRP,
-    'cand_exe': EG3DMAP, 'cand_map': EG3DMAP_M, 'cand_dgrp': 0xf5c0,
+    'cand_exe': EG3DMAP, 'cand_map': EG3DMAP_M, 'cand_dgrp': DG_3DMAP,
     'ds': '0x6000',
     'patches': p3dg_patches(),
-    'code_o': [[0, 0xfd80]], 'code_c': [[0, 0xf5c0]],
+    'code_o': [[0, 0xfd80]], 'code_c': CODE_3DMAP,
     'vectors': p3v,
 })
 
@@ -455,8 +490,8 @@ e3d.append({
 # formatMissionClock(time): time += tick; nameBuf = ":" + f2(t/0x708) + ":" +
 # f2(t/0x1e) + ":" + f2(t<<1); nameBuf[0] += nightMode+1
 # oracle: tick w@0x65c0 night byte@0x4ef4 nameBuf@0x65c6 (own consts via ds)
-# cand:   0x5970       0x4378            0x5134; consts ':' @0x53a/53c/53e,
-#         '0' @0x540 (extracted from cand image), itoa scratch@0x51c0 (bss ok)
+# cand cells by symbol; const ''/':'/':'/'0' pulled via the literal args the
+# cand pushes to strcpy/strcat — both move with test-exe relinks
 fmv = []
 for t, tick, night in [(0, 0, 0), (0, 0, 1), (1, 0, 0), (30, 0, 0),
                        (60, 0, 0), (0x708, 0, 0), (0x70e, 0, 0),
@@ -464,20 +499,25 @@ for t, tick, night in [(0, 0, 0), (0, 0, 1), (1, 0, 0), (30, 0, 0),
                        (0xffff, 0, 0), (0, 0x800, 0), (0x4000, 0x4000, 1),
                        (5, -1, 0), (0, 0, 2), (0x5555, 0x111, 1)]:
     fmv.append({'args': [t],
-                'patches': [cell(None, 0x65c0, 0x5970, w16(tick)),
-                            cell(None, 0x4ef4, 0x4378, bytes([night]))]})
+                'patches': [cell(None, 0x65c0, c(EGUI_M, 'g_missionTick'), w16(tick)),
+                            cell(None, 0x4ef4, c(EGUI_M, 'g_nightMode'), bytes([night]))]})
 clock = [{
     'fn': 'formatMissionClock', 'oracle_exe': EGAME_O, 'oracle_map': EGAME_OM,
     'oracle_off': 0x9c83, 'oracle_dgrp': EGAME_DGRP,
-    'cand_exe': EGUI, 'cand_map': EGUI_M, 'cand_dgrp': 0xf650,
+    'cand_exe': EGUI, 'cand_map': EGUI_M, 'cand_dgrp': DG_EGUI,
     'ds': '0x2ecf',
     'check_regs': [],
-    'patches': [{'c_off': '0x53c', 'size': 1},   # ''
-                {'c_off': '0x53d', 'size': 2},   # ':'
-                {'c_off': '0x53f', 'size': 2},   # ':'
-                {'c_off': '0x541', 'size': 2}],  # '0'
-    'observe': [{'o_off': '0x65c6', 'c_off': '0x51a2', 'size': 10}],
-    'code_o': [[0, 0xfd80]], 'code_c': [[0, 0xf650]],
+    'patches': [{'c_off': hex(arg_lit_off('EGUI', 'formatMissionClock',
+                                         'strcpy', 0, 1)), 'size': 1},  # ''
+                {'c_off': hex(arg_lit_off('EGUI', 'formatMissionClock',
+                                          'strcat', 0, 1)), 'size': 2}, # ':'
+                {'c_off': hex(arg_lit_off('EGUI', 'formatMissionClock',
+                                          'strcat', 1, 1)), 'size': 2}, # ':'
+                {'c_off': hex(arg_lit_off('EGUI', 'formatTwoDigit',
+                                          'strcat', 0, 1)), 'size': 2}],# '0'
+    'observe': [{'o_off': '0x65c6', 'c_off': hex(c(EGUI_M, 'g_nameBuf')),
+                 'size': 10}],
+    'code_o': [[0, 0xfd80]], 'code_c': CODE_EGUI,
     'vectors': fmv,
 }]
 
@@ -501,37 +541,39 @@ scl = [{
     ],
 }]
 
-# randomRange(maxVal): rand LCG state — oracle dword@0x622c, cand CRT@0x0e5a
+# randomRange(maxVal): rand LCG state — oracle dword@0x622c, cand CRT cell
+# derived from _rand's disasm (moves with every test-exe relink)
+RR_SEED = rand_seed_cell('EGMATH')
 rrv = []
 for seed in (0, 1, 0x12345678, 0xffffffff, 0x7fffffff):
     for mx in (0, 1, 2, 45, 100, 0x400, 0x4000, 0x7fff, -1, -32768):
         rrv.append({'args': [mx],
-                    'patches': [cell(None, 0x622c, 0x0e5a,
+                    'patches': [cell(None, 0x622c, RR_SEED,
                                      struct.pack('<I', seed))]})
 math2 = [{
     'fn': 'randomRange', 'oracle_exe': EGAME_O, 'oracle_map': EGAME_OM,
     'oracle_off': 0xd34b, 'oracle_dgrp': EGAME_DGRP,
     'cand_exe': 'build/EGMATH.EXE', 'cand_map': 'build/EGMATH.MAP',
-    'cand_dgrp': 0xf5c0,
+    'cand_dgrp': DG_EGMATH,
     'ds': '0x2ecf',
-    'observe': [{'o_off': '0x622c', 'c_off': '0xe5a', 'size': 4}],
-    'code_o': [[0, 0xfd80]], 'code_c': [[0, 0xf5c0]],
+    'observe': [{'o_off': '0x622c', 'c_off': hex(RR_SEED), 'size': 4}],
+    'code_o': [[0, 0xfd80]], 'code_c': CODE_EGMATH,
     'vectors': rrv,
 }, {
     'fn': 'signOf', 'oracle_exe': EGAME_O, 'oracle_map': EGAME_OM,
     'oracle_off': 0xd316, 'oracle_dgrp': EGAME_DGRP,
     'cand_exe': 'build/EGMATH.EXE', 'cand_map': 'build/EGMATH.MAP',
-    'cand_dgrp': 0xf5c0,
+    'cand_dgrp': DG_EGMATH,
     'ds': '0x6000',
-    'code_o': [[0, 0xfd80]], 'code_c': [[0, 0xf5c0]],
+    'code_o': [[0, 0xfd80]], 'code_c': CODE_EGMATH,
     'vectors': [[v] for v in (0, 1, -1, 5, -5, 0x7fff, -32768, 100, -300)],
 }, {
     'fn': 'signExtendByte', 'oracle_exe': EGAME_O, 'oracle_map': EGAME_OM,
     'oracle_off': 0xd2f9, 'oracle_dgrp': EGAME_DGRP,
     'cand_exe': 'build/EGMATH.EXE', 'cand_map': 'build/EGMATH.MAP',
-    'cand_dgrp': 0xf5c0,
+    'cand_dgrp': DG_EGMATH,
     'ds': '0x6000',
-    'code_o': [[0, 0xfd80]], 'code_c': [[0, 0xf5c0]],
+    'code_o': [[0, 0xfd80]], 'code_c': CODE_EGMATH,
     'vectors': [[v] for v in (0, 1, 0x7f, 0x80, 0x81, 0xfe, 0xff, -1, -256,
                               0x100, 0x1ff, -32768, 0x55)],
 }]

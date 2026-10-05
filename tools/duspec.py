@@ -32,27 +32,78 @@ def cand_off(map_path, sym):
     return None
 
 
+def cand_dgrp(map_path):
+    """image offset of DGROUP (para*16) from an MSC LINK .MAP, or None."""
+    for line in open(map_path, errors='replace'):
+        m = re.match(r'\s*([0-9A-Fa-f]+):0\s+DGROUP', line)
+        if m:
+            return int(m.group(1), 16) * 16
+    return None
+
+
+def _disasm_cand(mod, fn, span=0x140):
+    """Disassemble routine fn inside build/<mod>.EXE (capstone, 16-bit)."""
+    import capstone
+    data = open(os.path.join(ROOT, 'build/%s.EXE' % mod), 'rb').read()
+    hdr = struct.unpack('<H', data[8:10])[0] * 16
+    off = cand_off(os.path.join(ROOT, 'build/%s.MAP' % mod), fn)
+    md = capstone.Cs(capstone.CS_ARCH_X86, capstone.CS_MODE_16)
+    return list(md.disasm(data[hdr + off:hdr + off + span], off))
+
+
+def rand_seed_cell(mod):
+    """DS offset of the MSC CRT _rand 32-bit state — module-dependent
+    (DGROUP layout differs per test exe), so derive it: _rand pushes
+    [seed_hi] then [seed_lo] before its 32-bit multiply."""
+    pushes = [int(re.search(r'0x[0-9a-f]+', i.op_str).group(0), 16)
+              for i in _disasm_cand(mod, 'rand', 48)
+              if i.mnemonic == 'push' and 'word ptr [' in i.op_str]
+    return pushes[1]
+
+
+def arg_lit_off(mod, fn, callee, nth=0, argn=0):
+    """DS offset of the `mov ax,IMM; push ax` argument feeding the nth
+    `call <callee>` inside fn — tracks string-literal offsets that move
+    across relinks without editing the spec.  argn counts pushed args
+    back from the call site: 0 = last push (only arg of a 1-arg call,
+    or dst of strcpy/strcat), 1 = the push before it (src literal)."""
+    ins = _disasm_cand(mod, fn)
+    tgt = cand_off(os.path.join(ROOT, 'build/%s.MAP' % mod), callee)
+    hits = []
+    for i, insn in enumerate(ins):
+        if (insn.mnemonic == 'call'
+                and int(insn.op_str, 16) & 0xFFFF == tgt & 0xFFFF):
+            vals = []
+            for j in range(i - 1, max(0, i - 9), -1):
+                if (ins[j].mnemonic == 'push' and ins[j].op_str == 'ax'
+                        and ins[j - 1].mnemonic == 'mov'
+                        and ins[j - 1].op_str.startswith('ax,')):
+                    vals.append(int(ins[j - 1].op_str.split(',')[1], 16))
+            if len(vals) > argn:
+                hits.append(vals[argn])
+    return hits[nth]
+
+
 def emit(cases, out_path):
     spec = []
     for c in cases:
         exe, omap, odgrp = EXE[c['exe']]
         mod = c['mod']
         cmap = 'build/%s.MAP' % mod
+        # candidate dgrp = its image's DGROUP para*16 - resolve from MAP
+        cd = c.get('cand_dgrp')
+        if cd is None:
+            cd = cand_dgrp(os.path.join(ROOT, cmap))
+        # code window covers everything below DGROUP — tracks relinks
+        code_c = c.get('code_c', [[0, cd]]) if cd is not None \
+            else c.get('code_c', [[0, 62912]])
         case = {'fn': c['fn'], 'oracle_exe': exe, 'oracle_map': omap,
                 'cand_exe': 'build/%s.EXE' % mod, 'cand_map': cmap,
                 'ds': c.get('ds', '0x6000'),
                 'code_o': c.get('code_o', [[0, 64896]]),
-                'code_c': c.get('code_c', [[0, 62912]])}
+                'code_c': code_c}
         if odgrp is not None:
             case['oracle_dgrp'] = odgrp
-        # candidate dgrp = its image's DGROUP para*16 - resolve from MAP
-        cd = c.get('cand_dgrp')
-        if cd is None:
-            for line in open(os.path.join(ROOT, cmap), errors='replace'):
-                m = re.match(r'\s*([0-9A-Fa-f]+):0\s+DGROUP', line)
-                if m:
-                    cd = int(m.group(1), 16) * 16
-                    break
         if cd is not None:
             case['cand_dgrp'] = cd
         if 'oof' in c:
@@ -65,6 +116,9 @@ def emit(cases, out_path):
         def cells(lst):
             out = []
             for e in lst:
+                if isinstance(e, dict):   # raw {'seg','off','bytes'} escape
+                    out.append(e)
+                    continue
                 o_off, csym, size = e[0], e[1], e[2]
                 c_off = None
                 if csym is not None:
