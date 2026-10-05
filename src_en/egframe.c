@@ -9,7 +9,7 @@ void moveStuff(void);                            /* sub_14F18 */
 extern int16 flagFarToNear;              /* word_384CA */
 
 /* ==== seg000:0x4ef7 ==== */
-struct FrameRec { int16 tick; int8 y, x, a, b; };      /* packed 6-byte record */
+struct FrameRec { int16 tick; int8 x, y, a, b; };      /* packed 6-byte record */
 extern struct { struct FrameRec events[0x100]; } g_replayLog;  /* @0x8E64 */
 
 void moveDataFar() {
@@ -774,8 +774,8 @@ extern int16 g_viewX_, g_viewY_;       /* word_3838C / word_3837C */
 void recordFrame(uint8 a, uint8 b) {
     if (g_replayCount < 0xFF) {
         g_replayLog.events[g_replayCount].tick = g_missionTick;
-        g_replayLog.events[g_replayCount].y = (uint16)g_viewY_ >> 7;
         g_replayLog.events[g_replayCount].x = (uint16)g_viewX_ >> 7;
+        g_replayLog.events[g_replayCount].y = (uint16)g_viewY_ >> 7;
         g_replayLog.events[g_replayCount].a = a;
         g_replayLog.events[g_replayCount].b = b;
         g_replayLog.events[g_replayCount += 1].a = 0;
