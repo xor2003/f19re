@@ -1,0 +1,2118 @@
+{
+  "inputs": {
+    "candidate": {
+      "image": {
+        "bss_size": 59040,
+        "code_ranges": [
+          {
+            "address": "0x10000",
+            "size": 57712
+          }
+        ],
+        "code_scope": "declared",
+        "file_sha256": "20e8f6a19201008b6ca380ab687ccdbc3f4da086caec4bff9ba13a2e818132e9",
+        "image_sha256": "3eb2b8b02161e106406328e5333b4a50d6abc1e1251f457534399241c05d17fc",
+        "image_size": 63265,
+        "load_segment": "0x1000",
+        "reloc_sha256": "fa8388e8188e4d1dd12b86a1f82f5d021245c3fed4fc6c917027645b51eec2a6"
+      },
+      "path": "/home/xor/games/f19ru/F19/build/STGEN-ints-371d149a.EXE",
+      "sha256": "20e8f6a19201008b6ca380ab687ccdbc3f4da086caec4bff9ba13a2e818132e9"
+    },
+    "oracle": {
+      "image": {
+        "bss_size": 16928,
+        "code_ranges": [
+          {
+            "address": "0x10000",
+            "size": 65536
+          },
+          {
+            "address": "0x20afa",
+            "size": 545
+          }
+        ],
+        "code_scope": "declared",
+        "file_sha256": "d823e044af9fb8850f6781bbe071a34bf676678914f60e6d1857693ddc97ed23",
+        "image_sha256": "4e446b935883bc173a2be15e2c29b142a8d7e28f220d612397b01018e77ce967",
+        "image_size": 104672,
+        "load_segment": "0x1000",
+        "reloc_sha256": "05378000d775fafa2695fb2edb18eda457e2b6349fcbd6c903074abd4b1bb04f"
+      },
+      "path": "/home/xor/games/f19ru/F19/build/START-ints-78503bb1.EXE",
+      "sha256": "d823e044af9fb8850f6781bbe071a34bf676678914f60e6d1857693ddc97ed23"
+    }
+  },
+  "instruction_limit": 100000,
+  "policy": {
+    "a20": "enabled",
+    "high_half_default": "zero",
+    "initial_memory": "mapped pages start zero; relocated image, patches and caller frame are applied in order",
+    "initial_registers": "absent integer registers, high halves and non-CS segments start zero; flags default to 0x2",
+    "instruction_model": "Unicorn x86 real mode, integer observations; unsupported effects refuse",
+    "max_observation_bytes": 65536,
+    "max_patch_bytes": 65536,
+    "straddle": "linear_continue"
+  },
+  "proof_status": "not_established_by_execution",
+  "results": [
+    {
+      "candidate": {
+        "detail": "",
+        "effective_flags_mask": "0x8d5",
+        "events": [],
+        "instructions": 100000,
+        "observations": [
+          {
+            "bytes": "a5a5",
+            "linear": "0x3b386"
+          },
+          {
+            "bytes": "a5a5",
+            "linear": "0x39d84"
+          },
+          {
+            "bytes": "a5a5",
+            "linear": "0x3ca46"
+          },
+          {
+            "bytes": "a5a5",
+            "linear": "0x3b8c0"
+          },
+          {
+            "bytes": "a5a5",
+            "linear": "0x3ca48"
+          },
+          {
+            "bytes": "a5a5",
+            "linear": "0x3bbc0"
+          },
+          {
+            "bytes": "a5",
+            "linear": "0x3c160"
+          },
+          {
+            "bytes": "a5",
+            "linear": "0x37ff4"
+          }
+        ],
+        "registers": {
+          "ax": "0x0",
+          "bp": "0xeffe",
+          "bx": "0x0",
+          "cs": "0x1000",
+          "cx": "0x0",
+          "di": "0x0",
+          "ds": "0x3000",
+          "dx": "0x0",
+          "eax": "0x0",
+          "ebp": "0xeffe",
+          "ebx": "0x0",
+          "ecx": "0x0",
+          "edi": "0x0",
+          "edx": "0x0",
+          "eflags": "0x246",
+          "es": "0x3000",
+          "esi": "0x0",
+          "esp": "0xefee",
+          "flags": "0x246",
+          "fs": "0x0",
+          "gs": "0x0",
+          "ip": "0x97ca",
+          "si": "0x0",
+          "sp": "0xefee",
+          "ss": "0x4000"
+        },
+        "status": "budget_exhausted",
+        "writes": [
+          {
+            "bytes": "b233f00f18760000",
+            "linear": "0x4efee"
+          },
+          {
+            "bytes": "0000",
+            "linear": "0x4effe"
+          }
+        ]
+      },
+      "comparison": {
+        "flags_mask": "0x8d5",
+        "observables": [
+          "ax",
+          "bx",
+          "cx",
+          "dx",
+          "si",
+          "di",
+          "bp",
+          "sp",
+          "cs",
+          "ds",
+          "es",
+          "ss",
+          "fs",
+          "gs",
+          "ip",
+          "eflags",
+          "eax",
+          "ebx",
+          "ecx",
+          "edx",
+          "esi",
+          "edi",
+          "ebp",
+          "esp"
+        ],
+        "observables_source": "default",
+        "reason": "at least one side has no complete outcome"
+      },
+      "id": "sub_1B304#0",
+      "initial_state": {
+        "candidate_entry": {
+          "offset": "0x760e",
+          "segment": "0xff0"
+        },
+        "frame": {
+          "kind": "near16",
+          "target": {
+            "offset": "0x4",
+            "segment": "0xff0"
+          }
+        },
+        "high_halves": {},
+        "memory": [
+          {
+            "bytes": "0000",
+            "offset": "0xf002",
+            "segment": "0x4000"
+          },
+          {
+            "bytes": "0000",
+            "offset": "0xf004",
+            "segment": "0x4000"
+          },
+          {
+            "bytes": "0000",
+            "offset": "0xf006",
+            "segment": "0x4000"
+          },
+          {
+            "bytes": "0000",
+            "offset": "0xf008",
+            "segment": "0x4000"
+          },
+          {
+            "bytes": "0000",
+            "offset": "0xf00a",
+            "segment": "0x4000"
+          },
+          {
+            "bytes": "0000",
+            "offset": "0xf00c",
+            "segment": "0x4000"
+          },
+          {
+            "bytes": "0000000000004d532052756e2d54696d65204c696272617279202d20436f707972696768742028632920313938382c204d6963726f736f667420436f72701100",
+            "offset": "0x2",
+            "segment": "0x3000"
+          },
+          {
+            "bytes": "000000004d532052756e2d54696d65204c696272617279202d20436f707972696768742028632920313938382c204d6963726f736f667420436f727011007363",
+            "offset": "0x4",
+            "segment": "0x3000"
+          },
+          {
+            "bytes": "4d532052756e2d54696d65204c696272617279202d20436f707972696768742028632920313938382c204d6963726f736f667420436f727011007363656e6572",
+            "offset": "0x8",
+            "segment": "0x3000"
+          },
+          {
+            "bytes": "2052756e2d54696d65204c696272617279202d20436f707972696768742028632920313938382c204d6963726f736f667420436f727011007363656e65727930",
+            "offset": "0xa",
+            "segment": "0x3000"
+          },
+          {
+            "bytes": "11007363656e657279302e657865007469746c6531362e7069630063726564697431362e706963006164762e70696300496e73756666696369656e7420667265",
+            "offset": "0x40",
+            "segment": "0x3000"
+          },
+          {
+            "bytes": "b063",
+            "offset": "0x63c6",
+            "segment": "0x3000"
+          },
+          {
+            "bytes": "00004800a0008d00f0009500a0008d000401950000006900980008001b0139000700c8631a000700fa003c0000000000000000004800a0009800f000a000a000",
+            "offset": "0x640c",
+            "segment": "0x3000"
+          },
+          {
+            "bytes": "7464",
+            "offset": "0x6480",
+            "segment": "0x3000"
+          },
+          {
+            "bytes": "0000000000004d532052756e2d54696d65204c696272617279202d20436f707972696768742028632920313938382c204d6963726f736f667420436f72701100",
+            "offset": "0x2",
+            "segment": "0x3000"
+          },
+          {
+            "bytes": "000000004d532052756e2d54696d65204c696272617279202d20436f707972696768742028632920313938382c204d6963726f736f667420436f72701100496e",
+            "offset": "0x4",
+            "segment": "0x3000"
+          },
+          {
+            "bytes": "4d532052756e2d54696d65204c696272617279202d20436f707972696768742028632920313938382c204d6963726f736f667420436f72701100496e73756666",
+            "offset": "0x8",
+            "segment": "0x3000"
+          },
+          {
+            "bytes": "2052756e2d54696d65204c696272617279202d20436f707972696768742028632920313938382c204d6963726f736f667420436f72701100496e737566666963",
+            "offset": "0xa",
+            "segment": "0x3000"
+          },
+          {
+            "bytes": "1100496e73756666696369656e742073797374656d206d656d6f7279202d20416c6c6f6342756666657224002e2e2e6465616c6c6f63206572726f722e2e2e24",
+            "offset": "0x40",
+            "segment": "0x3000"
+          },
+          {
+            "bytes": "a5a5",
+            "offset": "0xb386",
+            "segment": "0x3000"
+          },
+          {
+            "bytes": "a5a5",
+            "offset": "0x9d84",
+            "segment": "0x3000"
+          },
+          {
+            "bytes": "a5a5",
+            "offset": "0xca46",
+            "segment": "0x3000"
+          },
+          {
+            "bytes": "a5a5",
+            "offset": "0xb8c0",
+            "segment": "0x3000"
+          },
+          {
+            "bytes": "a5a5",
+            "offset": "0xca48",
+            "segment": "0x3000"
+          },
+          {
+            "bytes": "a5a5",
+            "offset": "0xbbc0",
+            "segment": "0x3000"
+          },
+          {
+            "bytes": "a5",
+            "offset": "0xc160",
+            "segment": "0x3000"
+          },
+          {
+            "bytes": "a5",
+            "offset": "0x7ff4",
+            "segment": "0x3000"
+          },
+          {
+            "bytes": "00",
+            "offset": "0x0",
+            "segment": "0xa000"
+          },
+          {
+            "bytes": "00",
+            "offset": "0x0",
+            "segment": "0x3a00"
+          }
+        ],
+        "observations": [
+          {
+            "offset": "0xb386",
+            "segment": "0x3000",
+            "size": 2
+          },
+          {
+            "offset": "0x9d84",
+            "segment": "0x3000",
+            "size": 2
+          },
+          {
+            "offset": "0xca46",
+            "segment": "0x3000",
+            "size": 2
+          },
+          {
+            "offset": "0xb8c0",
+            "segment": "0x3000",
+            "size": 2
+          },
+          {
+            "offset": "0xca48",
+            "segment": "0x3000",
+            "size": 2
+          },
+          {
+            "offset": "0xbbc0",
+            "segment": "0x3000",
+            "size": 2
+          },
+          {
+            "offset": "0xc160",
+            "segment": "0x3000",
+            "size": 1
+          },
+          {
+            "offset": "0x7ff4",
+            "segment": "0x3000",
+            "size": 1
+          }
+        ],
+        "oracle_entry": {
+          "offset": "0xb404",
+          "segment": "0xff0"
+        },
+        "registers": {
+          "bp": "0x0",
+          "di": "0x0",
+          "flags": "0x202",
+          "si": "0x0",
+          "sp": "0xf000"
+        },
+        "segments": {
+          "ds": "0x3000",
+          "es": "0x3000",
+          "ss": "0x4000"
+        }
+      },
+      "oracle": {
+        "detail": "",
+        "effective_flags_mask": "0x8d5",
+        "events": [],
+        "instructions": 100000,
+        "observations": [
+          {
+            "bytes": "a5a5",
+            "linear": "0x3b386"
+          },
+          {
+            "bytes": "a5a5",
+            "linear": "0x39d84"
+          },
+          {
+            "bytes": "a5a5",
+            "linear": "0x3ca46"
+          },
+          {
+            "bytes": "a5a5",
+            "linear": "0x3b8c0"
+          },
+          {
+            "bytes": "a5a5",
+            "linear": "0x3ca48"
+          },
+          {
+            "bytes": "a5a5",
+            "linear": "0x3bbc0"
+          },
+          {
+            "bytes": "a5",
+            "linear": "0x3c160"
+          },
+          {
+            "bytes": "a5",
+            "linear": "0x37ff4"
+          }
+        ],
+        "registers": {
+          "ax": "0x0",
+          "bp": "0xeffe",
+          "bx": "0x0",
+          "cs": "0x2000",
+          "cx": "0x0",
+          "di": "0x0",
+          "ds": "0x3000",
+          "dx": "0x0",
+          "eax": "0x0",
+          "ebp": "0xeffe",
+          "ebx": "0x0",
+          "ecx": "0x0",
+          "edi": "0x0",
+          "edx": "0x0",
+          "eflags": "0x246",
+          "es": "0x3000",
+          "esi": "0x0",
+          "esp": "0xefee",
+          "flags": "0x246",
+          "fs": "0x0",
+          "gs": "0x0",
+          "ip": "0xcbe",
+          "si": "0x0",
+          "sp": "0xefee",
+          "ss": "0x4000"
+        },
+        "status": "budget_exhausted",
+        "writes": [
+          {
+            "bytes": "c309f00f0eb40000",
+            "linear": "0x4efee"
+          },
+          {
+            "bytes": "0000",
+            "linear": "0x4effe"
+          }
+        ]
+      },
+      "status": "incomplete"
+    },
+    {
+      "candidate": {
+        "detail": "",
+        "effective_flags_mask": "0x8d5",
+        "events": [],
+        "instructions": 100000,
+        "observations": [
+          {
+            "bytes": "a5a5",
+            "linear": "0x3b386"
+          },
+          {
+            "bytes": "a5a5",
+            "linear": "0x39d84"
+          },
+          {
+            "bytes": "a5a5",
+            "linear": "0x3ca46"
+          },
+          {
+            "bytes": "a5a5",
+            "linear": "0x3b8c0"
+          },
+          {
+            "bytes": "a5a5",
+            "linear": "0x3ca48"
+          },
+          {
+            "bytes": "a5a5",
+            "linear": "0x3bbc0"
+          },
+          {
+            "bytes": "a5",
+            "linear": "0x3c160"
+          },
+          {
+            "bytes": "a5",
+            "linear": "0x37ff4"
+          }
+        ],
+        "registers": {
+          "ax": "0x0",
+          "bp": "0xeffe",
+          "bx": "0x0",
+          "cs": "0x1000",
+          "cx": "0x0",
+          "di": "0x0",
+          "ds": "0x3000",
+          "dx": "0x0",
+          "eax": "0x0",
+          "ebp": "0xeffe",
+          "ebx": "0x0",
+          "ecx": "0x0",
+          "edi": "0x0",
+          "edx": "0x0",
+          "eflags": "0x246",
+          "es": "0x3000",
+          "esi": "0x0",
+          "esp": "0xefee",
+          "flags": "0x246",
+          "fs": "0x0",
+          "gs": "0x0",
+          "ip": "0x97ca",
+          "si": "0x0",
+          "sp": "0xefee",
+          "ss": "0x4000"
+        },
+        "status": "budget_exhausted",
+        "writes": [
+          {
+            "bytes": "b233f00f18760000",
+            "linear": "0x4efee"
+          },
+          {
+            "bytes": "0000",
+            "linear": "0x4effe"
+          }
+        ]
+      },
+      "comparison": {
+        "flags_mask": "0x8d5",
+        "observables": [
+          "ax",
+          "bx",
+          "cx",
+          "dx",
+          "si",
+          "di",
+          "bp",
+          "sp",
+          "cs",
+          "ds",
+          "es",
+          "ss",
+          "fs",
+          "gs",
+          "ip",
+          "eflags",
+          "eax",
+          "ebx",
+          "ecx",
+          "edx",
+          "esi",
+          "edi",
+          "ebp",
+          "esp"
+        ],
+        "observables_source": "default",
+        "reason": "at least one side has no complete outcome"
+      },
+      "id": "sub_1B304#1",
+      "initial_state": {
+        "candidate_entry": {
+          "offset": "0x760e",
+          "segment": "0xff0"
+        },
+        "frame": {
+          "kind": "near16",
+          "target": {
+            "offset": "0x4",
+            "segment": "0xff0"
+          }
+        },
+        "high_halves": {},
+        "memory": [
+          {
+            "bytes": "0100",
+            "offset": "0xf002",
+            "segment": "0x4000"
+          },
+          {
+            "bytes": "0200",
+            "offset": "0xf004",
+            "segment": "0x4000"
+          },
+          {
+            "bytes": "0300",
+            "offset": "0xf006",
+            "segment": "0x4000"
+          },
+          {
+            "bytes": "0400",
+            "offset": "0xf008",
+            "segment": "0x4000"
+          },
+          {
+            "bytes": "0500",
+            "offset": "0xf00a",
+            "segment": "0x4000"
+          },
+          {
+            "bytes": "0600",
+            "offset": "0xf00c",
+            "segment": "0x4000"
+          },
+          {
+            "bytes": "0000000000004d532052756e2d54696d65204c696272617279202d20436f707972696768742028632920313938382c204d6963726f736f667420436f72701100",
+            "offset": "0x2",
+            "segment": "0x3000"
+          },
+          {
+            "bytes": "000000004d532052756e2d54696d65204c696272617279202d20436f707972696768742028632920313938382c204d6963726f736f667420436f727011007363",
+            "offset": "0x4",
+            "segment": "0x3000"
+          },
+          {
+            "bytes": "4d532052756e2d54696d65204c696272617279202d20436f707972696768742028632920313938382c204d6963726f736f667420436f727011007363656e6572",
+            "offset": "0x8",
+            "segment": "0x3000"
+          },
+          {
+            "bytes": "2052756e2d54696d65204c696272617279202d20436f707972696768742028632920313938382c204d6963726f736f667420436f727011007363656e65727930",
+            "offset": "0xa",
+            "segment": "0x3000"
+          },
+          {
+            "bytes": "11007363656e657279302e657865007469746c6531362e7069630063726564697431362e706963006164762e70696300496e73756666696369656e7420667265",
+            "offset": "0x40",
+            "segment": "0x3000"
+          },
+          {
+            "bytes": "b063",
+            "offset": "0x63c6",
+            "segment": "0x3000"
+          },
+          {
+            "bytes": "00004800a0008d00f0009500a0008d000401950000006900980008001b0139000700c8631a000700fa003c0000000000000000004800a0009800f000a000a000",
+            "offset": "0x640c",
+            "segment": "0x3000"
+          },
+          {
+            "bytes": "7464",
+            "offset": "0x6480",
+            "segment": "0x3000"
+          },
+          {
+            "bytes": "0000000000004d532052756e2d54696d65204c696272617279202d20436f707972696768742028632920313938382c204d6963726f736f667420436f72701100",
+            "offset": "0x2",
+            "segment": "0x3000"
+          },
+          {
+            "bytes": "000000004d532052756e2d54696d65204c696272617279202d20436f707972696768742028632920313938382c204d6963726f736f667420436f72701100496e",
+            "offset": "0x4",
+            "segment": "0x3000"
+          },
+          {
+            "bytes": "4d532052756e2d54696d65204c696272617279202d20436f707972696768742028632920313938382c204d6963726f736f667420436f72701100496e73756666",
+            "offset": "0x8",
+            "segment": "0x3000"
+          },
+          {
+            "bytes": "2052756e2d54696d65204c696272617279202d20436f707972696768742028632920313938382c204d6963726f736f667420436f72701100496e737566666963",
+            "offset": "0xa",
+            "segment": "0x3000"
+          },
+          {
+            "bytes": "1100496e73756666696369656e742073797374656d206d656d6f7279202d20416c6c6f6342756666657224002e2e2e6465616c6c6f63206572726f722e2e2e24",
+            "offset": "0x40",
+            "segment": "0x3000"
+          },
+          {
+            "bytes": "a5a5",
+            "offset": "0xb386",
+            "segment": "0x3000"
+          },
+          {
+            "bytes": "a5a5",
+            "offset": "0x9d84",
+            "segment": "0x3000"
+          },
+          {
+            "bytes": "a5a5",
+            "offset": "0xca46",
+            "segment": "0x3000"
+          },
+          {
+            "bytes": "a5a5",
+            "offset": "0xb8c0",
+            "segment": "0x3000"
+          },
+          {
+            "bytes": "a5a5",
+            "offset": "0xca48",
+            "segment": "0x3000"
+          },
+          {
+            "bytes": "a5a5",
+            "offset": "0xbbc0",
+            "segment": "0x3000"
+          },
+          {
+            "bytes": "a5",
+            "offset": "0xc160",
+            "segment": "0x3000"
+          },
+          {
+            "bytes": "a5",
+            "offset": "0x7ff4",
+            "segment": "0x3000"
+          },
+          {
+            "bytes": "00",
+            "offset": "0x0",
+            "segment": "0xa000"
+          },
+          {
+            "bytes": "00",
+            "offset": "0x0",
+            "segment": "0x3a00"
+          }
+        ],
+        "observations": [
+          {
+            "offset": "0xb386",
+            "segment": "0x3000",
+            "size": 2
+          },
+          {
+            "offset": "0x9d84",
+            "segment": "0x3000",
+            "size": 2
+          },
+          {
+            "offset": "0xca46",
+            "segment": "0x3000",
+            "size": 2
+          },
+          {
+            "offset": "0xb8c0",
+            "segment": "0x3000",
+            "size": 2
+          },
+          {
+            "offset": "0xca48",
+            "segment": "0x3000",
+            "size": 2
+          },
+          {
+            "offset": "0xbbc0",
+            "segment": "0x3000",
+            "size": 2
+          },
+          {
+            "offset": "0xc160",
+            "segment": "0x3000",
+            "size": 1
+          },
+          {
+            "offset": "0x7ff4",
+            "segment": "0x3000",
+            "size": 1
+          }
+        ],
+        "oracle_entry": {
+          "offset": "0xb404",
+          "segment": "0xff0"
+        },
+        "registers": {
+          "bp": "0x0",
+          "di": "0x0",
+          "flags": "0x202",
+          "si": "0x0",
+          "sp": "0xf000"
+        },
+        "segments": {
+          "ds": "0x3000",
+          "es": "0x3000",
+          "ss": "0x4000"
+        }
+      },
+      "oracle": {
+        "detail": "",
+        "effective_flags_mask": "0x8d5",
+        "events": [],
+        "instructions": 100000,
+        "observations": [
+          {
+            "bytes": "a5a5",
+            "linear": "0x3b386"
+          },
+          {
+            "bytes": "a5a5",
+            "linear": "0x39d84"
+          },
+          {
+            "bytes": "a5a5",
+            "linear": "0x3ca46"
+          },
+          {
+            "bytes": "a5a5",
+            "linear": "0x3b8c0"
+          },
+          {
+            "bytes": "a5a5",
+            "linear": "0x3ca48"
+          },
+          {
+            "bytes": "a5a5",
+            "linear": "0x3bbc0"
+          },
+          {
+            "bytes": "a5",
+            "linear": "0x3c160"
+          },
+          {
+            "bytes": "a5",
+            "linear": "0x37ff4"
+          }
+        ],
+        "registers": {
+          "ax": "0x0",
+          "bp": "0xeffe",
+          "bx": "0x0",
+          "cs": "0x2000",
+          "cx": "0x0",
+          "di": "0x0",
+          "ds": "0x3000",
+          "dx": "0x0",
+          "eax": "0x0",
+          "ebp": "0xeffe",
+          "ebx": "0x0",
+          "ecx": "0x0",
+          "edi": "0x0",
+          "edx": "0x0",
+          "eflags": "0x246",
+          "es": "0x3000",
+          "esi": "0x0",
+          "esp": "0xefee",
+          "flags": "0x246",
+          "fs": "0x0",
+          "gs": "0x0",
+          "ip": "0xcbe",
+          "si": "0x0",
+          "sp": "0xefee",
+          "ss": "0x4000"
+        },
+        "status": "budget_exhausted",
+        "writes": [
+          {
+            "bytes": "c309f00f0eb40000",
+            "linear": "0x4efee"
+          },
+          {
+            "bytes": "0000",
+            "linear": "0x4effe"
+          }
+        ]
+      },
+      "status": "incomplete"
+    },
+    {
+      "candidate": {
+        "detail": "",
+        "effective_flags_mask": "0x8d5",
+        "events": [],
+        "instructions": 100000,
+        "observations": [
+          {
+            "bytes": "a5a5",
+            "linear": "0x3b386"
+          },
+          {
+            "bytes": "a5a5",
+            "linear": "0x39d84"
+          },
+          {
+            "bytes": "a5a5",
+            "linear": "0x3ca46"
+          },
+          {
+            "bytes": "a5a5",
+            "linear": "0x3b8c0"
+          },
+          {
+            "bytes": "a5a5",
+            "linear": "0x3ca48"
+          },
+          {
+            "bytes": "a5a5",
+            "linear": "0x3bbc0"
+          },
+          {
+            "bytes": "a5",
+            "linear": "0x3c160"
+          },
+          {
+            "bytes": "a5",
+            "linear": "0x37ff4"
+          }
+        ],
+        "registers": {
+          "ax": "0x0",
+          "bp": "0xeffe",
+          "bx": "0x0",
+          "cs": "0x1000",
+          "cx": "0x0",
+          "di": "0x0",
+          "ds": "0x3000",
+          "dx": "0x0",
+          "eax": "0x0",
+          "ebp": "0xeffe",
+          "ebx": "0x0",
+          "ecx": "0x0",
+          "edi": "0x0",
+          "edx": "0x0",
+          "eflags": "0x246",
+          "es": "0x3000",
+          "esi": "0x0",
+          "esp": "0xefee",
+          "flags": "0x246",
+          "fs": "0x0",
+          "gs": "0x0",
+          "ip": "0x97ca",
+          "si": "0x0",
+          "sp": "0xefee",
+          "ss": "0x4000"
+        },
+        "status": "budget_exhausted",
+        "writes": [
+          {
+            "bytes": "b233f00f18760000",
+            "linear": "0x4efee"
+          },
+          {
+            "bytes": "0000",
+            "linear": "0x4effe"
+          }
+        ]
+      },
+      "comparison": {
+        "flags_mask": "0x8d5",
+        "observables": [
+          "ax",
+          "bx",
+          "cx",
+          "dx",
+          "si",
+          "di",
+          "bp",
+          "sp",
+          "cs",
+          "ds",
+          "es",
+          "ss",
+          "fs",
+          "gs",
+          "ip",
+          "eflags",
+          "eax",
+          "ebx",
+          "ecx",
+          "edx",
+          "esi",
+          "edi",
+          "ebp",
+          "esp"
+        ],
+        "observables_source": "default",
+        "reason": "at least one side has no complete outcome"
+      },
+      "id": "sub_1B304#2",
+      "initial_state": {
+        "candidate_entry": {
+          "offset": "0x760e",
+          "segment": "0xff0"
+        },
+        "frame": {
+          "kind": "near16",
+          "target": {
+            "offset": "0x4",
+            "segment": "0xff0"
+          }
+        },
+        "high_halves": {},
+        "memory": [
+          {
+            "bytes": "0001",
+            "offset": "0xf002",
+            "segment": "0x4000"
+          },
+          {
+            "bytes": "8000",
+            "offset": "0xf004",
+            "segment": "0x4000"
+          },
+          {
+            "bytes": "4000",
+            "offset": "0xf006",
+            "segment": "0x4000"
+          },
+          {
+            "bytes": "2000",
+            "offset": "0xf008",
+            "segment": "0x4000"
+          },
+          {
+            "bytes": "1000",
+            "offset": "0xf00a",
+            "segment": "0x4000"
+          },
+          {
+            "bytes": "0800",
+            "offset": "0xf00c",
+            "segment": "0x4000"
+          },
+          {
+            "bytes": "0000000000004d532052756e2d54696d65204c696272617279202d20436f707972696768742028632920313938382c204d6963726f736f667420436f72701100",
+            "offset": "0x2",
+            "segment": "0x3000"
+          },
+          {
+            "bytes": "000000004d532052756e2d54696d65204c696272617279202d20436f707972696768742028632920313938382c204d6963726f736f667420436f727011007363",
+            "offset": "0x4",
+            "segment": "0x3000"
+          },
+          {
+            "bytes": "4d532052756e2d54696d65204c696272617279202d20436f707972696768742028632920313938382c204d6963726f736f667420436f727011007363656e6572",
+            "offset": "0x8",
+            "segment": "0x3000"
+          },
+          {
+            "bytes": "2052756e2d54696d65204c696272617279202d20436f707972696768742028632920313938382c204d6963726f736f667420436f727011007363656e65727930",
+            "offset": "0xa",
+            "segment": "0x3000"
+          },
+          {
+            "bytes": "11007363656e657279302e657865007469746c6531362e7069630063726564697431362e706963006164762e70696300496e73756666696369656e7420667265",
+            "offset": "0x40",
+            "segment": "0x3000"
+          },
+          {
+            "bytes": "b063",
+            "offset": "0x63c6",
+            "segment": "0x3000"
+          },
+          {
+            "bytes": "00004800a0008d00f0009500a0008d000401950000006900980008001b0139000700c8631a000700fa003c0000000000000000004800a0009800f000a000a000",
+            "offset": "0x640c",
+            "segment": "0x3000"
+          },
+          {
+            "bytes": "7464",
+            "offset": "0x6480",
+            "segment": "0x3000"
+          },
+          {
+            "bytes": "0000000000004d532052756e2d54696d65204c696272617279202d20436f707972696768742028632920313938382c204d6963726f736f667420436f72701100",
+            "offset": "0x2",
+            "segment": "0x3000"
+          },
+          {
+            "bytes": "000000004d532052756e2d54696d65204c696272617279202d20436f707972696768742028632920313938382c204d6963726f736f667420436f72701100496e",
+            "offset": "0x4",
+            "segment": "0x3000"
+          },
+          {
+            "bytes": "4d532052756e2d54696d65204c696272617279202d20436f707972696768742028632920313938382c204d6963726f736f667420436f72701100496e73756666",
+            "offset": "0x8",
+            "segment": "0x3000"
+          },
+          {
+            "bytes": "2052756e2d54696d65204c696272617279202d20436f707972696768742028632920313938382c204d6963726f736f667420436f72701100496e737566666963",
+            "offset": "0xa",
+            "segment": "0x3000"
+          },
+          {
+            "bytes": "1100496e73756666696369656e742073797374656d206d656d6f7279202d20416c6c6f6342756666657224002e2e2e6465616c6c6f63206572726f722e2e2e24",
+            "offset": "0x40",
+            "segment": "0x3000"
+          },
+          {
+            "bytes": "a5a5",
+            "offset": "0xb386",
+            "segment": "0x3000"
+          },
+          {
+            "bytes": "a5a5",
+            "offset": "0x9d84",
+            "segment": "0x3000"
+          },
+          {
+            "bytes": "a5a5",
+            "offset": "0xca46",
+            "segment": "0x3000"
+          },
+          {
+            "bytes": "a5a5",
+            "offset": "0xb8c0",
+            "segment": "0x3000"
+          },
+          {
+            "bytes": "a5a5",
+            "offset": "0xca48",
+            "segment": "0x3000"
+          },
+          {
+            "bytes": "a5a5",
+            "offset": "0xbbc0",
+            "segment": "0x3000"
+          },
+          {
+            "bytes": "a5",
+            "offset": "0xc160",
+            "segment": "0x3000"
+          },
+          {
+            "bytes": "a5",
+            "offset": "0x7ff4",
+            "segment": "0x3000"
+          },
+          {
+            "bytes": "00",
+            "offset": "0x0",
+            "segment": "0xa000"
+          },
+          {
+            "bytes": "00",
+            "offset": "0x0",
+            "segment": "0x3a00"
+          }
+        ],
+        "observations": [
+          {
+            "offset": "0xb386",
+            "segment": "0x3000",
+            "size": 2
+          },
+          {
+            "offset": "0x9d84",
+            "segment": "0x3000",
+            "size": 2
+          },
+          {
+            "offset": "0xca46",
+            "segment": "0x3000",
+            "size": 2
+          },
+          {
+            "offset": "0xb8c0",
+            "segment": "0x3000",
+            "size": 2
+          },
+          {
+            "offset": "0xca48",
+            "segment": "0x3000",
+            "size": 2
+          },
+          {
+            "offset": "0xbbc0",
+            "segment": "0x3000",
+            "size": 2
+          },
+          {
+            "offset": "0xc160",
+            "segment": "0x3000",
+            "size": 1
+          },
+          {
+            "offset": "0x7ff4",
+            "segment": "0x3000",
+            "size": 1
+          }
+        ],
+        "oracle_entry": {
+          "offset": "0xb404",
+          "segment": "0xff0"
+        },
+        "registers": {
+          "bp": "0x0",
+          "di": "0x0",
+          "flags": "0x202",
+          "si": "0x0",
+          "sp": "0xf000"
+        },
+        "segments": {
+          "ds": "0x3000",
+          "es": "0x3000",
+          "ss": "0x4000"
+        }
+      },
+      "oracle": {
+        "detail": "",
+        "effective_flags_mask": "0x8d5",
+        "events": [],
+        "instructions": 100000,
+        "observations": [
+          {
+            "bytes": "a5a5",
+            "linear": "0x3b386"
+          },
+          {
+            "bytes": "a5a5",
+            "linear": "0x39d84"
+          },
+          {
+            "bytes": "a5a5",
+            "linear": "0x3ca46"
+          },
+          {
+            "bytes": "a5a5",
+            "linear": "0x3b8c0"
+          },
+          {
+            "bytes": "a5a5",
+            "linear": "0x3ca48"
+          },
+          {
+            "bytes": "a5a5",
+            "linear": "0x3bbc0"
+          },
+          {
+            "bytes": "a5",
+            "linear": "0x3c160"
+          },
+          {
+            "bytes": "a5",
+            "linear": "0x37ff4"
+          }
+        ],
+        "registers": {
+          "ax": "0x0",
+          "bp": "0xeffe",
+          "bx": "0x0",
+          "cs": "0x2000",
+          "cx": "0x0",
+          "di": "0x0",
+          "ds": "0x3000",
+          "dx": "0x0",
+          "eax": "0x0",
+          "ebp": "0xeffe",
+          "ebx": "0x0",
+          "ecx": "0x0",
+          "edi": "0x0",
+          "edx": "0x0",
+          "eflags": "0x246",
+          "es": "0x3000",
+          "esi": "0x0",
+          "esp": "0xefee",
+          "flags": "0x246",
+          "fs": "0x0",
+          "gs": "0x0",
+          "ip": "0xcbe",
+          "si": "0x0",
+          "sp": "0xefee",
+          "ss": "0x4000"
+        },
+        "status": "budget_exhausted",
+        "writes": [
+          {
+            "bytes": "c309f00f0eb40000",
+            "linear": "0x4efee"
+          },
+          {
+            "bytes": "0000",
+            "linear": "0x4effe"
+          }
+        ]
+      },
+      "status": "incomplete"
+    },
+    {
+      "candidate": {
+        "detail": "",
+        "effective_flags_mask": "0x8d5",
+        "events": [],
+        "instructions": 100000,
+        "observations": [
+          {
+            "bytes": "a5a5",
+            "linear": "0x3b386"
+          },
+          {
+            "bytes": "a5a5",
+            "linear": "0x39d84"
+          },
+          {
+            "bytes": "a5a5",
+            "linear": "0x3ca46"
+          },
+          {
+            "bytes": "a5a5",
+            "linear": "0x3b8c0"
+          },
+          {
+            "bytes": "a5a5",
+            "linear": "0x3ca48"
+          },
+          {
+            "bytes": "a5a5",
+            "linear": "0x3bbc0"
+          },
+          {
+            "bytes": "a5",
+            "linear": "0x3c160"
+          },
+          {
+            "bytes": "a5",
+            "linear": "0x37ff4"
+          }
+        ],
+        "registers": {
+          "ax": "0x0",
+          "bp": "0xeffe",
+          "bx": "0x0",
+          "cs": "0x1000",
+          "cx": "0x0",
+          "di": "0x0",
+          "ds": "0x3000",
+          "dx": "0x0",
+          "eax": "0x0",
+          "ebp": "0xeffe",
+          "ebx": "0x0",
+          "ecx": "0x0",
+          "edi": "0x0",
+          "edx": "0x0",
+          "eflags": "0x246",
+          "es": "0x3000",
+          "esi": "0x0",
+          "esp": "0xefee",
+          "flags": "0x246",
+          "fs": "0x0",
+          "gs": "0x0",
+          "ip": "0x97ca",
+          "si": "0x0",
+          "sp": "0xefee",
+          "ss": "0x4000"
+        },
+        "status": "budget_exhausted",
+        "writes": [
+          {
+            "bytes": "b233f00f18760000",
+            "linear": "0x4efee"
+          },
+          {
+            "bytes": "0000",
+            "linear": "0x4effe"
+          }
+        ]
+      },
+      "comparison": {
+        "flags_mask": "0x8d5",
+        "observables": [
+          "ax",
+          "bx",
+          "cx",
+          "dx",
+          "si",
+          "di",
+          "bp",
+          "sp",
+          "cs",
+          "ds",
+          "es",
+          "ss",
+          "fs",
+          "gs",
+          "ip",
+          "eflags",
+          "eax",
+          "ebx",
+          "ecx",
+          "edx",
+          "esi",
+          "edi",
+          "ebp",
+          "esp"
+        ],
+        "observables_source": "default",
+        "reason": "at least one side has no complete outcome"
+      },
+      "id": "sub_1B304#3",
+      "initial_state": {
+        "candidate_entry": {
+          "offset": "0x760e",
+          "segment": "0xff0"
+        },
+        "frame": {
+          "kind": "near16",
+          "target": {
+            "offset": "0x4",
+            "segment": "0xff0"
+          }
+        },
+        "high_halves": {},
+        "memory": [
+          {
+            "bytes": "ff7f",
+            "offset": "0xf002",
+            "segment": "0x4000"
+          },
+          {
+            "bytes": "0080",
+            "offset": "0xf004",
+            "segment": "0x4000"
+          },
+          {
+            "bytes": "ffff",
+            "offset": "0xf006",
+            "segment": "0x4000"
+          },
+          {
+            "bytes": "0100",
+            "offset": "0xf008",
+            "segment": "0x4000"
+          },
+          {
+            "bytes": "0000",
+            "offset": "0xf00a",
+            "segment": "0x4000"
+          },
+          {
+            "bytes": "0040",
+            "offset": "0xf00c",
+            "segment": "0x4000"
+          },
+          {
+            "bytes": "0000000000004d532052756e2d54696d65204c696272617279202d20436f707972696768742028632920313938382c204d6963726f736f667420436f72701100",
+            "offset": "0x2",
+            "segment": "0x3000"
+          },
+          {
+            "bytes": "000000004d532052756e2d54696d65204c696272617279202d20436f707972696768742028632920313938382c204d6963726f736f667420436f727011007363",
+            "offset": "0x4",
+            "segment": "0x3000"
+          },
+          {
+            "bytes": "4d532052756e2d54696d65204c696272617279202d20436f707972696768742028632920313938382c204d6963726f736f667420436f727011007363656e6572",
+            "offset": "0x8",
+            "segment": "0x3000"
+          },
+          {
+            "bytes": "2052756e2d54696d65204c696272617279202d20436f707972696768742028632920313938382c204d6963726f736f667420436f727011007363656e65727930",
+            "offset": "0xa",
+            "segment": "0x3000"
+          },
+          {
+            "bytes": "11007363656e657279302e657865007469746c6531362e7069630063726564697431362e706963006164762e70696300496e73756666696369656e7420667265",
+            "offset": "0x40",
+            "segment": "0x3000"
+          },
+          {
+            "bytes": "b063",
+            "offset": "0x63c6",
+            "segment": "0x3000"
+          },
+          {
+            "bytes": "00004800a0008d00f0009500a0008d000401950000006900980008001b0139000700c8631a000700fa003c0000000000000000004800a0009800f000a000a000",
+            "offset": "0x640c",
+            "segment": "0x3000"
+          },
+          {
+            "bytes": "7464",
+            "offset": "0x6480",
+            "segment": "0x3000"
+          },
+          {
+            "bytes": "0000000000004d532052756e2d54696d65204c696272617279202d20436f707972696768742028632920313938382c204d6963726f736f667420436f72701100",
+            "offset": "0x2",
+            "segment": "0x3000"
+          },
+          {
+            "bytes": "000000004d532052756e2d54696d65204c696272617279202d20436f707972696768742028632920313938382c204d6963726f736f667420436f72701100496e",
+            "offset": "0x4",
+            "segment": "0x3000"
+          },
+          {
+            "bytes": "4d532052756e2d54696d65204c696272617279202d20436f707972696768742028632920313938382c204d6963726f736f667420436f72701100496e73756666",
+            "offset": "0x8",
+            "segment": "0x3000"
+          },
+          {
+            "bytes": "2052756e2d54696d65204c696272617279202d20436f707972696768742028632920313938382c204d6963726f736f667420436f72701100496e737566666963",
+            "offset": "0xa",
+            "segment": "0x3000"
+          },
+          {
+            "bytes": "1100496e73756666696369656e742073797374656d206d656d6f7279202d20416c6c6f6342756666657224002e2e2e6465616c6c6f63206572726f722e2e2e24",
+            "offset": "0x40",
+            "segment": "0x3000"
+          },
+          {
+            "bytes": "a5a5",
+            "offset": "0xb386",
+            "segment": "0x3000"
+          },
+          {
+            "bytes": "a5a5",
+            "offset": "0x9d84",
+            "segment": "0x3000"
+          },
+          {
+            "bytes": "a5a5",
+            "offset": "0xca46",
+            "segment": "0x3000"
+          },
+          {
+            "bytes": "a5a5",
+            "offset": "0xb8c0",
+            "segment": "0x3000"
+          },
+          {
+            "bytes": "a5a5",
+            "offset": "0xca48",
+            "segment": "0x3000"
+          },
+          {
+            "bytes": "a5a5",
+            "offset": "0xbbc0",
+            "segment": "0x3000"
+          },
+          {
+            "bytes": "a5",
+            "offset": "0xc160",
+            "segment": "0x3000"
+          },
+          {
+            "bytes": "a5",
+            "offset": "0x7ff4",
+            "segment": "0x3000"
+          },
+          {
+            "bytes": "00",
+            "offset": "0x0",
+            "segment": "0xa000"
+          },
+          {
+            "bytes": "00",
+            "offset": "0x0",
+            "segment": "0x3a00"
+          }
+        ],
+        "observations": [
+          {
+            "offset": "0xb386",
+            "segment": "0x3000",
+            "size": 2
+          },
+          {
+            "offset": "0x9d84",
+            "segment": "0x3000",
+            "size": 2
+          },
+          {
+            "offset": "0xca46",
+            "segment": "0x3000",
+            "size": 2
+          },
+          {
+            "offset": "0xb8c0",
+            "segment": "0x3000",
+            "size": 2
+          },
+          {
+            "offset": "0xca48",
+            "segment": "0x3000",
+            "size": 2
+          },
+          {
+            "offset": "0xbbc0",
+            "segment": "0x3000",
+            "size": 2
+          },
+          {
+            "offset": "0xc160",
+            "segment": "0x3000",
+            "size": 1
+          },
+          {
+            "offset": "0x7ff4",
+            "segment": "0x3000",
+            "size": 1
+          }
+        ],
+        "oracle_entry": {
+          "offset": "0xb404",
+          "segment": "0xff0"
+        },
+        "registers": {
+          "bp": "0x0",
+          "di": "0x0",
+          "flags": "0x202",
+          "si": "0x0",
+          "sp": "0xf000"
+        },
+        "segments": {
+          "ds": "0x3000",
+          "es": "0x3000",
+          "ss": "0x4000"
+        }
+      },
+      "oracle": {
+        "detail": "",
+        "effective_flags_mask": "0x8d5",
+        "events": [],
+        "instructions": 100000,
+        "observations": [
+          {
+            "bytes": "a5a5",
+            "linear": "0x3b386"
+          },
+          {
+            "bytes": "a5a5",
+            "linear": "0x39d84"
+          },
+          {
+            "bytes": "a5a5",
+            "linear": "0x3ca46"
+          },
+          {
+            "bytes": "a5a5",
+            "linear": "0x3b8c0"
+          },
+          {
+            "bytes": "a5a5",
+            "linear": "0x3ca48"
+          },
+          {
+            "bytes": "a5a5",
+            "linear": "0x3bbc0"
+          },
+          {
+            "bytes": "a5",
+            "linear": "0x3c160"
+          },
+          {
+            "bytes": "a5",
+            "linear": "0x37ff4"
+          }
+        ],
+        "registers": {
+          "ax": "0x0",
+          "bp": "0xeffe",
+          "bx": "0x0",
+          "cs": "0x2000",
+          "cx": "0x0",
+          "di": "0x0",
+          "ds": "0x3000",
+          "dx": "0x0",
+          "eax": "0x0",
+          "ebp": "0xeffe",
+          "ebx": "0x0",
+          "ecx": "0x0",
+          "edi": "0x0",
+          "edx": "0x0",
+          "eflags": "0x246",
+          "es": "0x3000",
+          "esi": "0x0",
+          "esp": "0xefee",
+          "flags": "0x246",
+          "fs": "0x0",
+          "gs": "0x0",
+          "ip": "0xcbe",
+          "si": "0x0",
+          "sp": "0xefee",
+          "ss": "0x4000"
+        },
+        "status": "budget_exhausted",
+        "writes": [
+          {
+            "bytes": "c309f00f0eb40000",
+            "linear": "0x4efee"
+          },
+          {
+            "bytes": "0000",
+            "linear": "0x4effe"
+          }
+        ]
+      },
+      "status": "incomplete"
+    },
+    {
+      "candidate": {
+        "detail": "",
+        "effective_flags_mask": "0x8d5",
+        "events": [],
+        "instructions": 100000,
+        "observations": [
+          {
+            "bytes": "a5a5",
+            "linear": "0x3b386"
+          },
+          {
+            "bytes": "a5a5",
+            "linear": "0x39d84"
+          },
+          {
+            "bytes": "a5a5",
+            "linear": "0x3ca46"
+          },
+          {
+            "bytes": "a5a5",
+            "linear": "0x3b8c0"
+          },
+          {
+            "bytes": "a5a5",
+            "linear": "0x3ca48"
+          },
+          {
+            "bytes": "a5a5",
+            "linear": "0x3bbc0"
+          },
+          {
+            "bytes": "a5",
+            "linear": "0x3c160"
+          },
+          {
+            "bytes": "a5",
+            "linear": "0x37ff4"
+          }
+        ],
+        "registers": {
+          "ax": "0x0",
+          "bp": "0xeffe",
+          "bx": "0x0",
+          "cs": "0x1000",
+          "cx": "0x0",
+          "di": "0x0",
+          "ds": "0x3000",
+          "dx": "0x0",
+          "eax": "0x0",
+          "ebp": "0xeffe",
+          "ebx": "0x0",
+          "ecx": "0x0",
+          "edi": "0x0",
+          "edx": "0x0",
+          "eflags": "0x246",
+          "es": "0x3000",
+          "esi": "0x0",
+          "esp": "0xefee",
+          "flags": "0x246",
+          "fs": "0x0",
+          "gs": "0x0",
+          "ip": "0x97ca",
+          "si": "0x0",
+          "sp": "0xefee",
+          "ss": "0x4000"
+        },
+        "status": "budget_exhausted",
+        "writes": [
+          {
+            "bytes": "b233f00f18760000",
+            "linear": "0x4efee"
+          },
+          {
+            "bytes": "0000",
+            "linear": "0x4effe"
+          }
+        ]
+      },
+      "comparison": {
+        "flags_mask": "0x8d5",
+        "observables": [
+          "ax",
+          "bx",
+          "cx",
+          "dx",
+          "si",
+          "di",
+          "bp",
+          "sp",
+          "cs",
+          "ds",
+          "es",
+          "ss",
+          "fs",
+          "gs",
+          "ip",
+          "eflags",
+          "eax",
+          "ebx",
+          "ecx",
+          "edx",
+          "esi",
+          "edi",
+          "ebp",
+          "esp"
+        ],
+        "observables_source": "default",
+        "reason": "at least one side has no complete outcome"
+      },
+      "id": "sub_1B304#4",
+      "initial_state": {
+        "candidate_entry": {
+          "offset": "0x760e",
+          "segment": "0xff0"
+        },
+        "frame": {
+          "kind": "near16",
+          "target": {
+            "offset": "0x4",
+            "segment": "0xff0"
+          }
+        },
+        "high_halves": {},
+        "memory": [
+          {
+            "bytes": "0040",
+            "offset": "0xf002",
+            "segment": "0x4000"
+          },
+          {
+            "bytes": "0040",
+            "offset": "0xf004",
+            "segment": "0x4000"
+          },
+          {
+            "bytes": "0040",
+            "offset": "0xf006",
+            "segment": "0x4000"
+          },
+          {
+            "bytes": "0040",
+            "offset": "0xf008",
+            "segment": "0x4000"
+          },
+          {
+            "bytes": "0040",
+            "offset": "0xf00a",
+            "segment": "0x4000"
+          },
+          {
+            "bytes": "0040",
+            "offset": "0xf00c",
+            "segment": "0x4000"
+          },
+          {
+            "bytes": "0000000000004d532052756e2d54696d65204c696272617279202d20436f707972696768742028632920313938382c204d6963726f736f667420436f72701100",
+            "offset": "0x2",
+            "segment": "0x3000"
+          },
+          {
+            "bytes": "000000004d532052756e2d54696d65204c696272617279202d20436f707972696768742028632920313938382c204d6963726f736f667420436f727011007363",
+            "offset": "0x4",
+            "segment": "0x3000"
+          },
+          {
+            "bytes": "4d532052756e2d54696d65204c696272617279202d20436f707972696768742028632920313938382c204d6963726f736f667420436f727011007363656e6572",
+            "offset": "0x8",
+            "segment": "0x3000"
+          },
+          {
+            "bytes": "2052756e2d54696d65204c696272617279202d20436f707972696768742028632920313938382c204d6963726f736f667420436f727011007363656e65727930",
+            "offset": "0xa",
+            "segment": "0x3000"
+          },
+          {
+            "bytes": "11007363656e657279302e657865007469746c6531362e7069630063726564697431362e706963006164762e70696300496e73756666696369656e7420667265",
+            "offset": "0x40",
+            "segment": "0x3000"
+          },
+          {
+            "bytes": "b063",
+            "offset": "0x63c6",
+            "segment": "0x3000"
+          },
+          {
+            "bytes": "00004800a0008d00f0009500a0008d000401950000006900980008001b0139000700c8631a000700fa003c0000000000000000004800a0009800f000a000a000",
+            "offset": "0x640c",
+            "segment": "0x3000"
+          },
+          {
+            "bytes": "7464",
+            "offset": "0x6480",
+            "segment": "0x3000"
+          },
+          {
+            "bytes": "0000000000004d532052756e2d54696d65204c696272617279202d20436f707972696768742028632920313938382c204d6963726f736f667420436f72701100",
+            "offset": "0x2",
+            "segment": "0x3000"
+          },
+          {
+            "bytes": "000000004d532052756e2d54696d65204c696272617279202d20436f707972696768742028632920313938382c204d6963726f736f667420436f72701100496e",
+            "offset": "0x4",
+            "segment": "0x3000"
+          },
+          {
+            "bytes": "4d532052756e2d54696d65204c696272617279202d20436f707972696768742028632920313938382c204d6963726f736f667420436f72701100496e73756666",
+            "offset": "0x8",
+            "segment": "0x3000"
+          },
+          {
+            "bytes": "2052756e2d54696d65204c696272617279202d20436f707972696768742028632920313938382c204d6963726f736f667420436f72701100496e737566666963",
+            "offset": "0xa",
+            "segment": "0x3000"
+          },
+          {
+            "bytes": "1100496e73756666696369656e742073797374656d206d656d6f7279202d20416c6c6f6342756666657224002e2e2e6465616c6c6f63206572726f722e2e2e24",
+            "offset": "0x40",
+            "segment": "0x3000"
+          },
+          {
+            "bytes": "a5a5",
+            "offset": "0xb386",
+            "segment": "0x3000"
+          },
+          {
+            "bytes": "a5a5",
+            "offset": "0x9d84",
+            "segment": "0x3000"
+          },
+          {
+            "bytes": "a5a5",
+            "offset": "0xca46",
+            "segment": "0x3000"
+          },
+          {
+            "bytes": "a5a5",
+            "offset": "0xb8c0",
+            "segment": "0x3000"
+          },
+          {
+            "bytes": "a5a5",
+            "offset": "0xca48",
+            "segment": "0x3000"
+          },
+          {
+            "bytes": "a5a5",
+            "offset": "0xbbc0",
+            "segment": "0x3000"
+          },
+          {
+            "bytes": "a5",
+            "offset": "0xc160",
+            "segment": "0x3000"
+          },
+          {
+            "bytes": "a5",
+            "offset": "0x7ff4",
+            "segment": "0x3000"
+          },
+          {
+            "bytes": "00",
+            "offset": "0x0",
+            "segment": "0xa000"
+          },
+          {
+            "bytes": "00",
+            "offset": "0x0",
+            "segment": "0x3a00"
+          }
+        ],
+        "observations": [
+          {
+            "offset": "0xb386",
+            "segment": "0x3000",
+            "size": 2
+          },
+          {
+            "offset": "0x9d84",
+            "segment": "0x3000",
+            "size": 2
+          },
+          {
+            "offset": "0xca46",
+            "segment": "0x3000",
+            "size": 2
+          },
+          {
+            "offset": "0xb8c0",
+            "segment": "0x3000",
+            "size": 2
+          },
+          {
+            "offset": "0xca48",
+            "segment": "0x3000",
+            "size": 2
+          },
+          {
+            "offset": "0xbbc0",
+            "segment": "0x3000",
+            "size": 2
+          },
+          {
+            "offset": "0xc160",
+            "segment": "0x3000",
+            "size": 1
+          },
+          {
+            "offset": "0x7ff4",
+            "segment": "0x3000",
+            "size": 1
+          }
+        ],
+        "oracle_entry": {
+          "offset": "0xb404",
+          "segment": "0xff0"
+        },
+        "registers": {
+          "bp": "0x0",
+          "di": "0x0",
+          "flags": "0x202",
+          "si": "0x0",
+          "sp": "0xf000"
+        },
+        "segments": {
+          "ds": "0x3000",
+          "es": "0x3000",
+          "ss": "0x4000"
+        }
+      },
+      "oracle": {
+        "detail": "",
+        "effective_flags_mask": "0x8d5",
+        "events": [],
+        "instructions": 100000,
+        "observations": [
+          {
+            "bytes": "a5a5",
+            "linear": "0x3b386"
+          },
+          {
+            "bytes": "a5a5",
+            "linear": "0x39d84"
+          },
+          {
+            "bytes": "a5a5",
+            "linear": "0x3ca46"
+          },
+          {
+            "bytes": "a5a5",
+            "linear": "0x3b8c0"
+          },
+          {
+            "bytes": "a5a5",
+            "linear": "0x3ca48"
+          },
+          {
+            "bytes": "a5a5",
+            "linear": "0x3bbc0"
+          },
+          {
+            "bytes": "a5",
+            "linear": "0x3c160"
+          },
+          {
+            "bytes": "a5",
+            "linear": "0x37ff4"
+          }
+        ],
+        "registers": {
+          "ax": "0x0",
+          "bp": "0xeffe",
+          "bx": "0x0",
+          "cs": "0x2000",
+          "cx": "0x0",
+          "di": "0x0",
+          "ds": "0x3000",
+          "dx": "0x0",
+          "eax": "0x0",
+          "ebp": "0xeffe",
+          "ebx": "0x0",
+          "ecx": "0x0",
+          "edi": "0x0",
+          "edx": "0x0",
+          "eflags": "0x246",
+          "es": "0x3000",
+          "esi": "0x0",
+          "esp": "0xefee",
+          "flags": "0x246",
+          "fs": "0x0",
+          "gs": "0x0",
+          "ip": "0xcbe",
+          "si": "0x0",
+          "sp": "0xefee",
+          "ss": "0x4000"
+        },
+        "status": "budget_exhausted",
+        "writes": [
+          {
+            "bytes": "c309f00f0eb40000",
+            "linear": "0x4efee"
+          },
+          {
+            "bytes": "0000",
+            "linear": "0x4effe"
+          }
+        ]
+      },
+      "status": "incomplete"
+    }
+  ],
+  "schema": "dosunit.real16_replay.v1",
+  "scope": "declared concrete vectors on relocated MZ images; segmented registers and caller frames are explicit; agreement is test evidence only and never a semantic proof",
+  "summary": {
+    "agreed": 0,
+    "incomplete": 5,
+    "mismatched": 0,
+    "total": 5
+  }
+}

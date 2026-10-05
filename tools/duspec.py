@@ -87,6 +87,78 @@ def arg_lit_off(mod, fn, callee, nth=0, argn=0):
     return hits[nth]
 
 
+_SLOT_CACHE = {}
+
+
+def overlay_slots(exe, odgrp):
+    """DSEG offsets of the runtime overlay jump table: stride-5 runs of
+    `EA` (jmp far) entries the drivers patch at install time.  Returns the
+    byte offset of each slot — patching slot[0] to 0xCB turns it into a
+    retf, matching the candidate build's compiled empty-thunk stubs."""
+    key = (exe, odgrp)
+    if key not in _SLOT_CACHE:
+        data = open(exe, 'rb').read()
+        hdr = struct.unpack('<H', data[8:10])[0] * 16
+        slots, i, end = [], odgrp, len(data) - hdr
+        while i < end - 5:
+            if data[hdr + i] == 0xEA:
+                j = i
+                while j + 5 <= end and data[hdr + j] == 0xEA:
+                    j += 5
+                if (j - i) // 5 >= 3:
+                    slots.extend(range(i, j, 5))
+                i = j
+            else:
+                i += 1
+        _SLOT_CACHE[key] = slots
+    return _SLOT_CACHE[key]
+
+
+def slot_stub_exe(exe, odgrp):
+    """Copy of the oracle exe with every runtime driver slot patched to
+    `xor ax,ax; retf` (31 c0 cb 90 90) — the load-image equivalent of the
+    candidate's compiled empty-thunk stubs, which return ax=0.  Patches
+    can't do this (dosunit refuses memory writes over declared code); the
+    bytes must ride in via the image.  Cached under build/."""
+    out = os.path.join(ROOT,
+                       'build/%s-slotstub.EXE' % os.path.basename(exe)[:-4])
+    if not os.path.exists(out):
+        data = bytearray(open(exe, 'rb').read())
+        hdr = struct.unpack('<H', data[8:10])[0] * 16
+        for s in overlay_slots(exe, odgrp):
+            data[hdr + s:hdr + s + 5] = b'\x31\xc0\xcb\x90\x90'
+        open(out, 'wb').write(bytes(data))
+    return out
+
+
+def int_stub_exe(exe, base, sites):
+    """Copy of the oracle exe with each `int NN` (CD xx) site the routine's
+    near-call graph reaches patched to `xor ax,ax` (31 c0) — a bounded
+    "service succeeded, ax=0" answer matching the cand build's
+    zero-returning int21/file helpers.  Fixture (not a vector patch)
+    because declared instruction bytes are immutable.  `base` is an
+    already-derived fixture path (e.g. slotstub) or the original exe.
+    Cached per unique (base content, site list) pair — the test-exe
+    candidates relink on every source change, so the tag must cover the
+    input bytes or a stale image would be replayed with shifted data
+    offsets."""
+    import hashlib
+    src = open(base, 'rb').read()
+    tag = hashlib.md5(src + b''.join(s.to_bytes(2, 'little')
+                                     for s in sites)).hexdigest()[:8]
+    out = os.path.join(ROOT, 'build/%s-ints-%s.EXE'
+                       % (os.path.basename(exe)[:-4], tag))
+    if not os.path.exists(out):
+        data = bytearray(src)
+        hdr = struct.unpack('<H', data[8:10])[0] * 16
+        for s in sites:
+            assert data[hdr + s] == 0xCD, \
+                '%s@%#x byte=%#x' % (base, s, data[hdr + s])
+            data[hdr + s:hdr + s + 2] = b'\x31\xc0'
+        open(out, 'wb').write(bytes(data))
+    return out
+
+
 def emit(cases, out_path):
     spec = []
     for c in cases:
@@ -144,6 +216,34 @@ def emit(cases, out_path):
 
         if 'patch' in c:
             case['patches'] = cells(c['patch'])
+        if c.get('stub_slots'):
+            # runtime driver slots -> retf via a pre-patched oracle image
+            # (the candidate's thunk stubs already no-op).  code_o must
+            # also cover the slot table or the lcall still trips
+            # fetch_outside_declared_code.
+            slots = overlay_slots(exe, odgrp)
+            case['oracle_exe'] = slot_stub_exe(exe, odgrp)
+            case['code_o'] = [[0, odgrp],
+                              [min(slots), max(slots) + 5 - min(slots)]]
+        if c.get('int_stub'):
+            # reachable `int NN` sites -> xor ax,ax via a prepatched oracle
+            # image (bounded "service ok, ax=0" — cand helpers already
+            # return 0).  Sites are image offsets; all in-extent so the
+            # existing code_o window already covers them.
+            try:
+                case['oracle_exe'] = int_stub_exe(
+                    exe, case.get('oracle_exe', exe), c['int_stub'])
+            except AssertionError as e:
+                raise AssertionError('%s: %s' % (c['fn'], e))
+        if c.get('int_stub_c'):
+            # symmetric stub for the candidate test exe: its linked
+            # skeleton/CRT helpers carry their own int NN sites.
+            cexe = os.path.join(ROOT, 'build/%s.EXE' % mod)
+            try:
+                case['cand_exe'] = int_stub_exe(
+                    cexe, case.get('cand_exe', cexe), c['int_stub_c'])
+            except AssertionError as e:
+                raise AssertionError('%s(c): %s' % (c['fn'], e))
         if 'obs' in c:
             case['observe'] = cells(c['obs'])
         vecs = []

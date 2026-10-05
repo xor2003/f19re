@@ -81,12 +81,12 @@ struct SpriteParams {
 struct SpriteParams blitSpriteParams;   /* @0x5856 */
 int16 gfxBufPtr;
 uint8 g_drawPage;
-void gfx_blitSpriteClipped(int16 *p) {}
-void gfx_blitSpriteOpaque(int16 *p) {}
+void far gfx_blitSpriteClipped(int16 *p) {}
+void far gfx_blitSpriteOpaque(int16 *p) {}
 int16 g_lineX1, g_lineX2, g_lineY1, g_lineY2, g_viewCenterX, g_viewCenterY;
 char far *g_modelStreamPtr;
-void gfx_setColor(uint8 c) {}
-void drawClipLineGlobal(void) {}
+void far gfx_setColor(uint8 c) {}
+void far drawClipLineGlobal(void) {}
 
 int16 g_modelEdgeCount, g_vtxSignMaskLo = 0, g_vtxSignMaskHi = 0;
 int8 g_modelWideVtxFlag;
@@ -94,12 +94,12 @@ int8 g_modelWideVtxFlag;
 struct VpParms { int16 f[11]; };
 struct VpParms *g_vpParms;
 int16 g_clipMaxX, g_clipMaxY;
-int16 gfx_clipWindow(int16 a, int16 b) { return 0; }
-void gfx_setOrigin(int16 a) {}
-void gfx_restoreVp(void) {}
+int16 far gfx_clipWindow(int16 a, int16 b) { return 0; }
+void far gfx_setOrigin(int16 a) {}
+void far gfx_restoreVp(void) {}
 /* drawClippedLine: real port now lives in src_end/enbrief.c */
 
-void gfx_nop23(void) {}
+void far gfx_nop23(void) {}
 
 int8 g_objShade;
 void far renderSortedListFar(void) {}
@@ -139,7 +139,7 @@ int16 far transformAndCullObjectFar(int16 a, int16 b, int16 c) { return 0; }
 
 int16 g_viewCenterY2;
 
-int16 g_hudVisible;
+int16 g_hudVisible = 1;                     /* oracle dseg:0x4efa init */
 int8 g_halfScaleRender;
 int16 g_overlayCenterX, g_overlayCenterY;
 int16 g_clipMaxX, g_clipMaxY;
@@ -275,7 +275,9 @@ void FAR gfx_copyRect(int16 a,int16 b,int16 c,int16 d,int16 e,int16 f,int16 g,in
 int16 pageFrontBuf[1] = {0}, pageBackBuf[1] = {0}, pageOffBuf[1] = {0};
 
 int16 g_threatActiveTimer, g_threatTimerInit, g_threatRefX, g_threatRefY, g_threatRefZ, g_threatRefHead;
-int16 g_unusedEventHist0, g_planeScanCount, g_missionStatus, g_difficultyTier;
+int16 g_unusedEventHist0, g_planeScanCount;
+int16 g_missionStatus = 1;                        /* oracle dseg:0x4ef0 init */
+int16 g_difficultyTier;
 int16 g_playerPlaneFlags, g_bombDamageMask, g_gunHits, g_damageTakenFlag;
 int16 g_viewX_, g_viewY_, g_viewZ, g_ourHead, g_autopilotEngaged, waypointIndex;
 char strBuf[64];
@@ -306,7 +308,7 @@ struct { int8 name[8]; int16 lethality, dangerTier, flags; } g_samSpecs[16]; /* 
 int16 g_inputDisabled, g_axisInputAccum[4], g_soundPriorityFloor, g_ejectState;
 int16 g_smokeTimer;                    /* word_34B0A — flag-0x20 duration counter */
 int8 g_commEventFlag;                  /* byte_38D18 */
-int16 g_frameRateScaling, g_frameSyncWait, g_timeAccelMode, g_bulletTrackCount;
+int16 g_frameRateScaling = 4, g_frameSyncWait, g_timeAccelMode, g_bulletTrackCount;
 int16 g_threatDisplayTtl;
 int16 FAR misc_readJoystick(int16 a) { return 0; }
 void FAR audio_playSound(int16 a) {}
@@ -469,12 +471,26 @@ int16 g_altitude, g_startRange;        /* word_33578/36E22 */
 int16 missileSpecIndex;                /* word_33D80 — selected missile slot */
 int16 g_lastMissileSlot;               /* word_36E1E — last fired projectile slot */
 int16 computeLoftAngle(void) { return 0; }   /* sub_1CAF2 */
-int16 missleSpec[0x10];                /* @0x4F00 4B {weaponIdx,ammo} records */
-int16 missiles[0x140];                 /* @0x4F24 26B records */
+int16 missleSpec[0x10] = {1, 3, 0x10, 1, 5, 3, 9, 3};
+                                     /* @0x4EDA 4B {weaponIdx,ammo} records —
+                                        oracle init: 4 loadout slots */
+struct Missile { char shortName[10]; char longName[12];
+                 int16 specIndex; int16 weaponCategory; };
+struct Missile missiles[20] = {        /* @0x4EFE 26B records — oracle init */
+    {"AIM-9M",  "Sidewinder", 0x17, 4}, {"AIM-120", "AMRAAM",    0x16, 3},
+    {"AGM-88A", "HARM",       0x18, 1}, {"P3 ASM",  "Penguin",   0x19, 2},
+    {"AGM-86A", "Harpoon",    0x1A, 1}, {"AGM-65D", "Maverick",  0x1B, 2},
+    {"GBU-12",  "Paveway",    0x1C, 2}, {"Mk 20",   "Rockeye",   0x1D, 2},
+    {"Dndl",    "Durandal",   0x1D, 2}, {"Mk 82-0", "Slick",     0x1E, 3},
+    {"Mk 82-1", "Snakeye",    0x1D, 3}, {"Mk 20",   "Rockeye II",0x1C, 2},
+    {"Mk 122",  "Fireeye",    0x1E, 2}, {"CBU-72",  "Fuel-Air",  0x1C, 2},
+    {"Mk 35",   "IN Cluster", 0x1D, 2}, {"ISC B-1", "Minelets",  0x1D, 1},
+    {"135 mm",  "Camera",     -1,   1}, {"1900lbs", "Extra Fuel",-2,   1},
+    {"20 mm",   "Guns",        0,   1}, {"Special", "Equip",     0x26, 1}};
 int16 g_wpnSpriteX[4], g_wpnSpriteY[4];    /* @0x5968/@0x5970 sprite src */
 int16 sams[0x80];                      /* @0x4C36 18B records */
 int16 g_keyCode;                        /* word_384CE: pending keycode */
-int16 g_threatScopeRange;               /* word_343B2: threat gauge level / scope range */
+int16 g_threatScopeRange = 4;           /* word_343B2: threat gauge level / scope range — oracle init */
 int16 g_scopeSweepTimer;                /* word_343C0: threat-scope sweep countdown */
 int16 g_prevScopeRange;                 /* word_384F6: last drawn scope range */
 int16 g_scopeArcRange;                  /* word_3831A */
@@ -774,7 +790,7 @@ int16 rtcTickBuf;                            /* dseg:0x3e24 */
 int16 rtcTickSaved;                          /* dseg:0x9920 */
 void  sub_167FD(void) { }
 void  sub_16208(void) { }
-int16 sub_148FE(int16 h, int16 n, int16 b) { return h; }   /* int21h raw read */
+int16 sub_148FE(int16 h, int16 n, int16 b) { return 0; }   /* int21h raw read */
 void  sub_15152(char *d, const char far *s) { }            /* far-src strcpy */
 int16 sub_15B22(int16 a, int16 b) { return a; }
 int16 word_22322;                                         /* scratch buf cursor */
@@ -843,7 +859,7 @@ void  wrapUnitTextFar(int16 a, char far *s, int16 w, int16 x, int16 y, int16 b) 
 #endif
 void  sub_151FE(char *d, uint8 *s, int16 n) { }        /* near copy */
 void  sub_1521C(char *d, char far *s, int16 n) { }     /* far copy */
-uint32 rngState;                                       /* dseg:0x7a50 LCG state */
+uint32 rngState = 1;                                   /* dseg:0x622c LCG seed init */
 int16 sub_150BA(void) { return 0; }                    /* int 1Ah tick read */
 /* stutil.c drawRoutePath deps */
 int16 pathWpA, pathWpB, pathWpC, pathWpD;              /* dseg:0xb94a/48/5a/5c */

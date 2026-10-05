@@ -127,7 +127,7 @@ def mem_refs(img, hdr, off, end=None):
     trusted for joining.
     """
     md = capstone.Cs(capstone.CS_ARCH_X86, capstone.CS_MODE_16)
-    pulls, stores = set(), []
+    pulls, stores, segptrs = {}, [], set()
     seen_st = set()
     for i in md.disasm(img[hdr + off:hdr + off + span], off):
         dst = i.op_str.split(',', 1)[0]
@@ -141,14 +141,204 @@ def mem_refs(img, hdr, off, end=None):
                 imm = (-imm) & 0xFFFF
             if seg == 'ss' or reg == 'bp':
                 continue                    # SS-relative — not DS scratch
-            pulls.add(imm)
+            # direct [imm] -> seed just that cell; indexed [reg+imm] ->
+            # seed a forward span: probe regs start at 0 but arg*stride
+            # products land the effective address past the bare cell —
+            # an unseeded divisor/table cell there faults interrupt:0
+            # or reads an untouched image byte asymmetrically.
+            want = 2 if reg is None else 0x40
+            pulls[imm] = max(pulls.get(imm, 0), want)
             if is_dst and i.mnemonic in WRITE_MN and reg is None \
                     and imm not in seen_st:
                 seen_st.add(imm)
                 size = 4 if 'dword' in i.op_str else \
                        1 if 'byte ptr' in i.op_str else 2
                 stores.append((imm, size))
-    return sorted(pulls), stores
+            # direct [imm] cells consumed as far-pointer parts: les/lds
+            # reads a dword (off@imm, seg@imm+2); `mov es,[imm]` loads
+            # the cell itself as a segment.  A natural image seg value
+            # dereferences unmapped space, so these cells get forced to
+            # the scratch DS at patch time.
+            if i.mnemonic in ('les', 'lds') and reg is None:
+                segptrs.add(imm + 2)
+            elif i.mnemonic == 'mov' and is_dst is False and reg is None \
+                    and i.op_str.split(',', 1)[0].strip() in ('es', 'ds'):
+                segptrs.add(imm)
+    return pulls, stores, sorted(segptrs)
+
+
+def _bp_disp(i):
+    """Signed [bp+d] disp of a no-index mem operand, or None."""
+    for op in i.operands:
+        if op.type == capstone.x86.X86_OP_MEM \
+                and op.mem.base == capstone.x86.X86_REG_BP \
+                and op.mem.index == capstone.x86.X86_REG_INVALID:
+            d = op.mem.disp
+            return d - 0x10000 if d > 0x7FFF else d
+    return None
+
+
+def far_arg_sites(img, hdr, off, end):
+    """Arg word indices consumed as far pointers.  Under the near16 probe
+    frame arg word w sits at [bp+4+2w] (push bp; mov bp,sp).  Sites:
+
+      les/lds r16, [bp+d]            -> ptr pair at words (d-4)/2, +1
+      push [bp+d+2]; push [bp+d]     -> far ptr forwarded by value to a
+                                       callee (adjacent hi/lo pushes)
+      mov es/ds, word ptr [bp+d]     -> manual seg load; off part is the
+                                       word below -> pair (d-6)/2, (d-4)/2
+
+    Fixed probe args point those words at unmapped segments; gen_probe
+    rewrites them into a seeded window inside the mapped scratch DS."""
+    md = capstone.Cs(capstone.CS_ARCH_X86, capstone.CS_MODE_16)
+    md.detail = True
+    insns = list(md.disasm(img[hdr + off:hdr + end], off))
+    idx = set()
+    has_far = False
+    run = []                     # descending [bp+d] push run, newest last
+    for i in insns:
+        d = _bp_disp(i)
+        if i.mnemonic in ('les', 'lds'):
+            has_far = True
+            if d is not None and 4 <= d <= 0x20 and d % 2 == 0:
+                idx.add((d - 4) // 2)
+        elif i.mnemonic == 'mov' and i.operands \
+                and i.operands[0].type == capstone.x86.X86_OP_REG \
+                and i.operands[0].reg in (capstone.x86.X86_REG_ES,
+                                          capstone.x86.X86_REG_DS):
+            if d is not None and 6 <= d <= 0x20 and d % 2 == 0:
+                idx.add((d - 6) // 2)
+                has_far = True
+        if i.mnemonic == 'push' and d is not None and d % 2 == 0:
+            if run and d != run[-1] - 2:
+                if len(run) >= 2:
+                    # each adjacent descending pair is a *possible* far
+                    # ptr forward — flag all of them; word values are
+                    # assigned so any pair decodes to mapped space.
+                    for lo in run[1:]:
+                        if 4 <= lo <= 0x1E:
+                            idx.add((lo - 4) // 2)
+                run = []
+            run.append(d)
+        elif i.mnemonic != 'push' or d is None:
+            if len(run) >= 2:
+                for lo in run[1:]:
+                    if 4 <= lo <= 0x1E:
+                        idx.add((lo - 4) // 2)
+            run = []
+    if len(run) >= 2:
+        for lo in run[1:]:
+            if 4 <= lo <= 0x1E:
+                idx.add((lo - 4) // 2)
+    if has_far:
+        # local far ptrs are commonly filled by an adjacent dword arg
+        # read (`mov ax,[bp+6]; mov dx,[bp+8]` into a local that a later
+        # les consumes) — flag the covered arg pair as well.
+        for k in range(len(insns) - 1):
+            a, b = insns[k], insns[k + 1]
+            if a.mnemonic != 'mov' or b.mnemonic != 'mov':
+                continue
+            if not (a.operands and a.operands[0].type ==
+                    capstone.x86.X86_OP_REG) \
+                    or not (b.operands and b.operands[0].type ==
+                            capstone.x86.X86_OP_REG):
+                continue
+            da, db = _bp_disp(a), _bp_disp(b)
+            if da is None or db is None or abs(da - db) != 2:
+                continue
+            lo = min(da, db)
+            if 4 <= lo <= 0x1E and lo % 2 == 0:
+                idx.add((lo - 4) // 2)
+    return sorted(idx)
+
+
+def free_window(used, total):
+    """Lowest scratch-DS offset with `total` contiguous bytes clear of
+    every patched cell in `used` (sorted (lo,hi) intervals)."""
+    cur = 0
+    for lo, hi in used:
+        if lo - cur >= total:
+            return cur
+        cur = max(cur, hi)
+    return cur if 0x10000 - cur >= total else None
+
+
+def reaches_lcall(img, hdr, off, end):
+    """True when the routine's near-call graph can reach an `lcall` (0x9A)
+    into the runtime overlay/driver jump table.  BFS over rel16 call
+    targets inside the image, bounded — misses are just kept-incomplete,
+    never misflagged cases."""
+    md = capstone.Cs(capstone.CS_ARCH_X86, capstone.CS_MODE_16)
+    imax = len(img) - hdr
+    seen, work, budget = set(), [(off, end)], 3000
+    while work and budget > 0:
+        cur, cend = work.pop()
+        if cur in seen or not (0 <= cur < imax):
+            continue
+        seen.add(cur)
+        for i in md.disasm(img[hdr + cur:hdr + min(cend, imax)], cur):
+            budget -= 1
+            if not budget or i.mnemonic in ('ret', 'retf', 'iret'):
+                break
+            if i.bytes and i.bytes[0] == 0x9A:
+                return True
+            if i.bytes and i.bytes[0] in (0xE8, 0xE9):
+                disp = int.from_bytes(i.bytes[1:3], 'little', signed=True)
+                tgt = (i.address + 3 + disp) & 0xFFFF
+                if 0 <= tgt < imax:
+                    work.append((tgt, min(tgt + 0x400, imax)))
+            elif i.bytes and i.bytes[0] == 0xEB:
+                disp = int.from_bytes(i.bytes[1:2], 'little', signed=True)
+                tgt = (i.address + 2 + disp) & 0xFFFF
+                if 0 <= tgt < imax:
+                    work.append((tgt, min(tgt + 0x400, imax)))
+    return False
+
+
+def find_ints(img, hdr, off, end):
+    """Image offsets of `int NN` instructions reachable through the
+    routine's call graph — BFS over rel16 call/jmp targets and lcall
+    seg:off immediates inside the image.  Callee windows extend to the
+    first ret (big file-IO helpers exceed a fixed 0x400 cap).  duspec
+    turns them into a prepatched oracle fixture (`CD xx` -> `31 C0` xor
+    ax,ax: a bounded "service succeeded, ax=0" answer symmetric to the
+    cand build's zero-returning stubs).  int3/into/iret are left alone."""
+    md = capstone.Cs(capstone.CS_ARCH_X86, capstone.CS_MODE_16)
+    imax = len(img) - hdr
+    seen, work, budget = set(), [(off, end)], 40000
+    sites = []
+    while work and budget > 0:
+        cur, cend = work.pop()
+        if cur in seen or not (0 <= cur < imax):
+            continue
+        seen.add(cur)
+        for i in md.disasm(img[hdr + cur:hdr + min(cend, imax)], cur):
+            budget -= 1
+            if not budget or i.mnemonic in ('ret', 'retf', 'iret'):
+                break
+            if i.bytes and i.bytes[0] == 0xCD and i.address not in seen:
+                seen.add(i.address)
+                sites.append(i.address)
+            if i.bytes and i.bytes[0] in (0x9A, 0xEA):
+                # lcall / jmp far seg:off — image offsets are link-linear
+                # (seg*16+off): resident far helpers, driver routines and
+                # resident-driver table entries all land inside the image.
+                tgt = (int.from_bytes(i.bytes[3:5], 'little') * 16
+                       + int.from_bytes(i.bytes[1:3], 'little'))
+                if 0 <= tgt < imax:
+                    work.append((tgt, min(tgt + 0x1800, imax)))
+            if i.bytes and i.bytes[0] in (0xE8, 0xE9):
+                # near call/jump rel16 — jmp covers tail-called helpers
+                disp = int.from_bytes(i.bytes[1:3], 'little', signed=True)
+                tgt = (i.address + 3 + disp) & 0xFFFF
+                if 0 <= tgt < imax:
+                    work.append((tgt, min(tgt + 0x1800, imax)))
+            elif i.bytes and i.bytes[0] == 0xEB:
+                disp = int.from_bytes(i.bytes[1:2], 'little', signed=True)
+                tgt = (i.address + 2 + disp) & 0xFFFF
+                if 0 <= tgt < imax:
+                    work.append((tgt, min(tgt + 0x1800, imax)))
+    return sorted(sites)
 
 
 def covered():
@@ -237,8 +427,8 @@ for suite, cfg in SUITES.items():
             skipped.append((name, 'not in cand map'))
             continue
 
-        o_pull, o_st = mem_refs(oimg, ohdr, f_o, e_o)
-        c_pull, c_st = mem_refs(cimg, chdr, f_c, e_c)
+        o_pull, o_st, o_seg = mem_refs(oimg, ohdr, f_o, e_o)
+        c_pull, c_st, c_seg = mem_refs(cimg, chdr, f_c, e_c)
         # instruction-order paired store-cell obs: byte-exact ports put the
         # i-th DS store on both sides at the same logical cell.  A count
         # mismatch means the paths diverged structurally — skip obs rather
@@ -254,25 +444,83 @@ for suite, cfg in SUITES.items():
         # layout-legit differences masquerading as behavior diffs.
         sent = {'o': {o for o, _, _ in obs}, 'c': {c for _, c, _ in obs}}
         patch = []
-        for off in o_pull:
-            if off + 2 <= odata_end and off not in sent['o']:
-                patch.append((off, None, 2))
-        for off in c_pull:
-            if off + 2 <= cdata_end and off not in sent['c']:
-                patch.append((None, off, 2))
+        for off, psz in sorted(o_pull.items()):
+            psz = min(psz, odata_end - off)
+            if psz > 0 and off not in sent['o']:
+                patch.append((off, None, psz))
+        for off, psz in sorted(c_pull.items()):
+            psz = min(psz, cdata_end - off)
+            if psz > 0 and off not in sent['c']:
+                patch.append((None, off, psz))
         patch += [(o, c, sz, 'a5' * sz) for o, c, sz in obs]
+        # Cells consumed as far-pointer segments: force the scratch DS so
+        # the deref stays in mapped space (image seg values point nowhere;
+        # the seg half of a les/lds dword is otherwise left unpatched).
+        dsle = struct.pack('<H', int(ds, 0)).hex()
+        for off in o_seg:
+            patch.append((off, None, 2, dsle))
+        for off in c_seg:
+            patch.append((None, off, 2, dsle))
+        # Resident-driver callees (fillRect/putpixel family, reached via
+        # lcall into the resident table) do rep-stosb writes to the video
+        # page globals — natural values like 0xA000/0x3A00 land in
+        # unmapped guest space.  Naming a segment in any patch maps its
+        # whole 64K window (see real16_guest._segment_pages); one byte at
+        # each video base turns those faults into real execution.
+        patch.append({'seg': '0xa000', 'off': '0x0', 'bytes': '00'})
+        patch.append({'seg': '0x3a00', 'off': '0x0', 'bytes': '00'})
 
         rt = defs[name]
         regs = (['ax', 'dx'] if rt in ('int32', 'uint32', 'long')
                 else [] if rt == 'void' else ['ax'])
         if not regs and not obs:
             vacuous.append(name)    # void + no paired stores = nothing checks
+
+        # Far-pointer args: fixed probe vectors fill arg words with scalars
+        # whose seg half lands in unmapped space (unmapped_access aborts
+        # before any real code runs).  far_arg_sites flags pair STARTS;
+        # which adjacent word pair is the real ptr is ambiguous (push-run
+        # order is callee-dependent), so every flagged WORD gets a
+        # distinct 0x800x value — any seg:off reading then resolves to a
+        # seg in 0x8000-0x8fff, all inside one mapped/seeded window.
+        vecs = VECTORS
+        fa = set(far_arg_sites(oimg, ohdr, f_o, e_o))
+        fa |= set(far_arg_sites(cimg, chdr, f_c, e_c))
+        words = sorted({w for i in fa for w in (i, i + 1)})
+        if words:
+            hi = words[-1]
+            # any pair (0x8000+4s : 0x8000+4o) resolves to linear
+            # 0x88000+0x40s+0x4o — seed the 0x400 window it lands in.
+            seed = (b'PROBE-EDGE-SEED-0123456789-ABCDEF-0123456789-'
+                    b'abcdef' + b'\0' * 0x80)[:0x100] * 4
+            vecs = []
+            for v in VECTORS:
+                a = list(v) + [0] * max(0, hi + 1 - len(v))
+                ps = [{'seg': '0x8000', 'off': '0x8000',
+                       'bytes': seed.hex()}]
+                for w in words:
+                    a[w] = 0x8000 + w * 4
+                vecs.append({'args': a, 'patch': ps})
+
         case = {'fn': name, 'exe': cfg['exe'], 'mod': cfg['mod'],
-                'ds': ds, 'patch': patch, 'vectors': VECTORS}
+                'ds': ds, 'patch': patch, 'vectors': vecs}
         if obs:
             case['obs'] = obs
         if regs != ['ax']:
             case['regs'] = regs
+        # Stub every oracle driver slot to retf unconditionally: near-BFS
+        # can't see lcalls hidden behind indirect dispatch (printObjective
+        # escapes at a slot with no static 0x9A in its call graph), and the
+        # slotstub fixture is inert for routines that never reach one —
+        # it changes only driver-ABI bytes inside DGROUP that no sane
+        # routine reads as data.
+        case['stub_slots'] = True
+        ints = find_ints(oimg, ohdr, f_o, e_o)
+        if ints:
+            case['int_stub'] = ints
+        cints = find_ints(cimg, chdr, f_c, e_c)
+        if cints:
+            case['int_stub_c'] = cints
         cases.append(case)
 
     # shard into ~25-case files so each replay group finishes within the

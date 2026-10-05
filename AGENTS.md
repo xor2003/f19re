@@ -166,11 +166,29 @@ mzmap (jump-table headers, no call-reachable exports).
 
    Generic probe sweep: `python3 dosunit/gen_probe.py` emits probe_<exe>_N
    specs (5 fixed 6-word vectors per ported routine, bounded extents,
-   sentinel-seeded store obs); `DOSUNIT_ILIMIT=50000 python3
-   tools/dosunit16.py dosunit/probe_<exe>_N.json` runs them (lower ilimit
-   for skeleton-loopers). Result: ~609 AGREE / 0 unresolved DIFF — every
-   routine has a case; `python3 dosunit/coverage.py` prints the inventory
+   sentinel-seeded store obs); `DOSUNIT_ILIMIT=100000 python3
+   tools/dosunit16.py dosunit/probe_<exe>_N.json` runs them. Every probe
+   case unconditionally uses the oracle slotstub fixture (driver-ABI
+   far-jump slots in DGROUP patched `EA`->`xor ax,ax; retf` — near-BFS
+   can't see lcalls hidden behind indirect dispatch, and the fixture is
+   inert for routines that never reach a slot). `find_ints` BFS follows
+   rel16 calls, jmp tail-calls, short jumps and lcall seg:off immediates
+   (40K-insn budget — initGraphics' graph alone spans 206 regions);
+   reachable `int NN` sites get a cached prepatched fixture
+   build/<EXE>-ints-<tag>.EXE with `CD xx`->`xor ax,ax` (bounded
+   "service succeeded, ax=0", symmetric to the cand build's
+   zero-returning helpers) on BOTH sides (int_stub_c covers the cand
+   image's own CRT/skeleton int sites). Result: `python3
+   dosunit/coverage.py` prints the inventory
    (dedicated/probe-agree/probe-mix/artifact/incomplete/skipped).
+   Latest full sweep (all 4 test exes rebuilt post missile-table init
+   fix): 64 dedicated + 185 probe-agree + 13 probe-mix + 7 artifact +
+   37 incomplete + 5 skipped — 0 diff, 0 uncovered across all 311
+   ported routines.  Fixture cache keys cover base content, so
+   post-relink regen (`gen_probe.py`) is mandatory before trusting
+   probe diffs — stale int-stub fixtures replay pre-relink data
+   offsets and produce systematic false DIFFs (bombTarget,
+   updateThreatTargeting were both this).
 
    Dedicated edge specs: `python3 dosunit/gen_edge.py` regenerates
    dosunit/edge.json — disassembles both sides, pairs DS operands
@@ -182,14 +200,23 @@ mzmap (jump-table headers, no call-reachable exports).
    provenance-suspect (own-image name tables); obs_drop skips pointer-
    constant stores. Currently 8 cases / 36 vectors all AGREE, incl.
    fireAirThreat on the ~630-insn real path and loadWorldStrings' full
-   movedata chain off a synthetic comm-buf world image.
+   movedata chain off a synthetic comm-buf world image. NB: edge's
+   MOVEDST/BUFPOS/WORLDSRC cand offsets are hardcoded per test-exe
+   layout — re-derive by disasm after every relink (last verified
+   layout: STGEN moveDst 0x3f18 pos 0x686e, ENBRIEF head 0x5966).
 
    Incomplete taxonomy (not regressions — sandbox limits):
-   - overlay/xseg call (~77): routine calls into unloaded overlay space
-     past the image end (fetch_outside_declared_code).
-   - int instruction (~38): int21 file/alloc calls the sandbox doesn't
-     service (interrupt_or_iret).
-   - hardware io (3): in/out + cli/sti (device_io_or_halt).
+   - unmapped_access:19/20: routines dereference far-ptr args the fixed
+     vectors fill with unmapped segments (drawFarString, fillRectBoth
+     etc.) — need dedicated specs pointing args at scratch DS.
+   - interrupt:0 one-sided: div0 on a vector whose divisor cell wasn't
+     pull-seeded (clip/draw family, info panels) — need index-aware
+     seeding or dedicated specs.
+   - budget_exhausted: loops proportional to args or unterminated
+     do-while scans (advanceBufPos, selectNext*, wrapUnitText*,
+     drawMapView PIC decode, alloc* on ax=0 retry) — symmetric loop
+     exhaustion counts AGREE-FAULT; asymmetric needs seeded bounds.
+   - device_io_or_halt (in/out port io): delayTicks, sub_10E5F.
    - 5 skipped entry points (main/gfxInit/runGameSession/...) — frame
      unsynthesizable.
    - artifact class: diffs proven to be probe mechanics, listed in

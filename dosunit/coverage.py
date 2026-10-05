@@ -32,6 +32,21 @@ ARTIFACTS = {
     'loadWorldStrings': 'stores runtime pointer values (binary-relative)',
     'sub_10E84': 'calls unported stub sub_11C4E (returns 0)',
     'memAppend': 'movedata dst seg pulled from image overlaps obs cell',
+    # slot-stub era: routine runs to completion; residual diffs are cells
+    # holding own-image pointers or init-table-derived values — binary
+    # provenance, not port behavior.  A dedicated spec could add scalar
+    # signal later, but nothing here indicates a port bug.
+    'drawRiskPanel': 'esTabBase stores own esTable address (pointer)',
+    'processDebriefInput': 'colorTablePtr stores own colorStyleTable address',
+    'sub_15D1B': 'popupXY from flightRecords init-table + mapToScreen*',
+    'drawViewportLine': 'clip coords via g_vpParms own-image struct',
+    'updateThreatSites': 'store pattern driven by planeTable init data',
+    # paired-store cross-wire: oracle flag cells are ADJACENT (0x5524/0x5526)
+    # while cand mirrors are far apart (0x64c2/0x1a90); positional pairing
+    # swapped them.  Mirrored stores DO match — both sides test+store ffff
+    # to their first flag cell in the same order; oracle's extra 0x551e
+    # clear and cand's 0x4e7e/0x4e8a clears are init-table-driven.
+    'renderFrame': 'paired obs cross-wired (adjacent o cells vs split c cells)',
 }
 SKIP = {  # entry points / unsynthesizable — kept in sync with gen_probe.SKIP
     'main', 'gfxInit', 'installCBreakHandler', 'setInt9Handler',
