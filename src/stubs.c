@@ -261,7 +261,7 @@ struct CommData FAR *commData;
 
 int16 g_scopeClipLeft = 0, g_scopeClipRight = 0, g_scopeClipTop = 0, g_scopeClipBottom = 0;
 int16 g_mapMode = 0;
-int16 g_panelLabelOn;
+int16 g_panelLabelOn = 1;   /* oracle inits the cell to 1 (word_33BEA=0001) */
 int16 *g_pageFront, *g_pageBack;
 union REGS regs;
 

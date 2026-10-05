@@ -15,10 +15,13 @@ import json, os, re, struct, subprocess, sys
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 F19EN = '/home/xor/games/f19/F19'
+# oracle dgrp = image offset of the DATA segment (from map/<x>_en.map's
+# DATA decl) — used to pull oracle image bytes for size-patches and to
+# default the oracle code window over every code segment.
 EXE = {'EGAME': (F19EN + '/EGAME.EXE', 'map/egame_en.map', 126192),
-       'START': (F19EN + '/START.EXE', 'map/start_en.map',  98816),
-       'END':   (F19EN + '/END.EXE',   'map/end_en.map',   None),
-       'SU':    (F19EN + '/SU.EXE',    'map/su_en.map',    None)}
+       'START': (F19EN + '/START.EXE', 'map/start_en.map',  65536),
+       'END':   (F19EN + '/END.EXE',   'map/end_en.map',    40336),
+       'SU':    (F19EN + '/SU.EXE',    'map/su_en.map',     12224)}
 
 
 def cand_off(map_path, sym):
@@ -100,7 +103,7 @@ def emit(cases, out_path):
         case = {'fn': c['fn'], 'oracle_exe': exe, 'oracle_map': omap,
                 'cand_exe': 'build/%s.EXE' % mod, 'cand_map': cmap,
                 'ds': c.get('ds', '0x6000'),
-                'code_o': c.get('code_o', [[0, 64896]]),
+                'code_o': c.get('code_o', [[0, odgrp or 64896]]),
                 'code_c': code_c}
         if odgrp is not None:
             case['oracle_dgrp'] = odgrp

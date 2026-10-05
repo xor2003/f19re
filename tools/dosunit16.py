@@ -271,9 +271,11 @@ def main():
         cmd = [VPY, '-m', 'tools.dosunit.dosunit', 'replay-real16',
                '--oracle-exe', oracle_exe, '--candidate-exe', cand_exe,
                '--vectors', vec_path, '--out', out_path,
-               '--instruction-limit', '200000']
+               '--instruction-limit',
+               os.environ.get('DOSUNIT_ILIMIT', '200000')]
         r = subprocess.run(cmd, cwd=VEXTEST, capture_output=True, text=True,
-                           timeout=600)
+                           timeout=int(os.environ.get('DOSUNIT_TIMEOUT',
+                                                      '1800')))
         if r.returncode not in (0, 1, 2) or not os.path.exists(out_path):
             print('dosunit failed:', r.stdout[-500:], r.stderr[-500:])
             return 1

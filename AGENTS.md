@@ -164,6 +164,38 @@ mzmap (jump-table headers, no call-reachable exports).
    stubs.c supplies real sine/fixedMulQ14 (asm-faithful) so test-EXEs
    exercise true math.
 
+   Generic probe sweep: `python3 dosunit/gen_probe.py` emits probe_<exe>_N
+   specs (5 fixed 6-word vectors per ported routine, bounded extents,
+   sentinel-seeded store obs); `DOSUNIT_ILIMIT=50000 python3
+   tools/dosunit16.py dosunit/probe_<exe>_N.json` runs them (lower ilimit
+   for skeleton-loopers). Result: ~609 AGREE / 0 unresolved DIFF — every
+   routine has a case; `python3 dosunit/coverage.py` prints the inventory
+   (dedicated/probe-agree/probe-mix/artifact/incomplete/skipped).
+
+   Dedicated edge specs: `python3 dosunit/gen_edge.py` regenerates
+   dosunit/edge.json — disassembles both sides, pairs DS operands
+   positionally (deep=True inlines near-call callees one level, keyed by
+   call ordinal so a stubbed callee can't shift the pairing), then builds
+   ONE shared-DS demand map (explicit > abs-cell > indexed-span > store-
+   zero) because replay patches land in both guests. span_obs=False
+   scopes obs to top-level scalar stores when indexed/callee stores are
+   provenance-suspect (own-image name tables); obs_drop skips pointer-
+   constant stores. Currently 8 cases / 36 vectors all AGREE, incl.
+   fireAirThreat on the ~630-insn real path and loadWorldStrings' full
+   movedata chain off a synthetic comm-buf world image.
+
+   Incomplete taxonomy (not regressions — sandbox limits):
+   - overlay/xseg call (~77): routine calls into unloaded overlay space
+     past the image end (fetch_outside_declared_code).
+   - int instruction (~38): int21 file/alloc calls the sandbox doesn't
+     service (interrupt_or_iret).
+   - hardware io (3): in/out + cli/sti (device_io_or_halt).
+   - 5 skipped entry points (main/gfxInit/runGameSession/...) — frame
+     unsynthesizable.
+   - artifact class: diffs proven to be probe mechanics, listed in
+     coverage.py ARTIFACTS (stub callees, write-stream overlap,
+     binary-relative pointer values).
+
 ## MSC 5.1 codegen facts (F19)
 
 - Small model `/AS`: near code+data; cross-segment callees declared `far`.
