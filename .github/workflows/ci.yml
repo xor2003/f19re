@@ -1,0 +1,51 @@
+name: CI
+
+on:
+  push:
+    branches: [master, main]
+  pull_request:
+    branches: [master, main]
+
+jobs:
+  lint:
+    name: Python lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Compile check
+        run: python -m compileall -q tools dosunit
+
+      - name: Ruff (syntax + undefined names)
+        run: |
+          pip install ruff==0.16.10
+          ruff check --select E9,F821,F822,F823 tools dosunit
+
+  coverage:
+    name: Differential-test inventory
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      # The oracle DOS binaries and the MSC 5.1 toolchain are not in the
+      # repo (copyrighted / proprietary), so the dosunit real16 replay
+      # itself is a local step.  What CI *can* verify is the committed
+      # replay artifacts: dosunit/*.out.json are the recorded oracle-vs-port
+      # results, and coverage.py must report zero unexplained diffs and
+      # zero uncovered routines.  A commit that regresses either number
+      # fails here.
+      - name: Coverage inventory
+        run: |
+          python3 dosunit/coverage.py | tee /tmp/coverage.txt
+          diff_n=$(awk '$1=="diff"{print $2}' /tmp/coverage.txt)
+          unco_n=$(awk '$1=="uncovered"{print $2}' /tmp/coverage.txt)
+          echo "diff=$diff_n uncovered=$unco_n"
+          test "$diff_n" = "0" && test "$unco_n" = "0"

@@ -40,6 +40,43 @@ SUITES = {
 
 STACK_LO, STACK_HI = 0x40000, 0x50000   # SS=0x4000 window
 
+# `int NN` sites find_ints' near-BFS cannot reach — dispatch through
+# indirect calls hides them from the static call graph.  Harvested from
+# replay `interrupt_or_iret` fault events (image offset = linear - load
+# base); keyed (oracle exe stem, fn) so a case picks up every site its
+# real execution reached.  Re-check after oracle changes (never — the
+# oracle binaries are frozen) or new fault reports.
+FORCE_INTS = {
+    ('EGAME', 'drawCockpit'):      [0xe0af, 0xe156],
+    ('EGAME', 'initFrameRandom'):  [0x1fac],
+    ('END',   'allocBuffer'):      [0x2eca],
+    ('END',   'allocClearBuf'):    [0x2eca],
+    ('END',   'cleanup'):          [0x3a2f],
+    ('END',   'drawMapView'):      [0x2eca],
+    ('END',   'freeBuffer'):       [0x2ee2],
+    ('END',   'initGraphics'):     [0x3846],
+    ('END',   'loadFileSection'):  [0x14c1],
+    ('END',   'loadMapView'):      [0x2eca],
+    ('END',   'sub_17334'):        [0x3a2f],
+    ('END',   'sub_175BC'):        [0x3a2f],
+    ('END',   'writeFileSection'): [0x1418],
+    ('START', 'allocBuffer'):      [0x68a0],
+    ('START', 'cleanup'):          [0x5295],
+    ('START', 'drawStoreIcons'):   [0x4841],
+    ('START', 'drawStringCentered'): [0x68a0],
+    ('START', 'freeBuffer'):       [0x68b8],
+    ('START', 'initGraphics'):     [0x50bc],
+    ('START', 'resFileReadBlock'): [0x4941],
+    ('START', 'resFileWriteBlock'): [0x4898],
+    ('START', 'saveHallfame'):     [0x40e3],
+    ('START', 'setViewOrigin'):    [0x68a0],
+    ('START', 'sub_10010'):        [0x46dc],
+    ('START', 'sub_15460'):        [0x4841],
+    ('START', 'sub_15B68'):        [0x68a0],
+    ('START', 'sub_18F12'):        [0x4841],
+    ('START', 'sub_193EE'):        [0x4841],
+}
+
 # 6 words pushed regardless of true arity — extras sit harmlessly on the
 # stack; missing args read deterministic zeros.
 VECTORS = [
@@ -482,6 +519,10 @@ for suite, cfg in SUITES.items():
         c_seg = sorted(set(c_seg) | ds2)
         ints_o = find_ints(oimg, ohdr, f_o, e_o)
         ints_c = find_ints(cimg, chdr, f_c, e_c)
+        for s in FORCE_INTS.get((cfg['exe'], name), []):
+            assert oimg[ohdr + s] == 0xCD, (name, hex(s))
+            if s not in ints_o:
+                ints_o.append(s)
         # instruction-order paired store-cell obs: byte-exact ports put the
         # i-th DS store on both sides at the same logical cell.  A count
         # mismatch means the paths diverged structurally — skip obs rather

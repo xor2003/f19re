@@ -105,7 +105,7 @@ extern int16 g_mapZoomLevel;             /* word_346E4 */
 extern int16 g_radarScopeRange;          /* word_346E6 */
 extern int16 g_selStoreIdx;              /* word_37626 */
 extern int16 g_northSouthSign;           /* word_37484 */
-extern int16 g_isCampaignMission;        /* word_33D88 */
+extern int16 g_difficultyTier;           /* word_33D88 */
 extern int16 g_missionStatus;            /* word_33D86 */
 extern int16 g_detailLevel;              /* word_354BC */
 extern int16 g_groundAltitude;           /* word_3837A */
@@ -225,7 +225,7 @@ void updateFrame(void) {
         initTacMapView();
         drawStatusItem(3, 0xA);
         drawMissionObjectives();
-        g_isCampaignMission = g_viewParamsFar[0x1D];
+        g_difficultyTier = g_viewParamsFar[0x1D];
         g_missionStatus = g_viewParamsFar[0x1F];
         g_detailLevel = ((uint16 FAR *)commData)[0x19];
         setupLodDistances();

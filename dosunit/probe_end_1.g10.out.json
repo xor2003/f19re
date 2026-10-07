@@ -2,7 +2,7 @@
   "inputs": {
     "candidate": {
       "image": {
-        "bss_size": 40352,
+        "bss_size": 38896,
         "code_ranges": [
           {
             "address": "0x10000",
@@ -10,14 +10,14 @@
           }
         ],
         "code_scope": "declared",
-        "file_sha256": "980d994c04d6c68d5a0d198049f5d14b9ff685694a3498f7c5d3a5998e96fb94",
-        "image_sha256": "ce415c8a7404e7cd041b3a2e8f5e93e9d0b4176e8eea8baadf9d8863e4d2214d",
-        "image_size": 38627,
+        "file_sha256": "f631c69de33598b193843845b8840e2f091fd9ef1b63f9f7a1bcf46b2402d01f",
+        "image_sha256": "388c930305daa06559f0710cdce85105d7aee06121a32212cf1cf09fcc443936",
+        "image_size": 38489,
         "load_segment": "0x1000",
-        "reloc_sha256": "6a2287ee57dbf9a1ae591ae33c9b6efe30372e0aef92ca71878d2f53f5843bb8"
+        "reloc_sha256": "1f604c594125607c2f6c3b4c3dba3333d186d0737075c660cfe195f62a898b1d"
       },
-      "path": "/home/xor/games/f19ru/F19/build/ENBRIEF-ints-e06ed830.EXE",
-      "sha256": "980d994c04d6c68d5a0d198049f5d14b9ff685694a3498f7c5d3a5998e96fb94"
+      "path": "/home/xor/games/f19ru/F19/build/ENBRIEF-ints-017b4bd0.EXE",
+      "sha256": "f631c69de33598b193843845b8840e2f091fd9ef1b63f9f7a1bcf46b2402d01f"
     },
     "oracle": {
       "image": {
@@ -33,17 +33,17 @@
           }
         ],
         "code_scope": "declared",
-        "file_sha256": "762858bb9de765bca434d4517d41bea43394689251e3ffdd2d19eb92a1fc8757",
-        "image_sha256": "52036ff29688e690937fbe4495caf34995706b24a8dc379070e1bf9365f6395d",
+        "file_sha256": "b1df0133c2ea37beb8dd7a983da5f415f27f54df88e2359188540c070a2591d9",
+        "image_sha256": "7bf6866c16292978425e5a9fd2bf1889aee66fcd9d77ce58b56b3198b765e74d",
         "image_size": 74800,
         "load_segment": "0x1000",
         "reloc_sha256": "054bf8e00a98db7a713addc35c7d1f1580413a17c6c87aa8c9eec471d2f03ab7"
       },
-      "path": "/home/xor/games/f19ru/F19/build/END-slotstub.EXE",
-      "sha256": "762858bb9de765bca434d4517d41bea43394689251e3ffdd2d19eb92a1fc8757"
+      "path": "/home/xor/games/f19ru/F19/build/END-ints-5429e7e6.EXE",
+      "sha256": "b1df0133c2ea37beb8dd7a983da5f415f27f54df88e2359188540c070a2591d9"
     }
   },
-  "instruction_limit": 200000,
+  "instruction_limit": 100000,
   "policy": {
     "a20": "enabled",
     "high_half_default": "zero",
@@ -61,515 +61,40 @@
         "detail": "",
         "effective_flags_mask": "0x8d5",
         "events": [],
-        "instructions": 14,
-        "observations": [
-          {
-            "bytes": "a5a5",
-            "linear": "0x31d4c"
-          },
-          {
-            "bytes": "a5a5",
-            "linear": "0x3567a"
-          }
-        ],
+        "instructions": 24,
+        "observations": [],
         "registers": {
           "ax": "0x0",
           "bp": "0x0",
-          "bx": "0x0",
+          "bx": "0xffd4",
           "cs": "0xff0",
-          "cx": "0x0",
+          "cx": "0x6d88",
           "di": "0x0",
           "ds": "0x3000",
           "dx": "0x0",
           "eax": "0x0",
           "ebp": "0x0",
-          "ebx": "0x0",
-          "ecx": "0x0",
+          "ebx": "0xffd4",
+          "ecx": "0x6d88",
           "edi": "0x0",
           "edx": "0x0",
-          "eflags": "0x246",
+          "eflags": "0x286",
           "es": "0x3000",
           "esi": "0x0",
-          "esp": "0xf002",
-          "flags": "0x246",
+          "esp": "0xffe2",
+          "flags": "0x286",
           "fs": "0x0",
           "gs": "0x0",
           "ip": "0x4",
           "si": "0x0",
-          "sp": "0xf002",
+          "sp": "0xffe2",
           "ss": "0x4000"
         },
         "status": "returned",
         "writes": [
           {
-            "bytes": "000000000000",
-            "linear": "0x4effa"
-          }
-        ]
-      },
-      "comparison": {
-        "flags_mask": "0x8d5",
-        "observables": [
-          "ax",
-          "bx",
-          "cx",
-          "dx",
-          "si",
-          "di",
-          "bp",
-          "sp",
-          "cs",
-          "ds",
-          "es",
-          "ss",
-          "fs",
-          "gs",
-          "ip",
-          "eflags",
-          "eax",
-          "ebx",
-          "ecx",
-          "edx",
-          "esi",
-          "edi",
-          "ebp",
-          "esp"
-        ],
-        "observables_source": "default",
-        "reason": ""
-      },
-      "id": "readStageStream#0",
-      "initial_state": {
-        "candidate_entry": {
-          "offset": "0x623c",
-          "segment": "0xff0"
-        },
-        "frame": {
-          "kind": "near16",
-          "target": {
-            "offset": "0x4",
-            "segment": "0xff0"
-          }
-        },
-        "high_halves": {},
-        "memory": [
-          {
-            "bytes": "0000",
-            "offset": "0xf002",
-            "segment": "0x4000"
-          },
-          {
-            "bytes": "0000",
-            "offset": "0xf004",
-            "segment": "0x4000"
-          },
-          {
-            "bytes": "0000",
-            "offset": "0xf006",
-            "segment": "0x4000"
-          },
-          {
-            "bytes": "0000",
-            "offset": "0xf008",
-            "segment": "0x4000"
-          },
-          {
-            "bytes": "0000",
-            "offset": "0xf00a",
-            "segment": "0x4000"
-          },
-          {
-            "bytes": "0000",
-            "offset": "0xf00c",
-            "segment": "0x4000"
-          },
-          {
-            "bytes": "000000000000004d532052756e2d54696d65204c696272617279202d20436f707972696768742028632920313938382c204d6963726f736f667420436f727011",
-            "offset": "0x1",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "0000000000004d532052756e2d54696d65204c696272617279202d20436f707972696768742028632920313938382c204d6963726f736f667420436f72701100",
-            "offset": "0x2",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
-            "offset": "0x194a",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "0000",
-            "offset": "0x325e",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "0000",
-            "offset": "0x41c0",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "0000",
-            "offset": "0x41ca",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "0000",
-            "offset": "0x41d4",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "0055aaff0055aaff0055aaff0055aaff0055aaff0055aaff0055aaff0055aaff0055aaff0055aaff0055aaff0055aaff0055aaff0055aaff0055aaff0055aaff",
-            "offset": "0x6b0d",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "0055aaff0055aaff0055aaff0055aaff0055aaff0055aaff0055aaff0055aaff0055aaff0055aaff0055aaff0055aaff3c3c4e4d53473e3e000052363030300d",
-            "offset": "0x6b1d",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "0055aaff0055aaff0055aaff0055aaff0055aaff0055aaff0055aaff0055aaff3c3c4e4d53473e3e000052363030300d0a2d20737461636b206f766572666c6f",
-            "offset": "0x6b2d",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "0055aaff0055aaff0055aaff0055aaff3c3c4e4d53473e3e000052363030300d0a2d20737461636b206f766572666c6f770d0a00030052363030330d0a2d2069",
-            "offset": "0x6b3d",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "0000",
-            "offset": "0x8640",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "0000",
-            "offset": "0x8641",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "0000",
-            "offset": "0x8642",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "0000",
-            "offset": "0x8644",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "0000",
-            "offset": "0x8646",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "0000",
-            "offset": "0x8647",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
-            "offset": "0x8648",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "0000",
-            "offset": "0x8688",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "0000",
-            "offset": "0x868a",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "0000",
-            "offset": "0x868c",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "0000",
-            "offset": "0x868e",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "0000000000004d532052756e2d54696d65204c696272617279202d20436f707972696768742028632920313938382c204d6963726f736f667420436f72701100",
-            "offset": "0x2",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "3139",
-            "offset": "0x2c",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "8974",
-            "offset": "0x19aa",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "0000",
-            "offset": "0x1a0b",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "0000",
-            "offset": "0x1a0d",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "0000",
-            "offset": "0x1a1d",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "0000",
-            "offset": "0x1a1f",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "8181810101000000000000000000000000000000000000000000441ab907430000000000000000000000f0b1000000160202180d090c0c0c07081616ff120d12",
-            "offset": "0x1a26",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "0000",
-            "offset": "0x1a3a",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "0000",
-            "offset": "0x1a3c",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "0000",
-            "offset": "0x1a3e",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "441a",
-            "offset": "0x1a40",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "b907",
-            "offset": "0x1a42",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "0000",
-            "offset": "0x1a48",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "0000",
-            "offset": "0x1a49",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "0000",
-            "offset": "0x1a4e",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "f0b1",
-            "offset": "0x1a50",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "0000",
-            "offset": "0x1a52",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "0000",
-            "offset": "0x1a70",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "a5a5",
-            "offset": "0x1d4c",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "a5a5",
-            "offset": "0x567a",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "0030",
-            "offset": "0x325e",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "0030",
-            "offset": "0x9ee4",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "0030",
-            "offset": "0x2c",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "0030",
-            "offset": "0x1a1d",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "00",
-            "offset": "0x0",
-            "segment": "0xa000"
-          },
-          {
-            "bytes": "00",
-            "offset": "0x0",
-            "segment": "0x3a00"
-          }
-        ],
-        "observations": [
-          {
-            "offset": "0x1d4c",
-            "segment": "0x3000",
-            "size": 2
-          },
-          {
-            "offset": "0x567a",
-            "segment": "0x3000",
-            "size": 2
-          }
-        ],
-        "oracle_entry": {
-          "offset": "0x224c",
-          "segment": "0xff0"
-        },
-        "registers": {
-          "bp": "0x0",
-          "di": "0x0",
-          "flags": "0x202",
-          "si": "0x0",
-          "sp": "0xf000"
-        },
-        "segments": {
-          "ds": "0x3000",
-          "es": "0x3000",
-          "ss": "0x4000"
-        }
-      },
-      "oracle": {
-        "detail": "",
-        "effective_flags_mask": "0x8d5",
-        "events": [],
-        "instructions": 14,
-        "observations": [
-          {
-            "bytes": "a5a5",
-            "linear": "0x31d4c"
-          },
-          {
-            "bytes": "a5a5",
-            "linear": "0x3567a"
-          }
-        ],
-        "registers": {
-          "ax": "0x0",
-          "bp": "0x0",
-          "bx": "0x0",
-          "cs": "0xff0",
-          "cx": "0x0",
-          "di": "0x0",
-          "ds": "0x3000",
-          "dx": "0x0",
-          "eax": "0x0",
-          "ebp": "0x0",
-          "ebx": "0x0",
-          "ecx": "0x0",
-          "edi": "0x0",
-          "edx": "0x0",
-          "eflags": "0x246",
-          "es": "0x3000",
-          "esi": "0x0",
-          "esp": "0xf002",
-          "flags": "0x246",
-          "fs": "0x0",
-          "gs": "0x0",
-          "ip": "0x4",
-          "si": "0x0",
-          "sp": "0xf002",
-          "ss": "0x4000"
-        },
-        "status": "returned",
-        "writes": [
-          {
-            "bytes": "000000000000",
-            "linear": "0x4effa"
-          }
-        ]
-      },
-      "status": "agreed"
-    },
-    {
-      "candidate": {
-        "detail": "",
-        "effective_flags_mask": "0x8d5",
-        "events": [],
-        "instructions": 38,
-        "observations": [
-          {
-            "bytes": "a5a5",
-            "linear": "0x31d4c"
-          },
-          {
-            "bytes": "a7a5",
-            "linear": "0x3567a"
-          }
-        ],
-        "registers": {
-          "ax": "0x2",
-          "bp": "0x0",
-          "bx": "0x2",
-          "cs": "0xff0",
-          "cx": "0x0",
-          "di": "0x0",
-          "ds": "0x3000",
-          "dx": "0x0",
-          "eax": "0x2",
-          "ebp": "0x0",
-          "ebx": "0x2",
-          "ecx": "0x0",
-          "edi": "0x0",
-          "edx": "0x0",
-          "eflags": "0x246",
-          "es": "0x3000",
-          "esi": "0x0",
-          "esp": "0xf002",
-          "flags": "0x246",
-          "fs": "0x0",
-          "gs": "0x0",
-          "ip": "0x4",
-          "si": "0x0",
-          "sp": "0xf002",
-          "ss": "0x4000"
-        },
-        "status": "returned",
-        "writes": [
-          {
-            "bytes": "0000",
-            "linear": "0x30001"
-          },
-          {
-            "bytes": "a7a5",
-            "linear": "0x3567a"
-          },
-          {
-            "bytes": "000002000000",
-            "linear": "0x4effa"
-          },
-          {
-            "bytes": "0300",
-            "linear": "0x4f002"
+            "bytes": "886ddeff89610080048008800000",
+            "linear": "0x4ffd2"
           }
         ]
       },
@@ -604,10 +129,10 @@
         "observables_source": "default",
         "reason": "declared observations diverge"
       },
-      "id": "readStageStream#1",
+      "id": "readFile1Wrapper#0",
       "initial_state": {
         "candidate_entry": {
-          "offset": "0x623c",
+          "offset": "0x617a",
           "segment": "0xff0"
         },
         "frame": {
@@ -620,269 +145,384 @@
         "high_halves": {},
         "memory": [
           {
-            "bytes": "0100",
-            "offset": "0xf002",
+            "bytes": "0000240348066b098c0cab0fc812e215f9180c1c1a1f2422282527281f2b112efc30df33ba368d39573c173fce417b441d47b449404cc04e34519b53f6554358",
+            "offset": "0xf90",
+            "segment": "0x3000"
+          },
+          {
+            "bytes": "240348066b098c0cab0fc812e215f9180c1c1a1f2422282527281f2b112efc30df33ba368d39573c173fce417b441d47b449404cc04e34519b53f6554358825a",
+            "offset": "0xf92",
+            "segment": "0x3000"
+          },
+          {
+            "bytes": "0000",
+            "offset": "0x71e",
+            "segment": "0x3000"
+          },
+          {
+            "bytes": "0000",
+            "offset": "0x1948",
+            "segment": "0x3000"
+          },
+          {
+            "bytes": "0000",
+            "offset": "0x1949",
+            "segment": "0x3000"
+          },
+          {
+            "bytes": "0000",
+            "offset": "0x1bac",
+            "segment": "0x3000"
+          },
+          {
+            "bytes": "0000",
+            "offset": "0x1bae",
+            "segment": "0x3000"
+          },
+          {
+            "bytes": "0000",
+            "offset": "0x1bb2",
+            "segment": "0x3000"
+          },
+          {
+            "bytes": "0000",
+            "offset": "0x1bb4",
+            "segment": "0x3000"
+          },
+          {
+            "bytes": "0000",
+            "offset": "0x1cf6",
+            "segment": "0x3000"
+          },
+          {
+            "bytes": "0000",
+            "offset": "0x1cf8",
+            "segment": "0x3000"
+          },
+          {
+            "bytes": "0000",
+            "offset": "0x1cfa",
+            "segment": "0x3000"
+          },
+          {
+            "bytes": "0000",
+            "offset": "0x1cfe",
+            "segment": "0x3000"
+          },
+          {
+            "bytes": "0000",
+            "offset": "0x1d00",
+            "segment": "0x3000"
+          },
+          {
+            "bytes": "0000",
+            "offset": "0x6c2e",
+            "segment": "0x3000"
+          },
+          {
+            "bytes": "50524f42452d454447452d534545442d303132333435363738392d4142434445462d303132333435363738392d616263646566000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000050524f42452d454447452d534545442d303132333435363738392d4142434445462d303132333435363738392d616263646566000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000050524f42452d454447452d534545442d303132333435363738392d4142434445462d303132333435363738392d616263646566000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000050524f42452d454447452d534545442d303132333435363738392d4142434445462d303132333435363738392d6162636465660000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+            "offset": "0x8000",
+            "segment": "0x8000"
+          },
+          {
+            "bytes": "0080",
+            "offset": "0xffe2",
             "segment": "0x4000"
           },
           {
-            "bytes": "0200",
-            "offset": "0xf004",
+            "bytes": "0480",
+            "offset": "0xffe4",
             "segment": "0x4000"
           },
           {
-            "bytes": "0300",
-            "offset": "0xf006",
+            "bytes": "0880",
+            "offset": "0xffe6",
+            "segment": "0x4000"
+          },
+          {
+            "bytes": "0000",
+            "offset": "0xffe8",
+            "segment": "0x4000"
+          },
+          {
+            "bytes": "0000",
+            "offset": "0xffea",
+            "segment": "0x4000"
+          },
+          {
+            "bytes": "0000",
+            "offset": "0xffec",
+            "segment": "0x4000"
+          },
+          {
+            "bytes": "00",
+            "offset": "0x0",
+            "segment": "0xa000"
+          },
+          {
+            "bytes": "00",
+            "offset": "0x0",
+            "segment": "0x3a00"
+          }
+        ],
+        "observations": [],
+        "oracle_entry": {
+          "offset": "0x1468",
+          "segment": "0xff0"
+        },
+        "registers": {
+          "bp": "0x0",
+          "di": "0x0",
+          "flags": "0x202",
+          "si": "0x0",
+          "sp": "0xffe0"
+        },
+        "segments": {
+          "ds": "0x3000",
+          "es": "0x3000",
+          "ss": "0x4000"
+        }
+      },
+      "oracle": {
+        "detail": "",
+        "effective_flags_mask": "0x8d5",
+        "events": [],
+        "instructions": 30,
+        "observations": [],
+        "registers": {
+          "ax": "0x0",
+          "bp": "0x0",
+          "bx": "0x8000",
+          "cs": "0xff0",
+          "cx": "0x8004",
+          "di": "0x0",
+          "ds": "0x4000",
+          "dx": "0x8008",
+          "eax": "0x0",
+          "ebp": "0x0",
+          "ebx": "0x8000",
+          "ecx": "0x8004",
+          "edi": "0x0",
+          "edx": "0x8008",
+          "eflags": "0x286",
+          "es": "0x3000",
+          "esi": "0x0",
+          "esp": "0xffe2",
+          "flags": "0x286",
+          "fs": "0x0",
+          "gs": "0x0",
+          "ip": "0x4",
+          "si": "0x0",
+          "sp": "0xffe2",
+          "ss": "0x4000"
+        },
+        "status": "returned",
+        "writes": [
+          {
+            "bytes": "d4ff003000000000deff77140080048008800000",
+            "linear": "0x4ffcc"
+          }
+        ]
+      },
+      "status": "mismatched"
+    },
+    {
+      "candidate": {
+        "detail": "",
+        "effective_flags_mask": "0x8d5",
+        "events": [],
+        "instructions": 24,
+        "observations": [],
+        "registers": {
+          "ax": "0x0",
+          "bp": "0x0",
+          "bx": "0xffd4",
+          "cs": "0xff0",
+          "cx": "0x6d88",
+          "di": "0x0",
+          "ds": "0x3000",
+          "dx": "0x0",
+          "eax": "0x0",
+          "ebp": "0x0",
+          "ebx": "0xffd4",
+          "ecx": "0x6d88",
+          "edi": "0x0",
+          "edx": "0x0",
+          "eflags": "0x286",
+          "es": "0x3000",
+          "esi": "0x0",
+          "esp": "0xffe2",
+          "flags": "0x286",
+          "fs": "0x0",
+          "gs": "0x0",
+          "ip": "0x4",
+          "si": "0x0",
+          "sp": "0xffe2",
+          "ss": "0x4000"
+        },
+        "status": "returned",
+        "writes": [
+          {
+            "bytes": "886ddeff89610080048008800000",
+            "linear": "0x4ffd2"
+          }
+        ]
+      },
+      "comparison": {
+        "flags_mask": "0x8d5",
+        "observables": [
+          "ax",
+          "bx",
+          "cx",
+          "dx",
+          "si",
+          "di",
+          "bp",
+          "sp",
+          "cs",
+          "ds",
+          "es",
+          "ss",
+          "fs",
+          "gs",
+          "ip",
+          "eflags",
+          "eax",
+          "ebx",
+          "ecx",
+          "edx",
+          "esi",
+          "edi",
+          "ebp",
+          "esp"
+        ],
+        "observables_source": "default",
+        "reason": "declared observations diverge"
+      },
+      "id": "readFile1Wrapper#1",
+      "initial_state": {
+        "candidate_entry": {
+          "offset": "0x617a",
+          "segment": "0xff0"
+        },
+        "frame": {
+          "kind": "near16",
+          "target": {
+            "offset": "0x4",
+            "segment": "0xff0"
+          }
+        },
+        "high_halves": {},
+        "memory": [
+          {
+            "bytes": "0000240348066b098c0cab0fc812e215f9180c1c1a1f2422282527281f2b112efc30df33ba368d39573c173fce417b441d47b449404cc04e34519b53f6554358",
+            "offset": "0xf90",
+            "segment": "0x3000"
+          },
+          {
+            "bytes": "240348066b098c0cab0fc812e215f9180c1c1a1f2422282527281f2b112efc30df33ba368d39573c173fce417b441d47b449404cc04e34519b53f6554358825a",
+            "offset": "0xf92",
+            "segment": "0x3000"
+          },
+          {
+            "bytes": "0000",
+            "offset": "0x71e",
+            "segment": "0x3000"
+          },
+          {
+            "bytes": "0000",
+            "offset": "0x1948",
+            "segment": "0x3000"
+          },
+          {
+            "bytes": "0000",
+            "offset": "0x1949",
+            "segment": "0x3000"
+          },
+          {
+            "bytes": "0000",
+            "offset": "0x1bac",
+            "segment": "0x3000"
+          },
+          {
+            "bytes": "0000",
+            "offset": "0x1bae",
+            "segment": "0x3000"
+          },
+          {
+            "bytes": "0000",
+            "offset": "0x1bb2",
+            "segment": "0x3000"
+          },
+          {
+            "bytes": "0000",
+            "offset": "0x1bb4",
+            "segment": "0x3000"
+          },
+          {
+            "bytes": "0000",
+            "offset": "0x1cf6",
+            "segment": "0x3000"
+          },
+          {
+            "bytes": "0000",
+            "offset": "0x1cf8",
+            "segment": "0x3000"
+          },
+          {
+            "bytes": "0000",
+            "offset": "0x1cfa",
+            "segment": "0x3000"
+          },
+          {
+            "bytes": "0000",
+            "offset": "0x1cfe",
+            "segment": "0x3000"
+          },
+          {
+            "bytes": "0000",
+            "offset": "0x1d00",
+            "segment": "0x3000"
+          },
+          {
+            "bytes": "0000",
+            "offset": "0x6c2e",
+            "segment": "0x3000"
+          },
+          {
+            "bytes": "50524f42452d454447452d534545442d303132333435363738392d4142434445462d303132333435363738392d616263646566000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000050524f42452d454447452d534545442d303132333435363738392d4142434445462d303132333435363738392d616263646566000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000050524f42452d454447452d534545442d303132333435363738392d4142434445462d303132333435363738392d616263646566000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000050524f42452d454447452d534545442d303132333435363738392d4142434445462d303132333435363738392d6162636465660000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+            "offset": "0x8000",
+            "segment": "0x8000"
+          },
+          {
+            "bytes": "0080",
+            "offset": "0xffe2",
+            "segment": "0x4000"
+          },
+          {
+            "bytes": "0480",
+            "offset": "0xffe4",
+            "segment": "0x4000"
+          },
+          {
+            "bytes": "0880",
+            "offset": "0xffe6",
             "segment": "0x4000"
           },
           {
             "bytes": "0400",
-            "offset": "0xf008",
+            "offset": "0xffe8",
             "segment": "0x4000"
           },
           {
             "bytes": "0500",
-            "offset": "0xf00a",
+            "offset": "0xffea",
             "segment": "0x4000"
           },
           {
             "bytes": "0600",
-            "offset": "0xf00c",
+            "offset": "0xffec",
             "segment": "0x4000"
-          },
-          {
-            "bytes": "000000000000004d532052756e2d54696d65204c696272617279202d20436f707972696768742028632920313938382c204d6963726f736f667420436f727011",
-            "offset": "0x1",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "0000000000004d532052756e2d54696d65204c696272617279202d20436f707972696768742028632920313938382c204d6963726f736f667420436f72701100",
-            "offset": "0x2",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
-            "offset": "0x194a",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "0000",
-            "offset": "0x325e",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "0000",
-            "offset": "0x41c0",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "0000",
-            "offset": "0x41ca",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "0000",
-            "offset": "0x41d4",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "0055aaff0055aaff0055aaff0055aaff0055aaff0055aaff0055aaff0055aaff0055aaff0055aaff0055aaff0055aaff0055aaff0055aaff0055aaff0055aaff",
-            "offset": "0x6b0d",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "0055aaff0055aaff0055aaff0055aaff0055aaff0055aaff0055aaff0055aaff0055aaff0055aaff0055aaff0055aaff3c3c4e4d53473e3e000052363030300d",
-            "offset": "0x6b1d",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "0055aaff0055aaff0055aaff0055aaff0055aaff0055aaff0055aaff0055aaff3c3c4e4d53473e3e000052363030300d0a2d20737461636b206f766572666c6f",
-            "offset": "0x6b2d",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "0055aaff0055aaff0055aaff0055aaff3c3c4e4d53473e3e000052363030300d0a2d20737461636b206f766572666c6f770d0a00030052363030330d0a2d2069",
-            "offset": "0x6b3d",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "0000",
-            "offset": "0x8640",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "0000",
-            "offset": "0x8641",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "0000",
-            "offset": "0x8642",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "0000",
-            "offset": "0x8644",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "0000",
-            "offset": "0x8646",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "0000",
-            "offset": "0x8647",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
-            "offset": "0x8648",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "0000",
-            "offset": "0x8688",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "0000",
-            "offset": "0x868a",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "0000",
-            "offset": "0x868c",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "0000",
-            "offset": "0x868e",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "0000000000004d532052756e2d54696d65204c696272617279202d20436f707972696768742028632920313938382c204d6963726f736f667420436f72701100",
-            "offset": "0x2",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "3139",
-            "offset": "0x2c",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "8974",
-            "offset": "0x19aa",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "0000",
-            "offset": "0x1a0b",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "0000",
-            "offset": "0x1a0d",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "0000",
-            "offset": "0x1a1d",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "0000",
-            "offset": "0x1a1f",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "8181810101000000000000000000000000000000000000000000441ab907430000000000000000000000f0b1000000160202180d090c0c0c07081616ff120d12",
-            "offset": "0x1a26",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "0000",
-            "offset": "0x1a3a",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "0000",
-            "offset": "0x1a3c",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "0000",
-            "offset": "0x1a3e",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "441a",
-            "offset": "0x1a40",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "b907",
-            "offset": "0x1a42",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "0000",
-            "offset": "0x1a48",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "0000",
-            "offset": "0x1a49",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "0000",
-            "offset": "0x1a4e",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "f0b1",
-            "offset": "0x1a50",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "0000",
-            "offset": "0x1a52",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "0000",
-            "offset": "0x1a70",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "a5a5",
-            "offset": "0x1d4c",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "a5a5",
-            "offset": "0x567a",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "0030",
-            "offset": "0x325e",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "0030",
-            "offset": "0x9ee4",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "0030",
-            "offset": "0x2c",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "0030",
-            "offset": "0x1a1d",
-            "segment": "0x3000"
           },
           {
             "bytes": "00",
@@ -895,20 +535,9 @@
             "segment": "0x3a00"
           }
         ],
-        "observations": [
-          {
-            "offset": "0x1d4c",
-            "segment": "0x3000",
-            "size": 2
-          },
-          {
-            "offset": "0x567a",
-            "segment": "0x3000",
-            "size": 2
-          }
-        ],
+        "observations": [],
         "oracle_entry": {
-          "offset": "0x224c",
+          "offset": "0x1468",
           "segment": "0xff0"
         },
         "registers": {
@@ -916,7 +545,7 @@
           "di": "0x0",
           "flags": "0x202",
           "si": "0x0",
-          "sp": "0xf000"
+          "sp": "0xffe0"
         },
         "segments": {
           "ds": "0x3000",
@@ -928,61 +557,40 @@
         "detail": "",
         "effective_flags_mask": "0x8d5",
         "events": [],
-        "instructions": 38,
-        "observations": [
-          {
-            "bytes": "a7a5",
-            "linear": "0x31d4c"
-          },
-          {
-            "bytes": "a5a5",
-            "linear": "0x3567a"
-          }
-        ],
+        "instructions": 30,
+        "observations": [],
         "registers": {
-          "ax": "0x2",
+          "ax": "0x0",
           "bp": "0x0",
-          "bx": "0x2",
+          "bx": "0x8000",
           "cs": "0xff0",
-          "cx": "0x0",
+          "cx": "0x8004",
           "di": "0x0",
-          "ds": "0x3000",
-          "dx": "0x0",
-          "eax": "0x2",
+          "ds": "0x4000",
+          "dx": "0x8008",
+          "eax": "0x0",
           "ebp": "0x0",
-          "ebx": "0x2",
-          "ecx": "0x0",
+          "ebx": "0x8000",
+          "ecx": "0x8004",
           "edi": "0x0",
-          "edx": "0x0",
-          "eflags": "0x246",
+          "edx": "0x8008",
+          "eflags": "0x286",
           "es": "0x3000",
           "esi": "0x0",
-          "esp": "0xf002",
-          "flags": "0x246",
+          "esp": "0xffe2",
+          "flags": "0x286",
           "fs": "0x0",
           "gs": "0x0",
           "ip": "0x4",
           "si": "0x0",
-          "sp": "0xf002",
+          "sp": "0xffe2",
           "ss": "0x4000"
         },
         "status": "returned",
         "writes": [
           {
-            "bytes": "0000",
-            "linear": "0x30001"
-          },
-          {
-            "bytes": "a7a5",
-            "linear": "0x31d4c"
-          },
-          {
-            "bytes": "000002000000",
-            "linear": "0x4effa"
-          },
-          {
-            "bytes": "0300",
-            "linear": "0x4f002"
+            "bytes": "d4ff003000000000deff77140080048008800000",
+            "linear": "0x4ffcc"
           }
         ]
       },
@@ -993,61 +601,40 @@
         "detail": "",
         "effective_flags_mask": "0x8d5",
         "events": [],
-        "instructions": 1550,
-        "observations": [
-          {
-            "bytes": "a5a5",
-            "linear": "0x31d4c"
-          },
-          {
-            "bytes": "25a6",
-            "linear": "0x3567a"
-          }
-        ],
+        "instructions": 24,
+        "observations": [],
         "registers": {
-          "ax": "0x80",
+          "ax": "0x0",
           "bp": "0x0",
-          "bx": "0x17f",
+          "bx": "0xffd4",
           "cs": "0xff0",
-          "cx": "0x0",
+          "cx": "0x6d88",
           "di": "0x0",
           "ds": "0x3000",
           "dx": "0x0",
-          "eax": "0x80",
+          "eax": "0x0",
           "ebp": "0x0",
-          "ebx": "0x17f",
-          "ecx": "0x0",
+          "ebx": "0xffd4",
+          "ecx": "0x6d88",
           "edi": "0x0",
           "edx": "0x0",
-          "eflags": "0x246",
+          "eflags": "0x286",
           "es": "0x3000",
           "esi": "0x0",
-          "esp": "0xf002",
-          "flags": "0x246",
+          "esp": "0xffe2",
+          "flags": "0x286",
           "fs": "0x0",
           "gs": "0x0",
           "ip": "0x4",
           "si": "0x0",
-          "sp": "0xf002",
+          "sp": "0xffe2",
           "ss": "0x4000"
         },
         "status": "returned",
         "writes": [
           {
-            "bytes": "0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
-            "linear": "0x30100"
-          },
-          {
-            "bytes": "25a6",
-            "linear": "0x3567a"
-          },
-          {
-            "bytes": "000080000000",
-            "linear": "0x4effa"
-          },
-          {
-            "bytes": "8001",
-            "linear": "0x4f002"
+            "bytes": "886ddeff89610080048008800000",
+            "linear": "0x4ffd2"
           }
         ]
       },
@@ -1082,10 +669,10 @@
         "observables_source": "default",
         "reason": "declared observations diverge"
       },
-      "id": "readStageStream#2",
+      "id": "readFile1Wrapper#2",
       "initial_state": {
         "candidate_entry": {
-          "offset": "0x623c",
+          "offset": "0x617a",
           "segment": "0xff0"
         },
         "frame": {
@@ -1098,269 +685,114 @@
         "high_halves": {},
         "memory": [
           {
-            "bytes": "0001",
-            "offset": "0xf002",
+            "bytes": "0000240348066b098c0cab0fc812e215f9180c1c1a1f2422282527281f2b112efc30df33ba368d39573c173fce417b441d47b449404cc04e34519b53f6554358",
+            "offset": "0xf90",
+            "segment": "0x3000"
+          },
+          {
+            "bytes": "240348066b098c0cab0fc812e215f9180c1c1a1f2422282527281f2b112efc30df33ba368d39573c173fce417b441d47b449404cc04e34519b53f6554358825a",
+            "offset": "0xf92",
+            "segment": "0x3000"
+          },
+          {
+            "bytes": "0000",
+            "offset": "0x71e",
+            "segment": "0x3000"
+          },
+          {
+            "bytes": "0000",
+            "offset": "0x1948",
+            "segment": "0x3000"
+          },
+          {
+            "bytes": "0000",
+            "offset": "0x1949",
+            "segment": "0x3000"
+          },
+          {
+            "bytes": "0000",
+            "offset": "0x1bac",
+            "segment": "0x3000"
+          },
+          {
+            "bytes": "0000",
+            "offset": "0x1bae",
+            "segment": "0x3000"
+          },
+          {
+            "bytes": "0000",
+            "offset": "0x1bb2",
+            "segment": "0x3000"
+          },
+          {
+            "bytes": "0000",
+            "offset": "0x1bb4",
+            "segment": "0x3000"
+          },
+          {
+            "bytes": "0000",
+            "offset": "0x1cf6",
+            "segment": "0x3000"
+          },
+          {
+            "bytes": "0000",
+            "offset": "0x1cf8",
+            "segment": "0x3000"
+          },
+          {
+            "bytes": "0000",
+            "offset": "0x1cfa",
+            "segment": "0x3000"
+          },
+          {
+            "bytes": "0000",
+            "offset": "0x1cfe",
+            "segment": "0x3000"
+          },
+          {
+            "bytes": "0000",
+            "offset": "0x1d00",
+            "segment": "0x3000"
+          },
+          {
+            "bytes": "0000",
+            "offset": "0x6c2e",
+            "segment": "0x3000"
+          },
+          {
+            "bytes": "50524f42452d454447452d534545442d303132333435363738392d4142434445462d303132333435363738392d616263646566000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000050524f42452d454447452d534545442d303132333435363738392d4142434445462d303132333435363738392d616263646566000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000050524f42452d454447452d534545442d303132333435363738392d4142434445462d303132333435363738392d616263646566000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000050524f42452d454447452d534545442d303132333435363738392d4142434445462d303132333435363738392d6162636465660000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+            "offset": "0x8000",
+            "segment": "0x8000"
+          },
+          {
+            "bytes": "0080",
+            "offset": "0xffe2",
             "segment": "0x4000"
           },
           {
-            "bytes": "8000",
-            "offset": "0xf004",
+            "bytes": "0480",
+            "offset": "0xffe4",
             "segment": "0x4000"
           },
           {
-            "bytes": "4000",
-            "offset": "0xf006",
+            "bytes": "0880",
+            "offset": "0xffe6",
             "segment": "0x4000"
           },
           {
             "bytes": "2000",
-            "offset": "0xf008",
+            "offset": "0xffe8",
             "segment": "0x4000"
           },
           {
             "bytes": "1000",
-            "offset": "0xf00a",
+            "offset": "0xffea",
             "segment": "0x4000"
           },
           {
             "bytes": "0800",
-            "offset": "0xf00c",
+            "offset": "0xffec",
             "segment": "0x4000"
-          },
-          {
-            "bytes": "000000000000004d532052756e2d54696d65204c696272617279202d20436f707972696768742028632920313938382c204d6963726f736f667420436f727011",
-            "offset": "0x1",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "0000000000004d532052756e2d54696d65204c696272617279202d20436f707972696768742028632920313938382c204d6963726f736f667420436f72701100",
-            "offset": "0x2",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
-            "offset": "0x194a",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "0000",
-            "offset": "0x325e",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "0000",
-            "offset": "0x41c0",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "0000",
-            "offset": "0x41ca",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "0000",
-            "offset": "0x41d4",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "0055aaff0055aaff0055aaff0055aaff0055aaff0055aaff0055aaff0055aaff0055aaff0055aaff0055aaff0055aaff0055aaff0055aaff0055aaff0055aaff",
-            "offset": "0x6b0d",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "0055aaff0055aaff0055aaff0055aaff0055aaff0055aaff0055aaff0055aaff0055aaff0055aaff0055aaff0055aaff3c3c4e4d53473e3e000052363030300d",
-            "offset": "0x6b1d",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "0055aaff0055aaff0055aaff0055aaff0055aaff0055aaff0055aaff0055aaff3c3c4e4d53473e3e000052363030300d0a2d20737461636b206f766572666c6f",
-            "offset": "0x6b2d",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "0055aaff0055aaff0055aaff0055aaff3c3c4e4d53473e3e000052363030300d0a2d20737461636b206f766572666c6f770d0a00030052363030330d0a2d2069",
-            "offset": "0x6b3d",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "0000",
-            "offset": "0x8640",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "0000",
-            "offset": "0x8641",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "0000",
-            "offset": "0x8642",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "0000",
-            "offset": "0x8644",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "0000",
-            "offset": "0x8646",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "0000",
-            "offset": "0x8647",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
-            "offset": "0x8648",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "0000",
-            "offset": "0x8688",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "0000",
-            "offset": "0x868a",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "0000",
-            "offset": "0x868c",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "0000",
-            "offset": "0x868e",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "0000000000004d532052756e2d54696d65204c696272617279202d20436f707972696768742028632920313938382c204d6963726f736f667420436f72701100",
-            "offset": "0x2",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "3139",
-            "offset": "0x2c",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "8974",
-            "offset": "0x19aa",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "0000",
-            "offset": "0x1a0b",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "0000",
-            "offset": "0x1a0d",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "0000",
-            "offset": "0x1a1d",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "0000",
-            "offset": "0x1a1f",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "8181810101000000000000000000000000000000000000000000441ab907430000000000000000000000f0b1000000160202180d090c0c0c07081616ff120d12",
-            "offset": "0x1a26",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "0000",
-            "offset": "0x1a3a",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "0000",
-            "offset": "0x1a3c",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "0000",
-            "offset": "0x1a3e",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "441a",
-            "offset": "0x1a40",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "b907",
-            "offset": "0x1a42",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "0000",
-            "offset": "0x1a48",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "0000",
-            "offset": "0x1a49",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "0000",
-            "offset": "0x1a4e",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "f0b1",
-            "offset": "0x1a50",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "0000",
-            "offset": "0x1a52",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "0000",
-            "offset": "0x1a70",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "a5a5",
-            "offset": "0x1d4c",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "a5a5",
-            "offset": "0x567a",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "0030",
-            "offset": "0x325e",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "0030",
-            "offset": "0x9ee4",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "0030",
-            "offset": "0x2c",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "0030",
-            "offset": "0x1a1d",
-            "segment": "0x3000"
           },
           {
             "bytes": "00",
@@ -1373,20 +805,9 @@
             "segment": "0x3a00"
           }
         ],
-        "observations": [
-          {
-            "offset": "0x1d4c",
-            "segment": "0x3000",
-            "size": 2
-          },
-          {
-            "offset": "0x567a",
-            "segment": "0x3000",
-            "size": 2
-          }
-        ],
+        "observations": [],
         "oracle_entry": {
-          "offset": "0x224c",
+          "offset": "0x1468",
           "segment": "0xff0"
         },
         "registers": {
@@ -1394,7 +815,7 @@
           "di": "0x0",
           "flags": "0x202",
           "si": "0x0",
-          "sp": "0xf000"
+          "sp": "0xffe0"
         },
         "segments": {
           "ds": "0x3000",
@@ -1406,61 +827,40 @@
         "detail": "",
         "effective_flags_mask": "0x8d5",
         "events": [],
-        "instructions": 1550,
-        "observations": [
-          {
-            "bytes": "25a6",
-            "linear": "0x31d4c"
-          },
-          {
-            "bytes": "a5a5",
-            "linear": "0x3567a"
-          }
-        ],
+        "instructions": 30,
+        "observations": [],
         "registers": {
-          "ax": "0x80",
+          "ax": "0x0",
           "bp": "0x0",
-          "bx": "0x17f",
+          "bx": "0x8000",
           "cs": "0xff0",
-          "cx": "0x0",
+          "cx": "0x8004",
           "di": "0x0",
-          "ds": "0x3000",
-          "dx": "0x0",
-          "eax": "0x80",
+          "ds": "0x4000",
+          "dx": "0x8008",
+          "eax": "0x0",
           "ebp": "0x0",
-          "ebx": "0x17f",
-          "ecx": "0x0",
+          "ebx": "0x8000",
+          "ecx": "0x8004",
           "edi": "0x0",
-          "edx": "0x0",
-          "eflags": "0x246",
+          "edx": "0x8008",
+          "eflags": "0x286",
           "es": "0x3000",
           "esi": "0x0",
-          "esp": "0xf002",
-          "flags": "0x246",
+          "esp": "0xffe2",
+          "flags": "0x286",
           "fs": "0x0",
           "gs": "0x0",
           "ip": "0x4",
           "si": "0x0",
-          "sp": "0xf002",
+          "sp": "0xffe2",
           "ss": "0x4000"
         },
         "status": "returned",
         "writes": [
           {
-            "bytes": "0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
-            "linear": "0x30100"
-          },
-          {
-            "bytes": "25a6",
-            "linear": "0x31d4c"
-          },
-          {
-            "bytes": "000080000000",
-            "linear": "0x4effa"
-          },
-          {
-            "bytes": "8001",
-            "linear": "0x4f002"
+            "bytes": "d4ff003000000000deff77140080048008800000",
+            "linear": "0x4ffcc"
           }
         ]
       },
@@ -1471,511 +871,40 @@
         "detail": "",
         "effective_flags_mask": "0x8d5",
         "events": [],
-        "instructions": 14,
-        "observations": [
-          {
-            "bytes": "a5a5",
-            "linear": "0x31d4c"
-          },
-          {
-            "bytes": "a5a5",
-            "linear": "0x3567a"
-          }
-        ],
+        "instructions": 24,
+        "observations": [],
         "registers": {
           "ax": "0x0",
           "bp": "0x0",
-          "bx": "0x0",
+          "bx": "0xffd4",
           "cs": "0xff0",
-          "cx": "0x0",
+          "cx": "0x6d88",
           "di": "0x0",
           "ds": "0x3000",
           "dx": "0x0",
           "eax": "0x0",
           "ebp": "0x0",
-          "ebx": "0x0",
-          "ecx": "0x0",
+          "ebx": "0xffd4",
+          "ecx": "0x6d88",
           "edi": "0x0",
           "edx": "0x0",
-          "eflags": "0xa87",
+          "eflags": "0x286",
           "es": "0x3000",
           "esi": "0x0",
-          "esp": "0xf002",
-          "flags": "0xa87",
+          "esp": "0xffe2",
+          "flags": "0x286",
           "fs": "0x0",
           "gs": "0x0",
           "ip": "0x4",
           "si": "0x0",
-          "sp": "0xf002",
+          "sp": "0xffe2",
           "ss": "0x4000"
         },
         "status": "returned",
         "writes": [
           {
-            "bytes": "000000000000",
-            "linear": "0x4effa"
-          }
-        ]
-      },
-      "comparison": {
-        "flags_mask": "0x8d5",
-        "observables": [
-          "ax",
-          "bx",
-          "cx",
-          "dx",
-          "si",
-          "di",
-          "bp",
-          "sp",
-          "cs",
-          "ds",
-          "es",
-          "ss",
-          "fs",
-          "gs",
-          "ip",
-          "eflags",
-          "eax",
-          "ebx",
-          "ecx",
-          "edx",
-          "esi",
-          "edi",
-          "ebp",
-          "esp"
-        ],
-        "observables_source": "default",
-        "reason": ""
-      },
-      "id": "readStageStream#3",
-      "initial_state": {
-        "candidate_entry": {
-          "offset": "0x623c",
-          "segment": "0xff0"
-        },
-        "frame": {
-          "kind": "near16",
-          "target": {
-            "offset": "0x4",
-            "segment": "0xff0"
-          }
-        },
-        "high_halves": {},
-        "memory": [
-          {
-            "bytes": "ff7f",
-            "offset": "0xf002",
-            "segment": "0x4000"
-          },
-          {
-            "bytes": "0080",
-            "offset": "0xf004",
-            "segment": "0x4000"
-          },
-          {
-            "bytes": "ffff",
-            "offset": "0xf006",
-            "segment": "0x4000"
-          },
-          {
-            "bytes": "0100",
-            "offset": "0xf008",
-            "segment": "0x4000"
-          },
-          {
-            "bytes": "0000",
-            "offset": "0xf00a",
-            "segment": "0x4000"
-          },
-          {
-            "bytes": "0040",
-            "offset": "0xf00c",
-            "segment": "0x4000"
-          },
-          {
-            "bytes": "000000000000004d532052756e2d54696d65204c696272617279202d20436f707972696768742028632920313938382c204d6963726f736f667420436f727011",
-            "offset": "0x1",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "0000000000004d532052756e2d54696d65204c696272617279202d20436f707972696768742028632920313938382c204d6963726f736f667420436f72701100",
-            "offset": "0x2",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
-            "offset": "0x194a",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "0000",
-            "offset": "0x325e",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "0000",
-            "offset": "0x41c0",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "0000",
-            "offset": "0x41ca",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "0000",
-            "offset": "0x41d4",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "0055aaff0055aaff0055aaff0055aaff0055aaff0055aaff0055aaff0055aaff0055aaff0055aaff0055aaff0055aaff0055aaff0055aaff0055aaff0055aaff",
-            "offset": "0x6b0d",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "0055aaff0055aaff0055aaff0055aaff0055aaff0055aaff0055aaff0055aaff0055aaff0055aaff0055aaff0055aaff3c3c4e4d53473e3e000052363030300d",
-            "offset": "0x6b1d",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "0055aaff0055aaff0055aaff0055aaff0055aaff0055aaff0055aaff0055aaff3c3c4e4d53473e3e000052363030300d0a2d20737461636b206f766572666c6f",
-            "offset": "0x6b2d",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "0055aaff0055aaff0055aaff0055aaff3c3c4e4d53473e3e000052363030300d0a2d20737461636b206f766572666c6f770d0a00030052363030330d0a2d2069",
-            "offset": "0x6b3d",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "0000",
-            "offset": "0x8640",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "0000",
-            "offset": "0x8641",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "0000",
-            "offset": "0x8642",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "0000",
-            "offset": "0x8644",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "0000",
-            "offset": "0x8646",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "0000",
-            "offset": "0x8647",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
-            "offset": "0x8648",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "0000",
-            "offset": "0x8688",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "0000",
-            "offset": "0x868a",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "0000",
-            "offset": "0x868c",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "0000",
-            "offset": "0x868e",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "0000000000004d532052756e2d54696d65204c696272617279202d20436f707972696768742028632920313938382c204d6963726f736f667420436f72701100",
-            "offset": "0x2",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "3139",
-            "offset": "0x2c",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "8974",
-            "offset": "0x19aa",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "0000",
-            "offset": "0x1a0b",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "0000",
-            "offset": "0x1a0d",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "0000",
-            "offset": "0x1a1d",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "0000",
-            "offset": "0x1a1f",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "8181810101000000000000000000000000000000000000000000441ab907430000000000000000000000f0b1000000160202180d090c0c0c07081616ff120d12",
-            "offset": "0x1a26",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "0000",
-            "offset": "0x1a3a",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "0000",
-            "offset": "0x1a3c",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "0000",
-            "offset": "0x1a3e",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "441a",
-            "offset": "0x1a40",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "b907",
-            "offset": "0x1a42",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "0000",
-            "offset": "0x1a48",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "0000",
-            "offset": "0x1a49",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "0000",
-            "offset": "0x1a4e",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "f0b1",
-            "offset": "0x1a50",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "0000",
-            "offset": "0x1a52",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "0000",
-            "offset": "0x1a70",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "a5a5",
-            "offset": "0x1d4c",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "a5a5",
-            "offset": "0x567a",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "0030",
-            "offset": "0x325e",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "0030",
-            "offset": "0x9ee4",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "0030",
-            "offset": "0x2c",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "0030",
-            "offset": "0x1a1d",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "00",
-            "offset": "0x0",
-            "segment": "0xa000"
-          },
-          {
-            "bytes": "00",
-            "offset": "0x0",
-            "segment": "0x3a00"
-          }
-        ],
-        "observations": [
-          {
-            "offset": "0x1d4c",
-            "segment": "0x3000",
-            "size": 2
-          },
-          {
-            "offset": "0x567a",
-            "segment": "0x3000",
-            "size": 2
-          }
-        ],
-        "oracle_entry": {
-          "offset": "0x224c",
-          "segment": "0xff0"
-        },
-        "registers": {
-          "bp": "0x0",
-          "di": "0x0",
-          "flags": "0x202",
-          "si": "0x0",
-          "sp": "0xf000"
-        },
-        "segments": {
-          "ds": "0x3000",
-          "es": "0x3000",
-          "ss": "0x4000"
-        }
-      },
-      "oracle": {
-        "detail": "",
-        "effective_flags_mask": "0x8d5",
-        "events": [],
-        "instructions": 14,
-        "observations": [
-          {
-            "bytes": "a5a5",
-            "linear": "0x31d4c"
-          },
-          {
-            "bytes": "a5a5",
-            "linear": "0x3567a"
-          }
-        ],
-        "registers": {
-          "ax": "0x0",
-          "bp": "0x0",
-          "bx": "0x0",
-          "cs": "0xff0",
-          "cx": "0x0",
-          "di": "0x0",
-          "ds": "0x3000",
-          "dx": "0x0",
-          "eax": "0x0",
-          "ebp": "0x0",
-          "ebx": "0x0",
-          "ecx": "0x0",
-          "edi": "0x0",
-          "edx": "0x0",
-          "eflags": "0xa87",
-          "es": "0x3000",
-          "esi": "0x0",
-          "esp": "0xf002",
-          "flags": "0xa87",
-          "fs": "0x0",
-          "gs": "0x0",
-          "ip": "0x4",
-          "si": "0x0",
-          "sp": "0xf002",
-          "ss": "0x4000"
-        },
-        "status": "returned",
-        "writes": [
-          {
-            "bytes": "000000000000",
-            "linear": "0x4effa"
-          }
-        ]
-      },
-      "status": "agreed"
-    },
-    {
-      "candidate": {
-        "detail": "",
-        "effective_flags_mask": "0x8d5",
-        "events": [],
-        "instructions": 196882,
-        "observations": [
-          {
-            "bytes": "a5a5",
-            "linear": "0x31d4c"
-          },
-          {
-            "bytes": "8501",
-            "linear": "0x3567a"
-          }
-        ],
-        "registers": {
-          "ax": "0x4000",
-          "bp": "0x0",
-          "bx": "0x7fff",
-          "cs": "0xff0",
-          "cx": "0x73bd",
-          "di": "0x0",
-          "ds": "0x3000",
-          "dx": "0x0",
-          "eax": "0x4000",
-          "ebp": "0x0",
-          "ebx": "0x7fff",
-          "ecx": "0x73bd",
-          "edi": "0x0",
-          "edx": "0x0",
-          "eflags": "0x246",
-          "es": "0x3000",
-          "esi": "0x0",
-          "esp": "0xf002",
-          "flags": "0x246",
-          "fs": "0x0",
-          "gs": "0x0",
-          "ip": "0x4",
-          "si": "0x0",
-          "sp": "0xf002",
-          "ss": "0x4000"
-        },
-        "status": "returned",
-        "writes": [
-          {
-            "bytes": "00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000003000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000085010000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
-            "linear": "0x34000"
-          },
-          {
-            "bytes": "bd735562000000400000",
-            "linear": "0x4eff6"
-          },
-          {
-            "bytes": "0080",
-            "linear": "0x4f002"
+            "bytes": "886ddeff89610080048008800000",
+            "linear": "0x4ffd2"
           }
         ]
       },
@@ -2010,10 +939,10 @@
         "observables_source": "default",
         "reason": "declared observations diverge"
       },
-      "id": "readStageStream#4",
+      "id": "readFile1Wrapper#3",
       "initial_state": {
         "candidate_entry": {
-          "offset": "0x623c",
+          "offset": "0x617a",
           "segment": "0xff0"
         },
         "frame": {
@@ -2026,269 +955,114 @@
         "high_halves": {},
         "memory": [
           {
-            "bytes": "0040",
-            "offset": "0xf002",
+            "bytes": "0000240348066b098c0cab0fc812e215f9180c1c1a1f2422282527281f2b112efc30df33ba368d39573c173fce417b441d47b449404cc04e34519b53f6554358",
+            "offset": "0xf90",
+            "segment": "0x3000"
+          },
+          {
+            "bytes": "240348066b098c0cab0fc812e215f9180c1c1a1f2422282527281f2b112efc30df33ba368d39573c173fce417b441d47b449404cc04e34519b53f6554358825a",
+            "offset": "0xf92",
+            "segment": "0x3000"
+          },
+          {
+            "bytes": "0000",
+            "offset": "0x71e",
+            "segment": "0x3000"
+          },
+          {
+            "bytes": "0000",
+            "offset": "0x1948",
+            "segment": "0x3000"
+          },
+          {
+            "bytes": "0000",
+            "offset": "0x1949",
+            "segment": "0x3000"
+          },
+          {
+            "bytes": "0000",
+            "offset": "0x1bac",
+            "segment": "0x3000"
+          },
+          {
+            "bytes": "0000",
+            "offset": "0x1bae",
+            "segment": "0x3000"
+          },
+          {
+            "bytes": "0000",
+            "offset": "0x1bb2",
+            "segment": "0x3000"
+          },
+          {
+            "bytes": "0000",
+            "offset": "0x1bb4",
+            "segment": "0x3000"
+          },
+          {
+            "bytes": "0000",
+            "offset": "0x1cf6",
+            "segment": "0x3000"
+          },
+          {
+            "bytes": "0000",
+            "offset": "0x1cf8",
+            "segment": "0x3000"
+          },
+          {
+            "bytes": "0000",
+            "offset": "0x1cfa",
+            "segment": "0x3000"
+          },
+          {
+            "bytes": "0000",
+            "offset": "0x1cfe",
+            "segment": "0x3000"
+          },
+          {
+            "bytes": "0000",
+            "offset": "0x1d00",
+            "segment": "0x3000"
+          },
+          {
+            "bytes": "0000",
+            "offset": "0x6c2e",
+            "segment": "0x3000"
+          },
+          {
+            "bytes": "50524f42452d454447452d534545442d303132333435363738392d4142434445462d303132333435363738392d616263646566000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000050524f42452d454447452d534545442d303132333435363738392d4142434445462d303132333435363738392d616263646566000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000050524f42452d454447452d534545442d303132333435363738392d4142434445462d303132333435363738392d616263646566000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000050524f42452d454447452d534545442d303132333435363738392d4142434445462d303132333435363738392d6162636465660000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+            "offset": "0x8000",
+            "segment": "0x8000"
+          },
+          {
+            "bytes": "0080",
+            "offset": "0xffe2",
+            "segment": "0x4000"
+          },
+          {
+            "bytes": "0480",
+            "offset": "0xffe4",
+            "segment": "0x4000"
+          },
+          {
+            "bytes": "0880",
+            "offset": "0xffe6",
+            "segment": "0x4000"
+          },
+          {
+            "bytes": "0100",
+            "offset": "0xffe8",
+            "segment": "0x4000"
+          },
+          {
+            "bytes": "0000",
+            "offset": "0xffea",
             "segment": "0x4000"
           },
           {
             "bytes": "0040",
-            "offset": "0xf004",
+            "offset": "0xffec",
             "segment": "0x4000"
-          },
-          {
-            "bytes": "0040",
-            "offset": "0xf006",
-            "segment": "0x4000"
-          },
-          {
-            "bytes": "0040",
-            "offset": "0xf008",
-            "segment": "0x4000"
-          },
-          {
-            "bytes": "0040",
-            "offset": "0xf00a",
-            "segment": "0x4000"
-          },
-          {
-            "bytes": "0040",
-            "offset": "0xf00c",
-            "segment": "0x4000"
-          },
-          {
-            "bytes": "000000000000004d532052756e2d54696d65204c696272617279202d20436f707972696768742028632920313938382c204d6963726f736f667420436f727011",
-            "offset": "0x1",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "0000000000004d532052756e2d54696d65204c696272617279202d20436f707972696768742028632920313938382c204d6963726f736f667420436f72701100",
-            "offset": "0x2",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
-            "offset": "0x194a",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "0000",
-            "offset": "0x325e",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "0000",
-            "offset": "0x41c0",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "0000",
-            "offset": "0x41ca",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "0000",
-            "offset": "0x41d4",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "0055aaff0055aaff0055aaff0055aaff0055aaff0055aaff0055aaff0055aaff0055aaff0055aaff0055aaff0055aaff0055aaff0055aaff0055aaff0055aaff",
-            "offset": "0x6b0d",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "0055aaff0055aaff0055aaff0055aaff0055aaff0055aaff0055aaff0055aaff0055aaff0055aaff0055aaff0055aaff3c3c4e4d53473e3e000052363030300d",
-            "offset": "0x6b1d",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "0055aaff0055aaff0055aaff0055aaff0055aaff0055aaff0055aaff0055aaff3c3c4e4d53473e3e000052363030300d0a2d20737461636b206f766572666c6f",
-            "offset": "0x6b2d",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "0055aaff0055aaff0055aaff0055aaff3c3c4e4d53473e3e000052363030300d0a2d20737461636b206f766572666c6f770d0a00030052363030330d0a2d2069",
-            "offset": "0x6b3d",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "0000",
-            "offset": "0x8640",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "0000",
-            "offset": "0x8641",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "0000",
-            "offset": "0x8642",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "0000",
-            "offset": "0x8644",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "0000",
-            "offset": "0x8646",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "0000",
-            "offset": "0x8647",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
-            "offset": "0x8648",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "0000",
-            "offset": "0x8688",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "0000",
-            "offset": "0x868a",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "0000",
-            "offset": "0x868c",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "0000",
-            "offset": "0x868e",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "0000000000004d532052756e2d54696d65204c696272617279202d20436f707972696768742028632920313938382c204d6963726f736f667420436f72701100",
-            "offset": "0x2",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "3139",
-            "offset": "0x2c",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "8974",
-            "offset": "0x19aa",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "0000",
-            "offset": "0x1a0b",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "0000",
-            "offset": "0x1a0d",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "0000",
-            "offset": "0x1a1d",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "0000",
-            "offset": "0x1a1f",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "8181810101000000000000000000000000000000000000000000441ab907430000000000000000000000f0b1000000160202180d090c0c0c07081616ff120d12",
-            "offset": "0x1a26",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "0000",
-            "offset": "0x1a3a",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "0000",
-            "offset": "0x1a3c",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "0000",
-            "offset": "0x1a3e",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "441a",
-            "offset": "0x1a40",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "b907",
-            "offset": "0x1a42",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "0000",
-            "offset": "0x1a48",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "0000",
-            "offset": "0x1a49",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "0000",
-            "offset": "0x1a4e",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "f0b1",
-            "offset": "0x1a50",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "0000",
-            "offset": "0x1a52",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "0000",
-            "offset": "0x1a70",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "a5a5",
-            "offset": "0x1d4c",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "a5a5",
-            "offset": "0x567a",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "0030",
-            "offset": "0x325e",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "0030",
-            "offset": "0x9ee4",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "0030",
-            "offset": "0x2c",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "0030",
-            "offset": "0x1a1d",
-            "segment": "0x3000"
           },
           {
             "bytes": "00",
@@ -2301,20 +1075,9 @@
             "segment": "0x3a00"
           }
         ],
-        "observations": [
-          {
-            "offset": "0x1d4c",
-            "segment": "0x3000",
-            "size": 2
-          },
-          {
-            "offset": "0x567a",
-            "segment": "0x3000",
-            "size": 2
-          }
-        ],
+        "observations": [],
         "oracle_entry": {
-          "offset": "0x224c",
+          "offset": "0x1468",
           "segment": "0xff0"
         },
         "registers": {
@@ -2322,7 +1085,7 @@
           "di": "0x0",
           "flags": "0x202",
           "si": "0x0",
-          "sp": "0xf000"
+          "sp": "0xffe0"
         },
         "segments": {
           "ds": "0x3000",
@@ -2334,61 +1097,310 @@
         "detail": "",
         "effective_flags_mask": "0x8d5",
         "events": [],
-        "instructions": 196622,
-        "observations": [
-          {
-            "bytes": "a5e5",
-            "linear": "0x31d4c"
-          },
-          {
-            "bytes": "0000",
-            "linear": "0x3567a"
-          }
-        ],
+        "instructions": 30,
+        "observations": [],
         "registers": {
-          "ax": "0x4000",
+          "ax": "0x0",
           "bp": "0x0",
-          "bx": "0x7fff",
+          "bx": "0x8000",
           "cs": "0xff0",
-          "cx": "0x0",
+          "cx": "0x8004",
           "di": "0x0",
-          "ds": "0x3000",
-          "dx": "0x0",
-          "eax": "0x4000",
+          "ds": "0x4000",
+          "dx": "0x8008",
+          "eax": "0x0",
           "ebp": "0x0",
-          "ebx": "0x7fff",
-          "ecx": "0x0",
+          "ebx": "0x8000",
+          "ecx": "0x8004",
           "edi": "0x0",
-          "edx": "0x0",
-          "eflags": "0x246",
+          "edx": "0x8008",
+          "eflags": "0x286",
           "es": "0x3000",
           "esi": "0x0",
-          "esp": "0xf002",
-          "flags": "0x246",
+          "esp": "0xffe2",
+          "flags": "0x286",
           "fs": "0x0",
           "gs": "0x0",
           "ip": "0x4",
           "si": "0x0",
-          "sp": "0xf002",
+          "sp": "0xffe2",
           "ss": "0x4000"
         },
         "status": "returned",
         "writes": [
           {
-            "bytes": "a5e5",
-            "linear": "0x31d4c"
+            "bytes": "d4ff003000000000deff77140080048008800000",
+            "linear": "0x4ffcc"
+          }
+        ]
+      },
+      "status": "mismatched"
+    },
+    {
+      "candidate": {
+        "detail": "",
+        "effective_flags_mask": "0x8d5",
+        "events": [],
+        "instructions": 24,
+        "observations": [],
+        "registers": {
+          "ax": "0x0",
+          "bp": "0x0",
+          "bx": "0xffd4",
+          "cs": "0xff0",
+          "cx": "0x6d88",
+          "di": "0x0",
+          "ds": "0x3000",
+          "dx": "0x0",
+          "eax": "0x0",
+          "ebp": "0x0",
+          "ebx": "0xffd4",
+          "ecx": "0x6d88",
+          "edi": "0x0",
+          "edx": "0x0",
+          "eflags": "0x286",
+          "es": "0x3000",
+          "esi": "0x0",
+          "esp": "0xffe2",
+          "flags": "0x286",
+          "fs": "0x0",
+          "gs": "0x0",
+          "ip": "0x4",
+          "si": "0x0",
+          "sp": "0xffe2",
+          "ss": "0x4000"
+        },
+        "status": "returned",
+        "writes": [
+          {
+            "bytes": "886ddeff89610080048008800000",
+            "linear": "0x4ffd2"
+          }
+        ]
+      },
+      "comparison": {
+        "flags_mask": "0x8d5",
+        "observables": [
+          "ax",
+          "bx",
+          "cx",
+          "dx",
+          "si",
+          "di",
+          "bp",
+          "sp",
+          "cs",
+          "ds",
+          "es",
+          "ss",
+          "fs",
+          "gs",
+          "ip",
+          "eflags",
+          "eax",
+          "ebx",
+          "ecx",
+          "edx",
+          "esi",
+          "edi",
+          "ebp",
+          "esp"
+        ],
+        "observables_source": "default",
+        "reason": "declared observations diverge"
+      },
+      "id": "readFile1Wrapper#4",
+      "initial_state": {
+        "candidate_entry": {
+          "offset": "0x617a",
+          "segment": "0xff0"
+        },
+        "frame": {
+          "kind": "near16",
+          "target": {
+            "offset": "0x4",
+            "segment": "0xff0"
+          }
+        },
+        "high_halves": {},
+        "memory": [
+          {
+            "bytes": "0000240348066b098c0cab0fc812e215f9180c1c1a1f2422282527281f2b112efc30df33ba368d39573c173fce417b441d47b449404cc04e34519b53f6554358",
+            "offset": "0xf90",
+            "segment": "0x3000"
           },
           {
-            "bytes": "00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
-            "linear": "0x34000"
+            "bytes": "240348066b098c0cab0fc812e215f9180c1c1a1f2422282527281f2b112efc30df33ba368d39573c173fce417b441d47b449404cc04e34519b53f6554358825a",
+            "offset": "0xf92",
+            "segment": "0x3000"
           },
           {
-            "bytes": "000000400000",
-            "linear": "0x4effa"
+            "bytes": "0000",
+            "offset": "0x71e",
+            "segment": "0x3000"
+          },
+          {
+            "bytes": "0000",
+            "offset": "0x1948",
+            "segment": "0x3000"
+          },
+          {
+            "bytes": "0000",
+            "offset": "0x1949",
+            "segment": "0x3000"
+          },
+          {
+            "bytes": "0000",
+            "offset": "0x1bac",
+            "segment": "0x3000"
+          },
+          {
+            "bytes": "0000",
+            "offset": "0x1bae",
+            "segment": "0x3000"
+          },
+          {
+            "bytes": "0000",
+            "offset": "0x1bb2",
+            "segment": "0x3000"
+          },
+          {
+            "bytes": "0000",
+            "offset": "0x1bb4",
+            "segment": "0x3000"
+          },
+          {
+            "bytes": "0000",
+            "offset": "0x1cf6",
+            "segment": "0x3000"
+          },
+          {
+            "bytes": "0000",
+            "offset": "0x1cf8",
+            "segment": "0x3000"
+          },
+          {
+            "bytes": "0000",
+            "offset": "0x1cfa",
+            "segment": "0x3000"
+          },
+          {
+            "bytes": "0000",
+            "offset": "0x1cfe",
+            "segment": "0x3000"
+          },
+          {
+            "bytes": "0000",
+            "offset": "0x1d00",
+            "segment": "0x3000"
+          },
+          {
+            "bytes": "0000",
+            "offset": "0x6c2e",
+            "segment": "0x3000"
+          },
+          {
+            "bytes": "50524f42452d454447452d534545442d303132333435363738392d4142434445462d303132333435363738392d616263646566000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000050524f42452d454447452d534545442d303132333435363738392d4142434445462d303132333435363738392d616263646566000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000050524f42452d454447452d534545442d303132333435363738392d4142434445462d303132333435363738392d616263646566000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000050524f42452d454447452d534545442d303132333435363738392d4142434445462d303132333435363738392d6162636465660000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+            "offset": "0x8000",
+            "segment": "0x8000"
           },
           {
             "bytes": "0080",
-            "linear": "0x4f002"
+            "offset": "0xffe2",
+            "segment": "0x4000"
+          },
+          {
+            "bytes": "0480",
+            "offset": "0xffe4",
+            "segment": "0x4000"
+          },
+          {
+            "bytes": "0880",
+            "offset": "0xffe6",
+            "segment": "0x4000"
+          },
+          {
+            "bytes": "0040",
+            "offset": "0xffe8",
+            "segment": "0x4000"
+          },
+          {
+            "bytes": "0040",
+            "offset": "0xffea",
+            "segment": "0x4000"
+          },
+          {
+            "bytes": "0040",
+            "offset": "0xffec",
+            "segment": "0x4000"
+          },
+          {
+            "bytes": "00",
+            "offset": "0x0",
+            "segment": "0xa000"
+          },
+          {
+            "bytes": "00",
+            "offset": "0x0",
+            "segment": "0x3a00"
+          }
+        ],
+        "observations": [],
+        "oracle_entry": {
+          "offset": "0x1468",
+          "segment": "0xff0"
+        },
+        "registers": {
+          "bp": "0x0",
+          "di": "0x0",
+          "flags": "0x202",
+          "si": "0x0",
+          "sp": "0xffe0"
+        },
+        "segments": {
+          "ds": "0x3000",
+          "es": "0x3000",
+          "ss": "0x4000"
+        }
+      },
+      "oracle": {
+        "detail": "",
+        "effective_flags_mask": "0x8d5",
+        "events": [],
+        "instructions": 30,
+        "observations": [],
+        "registers": {
+          "ax": "0x0",
+          "bp": "0x0",
+          "bx": "0x8000",
+          "cs": "0xff0",
+          "cx": "0x8004",
+          "di": "0x0",
+          "ds": "0x4000",
+          "dx": "0x8008",
+          "eax": "0x0",
+          "ebp": "0x0",
+          "ebx": "0x8000",
+          "ecx": "0x8004",
+          "edi": "0x0",
+          "edx": "0x8008",
+          "eflags": "0x286",
+          "es": "0x3000",
+          "esi": "0x0",
+          "esp": "0xffe2",
+          "flags": "0x286",
+          "fs": "0x0",
+          "gs": "0x0",
+          "ip": "0x4",
+          "si": "0x0",
+          "sp": "0xffe2",
+          "ss": "0x4000"
+        },
+        "status": "returned",
+        "writes": [
+          {
+            "bytes": "d4ff003000000000deff77140080048008800000",
+            "linear": "0x4ffcc"
           }
         ]
       },
@@ -2398,9 +1410,9 @@
   "schema": "dosunit.real16_replay.v1",
   "scope": "declared concrete vectors on relocated MZ images; segmented registers and caller frames are explicit; agreement is test evidence only and never a semantic proof",
   "summary": {
-    "agreed": 2,
+    "agreed": 0,
     "incomplete": 0,
-    "mismatched": 3,
+    "mismatched": 5,
     "total": 5
   }
 }

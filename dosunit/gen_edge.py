@@ -156,10 +156,14 @@ def case_for(name, cfg, oexe, odgrp, oimg, ohdr, cmap, cimg, chdr, cdgrp,
     # The replay shares ONE DS window between the guests: a patch entry at a
     # DS offset lands in BOTH runs, so the byte at each offset must satisfy
     # both sides. Collect per-byte demands with a precedence —
-    #   4 explicit setup, 3 absolute cells, 2 indexed read spans,
-    #   1 store-region zeroing —
+    #   4 explicit setup, 3 absolute cells, 2 indexed span pair-starts,
+    #   1 indexed span bleed, 0 store-region zeroing —
     # then force obs-pair positions to a consensus byte so untouched obs
     # cells compare equal instead of leaking each side's own init data.
+    # Span bleed must NOT outvote a pair's own start cell: same-prio demands
+    # settle by byte value, so a wider neighbour span (e.g. the sams span
+    # spilling into objTypes) would otherwise scribble a foreign table byte
+    # over the paired cell and the two sides would read different values.
     dem = {}
     obs_pairs = []
 
@@ -189,8 +193,8 @@ def case_for(name, cfg, oexe, odgrp, oimg, ohdr, cmap, cimg, chdr, cdgrp,
                     obs_pairs.append(((oimm + d) & 0xffff,
                                       (cimm + d) & 0xffff))
             for k in range(width):
-                put(oimm + k, 0, 1)
-                put(cimm + k, 0, 1)
+                put(oimm + k, 0, 0)
+                put(cimm + k, 0, 0)
         else:
             # indexed spans that fall in BSS must be zeroed, not patterned:
             # pattern bytes make index-feeding fields (planeType etc.) huge,
@@ -200,8 +204,8 @@ def case_for(name, cfg, oexe, odgrp, oimg, ohdr, cmap, cimg, chdr, cdgrp,
                  else b'\x00' * width if oidx
                  else pattern(width))
             for k in range(width):
-                put(oimm + k, b[k], 2 if oidx else 3)
-                put(cimm + k, b[k], 2 if oidx else 3)
+                put(oimm + k, b[k], (2 if k < osz else 1) if oidx else 3)
+                put(cimm + k, b[k], (2 if k < osz else 1) if oidx else 3)
     for oo, co, sz, hx in extra_patch:
         for k, byte in enumerate(bytes.fromhex(hx)):
             put(oo + k, byte, 4)
@@ -304,35 +308,36 @@ CASES = [
          vectors=[[]]),
 ]
 
-# moveDst far-ptr (oracle ds:0x98c8 / cand ds:0x3f18) -> ds:0x8000 scratch
+# moveDst far-ptr (oracle ds:0x98c8 / cand ds:0x4a62) -> ds:0x8000 scratch
 # NB: cand offsets shift on every test-exe relink — re-derive by disasm.
-MOVEDST = {'commFetch': (0x98c8, 0x4286), 'memAppend': (0x98c8, 0x4286)}
+MOVEDST = {'commFetch': (0x98c8, 0x4202), 'memAppend': (0x98c8, 0x4202)}
 # shared read-pos cell + oracle buffer base (cand base derived by pairing)
-BUFPOS = {'bufReadBytes': (0x1714, 0x6bd8, 0x12c2),
-          'bufReadFile': (0x1714, 0x6bd8, 0x12c2)}
+BUFPOS = {'bufReadBytes': (0x1714, 0x6b16, 0x12c2),
+          'bufReadFile': (0x1714, 0x6b16, 0x12c2)}
 # loadWorldStrings: commData far-ptr cells (o/c) and every movedata dest
 # pair, in readWorldData's call order, lifted from each side's disasm.
 WORLDSRC = {
     'loadWorldStrings': dict(
-        comm=(0x9ed6, 0x4016),          # far ptr -> repointed at ds:0x8000
-        bufptr=(0x6c26, 0x57a2),        # worldBufPtr (off,seg) advanced end
-        ready=(0x99f2, 0x4cfe),         # worldDataReady
-        fields=[(0x86b6, 0x68c8, 2),    # worldRouteTable
-                (0x9ed4, 0x36ea, 2),    # worldRouteCount
-                (0x86c6, 0x878e, 16),   # worldObjects   (objCount<<4)
-                (0x9a1c, 0x4cd4, 2),    # worldSamCount
-                (0x8ea8, 0x7346, 72),   # worldSamTable  (36*samCount)
-                (0x998a, 0x3f00, 100),  # unitTypeTable
-                (0x9922, 0x6340, 100),  # worldUnitFlags
-                (0x9bea, 0x5db6, 0x1f0),# worldStringBuf tail (cand head
-                                        #  0x5cb8 overlapped by flightData
-                                        #  through 0x5db6 = head+0xfe)
-                (0x8b7a, 0x5698, 0x100),# gridFlags
-                (0x99f0, 0x7b98, 2),    # worldGridSize
-                (0x86a6, 0x36a0, 2),    # worldMiscHeader
-                (0x42,   0x8da6, 16),   # weaponDataBlock
-                (0x8c7a, 0x5428, 36),   # targetBlockWd
-                (0x9182, 0x57b6, 0x600)]  # flightDataBuf
+        comm=(0x9ed6, 0x3f62),          # far ptr -> repointed at ds:0x8000
+        bufptr=(0x6c26, 0x55be),        # worldBufPtr (off,seg) advanced end
+        ready=(0x99f2, 0x4b1c),         # worldDataReady
+        fields=[(0x86b6, 0x6654, 2),    # worldRouteTable
+                (0x9ed4, 0x3646, 2),    # worldRouteCount
+                (0x86c6, 0x8290, 16),   # worldObjects   (objCount<<4)
+                (0x9a1c, 0x4b06, 2),    # worldSamCount
+                (0x8ea8, 0x708e, 72),   # worldSamTable  (36*samCount)
+                (0x998a, 0x3e5c, 100),  # unitTypeTable
+                (0x9922, 0x6156, 100),  # worldUnitFlags
+                (0x9bec, 0x5bd2, 0x1ee),# worldStringTable tail — real table
+                                        #  is 0x9aec/0x2ee; cand head 0x5ad2
+                                        #  sits inside flightData span and is
+                                        #  clobbered by the final read
+                (0x8b7a, 0x54b4, 0x100),# gridFlags
+                (0x99f0, 0x76b2, 2),    # worldGridSize
+                (0x86a6, 0x360c, 2),    # worldMiscHeader
+                (0x42,   0x886e, 16),   # weaponDataBlock
+                (0x8c7a, 0x5242, 36),   # targetBlockWd
+                (0x9182, 0x55d2, 0x600)]  # flightDataBuf
     ),
 }
 

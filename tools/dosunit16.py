@@ -42,7 +42,9 @@ LOAD = 0x1000          # both images at linear 0x10000
 K = 0x10               # CS = 0x0FFF, window covers image offsets 0..0xFFEF
 SS = 0x4000            # scratch stack segment (its 64KB window is mapped)
 DS = 0x6000            # scratch data segment
-SP = 0xF000
+SP = 0xFFE0            # near window top — chkstk guards (e.g. STGEN's
+                       # 0xef60 limit cell) trip when the frame leaves the
+                       # callee < ~0xa0 of stack; real DOS gives ~64K
 CS_SEG = LOAD - K      # 0x0FFF
 TRAP_OFF = 0x0004      # trap linear = CS_SEG*16 + 4 = 0xFFF4 < 0x10000
 
@@ -110,12 +112,18 @@ def build_vector(vid, f_o, f_c, args, case, ds_seg, flags='0x0202'):
     Patches: {'seg'? -> ds, 'off'|'o_off'|'c_off', 'bytes' hex | 'size' N}
     With 'size' and no 'bytes', bytes are pulled from that side's own image
     at (dgrp_img_off + off) — replays the side's natural dseg content.
+
+    Shared-DS collisions: an oracle cell and a cand cell may carry the same
+    numeric offset while intending different content.  Small (explicit
+    scalar) writes apply after large (span) writes so explicit seeds win;
+    bytes contested by conflicting patch intents are removed from the
+    paired-observation contract (the seed can't satisfy both sides there).
     """
-    mem = []
+    writes = []          # (seg, off, bytes, pulled)
     sp = SP
     for i, w in enumerate(args):
-        mem.append({'segment': u16hex(SS), 'offset': u16hex(sp + 2 + 2 * i),
-                    'bytes': struct.pack('<H', w & 0xFFFF).hex()})
+        writes.append((SS, sp + 2 + 2 * i,
+                       struct.pack('<H', w & 0xFFFF), False))
     for p in case.get('patches', []):
         seg = int(str(p.get('seg', ds_seg)), 0)
         offs = []
@@ -128,31 +136,63 @@ def build_vector(vid, f_o, f_c, args, case, ds_seg, flags='0x0202'):
                 offs.append((int(str(p['c_off']), 0), 'candidate'))
         for off, side in offs:
             b = p.get('bytes')
-            if b is None:
+            pulled = b is None
+            if pulled:
                 exe = case['oracle_exe'] if side == 'oracle' \
                     else case['cand_exe']
                 dgrp = case['oracle_dgrp'] if side == 'oracle' \
                     else case['cand_dgrp']
                 b = img_slice(exe, dgrp + off, int(str(p['size']), 0)).hex()
-            mem.append({'segment': u16hex(seg), 'offset': u16hex(off),
-                        'bytes': b})
+            writes.append((seg, off, bytes.fromhex(b), pulled))
+    # natural-image pulls first, then explicit seeds big->small: explicit
+    # scalar cells outrank span bleed; listed order keeps ties stable
+    order = sorted(range(len(writes)),
+                   key=lambda i: (not writes[i][3], -len(writes[i][2])))
+    last = {}            # linear -> final byte value
+    contested = set()    # linears where patch intents disagreed
+    for i in order:
+        seg, off, b, _ = writes[i]
+        for k, by in enumerate(b):
+            lin = seg * 16 + off + k
+            if lin in last and last[lin] != by:
+                contested.add(lin)
+            last[lin] = by
+    mem = [{'segment': u16hex(writes[i][0]),
+            'offset': u16hex(writes[i][1]),
+            'bytes': writes[i][2].hex()} for i in order]
+
     obs = []
     pairs = []          # (idx_in_oracle, idx_in_candidate) to compare
+
+    def emit_obs(oseg, ooff, cseg, coff, size):
+        """Paired obs split around contested bytes (either side)."""
+        run = 0
+        for k in range(size + 1):
+            bad = k < size and (oseg * 16 + ooff + k in contested
+                                or cseg * 16 + coff + k in contested)
+            if k == size or bad:
+                if run:
+                    obs.append({'segment': u16hex(oseg),
+                                'offset': u16hex(ooff + k - run),
+                                'size': run})
+                    obs.append({'segment': u16hex(cseg),
+                                'offset': u16hex(coff + k - run),
+                                'size': run})
+                    pairs.append((len(obs) - 2, len(obs) - 1))
+                run = 0
+            else:
+                run += 1
+
     for o in case.get('observe', []):
         if 'off' in o:                      # same seg:off on both sides
-            obs.append({'segment': u16hex(int(str(o.get('seg', ds_seg)), 0)),
-                        'offset': u16hex(int(str(o['off']), 0)),
-                        'size': o['size']})
-            pairs.append((len(obs) - 1, len(obs) - 1))
+            emit_obs(int(str(o.get('seg', ds_seg)), 0),
+                     int(str(o['off']), 0),
+                     int(str(o.get('seg', ds_seg)), 0),
+                     int(str(o['off']), 0), o['size'])
         else:                               # per-side cells: o_off vs c_off
             seg = int(str(o.get('seg', ds_seg)), 0)
-            obs.append({'segment': u16hex(seg),
-                        'offset': u16hex(int(str(o['o_off']), 0)),
-                        'size': o['size']})
-            obs.append({'segment': u16hex(seg),
-                        'offset': u16hex(int(str(o['c_off']), 0)),
-                        'size': o['size']})
-            pairs.append((len(obs) - 2, len(obs) - 1))
+            emit_obs(seg, int(str(o['o_off']), 0),
+                     seg, int(str(o['c_off']), 0), o['size'])
     vec = {
         'id': vid,
         'oracle_entry': {'segment': u16hex(CS_SEG), 'offset': u16hex(f_o + K * 16)},
@@ -165,6 +205,7 @@ def build_vector(vid, f_o, f_c, args, case, ds_seg, flags='0x0202'):
                   'target': {'segment': u16hex(CS_SEG), 'offset': u16hex(TRAP_OFF)}},
         'memory': mem,
         'observations': obs,
+        'obs_pairs': pairs,   # emitted-obs indices to compare (frag-split aware)
         'flags_mask': '0x08d5',
     }
     return vec, pairs
@@ -245,6 +286,7 @@ def main():
         print('SKIP', p)
 
     stem = spec_path.replace('.json', '')
+    emit_only = '--emit-only' in sys.argv
     results = []
     for gi, key in enumerate(order):
         manifest = {'oracle_load_segment': u16hex(LOAD),
@@ -266,6 +308,8 @@ def main():
         if not cand_exe.startswith('/'):
             cand_exe = os.path.join(ROOT, cand_exe)
         json.dump(manifest, open(vec_path, 'w'), indent=1)
+        if emit_only:
+            continue            # vectors refreshed without touching out files
         if os.path.exists(out_path):
             os.remove(out_path)     # a failed replay must not surface stale results
         cmd = [VPY, '-m', 'tools.dosunit.dosunit', 'replay-real16',
@@ -280,6 +324,8 @@ def main():
             print('dosunit failed:', r.stdout[-500:], r.stderr[-500:])
             return 1
         results += json.load(open(out_path))['results']
+    if emit_only:
+        return 0
     rep = {'results': results}
     print(f"{'vector':34s} {'oracle':>24s} {'cand':>24s} verdict")
     n_agree = n_diff = n_inc = 0

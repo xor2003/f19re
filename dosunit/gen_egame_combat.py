@@ -161,17 +161,14 @@ def _storedef_xy(np_, sel):
                 d[8 + 16 * sel + 4] | d[8 + 16 * sel + 5] << 8)
     return 0x1234, 0x5678
 
-def ds_src_patches(mod, np_, ng):
-    """flagFtN==0 direction: fill every DS source cell with the same
-    position-coded pattern the stream would hold."""
-    lens = [('landTgt', 'g_landTargetId', 1),
+SRC_LENS = [('landTgt', 'g_landTargetId', 1),
             ('waterTgt', 'g_waterTargetId', 1),
             ('planeCnt', 'g_planeCount', 2),
             ('tgtEntCnt', 'g_targetEntityCount', 2),
             ('planeScan', 'g_planeScanCount', 2),
-            ('planeTab', 'g_planeTable', 16 * np_),
+            ('planeTab', 'g_planeTable', 16),
             ('gndUnitCnt', 'g_groundUnitCount', 2),
-            ('simObjects', 'g_simObjects', 36 * ng),
+            ('simObjects', 'g_simObjects', 36),
             ('shapeCat', 'g_shapeTargetCategory', 0x64),
             ('killTally', 'g_tileKillTally', 0x64),
             ('strPool', 'g_stringPool', 0x2EE),
@@ -180,8 +177,15 @@ def ds_src_patches(mod, np_, ng):
             ('padlockAc', 'g_padlockAircraft', 2),
             ('waypoints', 'waypoints', 0x10),
             ('targetSlots', 'g_targetSlots', 0x24)]
+
+def ds_src_patches(mod, np_, ng):
+    """flagFtN==0 direction: fill every DS source cell with the same
+    position-coded pattern the stream would hold."""
     pos = 0; out = []
-    for ok, cs, ln in lens:
+    for ok, cs, ln in SRC_LENS:
+        ln = ln if ok in ('planeTab', 'simObjects') else ln
+        if ok == 'planeTab': ln = 16 * np_
+        if ok == 'simObjects': ln = 36 * ng
         if ln == 0:
             continue
         # planeCnt / gndUnitCnt must carry the real counts: they size later
@@ -194,6 +198,50 @@ def ds_src_patches(mod, np_, ng):
         else: hx = data.hex()
         out.append((O[ok], c(mod, cs), ln, hx))
         pos += ln
+    return out
+
+def stream_obs_fragments(mod, np_, ng, total):
+    """Shared OFFOBS fragments for the flag=0 stream, skipping positions
+    fed by contested source bytes: a cand span seed that numerically
+    covers an oracle scalar cell leaves that cand byte holding the
+    scalar's pattern, so the copied stream differs from the oracle's
+    there by construction (shared-DS limitation, not a port bug)."""
+    lens = {'planeTab': 16 * np_, 'simObjects': 36 * ng}
+    spos = {}; pos = 0
+    for ok, cs, ln in SRC_LENS:
+        ln = lens.get(ok, ln)
+        if ln == 0: continue
+        spos[ok] = (pos, c(mod, cs), ln); pos += ln
+    # contested = a scalar seed cell inside the other side's span seed
+    # range; mask the span's stream position (shared-DS limitation)
+    skip = set()
+    orng = [(O[ok], ln) for ok, _, ln in SRC_LENS]
+    for ok, cs, ln in SRC_LENS:
+        ln = lens.get(ok, ln)
+        if ln == 0: continue
+        cbase = spos[ok][1]
+        for oo, oln in orng:
+            if oo == cbase or oln > 4:
+                continue        # only oracle scalars contest
+            if cbase <= oo < cbase + ln:
+                d = oo - cbase
+                for k in range(oln):
+                    skip.add(spos[ok][0] + d + k)
+        if ln <= 4:             # cand scalar under an oracle span
+            for ok2, _, ln2 in SRC_LENS:
+                ln2 = lens.get(ok2, ln2)
+                if ln2 <= 4: continue
+                obase = O[ok2]
+                if obase <= cbase < obase + ln2:
+                    for k in range(ln):
+                        skip.add(spos[ok][0] + k)
+    out = []; run = 0
+    for k in range(total + 1):
+        if k == total or k in skip:
+            if run:
+                out.append(OFFOBS(SC + k - run, run)); run = 0
+        else:
+            run += 1
     return out
 
 cases = [
@@ -394,8 +442,9 @@ cases = [
                  + stream_patch(FR, np_, ng)
                  + [(SC, SC, len(stream_bytes(np_, ng)),
                      '00' * len(stream_bytes(np_, ng)))],
-              'obs': [OFFOBS(SC, len(stream_bytes(np_, ng))),
-                      obsv(O['farPtr'], c(FR, 'farPointer'), 4)]}
+              'obs': stream_obs_fragments(FR, np_, ng,
+                                          len(stream_bytes(np_, ng)))
+                      + [obsv(O['farPtr'], c(FR, 'farPointer'), 4)]}
              for np_, ng in [(0, 0), (1, 1), (2, 0), (3, 2)]]),
 
     # ---- initStoreData(): cursor init + moveStuff + nameTab scan +

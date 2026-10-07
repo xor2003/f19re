@@ -1,0 +1,241 @@
+[
+ {
+  "fn": "wrapUnitText",
+  "oracle_exe": "build/START-slotstub.EXE",
+  "oracle_map": "map/start_en.map",
+  "cand_exe": "build/STGEN.EXE",
+  "cand_map": "build/STGEN.MAP",
+  "ds": "0x3000",
+  "check_regs": [],
+  "code_o": [
+   [
+    0,
+    65536
+   ],
+   [
+    68346,
+    545
+   ]
+  ],
+  "code_c": [
+   [
+    0,
+    57712
+   ]
+  ],
+  "oracle_dgrp": 65536,
+  "patches": [
+   {
+    "o_off": "0xc",
+    "c_off": "0x843e",
+    "bytes": "0100"
+   },
+   {
+    "off": "0x8000",
+    "seg": "0x3000",
+    "bytes": "414220434420454600"
+   },
+   {
+    "off": "0x8010",
+    "seg": "0x3000",
+    "bytes": "48454c4c4f2d574f524c44204e4f5700"
+   },
+   {
+    "off": "0x8020",
+    "seg": "0x3000",
+    "bytes": "00"
+   },
+   {
+    "off": "0x8030",
+    "seg": "0x3000",
+    "bytes": "41420d43440a454600"
+   }
+  ],
+  "observe": [
+   {
+    "o_off": "0x8",
+    "c_off": "0x843a",
+    "size": 2
+   },
+   {
+    "o_off": "0xa",
+    "c_off": "0x843c",
+    "size": 2
+   }
+  ],
+  "vectors": [
+   {
+    "args": [
+     0,
+     32768,
+     8,
+     2,
+     16,
+     4
+    ]
+   },
+   {
+    "args": [
+     0,
+     32768,
+     256,
+     2,
+     16,
+     4
+    ]
+   },
+   {
+    "args": [
+     0,
+     32784,
+     8,
+     2,
+     16,
+     4
+    ]
+   },
+   {
+    "args": [
+     0,
+     32800,
+     8,
+     2,
+     16,
+     4
+    ]
+   },
+   {
+    "args": [
+     0,
+     32816,
+     8,
+     2,
+     16,
+     4
+    ]
+   }
+  ]
+ },
+ {
+  "fn": "wrapUnitTextFar",
+  "oracle_exe": "build/START-slotstub.EXE",
+  "oracle_map": "map/start_en.map",
+  "cand_exe": "build/STGEN.EXE",
+  "cand_map": "build/STGEN.MAP",
+  "ds": "0x3000",
+  "check_regs": [],
+  "code_o": [
+   [
+    0,
+    65536
+   ],
+   [
+    68346,
+    545
+   ]
+  ],
+  "code_c": [
+   [
+    0,
+    57712
+   ]
+  ],
+  "oracle_dgrp": 65536,
+  "patches": [
+   {
+    "o_off": "0xc",
+    "c_off": "0x843e",
+    "bytes": "0100"
+   },
+   {
+    "off": "0x8000",
+    "seg": "0x3000",
+    "bytes": "414220434420454600"
+   },
+   {
+    "off": "0x8010",
+    "seg": "0x3000",
+    "bytes": "48454c4c4f2d574f524c44204e4f5700"
+   },
+   {
+    "off": "0x8020",
+    "seg": "0x3000",
+    "bytes": "00"
+   },
+   {
+    "off": "0x8030",
+    "seg": "0x3000",
+    "bytes": "41420d43440a454600"
+   }
+  ],
+  "observe": [
+   {
+    "o_off": "0x8",
+    "c_off": "0x843a",
+    "size": 2
+   },
+   {
+    "o_off": "0xa",
+    "c_off": "0x843c",
+    "size": 2
+   }
+  ],
+  "vectors": [
+   {
+    "args": [
+     0,
+     32768,
+     12288,
+     8,
+     2,
+     16,
+     4
+    ]
+   },
+   {
+    "args": [
+     0,
+     32768,
+     12288,
+     256,
+     2,
+     16,
+     4
+    ]
+   },
+   {
+    "args": [
+     0,
+     32784,
+     12288,
+     8,
+     2,
+     16,
+     4
+    ]
+   },
+   {
+    "args": [
+     0,
+     32800,
+     12288,
+     8,
+     2,
+     16,
+     4
+    ]
+   },
+   {
+    "args": [
+     0,
+     32816,
+     12288,
+     8,
+     2,
+     16,
+     4
+    ]
+   }
+  ]
+ }
+]

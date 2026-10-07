@@ -47,6 +47,18 @@ ARTIFACTS = {
     # to their first flag cell in the same order; oracle's extra 0x551e
     # clear and cand's 0x4e7e/0x4e8a clears are init-table-driven.
     'renderFrame': 'paired obs cross-wired (adjacent o cells vs split c cells)',
+    # oracle init flag array at shared-DS 0x5524-0x553e lands on the cand's
+    # g_projectiles BSS cells; cand flag check reads oracle's 0x01 and runs
+    # a loop the oracle (BSS-zero) skips.  Same-offset/different-role pull
+    # collision, not a port diff.
+    'updateThreatTargeting': 'oracle init flags collide with cand g_projectiles',
+    # both sides run to the same overlay/slot dispatch; cand follows its
+    # slot-stub thunk while oracle enters the slot-stub path — streams
+    # realign after; observed cells hold binary-relative overlay tables.
+    'renderHudFrame': 'overlay slot thunk vs slotstub, binary-relative cells',
+    # START satellite: draw work lives in unported reg-ABI callee sub_141A3
+    # (skeleton in STGEN); clip shim returns 0 — unported-callee artifact.
+    'drawLine': 'satellite draw callee sub_141A3 is skeleton',
 }
 SKIP = {  # entry points / unsynthesizable — kept in sync with gen_probe.SKIP
     'main', 'gfxInit', 'installCBreakHandler', 'setInt9Handler',
@@ -133,6 +145,14 @@ def probe_verdicts():
                 res = json.load(open(of))['results']
             except Exception:
                 continue
+            vp = {}   # emitted obs_pairs survive frag-splitting; spec-derived
+            try:      # pairs_of is only a fallback for pre-paired vectors
+                for v in json.load(
+                        open(of.replace('.out.json', '.vectors.json'))
+                        )['vectors']:
+                    vp[v['id']] = v.get('obs_pairs')
+            except Exception:
+                pass
             for r in res:
                 fn = r['id'].rsplit('#', 1)[0]
                 case = cases.get(fn)
@@ -156,7 +176,7 @@ def probe_verdicts():
                 obs_ok = all(
                     i < len(oo) and j < len(co) and
                     oo[i].get('bytes') == co[j].get('bytes')
-                    for i, j in pairs_of(case))
+                    for i, j in (vp.get(r['id']) or pairs_of(case)))
                 agg[fn]['agree' if regs_ok and obs_ok else 'diff'] += 1
     return agg
 

@@ -6,10 +6,10 @@ sys.path.insert(0, '/home/xor/vextest/angr_platforms')
 import json
 import unicorn
 from pathlib import Path
-from tools.dosunit.real16_replay_cli import _image, _manifest
-from tools.dosunit.real16_guest import _initialize_guest
-from tools.dosunit.real16_replay_model import Real16ReplayPolicy
-from tools.dosunit.real16_replay_manifest import parse_manifest
+from tools.dosunit.reporting.real16_replay_cli import _image, _manifest
+from tools.dosunit.runtime.real16_guest import _initialize_guest
+from tools.dosunit.runtime.real16_replay_model import Real16ReplayPolicy
+from tools.dosunit.reporting.real16_replay_manifest import parse_manifest
 
 VEC = sys.argv[1] if len(sys.argv) > 1 else '/home/xor/games/f19ru/F19/dosunit/probe_egame_1.g1.vectors.json'
 OEXE = sys.argv[2] if len(sys.argv) > 2 else '/home/xor/games/f19ru/F19/build/EGAME-ints-5f1cf5d8.EXE'

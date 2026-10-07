@@ -2,7 +2,7 @@
   "inputs": {
     "candidate": {
       "image": {
-        "bss_size": 34672,
+        "bss_size": 32736,
         "code_ranges": [
           {
             "address": "0x10000",
@@ -10,14 +10,14 @@
           }
         ],
         "code_scope": "declared",
-        "file_sha256": "b6d1d62533c2392ece682d787d3fdadb604054ec1a5eb3c8cc8dcf7c3503cd30",
-        "image_sha256": "6d800639bd7ced02045b5ca4ea5e29f209f5b3fb2c9eb032a006a51a90892527",
-        "image_size": 69279,
+        "file_sha256": "2a1e07601a1746a752edff4def1dba4f99ee1ff679219c850fdf946ce722958b",
+        "image_sha256": "dac141151283cd4939ced0914b68c2c4c7b2b43eccad7088c10a83cfbc49f94b",
+        "image_size": 72207,
         "load_segment": "0x1000",
-        "reloc_sha256": "ba47ad8a6e926722f0fe3f59ad5153418199d1b13f3d8cfc21d1ca5f58eca3d8"
+        "reloc_sha256": "defccdd3a18c209ae06f728fe5a370c77cc5d2c1c398cf1fc1963a46ba26927d"
       },
       "path": "/home/xor/games/f19ru/F19/build/EGFRAME.EXE",
-      "sha256": "b6d1d62533c2392ece682d787d3fdadb604054ec1a5eb3c8cc8dcf7c3503cd30"
+      "sha256": "2a1e07601a1746a752edff4def1dba4f99ee1ff679219c850fdf946ce722958b"
     },
     "oracle": {
       "image": {
@@ -25,7 +25,7 @@
         "code_ranges": [
           {
             "address": "0x10000",
-            "size": 64896
+            "size": 126192
           }
         ],
         "code_scope": "declared",
@@ -39,7 +39,7 @@
       "sha256": "66fdad8c063ab1afef206108518165cefe16e3d311a409084ad86bcfb388fd4b"
     }
   },
-  "instruction_limit": 200000,
+  "instruction_limit": 100000,
   "policy": {
     "a20": "enabled",
     "high_half_default": "zero",
@@ -65,7 +65,7 @@
           },
           {
             "bytes": "0100",
-            "linear": "0x6530c"
+            "linear": "0x65cf0"
           },
           {
             "bytes": "000000000000000000000000",
@@ -73,7 +73,7 @@
           },
           {
             "bytes": "110180410000000000000000",
-            "linear": "0x66618"
+            "linear": "0x66b38"
           }
         ],
         "registers": {
@@ -94,32 +94,32 @@
           "eflags": "0x206",
           "es": "0x6000",
           "esi": "0x0",
-          "esp": "0xf002",
+          "esp": "0xffe2",
           "flags": "0x206",
           "fs": "0x0",
           "gs": "0x0",
           "ip": "0x4",
           "si": "0x0",
-          "sp": "0xf002",
+          "sp": "0xffe2",
           "ss": "0x4000"
         },
         "status": "returned",
         "writes": [
           {
             "bytes": "00000000",
-            "linear": "0x4effc"
+            "linear": "0x4ffdc"
           },
           {
             "bytes": "0100",
-            "linear": "0x6530c"
+            "linear": "0x65cf0"
           },
           {
             "bytes": "110180410000",
-            "linear": "0x66618"
+            "linear": "0x66b38"
           },
           {
             "bytes": "00",
-            "linear": "0x66622"
+            "linear": "0x66b42"
           }
         ]
       },
@@ -171,12 +171,12 @@
         "memory": [
           {
             "bytes": "0000",
-            "offset": "0xf002",
+            "offset": "0xffe2",
             "segment": "0x4000"
           },
           {
             "bytes": "0000",
-            "offset": "0xf004",
+            "offset": "0xffe4",
             "segment": "0x4000"
           },
           {
@@ -186,7 +186,7 @@
           },
           {
             "bytes": "0000",
-            "offset": "0x530c",
+            "offset": "0x5cf0",
             "segment": "0x6000"
           },
           {
@@ -196,7 +196,7 @@
           },
           {
             "bytes": "1101",
-            "offset": "0x6258",
+            "offset": "0x6840",
             "segment": "0x6000"
           },
           {
@@ -206,7 +206,7 @@
           },
           {
             "bytes": "2040",
-            "offset": "0x5bf0",
+            "offset": "0x645c",
             "segment": "0x6000"
           },
           {
@@ -216,7 +216,7 @@
           },
           {
             "bytes": "9120",
-            "offset": "0x5cca",
+            "offset": "0x6534",
             "segment": "0x6000"
           }
         ],
@@ -227,7 +227,7 @@
             "size": 2
           },
           {
-            "offset": "0x530c",
+            "offset": "0x5cf0",
             "segment": "0x6000",
             "size": 2
           },
@@ -237,7 +237,7 @@
             "size": 12
           },
           {
-            "offset": "0x6618",
+            "offset": "0x6b38",
             "segment": "0x6000",
             "size": 12
           }
@@ -251,7 +251,7 @@
           "di": "0x0",
           "flags": "0x202",
           "si": "0x0",
-          "sp": "0xf000"
+          "sp": "0xffe0"
         },
         "segments": {
           "ds": "0x6000",
@@ -271,7 +271,7 @@
           },
           {
             "bytes": "0000",
-            "linear": "0x6530c"
+            "linear": "0x65cf0"
           },
           {
             "bytes": "110180410000000000000000",
@@ -279,7 +279,7 @@
           },
           {
             "bytes": "000000000000000000000000",
-            "linear": "0x66618"
+            "linear": "0x66b38"
           }
         ],
         "registers": {
@@ -300,20 +300,20 @@
           "eflags": "0x206",
           "es": "0x6000",
           "esi": "0x0",
-          "esp": "0xf002",
+          "esp": "0xffe2",
           "flags": "0x206",
           "fs": "0x0",
           "gs": "0x0",
           "ip": "0x4",
           "si": "0x0",
-          "sp": "0xf002",
+          "sp": "0xffe2",
           "ss": "0x4000"
         },
         "status": "returned",
         "writes": [
           {
             "bytes": "00000000",
-            "linear": "0x4effc"
+            "linear": "0x4ffdc"
           },
           {
             "bytes": "0100",
@@ -344,7 +344,7 @@
           },
           {
             "bytes": "0100",
-            "linear": "0x6530c"
+            "linear": "0x65cf0"
           },
           {
             "bytes": "000000000000000000000000",
@@ -352,7 +352,7 @@
           },
           {
             "bytes": "110180418041000000000000",
-            "linear": "0x66618"
+            "linear": "0x66b38"
           }
         ],
         "registers": {
@@ -373,32 +373,32 @@
           "eflags": "0x206",
           "es": "0x6000",
           "esi": "0x0",
-          "esp": "0xf002",
+          "esp": "0xffe2",
           "flags": "0x206",
           "fs": "0x0",
           "gs": "0x0",
           "ip": "0x4",
           "si": "0x0",
-          "sp": "0xf002",
+          "sp": "0xffe2",
           "ss": "0x4000"
         },
         "status": "returned",
         "writes": [
           {
             "bytes": "00000000",
-            "linear": "0x4effc"
+            "linear": "0x4ffdc"
           },
           {
             "bytes": "0100",
-            "linear": "0x6530c"
+            "linear": "0x65cf0"
           },
           {
             "bytes": "110180418041",
-            "linear": "0x66618"
+            "linear": "0x66b38"
           },
           {
             "bytes": "00",
-            "linear": "0x66622"
+            "linear": "0x66b42"
           }
         ]
       },
@@ -450,12 +450,12 @@
         "memory": [
           {
             "bytes": "8000",
-            "offset": "0xf002",
+            "offset": "0xffe2",
             "segment": "0x4000"
           },
           {
             "bytes": "4100",
-            "offset": "0xf004",
+            "offset": "0xffe4",
             "segment": "0x4000"
           },
           {
@@ -465,7 +465,7 @@
           },
           {
             "bytes": "0000",
-            "offset": "0x530c",
+            "offset": "0x5cf0",
             "segment": "0x6000"
           },
           {
@@ -475,7 +475,7 @@
           },
           {
             "bytes": "1101",
-            "offset": "0x6258",
+            "offset": "0x6840",
             "segment": "0x6000"
           },
           {
@@ -485,7 +485,7 @@
           },
           {
             "bytes": "2040",
-            "offset": "0x5bf0",
+            "offset": "0x645c",
             "segment": "0x6000"
           },
           {
@@ -495,7 +495,7 @@
           },
           {
             "bytes": "9120",
-            "offset": "0x5cca",
+            "offset": "0x6534",
             "segment": "0x6000"
           }
         ],
@@ -506,7 +506,7 @@
             "size": 2
           },
           {
-            "offset": "0x530c",
+            "offset": "0x5cf0",
             "segment": "0x6000",
             "size": 2
           },
@@ -516,7 +516,7 @@
             "size": 12
           },
           {
-            "offset": "0x6618",
+            "offset": "0x6b38",
             "segment": "0x6000",
             "size": 12
           }
@@ -530,7 +530,7 @@
           "di": "0x0",
           "flags": "0x202",
           "si": "0x0",
-          "sp": "0xf000"
+          "sp": "0xffe0"
         },
         "segments": {
           "ds": "0x6000",
@@ -550,7 +550,7 @@
           },
           {
             "bytes": "0000",
-            "linear": "0x6530c"
+            "linear": "0x65cf0"
           },
           {
             "bytes": "110180418041000000000000",
@@ -558,7 +558,7 @@
           },
           {
             "bytes": "000000000000000000000000",
-            "linear": "0x66618"
+            "linear": "0x66b38"
           }
         ],
         "registers": {
@@ -579,20 +579,20 @@
           "eflags": "0x206",
           "es": "0x6000",
           "esi": "0x0",
-          "esp": "0xf002",
+          "esp": "0xffe2",
           "flags": "0x206",
           "fs": "0x0",
           "gs": "0x0",
           "ip": "0x4",
           "si": "0x0",
-          "sp": "0xf002",
+          "sp": "0xffe2",
           "ss": "0x4000"
         },
         "status": "returned",
         "writes": [
           {
             "bytes": "00000000",
-            "linear": "0x4effc"
+            "linear": "0x4ffdc"
           },
           {
             "bytes": "0100",
@@ -623,7 +623,7 @@
           },
           {
             "bytes": "0100",
-            "linear": "0x6530c"
+            "linear": "0x65cf0"
           },
           {
             "bytes": "000000000000000000000000",
@@ -631,7 +631,7 @@
           },
           {
             "bytes": "11018041ffff000000000000",
-            "linear": "0x66618"
+            "linear": "0x66b38"
           }
         ],
         "registers": {
@@ -652,32 +652,32 @@
           "eflags": "0x206",
           "es": "0x6000",
           "esi": "0x0",
-          "esp": "0xf002",
+          "esp": "0xffe2",
           "flags": "0x206",
           "fs": "0x0",
           "gs": "0x0",
           "ip": "0x4",
           "si": "0x0",
-          "sp": "0xf002",
+          "sp": "0xffe2",
           "ss": "0x4000"
         },
         "status": "returned",
         "writes": [
           {
             "bytes": "00000000",
-            "linear": "0x4effc"
+            "linear": "0x4ffdc"
           },
           {
             "bytes": "0100",
-            "linear": "0x6530c"
+            "linear": "0x65cf0"
           },
           {
             "bytes": "11018041ffff",
-            "linear": "0x66618"
+            "linear": "0x66b38"
           },
           {
             "bytes": "00",
-            "linear": "0x66622"
+            "linear": "0x66b42"
           }
         ]
       },
@@ -729,12 +729,12 @@
         "memory": [
           {
             "bytes": "ff00",
-            "offset": "0xf002",
+            "offset": "0xffe2",
             "segment": "0x4000"
           },
           {
             "bytes": "ff00",
-            "offset": "0xf004",
+            "offset": "0xffe4",
             "segment": "0x4000"
           },
           {
@@ -744,7 +744,7 @@
           },
           {
             "bytes": "0000",
-            "offset": "0x530c",
+            "offset": "0x5cf0",
             "segment": "0x6000"
           },
           {
@@ -754,7 +754,7 @@
           },
           {
             "bytes": "1101",
-            "offset": "0x6258",
+            "offset": "0x6840",
             "segment": "0x6000"
           },
           {
@@ -764,7 +764,7 @@
           },
           {
             "bytes": "2040",
-            "offset": "0x5bf0",
+            "offset": "0x645c",
             "segment": "0x6000"
           },
           {
@@ -774,7 +774,7 @@
           },
           {
             "bytes": "9120",
-            "offset": "0x5cca",
+            "offset": "0x6534",
             "segment": "0x6000"
           }
         ],
@@ -785,7 +785,7 @@
             "size": 2
           },
           {
-            "offset": "0x530c",
+            "offset": "0x5cf0",
             "segment": "0x6000",
             "size": 2
           },
@@ -795,7 +795,7 @@
             "size": 12
           },
           {
-            "offset": "0x6618",
+            "offset": "0x6b38",
             "segment": "0x6000",
             "size": 12
           }
@@ -809,7 +809,7 @@
           "di": "0x0",
           "flags": "0x202",
           "si": "0x0",
-          "sp": "0xf000"
+          "sp": "0xffe0"
         },
         "segments": {
           "ds": "0x6000",
@@ -829,7 +829,7 @@
           },
           {
             "bytes": "0000",
-            "linear": "0x6530c"
+            "linear": "0x65cf0"
           },
           {
             "bytes": "11018041ffff000000000000",
@@ -837,7 +837,7 @@
           },
           {
             "bytes": "000000000000000000000000",
-            "linear": "0x66618"
+            "linear": "0x66b38"
           }
         ],
         "registers": {
@@ -858,20 +858,20 @@
           "eflags": "0x206",
           "es": "0x6000",
           "esi": "0x0",
-          "esp": "0xf002",
+          "esp": "0xffe2",
           "flags": "0x206",
           "fs": "0x0",
           "gs": "0x0",
           "ip": "0x4",
           "si": "0x0",
-          "sp": "0xf002",
+          "sp": "0xffe2",
           "ss": "0x4000"
         },
         "status": "returned",
         "writes": [
           {
             "bytes": "00000000",
-            "linear": "0x4effc"
+            "linear": "0x4ffdc"
           },
           {
             "bytes": "0100",
@@ -902,7 +902,7 @@
           },
           {
             "bytes": "0200",
-            "linear": "0x6530c"
+            "linear": "0x65cf0"
           },
           {
             "bytes": "000000000000000000000000",
@@ -910,7 +910,7 @@
           },
           {
             "bytes": "110180410000000000000000",
-            "linear": "0x6661e"
+            "linear": "0x66b3e"
           }
         ],
         "registers": {
@@ -931,32 +931,32 @@
           "eflags": "0x206",
           "es": "0x6000",
           "esi": "0x0",
-          "esp": "0xf002",
+          "esp": "0xffe2",
           "flags": "0x206",
           "fs": "0x0",
           "gs": "0x0",
           "ip": "0x4",
           "si": "0x0",
-          "sp": "0xf002",
+          "sp": "0xffe2",
           "ss": "0x4000"
         },
         "status": "returned",
         "writes": [
           {
             "bytes": "00000000",
-            "linear": "0x4effc"
+            "linear": "0x4ffdc"
           },
           {
             "bytes": "0200",
-            "linear": "0x6530c"
+            "linear": "0x65cf0"
           },
           {
             "bytes": "110180410000",
-            "linear": "0x6661e"
+            "linear": "0x66b3e"
           },
           {
             "bytes": "00",
-            "linear": "0x66628"
+            "linear": "0x66b48"
           }
         ]
       },
@@ -1008,12 +1008,12 @@
         "memory": [
           {
             "bytes": "0000",
-            "offset": "0xf002",
+            "offset": "0xffe2",
             "segment": "0x4000"
           },
           {
             "bytes": "0000",
-            "offset": "0xf004",
+            "offset": "0xffe4",
             "segment": "0x4000"
           },
           {
@@ -1023,7 +1023,7 @@
           },
           {
             "bytes": "0100",
-            "offset": "0x530c",
+            "offset": "0x5cf0",
             "segment": "0x6000"
           },
           {
@@ -1033,7 +1033,7 @@
           },
           {
             "bytes": "1101",
-            "offset": "0x6258",
+            "offset": "0x6840",
             "segment": "0x6000"
           },
           {
@@ -1043,7 +1043,7 @@
           },
           {
             "bytes": "2040",
-            "offset": "0x5bf0",
+            "offset": "0x645c",
             "segment": "0x6000"
           },
           {
@@ -1053,7 +1053,7 @@
           },
           {
             "bytes": "9120",
-            "offset": "0x5cca",
+            "offset": "0x6534",
             "segment": "0x6000"
           }
         ],
@@ -1064,7 +1064,7 @@
             "size": 2
           },
           {
-            "offset": "0x530c",
+            "offset": "0x5cf0",
             "segment": "0x6000",
             "size": 2
           },
@@ -1074,7 +1074,7 @@
             "size": 12
           },
           {
-            "offset": "0x661e",
+            "offset": "0x6b3e",
             "segment": "0x6000",
             "size": 12
           }
@@ -1088,7 +1088,7 @@
           "di": "0x0",
           "flags": "0x202",
           "si": "0x0",
-          "sp": "0xf000"
+          "sp": "0xffe0"
         },
         "segments": {
           "ds": "0x6000",
@@ -1108,7 +1108,7 @@
           },
           {
             "bytes": "0100",
-            "linear": "0x6530c"
+            "linear": "0x65cf0"
           },
           {
             "bytes": "110180410000000000000000",
@@ -1116,7 +1116,7 @@
           },
           {
             "bytes": "000000000000000000000000",
-            "linear": "0x6661e"
+            "linear": "0x66b3e"
           }
         ],
         "registers": {
@@ -1137,20 +1137,20 @@
           "eflags": "0x206",
           "es": "0x6000",
           "esi": "0x0",
-          "esp": "0xf002",
+          "esp": "0xffe2",
           "flags": "0x206",
           "fs": "0x0",
           "gs": "0x0",
           "ip": "0x4",
           "si": "0x0",
-          "sp": "0xf002",
+          "sp": "0xffe2",
           "ss": "0x4000"
         },
         "status": "returned",
         "writes": [
           {
             "bytes": "00000000",
-            "linear": "0x4effc"
+            "linear": "0x4ffdc"
           },
           {
             "bytes": "0200",
@@ -1181,7 +1181,7 @@
           },
           {
             "bytes": "0200",
-            "linear": "0x6530c"
+            "linear": "0x65cf0"
           },
           {
             "bytes": "000000000000000000000000",
@@ -1189,7 +1189,7 @@
           },
           {
             "bytes": "110180418041000000000000",
-            "linear": "0x6661e"
+            "linear": "0x66b3e"
           }
         ],
         "registers": {
@@ -1210,32 +1210,32 @@
           "eflags": "0x206",
           "es": "0x6000",
           "esi": "0x0",
-          "esp": "0xf002",
+          "esp": "0xffe2",
           "flags": "0x206",
           "fs": "0x0",
           "gs": "0x0",
           "ip": "0x4",
           "si": "0x0",
-          "sp": "0xf002",
+          "sp": "0xffe2",
           "ss": "0x4000"
         },
         "status": "returned",
         "writes": [
           {
             "bytes": "00000000",
-            "linear": "0x4effc"
+            "linear": "0x4ffdc"
           },
           {
             "bytes": "0200",
-            "linear": "0x6530c"
+            "linear": "0x65cf0"
           },
           {
             "bytes": "110180418041",
-            "linear": "0x6661e"
+            "linear": "0x66b3e"
           },
           {
             "bytes": "00",
-            "linear": "0x66628"
+            "linear": "0x66b48"
           }
         ]
       },
@@ -1287,12 +1287,12 @@
         "memory": [
           {
             "bytes": "8000",
-            "offset": "0xf002",
+            "offset": "0xffe2",
             "segment": "0x4000"
           },
           {
             "bytes": "4100",
-            "offset": "0xf004",
+            "offset": "0xffe4",
             "segment": "0x4000"
           },
           {
@@ -1302,7 +1302,7 @@
           },
           {
             "bytes": "0100",
-            "offset": "0x530c",
+            "offset": "0x5cf0",
             "segment": "0x6000"
           },
           {
@@ -1312,7 +1312,7 @@
           },
           {
             "bytes": "1101",
-            "offset": "0x6258",
+            "offset": "0x6840",
             "segment": "0x6000"
           },
           {
@@ -1322,7 +1322,7 @@
           },
           {
             "bytes": "2040",
-            "offset": "0x5bf0",
+            "offset": "0x645c",
             "segment": "0x6000"
           },
           {
@@ -1332,7 +1332,7 @@
           },
           {
             "bytes": "9120",
-            "offset": "0x5cca",
+            "offset": "0x6534",
             "segment": "0x6000"
           }
         ],
@@ -1343,7 +1343,7 @@
             "size": 2
           },
           {
-            "offset": "0x530c",
+            "offset": "0x5cf0",
             "segment": "0x6000",
             "size": 2
           },
@@ -1353,7 +1353,7 @@
             "size": 12
           },
           {
-            "offset": "0x661e",
+            "offset": "0x6b3e",
             "segment": "0x6000",
             "size": 12
           }
@@ -1367,7 +1367,7 @@
           "di": "0x0",
           "flags": "0x202",
           "si": "0x0",
-          "sp": "0xf000"
+          "sp": "0xffe0"
         },
         "segments": {
           "ds": "0x6000",
@@ -1387,7 +1387,7 @@
           },
           {
             "bytes": "0100",
-            "linear": "0x6530c"
+            "linear": "0x65cf0"
           },
           {
             "bytes": "110180418041000000000000",
@@ -1395,7 +1395,7 @@
           },
           {
             "bytes": "000000000000000000000000",
-            "linear": "0x6661e"
+            "linear": "0x66b3e"
           }
         ],
         "registers": {
@@ -1416,20 +1416,20 @@
           "eflags": "0x206",
           "es": "0x6000",
           "esi": "0x0",
-          "esp": "0xf002",
+          "esp": "0xffe2",
           "flags": "0x206",
           "fs": "0x0",
           "gs": "0x0",
           "ip": "0x4",
           "si": "0x0",
-          "sp": "0xf002",
+          "sp": "0xffe2",
           "ss": "0x4000"
         },
         "status": "returned",
         "writes": [
           {
             "bytes": "00000000",
-            "linear": "0x4effc"
+            "linear": "0x4ffdc"
           },
           {
             "bytes": "0200",
@@ -1460,7 +1460,7 @@
           },
           {
             "bytes": "0200",
-            "linear": "0x6530c"
+            "linear": "0x65cf0"
           },
           {
             "bytes": "000000000000000000000000",
@@ -1468,7 +1468,7 @@
           },
           {
             "bytes": "11018041ffff000000000000",
-            "linear": "0x6661e"
+            "linear": "0x66b3e"
           }
         ],
         "registers": {
@@ -1489,32 +1489,32 @@
           "eflags": "0x206",
           "es": "0x6000",
           "esi": "0x0",
-          "esp": "0xf002",
+          "esp": "0xffe2",
           "flags": "0x206",
           "fs": "0x0",
           "gs": "0x0",
           "ip": "0x4",
           "si": "0x0",
-          "sp": "0xf002",
+          "sp": "0xffe2",
           "ss": "0x4000"
         },
         "status": "returned",
         "writes": [
           {
             "bytes": "00000000",
-            "linear": "0x4effc"
+            "linear": "0x4ffdc"
           },
           {
             "bytes": "0200",
-            "linear": "0x6530c"
+            "linear": "0x65cf0"
           },
           {
             "bytes": "11018041ffff",
-            "linear": "0x6661e"
+            "linear": "0x66b3e"
           },
           {
             "bytes": "00",
-            "linear": "0x66628"
+            "linear": "0x66b48"
           }
         ]
       },
@@ -1566,12 +1566,12 @@
         "memory": [
           {
             "bytes": "ff00",
-            "offset": "0xf002",
+            "offset": "0xffe2",
             "segment": "0x4000"
           },
           {
             "bytes": "ff00",
-            "offset": "0xf004",
+            "offset": "0xffe4",
             "segment": "0x4000"
           },
           {
@@ -1581,7 +1581,7 @@
           },
           {
             "bytes": "0100",
-            "offset": "0x530c",
+            "offset": "0x5cf0",
             "segment": "0x6000"
           },
           {
@@ -1591,7 +1591,7 @@
           },
           {
             "bytes": "1101",
-            "offset": "0x6258",
+            "offset": "0x6840",
             "segment": "0x6000"
           },
           {
@@ -1601,7 +1601,7 @@
           },
           {
             "bytes": "2040",
-            "offset": "0x5bf0",
+            "offset": "0x645c",
             "segment": "0x6000"
           },
           {
@@ -1611,7 +1611,7 @@
           },
           {
             "bytes": "9120",
-            "offset": "0x5cca",
+            "offset": "0x6534",
             "segment": "0x6000"
           }
         ],
@@ -1622,7 +1622,7 @@
             "size": 2
           },
           {
-            "offset": "0x530c",
+            "offset": "0x5cf0",
             "segment": "0x6000",
             "size": 2
           },
@@ -1632,7 +1632,7 @@
             "size": 12
           },
           {
-            "offset": "0x661e",
+            "offset": "0x6b3e",
             "segment": "0x6000",
             "size": 12
           }
@@ -1646,7 +1646,7 @@
           "di": "0x0",
           "flags": "0x202",
           "si": "0x0",
-          "sp": "0xf000"
+          "sp": "0xffe0"
         },
         "segments": {
           "ds": "0x6000",
@@ -1666,7 +1666,7 @@
           },
           {
             "bytes": "0100",
-            "linear": "0x6530c"
+            "linear": "0x65cf0"
           },
           {
             "bytes": "11018041ffff000000000000",
@@ -1674,7 +1674,7 @@
           },
           {
             "bytes": "000000000000000000000000",
-            "linear": "0x6661e"
+            "linear": "0x66b3e"
           }
         ],
         "registers": {
@@ -1695,20 +1695,20 @@
           "eflags": "0x206",
           "es": "0x6000",
           "esi": "0x0",
-          "esp": "0xf002",
+          "esp": "0xffe2",
           "flags": "0x206",
           "fs": "0x0",
           "gs": "0x0",
           "ip": "0x4",
           "si": "0x0",
-          "sp": "0xf002",
+          "sp": "0xffe2",
           "ss": "0x4000"
         },
         "status": "returned",
         "writes": [
           {
             "bytes": "00000000",
-            "linear": "0x4effc"
+            "linear": "0x4ffdc"
           },
           {
             "bytes": "0200",
@@ -1739,7 +1739,7 @@
           },
           {
             "bytes": "ff00",
-            "linear": "0x6530c"
+            "linear": "0x65cf0"
           },
           {
             "bytes": "000000000000000000000000",
@@ -1747,7 +1747,7 @@
           },
           {
             "bytes": "110180410000000000000000",
-            "linear": "0x66c0c"
+            "linear": "0x6712c"
           }
         ],
         "registers": {
@@ -1768,32 +1768,32 @@
           "eflags": "0x206",
           "es": "0x6000",
           "esi": "0x0",
-          "esp": "0xf002",
+          "esp": "0xffe2",
           "flags": "0x206",
           "fs": "0x0",
           "gs": "0x0",
           "ip": "0x4",
           "si": "0x0",
-          "sp": "0xf002",
+          "sp": "0xffe2",
           "ss": "0x4000"
         },
         "status": "returned",
         "writes": [
           {
             "bytes": "00000000",
-            "linear": "0x4effc"
+            "linear": "0x4ffdc"
           },
           {
             "bytes": "ff00",
-            "linear": "0x6530c"
+            "linear": "0x65cf0"
           },
           {
             "bytes": "110180410000",
-            "linear": "0x66c0c"
+            "linear": "0x6712c"
           },
           {
             "bytes": "00",
-            "linear": "0x66c16"
+            "linear": "0x67136"
           }
         ]
       },
@@ -1845,12 +1845,12 @@
         "memory": [
           {
             "bytes": "0000",
-            "offset": "0xf002",
+            "offset": "0xffe2",
             "segment": "0x4000"
           },
           {
             "bytes": "0000",
-            "offset": "0xf004",
+            "offset": "0xffe4",
             "segment": "0x4000"
           },
           {
@@ -1860,7 +1860,7 @@
           },
           {
             "bytes": "fe00",
-            "offset": "0x530c",
+            "offset": "0x5cf0",
             "segment": "0x6000"
           },
           {
@@ -1870,7 +1870,7 @@
           },
           {
             "bytes": "1101",
-            "offset": "0x6258",
+            "offset": "0x6840",
             "segment": "0x6000"
           },
           {
@@ -1880,7 +1880,7 @@
           },
           {
             "bytes": "2040",
-            "offset": "0x5bf0",
+            "offset": "0x645c",
             "segment": "0x6000"
           },
           {
@@ -1890,7 +1890,7 @@
           },
           {
             "bytes": "9120",
-            "offset": "0x5cca",
+            "offset": "0x6534",
             "segment": "0x6000"
           }
         ],
@@ -1901,7 +1901,7 @@
             "size": 2
           },
           {
-            "offset": "0x530c",
+            "offset": "0x5cf0",
             "segment": "0x6000",
             "size": 2
           },
@@ -1911,7 +1911,7 @@
             "size": 12
           },
           {
-            "offset": "0x6c0c",
+            "offset": "0x712c",
             "segment": "0x6000",
             "size": 12
           }
@@ -1925,7 +1925,7 @@
           "di": "0x0",
           "flags": "0x202",
           "si": "0x0",
-          "sp": "0xf000"
+          "sp": "0xffe0"
         },
         "segments": {
           "ds": "0x6000",
@@ -1945,7 +1945,7 @@
           },
           {
             "bytes": "fe00",
-            "linear": "0x6530c"
+            "linear": "0x65cf0"
           },
           {
             "bytes": "110180410000000000000000",
@@ -1953,7 +1953,7 @@
           },
           {
             "bytes": "000000000000000000000000",
-            "linear": "0x66c0c"
+            "linear": "0x6712c"
           }
         ],
         "registers": {
@@ -1974,20 +1974,20 @@
           "eflags": "0x206",
           "es": "0x6000",
           "esi": "0x0",
-          "esp": "0xf002",
+          "esp": "0xffe2",
           "flags": "0x206",
           "fs": "0x0",
           "gs": "0x0",
           "ip": "0x4",
           "si": "0x0",
-          "sp": "0xf002",
+          "sp": "0xffe2",
           "ss": "0x4000"
         },
         "status": "returned",
         "writes": [
           {
             "bytes": "00000000",
-            "linear": "0x4effc"
+            "linear": "0x4ffdc"
           },
           {
             "bytes": "ff00",
@@ -2018,7 +2018,7 @@
           },
           {
             "bytes": "ff00",
-            "linear": "0x6530c"
+            "linear": "0x65cf0"
           },
           {
             "bytes": "000000000000000000000000",
@@ -2026,7 +2026,7 @@
           },
           {
             "bytes": "110180418041000000000000",
-            "linear": "0x66c0c"
+            "linear": "0x6712c"
           }
         ],
         "registers": {
@@ -2047,32 +2047,32 @@
           "eflags": "0x206",
           "es": "0x6000",
           "esi": "0x0",
-          "esp": "0xf002",
+          "esp": "0xffe2",
           "flags": "0x206",
           "fs": "0x0",
           "gs": "0x0",
           "ip": "0x4",
           "si": "0x0",
-          "sp": "0xf002",
+          "sp": "0xffe2",
           "ss": "0x4000"
         },
         "status": "returned",
         "writes": [
           {
             "bytes": "00000000",
-            "linear": "0x4effc"
+            "linear": "0x4ffdc"
           },
           {
             "bytes": "ff00",
-            "linear": "0x6530c"
+            "linear": "0x65cf0"
           },
           {
             "bytes": "110180418041",
-            "linear": "0x66c0c"
+            "linear": "0x6712c"
           },
           {
             "bytes": "00",
-            "linear": "0x66c16"
+            "linear": "0x67136"
           }
         ]
       },
@@ -2124,12 +2124,12 @@
         "memory": [
           {
             "bytes": "8000",
-            "offset": "0xf002",
+            "offset": "0xffe2",
             "segment": "0x4000"
           },
           {
             "bytes": "4100",
-            "offset": "0xf004",
+            "offset": "0xffe4",
             "segment": "0x4000"
           },
           {
@@ -2139,7 +2139,7 @@
           },
           {
             "bytes": "fe00",
-            "offset": "0x530c",
+            "offset": "0x5cf0",
             "segment": "0x6000"
           },
           {
@@ -2149,7 +2149,7 @@
           },
           {
             "bytes": "1101",
-            "offset": "0x6258",
+            "offset": "0x6840",
             "segment": "0x6000"
           },
           {
@@ -2159,7 +2159,7 @@
           },
           {
             "bytes": "2040",
-            "offset": "0x5bf0",
+            "offset": "0x645c",
             "segment": "0x6000"
           },
           {
@@ -2169,7 +2169,7 @@
           },
           {
             "bytes": "9120",
-            "offset": "0x5cca",
+            "offset": "0x6534",
             "segment": "0x6000"
           }
         ],
@@ -2180,7 +2180,7 @@
             "size": 2
           },
           {
-            "offset": "0x530c",
+            "offset": "0x5cf0",
             "segment": "0x6000",
             "size": 2
           },
@@ -2190,7 +2190,7 @@
             "size": 12
           },
           {
-            "offset": "0x6c0c",
+            "offset": "0x712c",
             "segment": "0x6000",
             "size": 12
           }
@@ -2204,7 +2204,7 @@
           "di": "0x0",
           "flags": "0x202",
           "si": "0x0",
-          "sp": "0xf000"
+          "sp": "0xffe0"
         },
         "segments": {
           "ds": "0x6000",
@@ -2224,7 +2224,7 @@
           },
           {
             "bytes": "fe00",
-            "linear": "0x6530c"
+            "linear": "0x65cf0"
           },
           {
             "bytes": "110180418041000000000000",
@@ -2232,7 +2232,7 @@
           },
           {
             "bytes": "000000000000000000000000",
-            "linear": "0x66c0c"
+            "linear": "0x6712c"
           }
         ],
         "registers": {
@@ -2253,20 +2253,20 @@
           "eflags": "0x206",
           "es": "0x6000",
           "esi": "0x0",
-          "esp": "0xf002",
+          "esp": "0xffe2",
           "flags": "0x206",
           "fs": "0x0",
           "gs": "0x0",
           "ip": "0x4",
           "si": "0x0",
-          "sp": "0xf002",
+          "sp": "0xffe2",
           "ss": "0x4000"
         },
         "status": "returned",
         "writes": [
           {
             "bytes": "00000000",
-            "linear": "0x4effc"
+            "linear": "0x4ffdc"
           },
           {
             "bytes": "ff00",
@@ -2297,7 +2297,7 @@
           },
           {
             "bytes": "ff00",
-            "linear": "0x6530c"
+            "linear": "0x65cf0"
           },
           {
             "bytes": "000000000000000000000000",
@@ -2305,7 +2305,7 @@
           },
           {
             "bytes": "11018041ffff000000000000",
-            "linear": "0x66c0c"
+            "linear": "0x6712c"
           }
         ],
         "registers": {
@@ -2326,32 +2326,32 @@
           "eflags": "0x206",
           "es": "0x6000",
           "esi": "0x0",
-          "esp": "0xf002",
+          "esp": "0xffe2",
           "flags": "0x206",
           "fs": "0x0",
           "gs": "0x0",
           "ip": "0x4",
           "si": "0x0",
-          "sp": "0xf002",
+          "sp": "0xffe2",
           "ss": "0x4000"
         },
         "status": "returned",
         "writes": [
           {
             "bytes": "00000000",
-            "linear": "0x4effc"
+            "linear": "0x4ffdc"
           },
           {
             "bytes": "ff00",
-            "linear": "0x6530c"
+            "linear": "0x65cf0"
           },
           {
             "bytes": "11018041ffff",
-            "linear": "0x66c0c"
+            "linear": "0x6712c"
           },
           {
             "bytes": "00",
-            "linear": "0x66c16"
+            "linear": "0x67136"
           }
         ]
       },
@@ -2403,12 +2403,12 @@
         "memory": [
           {
             "bytes": "ff00",
-            "offset": "0xf002",
+            "offset": "0xffe2",
             "segment": "0x4000"
           },
           {
             "bytes": "ff00",
-            "offset": "0xf004",
+            "offset": "0xffe4",
             "segment": "0x4000"
           },
           {
@@ -2418,7 +2418,7 @@
           },
           {
             "bytes": "fe00",
-            "offset": "0x530c",
+            "offset": "0x5cf0",
             "segment": "0x6000"
           },
           {
@@ -2428,7 +2428,7 @@
           },
           {
             "bytes": "1101",
-            "offset": "0x6258",
+            "offset": "0x6840",
             "segment": "0x6000"
           },
           {
@@ -2438,7 +2438,7 @@
           },
           {
             "bytes": "2040",
-            "offset": "0x5bf0",
+            "offset": "0x645c",
             "segment": "0x6000"
           },
           {
@@ -2448,7 +2448,7 @@
           },
           {
             "bytes": "9120",
-            "offset": "0x5cca",
+            "offset": "0x6534",
             "segment": "0x6000"
           }
         ],
@@ -2459,7 +2459,7 @@
             "size": 2
           },
           {
-            "offset": "0x530c",
+            "offset": "0x5cf0",
             "segment": "0x6000",
             "size": 2
           },
@@ -2469,7 +2469,7 @@
             "size": 12
           },
           {
-            "offset": "0x6c0c",
+            "offset": "0x712c",
             "segment": "0x6000",
             "size": 12
           }
@@ -2483,7 +2483,7 @@
           "di": "0x0",
           "flags": "0x202",
           "si": "0x0",
-          "sp": "0xf000"
+          "sp": "0xffe0"
         },
         "segments": {
           "ds": "0x6000",
@@ -2503,7 +2503,7 @@
           },
           {
             "bytes": "fe00",
-            "linear": "0x6530c"
+            "linear": "0x65cf0"
           },
           {
             "bytes": "11018041ffff000000000000",
@@ -2511,7 +2511,7 @@
           },
           {
             "bytes": "000000000000000000000000",
-            "linear": "0x66c0c"
+            "linear": "0x6712c"
           }
         ],
         "registers": {
@@ -2532,20 +2532,20 @@
           "eflags": "0x206",
           "es": "0x6000",
           "esi": "0x0",
-          "esp": "0xf002",
+          "esp": "0xffe2",
           "flags": "0x206",
           "fs": "0x0",
           "gs": "0x0",
           "ip": "0x4",
           "si": "0x0",
-          "sp": "0xf002",
+          "sp": "0xffe2",
           "ss": "0x4000"
         },
         "status": "returned",
         "writes": [
           {
             "bytes": "00000000",
-            "linear": "0x4effc"
+            "linear": "0x4ffdc"
           },
           {
             "bytes": "ff00",
@@ -2576,7 +2576,7 @@
           },
           {
             "bytes": "ff00",
-            "linear": "0x6530c"
+            "linear": "0x65cf0"
           },
           {
             "bytes": "000000000000000000000000",
@@ -2584,7 +2584,7 @@
           },
           {
             "bytes": "000000000000000000000000",
-            "linear": "0x66c12"
+            "linear": "0x67132"
           }
         ],
         "registers": {
@@ -2605,20 +2605,20 @@
           "eflags": "0x246",
           "es": "0x6000",
           "esi": "0x0",
-          "esp": "0xf002",
+          "esp": "0xffe2",
           "flags": "0x246",
           "fs": "0x0",
           "gs": "0x0",
           "ip": "0x4",
           "si": "0x0",
-          "sp": "0xf002",
+          "sp": "0xffe2",
           "ss": "0x4000"
         },
         "status": "returned",
         "writes": [
           {
             "bytes": "00000000",
-            "linear": "0x4effc"
+            "linear": "0x4ffdc"
           }
         ]
       },
@@ -2670,12 +2670,12 @@
         "memory": [
           {
             "bytes": "0000",
-            "offset": "0xf002",
+            "offset": "0xffe2",
             "segment": "0x4000"
           },
           {
             "bytes": "0000",
-            "offset": "0xf004",
+            "offset": "0xffe4",
             "segment": "0x4000"
           },
           {
@@ -2685,7 +2685,7 @@
           },
           {
             "bytes": "ff00",
-            "offset": "0x530c",
+            "offset": "0x5cf0",
             "segment": "0x6000"
           },
           {
@@ -2695,7 +2695,7 @@
           },
           {
             "bytes": "1101",
-            "offset": "0x6258",
+            "offset": "0x6840",
             "segment": "0x6000"
           },
           {
@@ -2705,7 +2705,7 @@
           },
           {
             "bytes": "2040",
-            "offset": "0x5bf0",
+            "offset": "0x645c",
             "segment": "0x6000"
           },
           {
@@ -2715,7 +2715,7 @@
           },
           {
             "bytes": "9120",
-            "offset": "0x5cca",
+            "offset": "0x6534",
             "segment": "0x6000"
           }
         ],
@@ -2726,7 +2726,7 @@
             "size": 2
           },
           {
-            "offset": "0x530c",
+            "offset": "0x5cf0",
             "segment": "0x6000",
             "size": 2
           },
@@ -2736,7 +2736,7 @@
             "size": 12
           },
           {
-            "offset": "0x6c12",
+            "offset": "0x7132",
             "segment": "0x6000",
             "size": 12
           }
@@ -2750,7 +2750,7 @@
           "di": "0x0",
           "flags": "0x202",
           "si": "0x0",
-          "sp": "0xf000"
+          "sp": "0xffe0"
         },
         "segments": {
           "ds": "0x6000",
@@ -2770,7 +2770,7 @@
           },
           {
             "bytes": "ff00",
-            "linear": "0x6530c"
+            "linear": "0x65cf0"
           },
           {
             "bytes": "000000000000000000000000",
@@ -2778,7 +2778,7 @@
           },
           {
             "bytes": "000000000000000000000000",
-            "linear": "0x66c12"
+            "linear": "0x67132"
           }
         ],
         "registers": {
@@ -2799,20 +2799,20 @@
           "eflags": "0x246",
           "es": "0x6000",
           "esi": "0x0",
-          "esp": "0xf002",
+          "esp": "0xffe2",
           "flags": "0x246",
           "fs": "0x0",
           "gs": "0x0",
           "ip": "0x4",
           "si": "0x0",
-          "sp": "0xf002",
+          "sp": "0xffe2",
           "ss": "0x4000"
         },
         "status": "returned",
         "writes": [
           {
             "bytes": "00000000",
-            "linear": "0x4effc"
+            "linear": "0x4ffdc"
           }
         ]
       },
@@ -2831,7 +2831,7 @@
           },
           {
             "bytes": "ff00",
-            "linear": "0x6530c"
+            "linear": "0x65cf0"
           },
           {
             "bytes": "000000000000000000000000",
@@ -2839,7 +2839,7 @@
           },
           {
             "bytes": "000000000000000000000000",
-            "linear": "0x66c12"
+            "linear": "0x67132"
           }
         ],
         "registers": {
@@ -2860,20 +2860,20 @@
           "eflags": "0x246",
           "es": "0x6000",
           "esi": "0x0",
-          "esp": "0xf002",
+          "esp": "0xffe2",
           "flags": "0x246",
           "fs": "0x0",
           "gs": "0x0",
           "ip": "0x4",
           "si": "0x0",
-          "sp": "0xf002",
+          "sp": "0xffe2",
           "ss": "0x4000"
         },
         "status": "returned",
         "writes": [
           {
             "bytes": "00000000",
-            "linear": "0x4effc"
+            "linear": "0x4ffdc"
           }
         ]
       },
@@ -2925,12 +2925,12 @@
         "memory": [
           {
             "bytes": "8000",
-            "offset": "0xf002",
+            "offset": "0xffe2",
             "segment": "0x4000"
           },
           {
             "bytes": "4100",
-            "offset": "0xf004",
+            "offset": "0xffe4",
             "segment": "0x4000"
           },
           {
@@ -2940,7 +2940,7 @@
           },
           {
             "bytes": "ff00",
-            "offset": "0x530c",
+            "offset": "0x5cf0",
             "segment": "0x6000"
           },
           {
@@ -2950,7 +2950,7 @@
           },
           {
             "bytes": "1101",
-            "offset": "0x6258",
+            "offset": "0x6840",
             "segment": "0x6000"
           },
           {
@@ -2960,7 +2960,7 @@
           },
           {
             "bytes": "2040",
-            "offset": "0x5bf0",
+            "offset": "0x645c",
             "segment": "0x6000"
           },
           {
@@ -2970,7 +2970,7 @@
           },
           {
             "bytes": "9120",
-            "offset": "0x5cca",
+            "offset": "0x6534",
             "segment": "0x6000"
           }
         ],
@@ -2981,7 +2981,7 @@
             "size": 2
           },
           {
-            "offset": "0x530c",
+            "offset": "0x5cf0",
             "segment": "0x6000",
             "size": 2
           },
@@ -2991,7 +2991,7 @@
             "size": 12
           },
           {
-            "offset": "0x6c12",
+            "offset": "0x7132",
             "segment": "0x6000",
             "size": 12
           }
@@ -3005,7 +3005,7 @@
           "di": "0x0",
           "flags": "0x202",
           "si": "0x0",
-          "sp": "0xf000"
+          "sp": "0xffe0"
         },
         "segments": {
           "ds": "0x6000",
@@ -3025,7 +3025,7 @@
           },
           {
             "bytes": "ff00",
-            "linear": "0x6530c"
+            "linear": "0x65cf0"
           },
           {
             "bytes": "000000000000000000000000",
@@ -3033,7 +3033,7 @@
           },
           {
             "bytes": "000000000000000000000000",
-            "linear": "0x66c12"
+            "linear": "0x67132"
           }
         ],
         "registers": {
@@ -3054,20 +3054,20 @@
           "eflags": "0x246",
           "es": "0x6000",
           "esi": "0x0",
-          "esp": "0xf002",
+          "esp": "0xffe2",
           "flags": "0x246",
           "fs": "0x0",
           "gs": "0x0",
           "ip": "0x4",
           "si": "0x0",
-          "sp": "0xf002",
+          "sp": "0xffe2",
           "ss": "0x4000"
         },
         "status": "returned",
         "writes": [
           {
             "bytes": "00000000",
-            "linear": "0x4effc"
+            "linear": "0x4ffdc"
           }
         ]
       },
@@ -3086,7 +3086,7 @@
           },
           {
             "bytes": "ff00",
-            "linear": "0x6530c"
+            "linear": "0x65cf0"
           },
           {
             "bytes": "000000000000000000000000",
@@ -3094,7 +3094,7 @@
           },
           {
             "bytes": "000000000000000000000000",
-            "linear": "0x66c12"
+            "linear": "0x67132"
           }
         ],
         "registers": {
@@ -3115,20 +3115,20 @@
           "eflags": "0x246",
           "es": "0x6000",
           "esi": "0x0",
-          "esp": "0xf002",
+          "esp": "0xffe2",
           "flags": "0x246",
           "fs": "0x0",
           "gs": "0x0",
           "ip": "0x4",
           "si": "0x0",
-          "sp": "0xf002",
+          "sp": "0xffe2",
           "ss": "0x4000"
         },
         "status": "returned",
         "writes": [
           {
             "bytes": "00000000",
-            "linear": "0x4effc"
+            "linear": "0x4ffdc"
           }
         ]
       },
@@ -3180,12 +3180,12 @@
         "memory": [
           {
             "bytes": "ff00",
-            "offset": "0xf002",
+            "offset": "0xffe2",
             "segment": "0x4000"
           },
           {
             "bytes": "ff00",
-            "offset": "0xf004",
+            "offset": "0xffe4",
             "segment": "0x4000"
           },
           {
@@ -3195,7 +3195,7 @@
           },
           {
             "bytes": "ff00",
-            "offset": "0x530c",
+            "offset": "0x5cf0",
             "segment": "0x6000"
           },
           {
@@ -3205,7 +3205,7 @@
           },
           {
             "bytes": "1101",
-            "offset": "0x6258",
+            "offset": "0x6840",
             "segment": "0x6000"
           },
           {
@@ -3215,7 +3215,7 @@
           },
           {
             "bytes": "2040",
-            "offset": "0x5bf0",
+            "offset": "0x645c",
             "segment": "0x6000"
           },
           {
@@ -3225,7 +3225,7 @@
           },
           {
             "bytes": "9120",
-            "offset": "0x5cca",
+            "offset": "0x6534",
             "segment": "0x6000"
           }
         ],
@@ -3236,7 +3236,7 @@
             "size": 2
           },
           {
-            "offset": "0x530c",
+            "offset": "0x5cf0",
             "segment": "0x6000",
             "size": 2
           },
@@ -3246,7 +3246,7 @@
             "size": 12
           },
           {
-            "offset": "0x6c12",
+            "offset": "0x7132",
             "segment": "0x6000",
             "size": 12
           }
@@ -3260,7 +3260,7 @@
           "di": "0x0",
           "flags": "0x202",
           "si": "0x0",
-          "sp": "0xf000"
+          "sp": "0xffe0"
         },
         "segments": {
           "ds": "0x6000",
@@ -3280,7 +3280,7 @@
           },
           {
             "bytes": "ff00",
-            "linear": "0x6530c"
+            "linear": "0x65cf0"
           },
           {
             "bytes": "000000000000000000000000",
@@ -3288,7 +3288,7 @@
           },
           {
             "bytes": "000000000000000000000000",
-            "linear": "0x66c12"
+            "linear": "0x67132"
           }
         ],
         "registers": {
@@ -3309,20 +3309,20 @@
           "eflags": "0x246",
           "es": "0x6000",
           "esi": "0x0",
-          "esp": "0xf002",
+          "esp": "0xffe2",
           "flags": "0x246",
           "fs": "0x0",
           "gs": "0x0",
           "ip": "0x4",
           "si": "0x0",
-          "sp": "0xf002",
+          "sp": "0xffe2",
           "ss": "0x4000"
         },
         "status": "returned",
         "writes": [
           {
             "bytes": "00000000",
-            "linear": "0x4effc"
+            "linear": "0x4ffdc"
           }
         ]
       },
@@ -3341,7 +3341,7 @@
           },
           {
             "bytes": "4d49472d32390000000000000000000000000000000000000000000000000000",
-            "linear": "0x65a8c"
+            "linear": "0x66386"
           }
         ],
         "registers": {
@@ -3362,24 +3362,24 @@
           "eflags": "0x297",
           "es": "0x6000",
           "esi": "0x0",
-          "esp": "0xf002",
+          "esp": "0xffe2",
           "flags": "0x297",
           "fs": "0x0",
           "gs": "0x0",
           "ip": "0x4",
           "si": "0x0",
-          "sp": "0xf002",
+          "sp": "0xffe2",
           "ss": "0x4000"
         },
         "status": "returned",
         "writes": [
           {
-            "bytes": "feeffeef75728c5a00000000",
-            "linear": "0x4eff4"
+            "bytes": "deffdeff7572866300000000",
+            "linear": "0x4ffd4"
           },
           {
             "bytes": "4d49472d323900",
-            "linear": "0x65a8c"
+            "linear": "0x66386"
           }
         ]
       },
@@ -3430,8 +3430,18 @@
         "high_halves": {},
         "memory": [
           {
+            "bytes": "4d49472d323900",
+            "offset": "0x7000",
+            "segment": "0x6000"
+          },
+          {
+            "bytes": "4d49472d323900",
+            "offset": "0x7000",
+            "segment": "0x6000"
+          },
+          {
             "bytes": "0000",
-            "offset": "0xf002",
+            "offset": "0xffe2",
             "segment": "0x4000"
           },
           {
@@ -3441,7 +3451,7 @@
           },
           {
             "bytes": "0000",
-            "offset": "0x5cd8",
+            "offset": "0x6542",
             "segment": "0x6000"
           },
           {
@@ -3451,7 +3461,7 @@
           },
           {
             "bytes": "0200",
-            "offset": "0x5ce6",
+            "offset": "0x6550",
             "segment": "0x6000"
           },
           {
@@ -3461,7 +3471,7 @@
           },
           {
             "bytes": "0070",
-            "offset": "0x518a",
+            "offset": "0x5b72",
             "segment": "0x6000"
           },
           {
@@ -3471,17 +3481,7 @@
           },
           {
             "bytes": "0072",
-            "offset": "0x5186",
-            "segment": "0x6000"
-          },
-          {
-            "bytes": "4d49472d323900",
-            "offset": "0x7000",
-            "segment": "0x6000"
-          },
-          {
-            "bytes": "4d49472d323900",
-            "offset": "0x7000",
+            "offset": "0x5b6e",
             "segment": "0x6000"
           },
           {
@@ -3502,7 +3502,7 @@
             "size": 32
           },
           {
-            "offset": "0x5a8c",
+            "offset": "0x6386",
             "segment": "0x6000",
             "size": 32
           }
@@ -3516,7 +3516,7 @@
           "di": "0x0",
           "flags": "0x202",
           "si": "0x0",
-          "sp": "0xf000"
+          "sp": "0xffe0"
         },
         "segments": {
           "ds": "0x6000",
@@ -3536,7 +3536,7 @@
           },
           {
             "bytes": "0000000000000000000000000000000000000000000000000000000000000000",
-            "linear": "0x65a8c"
+            "linear": "0x66386"
           }
         ],
         "registers": {
@@ -3557,20 +3557,20 @@
           "eflags": "0x297",
           "es": "0x6000",
           "esi": "0x0",
-          "esp": "0xf002",
+          "esp": "0xffe2",
           "flags": "0x297",
           "fs": "0x0",
           "gs": "0x0",
           "ip": "0x4",
           "si": "0x0",
-          "sp": "0xf002",
+          "sp": "0xffe2",
           "ss": "0x4000"
         },
         "status": "returned",
         "writes": [
           {
-            "bytes": "feeffeeff34cc66500000000",
-            "linear": "0x4eff4"
+            "bytes": "deffdefff34cc66500000000",
+            "linear": "0x4ffd4"
           },
           {
             "bytes": "4d49472d323900",
@@ -3593,7 +3593,7 @@
           },
           {
             "bytes": "4d49472d32392073712e00000000000000000000000000000000000000000000",
-            "linear": "0x65a8c"
+            "linear": "0x66386"
           }
         ],
         "registers": {
@@ -3614,24 +3614,24 @@
           "eflags": "0x283",
           "es": "0x6000",
           "esi": "0x0",
-          "esp": "0xf002",
+          "esp": "0xffe2",
           "flags": "0x283",
           "fs": "0x0",
           "gs": "0x0",
           "ip": "0x4",
           "si": "0x0",
-          "sp": "0xf002",
+          "sp": "0xffe2",
           "ss": "0x4000"
         },
         "status": "returned",
         "writes": [
           {
-            "bytes": "feeffeef75728c5a00000000",
-            "linear": "0x4eff4"
+            "bytes": "deffdeff7572866300000000",
+            "linear": "0x4ffd4"
           },
           {
             "bytes": "4d49472d32392073712e00",
-            "linear": "0x65a8c"
+            "linear": "0x66386"
           }
         ]
       },
@@ -3682,8 +3682,28 @@
         "high_halves": {},
         "memory": [
           {
+            "bytes": "4d49472d323900",
+            "offset": "0x7000",
+            "segment": "0x6000"
+          },
+          {
+            "bytes": "4d49472d323900",
+            "offset": "0x7000",
+            "segment": "0x6000"
+          },
+          {
+            "bytes": "2073712e00",
+            "offset": "0x7200",
+            "segment": "0x6000"
+          },
+          {
+            "bytes": "2073712e00",
+            "offset": "0x7200",
+            "segment": "0x6000"
+          },
+          {
             "bytes": "0000",
-            "offset": "0xf002",
+            "offset": "0xffe2",
             "segment": "0x4000"
           },
           {
@@ -3693,7 +3713,7 @@
           },
           {
             "bytes": "0500",
-            "offset": "0x5cd8",
+            "offset": "0x6542",
             "segment": "0x6000"
           },
           {
@@ -3703,7 +3723,7 @@
           },
           {
             "bytes": "0200",
-            "offset": "0x5ce6",
+            "offset": "0x6550",
             "segment": "0x6000"
           },
           {
@@ -3713,7 +3733,7 @@
           },
           {
             "bytes": "0070",
-            "offset": "0x518a",
+            "offset": "0x5b72",
             "segment": "0x6000"
           },
           {
@@ -3723,27 +3743,7 @@
           },
           {
             "bytes": "0072",
-            "offset": "0x5190",
-            "segment": "0x6000"
-          },
-          {
-            "bytes": "4d49472d323900",
-            "offset": "0x7000",
-            "segment": "0x6000"
-          },
-          {
-            "bytes": "4d49472d323900",
-            "offset": "0x7000",
-            "segment": "0x6000"
-          },
-          {
-            "bytes": "2073712e00",
-            "offset": "0x7200",
-            "segment": "0x6000"
-          },
-          {
-            "bytes": "2073712e00",
-            "offset": "0x7200",
+            "offset": "0x5b78",
             "segment": "0x6000"
           }
         ],
@@ -3754,7 +3754,7 @@
             "size": 32
           },
           {
-            "offset": "0x5a8c",
+            "offset": "0x6386",
             "segment": "0x6000",
             "size": 32
           }
@@ -3768,7 +3768,7 @@
           "di": "0x0",
           "flags": "0x202",
           "si": "0x0",
-          "sp": "0xf000"
+          "sp": "0xffe0"
         },
         "segments": {
           "ds": "0x6000",
@@ -3788,7 +3788,7 @@
           },
           {
             "bytes": "0000000000000000000000000000000000000000000000000000000000000000",
-            "linear": "0x65a8c"
+            "linear": "0x66386"
           }
         ],
         "registers": {
@@ -3809,20 +3809,20 @@
           "eflags": "0x283",
           "es": "0x6000",
           "esi": "0x0",
-          "esp": "0xf002",
+          "esp": "0xffe2",
           "flags": "0x283",
           "fs": "0x0",
           "gs": "0x0",
           "ip": "0x4",
           "si": "0x0",
-          "sp": "0xf002",
+          "sp": "0xffe2",
           "ss": "0x4000"
         },
         "status": "returned",
         "writes": [
           {
-            "bytes": "feeffeeff34cc66500000000",
-            "linear": "0x4eff4"
+            "bytes": "deffdefff34cc66500000000",
+            "linear": "0x4ffd4"
           },
           {
             "bytes": "4d49472d32392073712e00",
@@ -3845,7 +3845,7 @@
           },
           {
             "bytes": "4d49472d32397878787878787878787878787878787878782e00787878787878",
-            "linear": "0x65a8c"
+            "linear": "0x66386"
           }
         ],
         "registers": {
@@ -3866,24 +3866,24 @@
           "eflags": "0x212",
           "es": "0x6000",
           "esi": "0x0",
-          "esp": "0xf002",
+          "esp": "0xffe2",
           "flags": "0x212",
           "fs": "0x0",
           "gs": "0x0",
           "ip": "0x4",
           "si": "0x0",
-          "sp": "0xf002",
+          "sp": "0xffe2",
           "ss": "0x4000"
         },
         "status": "returned",
         "writes": [
           {
-            "bytes": "feeffeef75728c5a00000000",
-            "linear": "0x4eff4"
+            "bytes": "deffdeff7572866300000000",
+            "linear": "0x4ffd4"
           },
           {
             "bytes": "4d49472d32397878787878787878787878787878787878782e007878787878787878787800",
-            "linear": "0x65a8c"
+            "linear": "0x66386"
           }
         ]
       },
@@ -3934,8 +3934,28 @@
         "high_halves": {},
         "memory": [
           {
+            "bytes": "78787878787878787878787878787878787878787878787878787878787800",
+            "offset": "0x7200",
+            "segment": "0x6000"
+          },
+          {
+            "bytes": "78787878787878787878787878787878787878787878787878787878787800",
+            "offset": "0x7200",
+            "segment": "0x6000"
+          },
+          {
+            "bytes": "4d49472d323900",
+            "offset": "0x7000",
+            "segment": "0x6000"
+          },
+          {
+            "bytes": "4d49472d323900",
+            "offset": "0x7000",
+            "segment": "0x6000"
+          },
+          {
             "bytes": "0000",
-            "offset": "0xf002",
+            "offset": "0xffe2",
             "segment": "0x4000"
           },
           {
@@ -3945,7 +3965,7 @@
           },
           {
             "bytes": "0700",
-            "offset": "0x5cd8",
+            "offset": "0x6542",
             "segment": "0x6000"
           },
           {
@@ -3955,7 +3975,7 @@
           },
           {
             "bytes": "0200",
-            "offset": "0x5ce6",
+            "offset": "0x6550",
             "segment": "0x6000"
           },
           {
@@ -3965,7 +3985,7 @@
           },
           {
             "bytes": "0070",
-            "offset": "0x518a",
+            "offset": "0x5b72",
             "segment": "0x6000"
           },
           {
@@ -3975,27 +3995,7 @@
           },
           {
             "bytes": "0072",
-            "offset": "0x5194",
-            "segment": "0x6000"
-          },
-          {
-            "bytes": "4d49472d323900",
-            "offset": "0x7000",
-            "segment": "0x6000"
-          },
-          {
-            "bytes": "4d49472d323900",
-            "offset": "0x7000",
-            "segment": "0x6000"
-          },
-          {
-            "bytes": "78787878787878787878787878787878787878787878787878787878787800",
-            "offset": "0x7200",
-            "segment": "0x6000"
-          },
-          {
-            "bytes": "78787878787878787878787878787878787878787878787878787878787800",
-            "offset": "0x7200",
+            "offset": "0x5b7c",
             "segment": "0x6000"
           }
         ],
@@ -4006,7 +4006,7 @@
             "size": 32
           },
           {
-            "offset": "0x5a8c",
+            "offset": "0x6386",
             "segment": "0x6000",
             "size": 32
           }
@@ -4020,7 +4020,7 @@
           "di": "0x0",
           "flags": "0x202",
           "si": "0x0",
-          "sp": "0xf000"
+          "sp": "0xffe0"
         },
         "segments": {
           "ds": "0x6000",
@@ -4040,7 +4040,7 @@
           },
           {
             "bytes": "0000000000000000000000000000000000000000000000000000000000000000",
-            "linear": "0x65a8c"
+            "linear": "0x66386"
           }
         ],
         "registers": {
@@ -4061,20 +4061,20 @@
           "eflags": "0x212",
           "es": "0x6000",
           "esi": "0x0",
-          "esp": "0xf002",
+          "esp": "0xffe2",
           "flags": "0x212",
           "fs": "0x0",
           "gs": "0x0",
           "ip": "0x4",
           "si": "0x0",
-          "sp": "0xf002",
+          "sp": "0xffe2",
           "ss": "0x4000"
         },
         "status": "returned",
         "writes": [
           {
-            "bytes": "feeffeeff34cc66500000000",
-            "linear": "0x4eff4"
+            "bytes": "deffdefff34cc66500000000",
+            "linear": "0x4ffd4"
           },
           {
             "bytes": "4d49472d32397878787878787878787878787878787878782e007878787878787878787800",
@@ -4097,7 +4097,7 @@
           },
           {
             "bytes": "412d313000000000000000000000000000000000000000000000000000000000",
-            "linear": "0x65a8c"
+            "linear": "0x66386"
           }
         ],
         "registers": {
@@ -4118,24 +4118,24 @@
           "eflags": "0x297",
           "es": "0x6000",
           "esi": "0x0",
-          "esp": "0xf002",
+          "esp": "0xffe2",
           "flags": "0x297",
           "fs": "0x0",
           "gs": "0x0",
           "ip": "0x4",
           "si": "0x0",
-          "sp": "0xf002",
+          "sp": "0xffe2",
           "ss": "0x4000"
         },
         "status": "returned",
         "writes": [
           {
-            "bytes": "feeffeef75728c5a00000000",
-            "linear": "0x4eff4"
+            "bytes": "deffdeff7572866300000000",
+            "linear": "0x4ffd4"
           },
           {
             "bytes": "412d313000",
-            "linear": "0x65a8c"
+            "linear": "0x66386"
           }
         ]
       },
@@ -4186,8 +4186,18 @@
         "high_halves": {},
         "memory": [
           {
+            "bytes": "412d313000",
+            "offset": "0x7000",
+            "segment": "0x6000"
+          },
+          {
+            "bytes": "412d313000",
+            "offset": "0x7000",
+            "segment": "0x6000"
+          },
+          {
             "bytes": "0000",
-            "offset": "0xf002",
+            "offset": "0xffe2",
             "segment": "0x4000"
           },
           {
@@ -4197,7 +4207,7 @@
           },
           {
             "bytes": "0000",
-            "offset": "0x5cd8",
+            "offset": "0x6542",
             "segment": "0x6000"
           },
           {
@@ -4207,7 +4217,7 @@
           },
           {
             "bytes": "8500",
-            "offset": "0x5ce6",
+            "offset": "0x6550",
             "segment": "0x6000"
           },
           {
@@ -4217,7 +4227,7 @@
           },
           {
             "bytes": "0070",
-            "offset": "0x5190",
+            "offset": "0x5b78",
             "segment": "0x6000"
           },
           {
@@ -4227,17 +4237,7 @@
           },
           {
             "bytes": "0072",
-            "offset": "0x5186",
-            "segment": "0x6000"
-          },
-          {
-            "bytes": "412d313000",
-            "offset": "0x7000",
-            "segment": "0x6000"
-          },
-          {
-            "bytes": "412d313000",
-            "offset": "0x7000",
+            "offset": "0x5b6e",
             "segment": "0x6000"
           },
           {
@@ -4258,7 +4258,7 @@
             "size": 32
           },
           {
-            "offset": "0x5a8c",
+            "offset": "0x6386",
             "segment": "0x6000",
             "size": 32
           }
@@ -4272,7 +4272,7 @@
           "di": "0x0",
           "flags": "0x202",
           "si": "0x0",
-          "sp": "0xf000"
+          "sp": "0xffe0"
         },
         "segments": {
           "ds": "0x6000",
@@ -4292,7 +4292,7 @@
           },
           {
             "bytes": "0000000000000000000000000000000000000000000000000000000000000000",
-            "linear": "0x65a8c"
+            "linear": "0x66386"
           }
         ],
         "registers": {
@@ -4313,20 +4313,20 @@
           "eflags": "0x297",
           "es": "0x6000",
           "esi": "0x0",
-          "esp": "0xf002",
+          "esp": "0xffe2",
           "flags": "0x297",
           "fs": "0x0",
           "gs": "0x0",
           "ip": "0x4",
           "si": "0x0",
-          "sp": "0xf002",
+          "sp": "0xffe2",
           "ss": "0x4000"
         },
         "status": "returned",
         "writes": [
           {
-            "bytes": "feeffeeff34cc66500000000",
-            "linear": "0x4eff4"
+            "bytes": "deffdefff34cc66500000000",
+            "linear": "0x4ffd4"
           },
           {
             "bytes": "412d313000",
@@ -4349,7 +4349,7 @@
           },
           {
             "bytes": "2073712e2073712e000000000000000000000000000000000000000000000000",
-            "linear": "0x65a8c"
+            "linear": "0x66386"
           }
         ],
         "registers": {
@@ -4370,24 +4370,24 @@
           "eflags": "0x293",
           "es": "0x6000",
           "esi": "0x0",
-          "esp": "0xf002",
+          "esp": "0xffe2",
           "flags": "0x293",
           "fs": "0x0",
           "gs": "0x0",
           "ip": "0x4",
           "si": "0x0",
-          "sp": "0xf002",
+          "sp": "0xffe2",
           "ss": "0x4000"
         },
         "status": "returned",
         "writes": [
           {
-            "bytes": "feeffeef75728c5a00000000",
-            "linear": "0x4eff4"
+            "bytes": "deffdeff7572866300000000",
+            "linear": "0x4ffd4"
           },
           {
             "bytes": "2073712e2073712e00",
-            "linear": "0x65a8c"
+            "linear": "0x66386"
           }
         ]
       },
@@ -4438,8 +4438,28 @@
         "high_halves": {},
         "memory": [
           {
+            "bytes": "412d313000",
+            "offset": "0x7000",
+            "segment": "0x6000"
+          },
+          {
+            "bytes": "412d313000",
+            "offset": "0x7000",
+            "segment": "0x6000"
+          },
+          {
+            "bytes": "2073712e00",
+            "offset": "0x7200",
+            "segment": "0x6000"
+          },
+          {
+            "bytes": "2073712e00",
+            "offset": "0x7200",
+            "segment": "0x6000"
+          },
+          {
             "bytes": "0000",
-            "offset": "0xf002",
+            "offset": "0xffe2",
             "segment": "0x4000"
           },
           {
@@ -4449,7 +4469,7 @@
           },
           {
             "bytes": "0500",
-            "offset": "0x5cd8",
+            "offset": "0x6542",
             "segment": "0x6000"
           },
           {
@@ -4459,7 +4479,7 @@
           },
           {
             "bytes": "8500",
-            "offset": "0x5ce6",
+            "offset": "0x6550",
             "segment": "0x6000"
           },
           {
@@ -4469,7 +4489,7 @@
           },
           {
             "bytes": "0070",
-            "offset": "0x5190",
+            "offset": "0x5b78",
             "segment": "0x6000"
           },
           {
@@ -4479,27 +4499,7 @@
           },
           {
             "bytes": "0072",
-            "offset": "0x5190",
-            "segment": "0x6000"
-          },
-          {
-            "bytes": "412d313000",
-            "offset": "0x7000",
-            "segment": "0x6000"
-          },
-          {
-            "bytes": "412d313000",
-            "offset": "0x7000",
-            "segment": "0x6000"
-          },
-          {
-            "bytes": "2073712e00",
-            "offset": "0x7200",
-            "segment": "0x6000"
-          },
-          {
-            "bytes": "2073712e00",
-            "offset": "0x7200",
+            "offset": "0x5b78",
             "segment": "0x6000"
           }
         ],
@@ -4510,7 +4510,7 @@
             "size": 32
           },
           {
-            "offset": "0x5a8c",
+            "offset": "0x6386",
             "segment": "0x6000",
             "size": 32
           }
@@ -4524,7 +4524,7 @@
           "di": "0x0",
           "flags": "0x202",
           "si": "0x0",
-          "sp": "0xf000"
+          "sp": "0xffe0"
         },
         "segments": {
           "ds": "0x6000",
@@ -4544,7 +4544,7 @@
           },
           {
             "bytes": "0000000000000000000000000000000000000000000000000000000000000000",
-            "linear": "0x65a8c"
+            "linear": "0x66386"
           }
         ],
         "registers": {
@@ -4565,20 +4565,20 @@
           "eflags": "0x293",
           "es": "0x6000",
           "esi": "0x0",
-          "esp": "0xf002",
+          "esp": "0xffe2",
           "flags": "0x293",
           "fs": "0x0",
           "gs": "0x0",
           "ip": "0x4",
           "si": "0x0",
-          "sp": "0xf002",
+          "sp": "0xffe2",
           "ss": "0x4000"
         },
         "status": "returned",
         "writes": [
           {
-            "bytes": "feeffeeff34cc66500000000",
-            "linear": "0x4eff4"
+            "bytes": "deffdefff34cc66500000000",
+            "linear": "0x4ffd4"
           },
           {
             "bytes": "2073712e2073712e00",
@@ -4601,7 +4601,7 @@
           },
           {
             "bytes": "412d313078787878787878787878787878787878787878782e00787878787878",
-            "linear": "0x65a8c"
+            "linear": "0x66386"
           }
         ],
         "registers": {
@@ -4622,24 +4622,24 @@
           "eflags": "0x216",
           "es": "0x6000",
           "esi": "0x0",
-          "esp": "0xf002",
+          "esp": "0xffe2",
           "flags": "0x216",
           "fs": "0x0",
           "gs": "0x0",
           "ip": "0x4",
           "si": "0x0",
-          "sp": "0xf002",
+          "sp": "0xffe2",
           "ss": "0x4000"
         },
         "status": "returned",
         "writes": [
           {
-            "bytes": "feeffeef75728c5a00000000",
-            "linear": "0x4eff4"
+            "bytes": "deffdeff7572866300000000",
+            "linear": "0x4ffd4"
           },
           {
             "bytes": "412d313078787878787878787878787878787878787878782e00787878787878787800",
-            "linear": "0x65a8c"
+            "linear": "0x66386"
           }
         ]
       },
@@ -4690,8 +4690,28 @@
         "high_halves": {},
         "memory": [
           {
+            "bytes": "78787878787878787878787878787878787878787878787878787878787800",
+            "offset": "0x7200",
+            "segment": "0x6000"
+          },
+          {
+            "bytes": "78787878787878787878787878787878787878787878787878787878787800",
+            "offset": "0x7200",
+            "segment": "0x6000"
+          },
+          {
+            "bytes": "412d313000",
+            "offset": "0x7000",
+            "segment": "0x6000"
+          },
+          {
+            "bytes": "412d313000",
+            "offset": "0x7000",
+            "segment": "0x6000"
+          },
+          {
             "bytes": "0000",
-            "offset": "0xf002",
+            "offset": "0xffe2",
             "segment": "0x4000"
           },
           {
@@ -4701,7 +4721,7 @@
           },
           {
             "bytes": "0700",
-            "offset": "0x5cd8",
+            "offset": "0x6542",
             "segment": "0x6000"
           },
           {
@@ -4711,7 +4731,7 @@
           },
           {
             "bytes": "8500",
-            "offset": "0x5ce6",
+            "offset": "0x6550",
             "segment": "0x6000"
           },
           {
@@ -4721,7 +4741,7 @@
           },
           {
             "bytes": "0070",
-            "offset": "0x5190",
+            "offset": "0x5b78",
             "segment": "0x6000"
           },
           {
@@ -4731,27 +4751,7 @@
           },
           {
             "bytes": "0072",
-            "offset": "0x5194",
-            "segment": "0x6000"
-          },
-          {
-            "bytes": "412d313000",
-            "offset": "0x7000",
-            "segment": "0x6000"
-          },
-          {
-            "bytes": "412d313000",
-            "offset": "0x7000",
-            "segment": "0x6000"
-          },
-          {
-            "bytes": "78787878787878787878787878787878787878787878787878787878787800",
-            "offset": "0x7200",
-            "segment": "0x6000"
-          },
-          {
-            "bytes": "78787878787878787878787878787878787878787878787878787878787800",
-            "offset": "0x7200",
+            "offset": "0x5b7c",
             "segment": "0x6000"
           }
         ],
@@ -4762,7 +4762,7 @@
             "size": 32
           },
           {
-            "offset": "0x5a8c",
+            "offset": "0x6386",
             "segment": "0x6000",
             "size": 32
           }
@@ -4776,7 +4776,7 @@
           "di": "0x0",
           "flags": "0x202",
           "si": "0x0",
-          "sp": "0xf000"
+          "sp": "0xffe0"
         },
         "segments": {
           "ds": "0x6000",
@@ -4796,7 +4796,7 @@
           },
           {
             "bytes": "0000000000000000000000000000000000000000000000000000000000000000",
-            "linear": "0x65a8c"
+            "linear": "0x66386"
           }
         ],
         "registers": {
@@ -4817,20 +4817,20 @@
           "eflags": "0x216",
           "es": "0x6000",
           "esi": "0x0",
-          "esp": "0xf002",
+          "esp": "0xffe2",
           "flags": "0x216",
           "fs": "0x0",
           "gs": "0x0",
           "ip": "0x4",
           "si": "0x0",
-          "sp": "0xf002",
+          "sp": "0xffe2",
           "ss": "0x4000"
         },
         "status": "returned",
         "writes": [
           {
-            "bytes": "feeffeeff34cc66500000000",
-            "linear": "0x4eff4"
+            "bytes": "deffdefff34cc66500000000",
+            "linear": "0x4ffd4"
           },
           {
             "bytes": "412d313078787878787878787878787878787878787878782e00787878787878787800",
@@ -4853,7 +4853,7 @@
           },
           {
             "bytes": "4d49472d32390000000000000000000000000000000000000000000000000000",
-            "linear": "0x65a8c"
+            "linear": "0x66386"
           }
         ],
         "registers": {
@@ -4874,24 +4874,24 @@
           "eflags": "0x297",
           "es": "0x6000",
           "esi": "0x0",
-          "esp": "0xf002",
+          "esp": "0xffe2",
           "flags": "0x297",
           "fs": "0x0",
           "gs": "0x0",
           "ip": "0x4",
           "si": "0x0",
-          "sp": "0xf002",
+          "sp": "0xffe2",
           "ss": "0x4000"
         },
         "status": "returned",
         "writes": [
           {
-            "bytes": "feeffeef75728c5a00000000",
-            "linear": "0x4eff4"
+            "bytes": "deffdeff7572866300000000",
+            "linear": "0x4ffd4"
           },
           {
             "bytes": "4d49472d323900",
-            "linear": "0x65a8c"
+            "linear": "0x66386"
           }
         ]
       },
@@ -4942,8 +4942,18 @@
         "high_halves": {},
         "memory": [
           {
+            "bytes": "4d49472d323900",
+            "offset": "0x7000",
+            "segment": "0x6000"
+          },
+          {
+            "bytes": "4d49472d323900",
+            "offset": "0x7000",
+            "segment": "0x6000"
+          },
+          {
             "bytes": "0300",
-            "offset": "0xf002",
+            "offset": "0xffe2",
             "segment": "0x4000"
           },
           {
@@ -4953,7 +4963,7 @@
           },
           {
             "bytes": "0000",
-            "offset": "0x5d08",
+            "offset": "0x6572",
             "segment": "0x6000"
           },
           {
@@ -4963,7 +4973,7 @@
           },
           {
             "bytes": "0200",
-            "offset": "0x5d16",
+            "offset": "0x6580",
             "segment": "0x6000"
           },
           {
@@ -4973,7 +4983,7 @@
           },
           {
             "bytes": "0070",
-            "offset": "0x518a",
+            "offset": "0x5b72",
             "segment": "0x6000"
           },
           {
@@ -4983,17 +4993,7 @@
           },
           {
             "bytes": "0072",
-            "offset": "0x5186",
-            "segment": "0x6000"
-          },
-          {
-            "bytes": "4d49472d323900",
-            "offset": "0x7000",
-            "segment": "0x6000"
-          },
-          {
-            "bytes": "4d49472d323900",
-            "offset": "0x7000",
+            "offset": "0x5b6e",
             "segment": "0x6000"
           },
           {
@@ -5014,7 +5014,7 @@
             "size": 32
           },
           {
-            "offset": "0x5a8c",
+            "offset": "0x6386",
             "segment": "0x6000",
             "size": 32
           }
@@ -5028,7 +5028,7 @@
           "di": "0x0",
           "flags": "0x202",
           "si": "0x0",
-          "sp": "0xf000"
+          "sp": "0xffe0"
         },
         "segments": {
           "ds": "0x6000",
@@ -5048,7 +5048,7 @@
           },
           {
             "bytes": "0000000000000000000000000000000000000000000000000000000000000000",
-            "linear": "0x65a8c"
+            "linear": "0x66386"
           }
         ],
         "registers": {
@@ -5069,20 +5069,20 @@
           "eflags": "0x297",
           "es": "0x6000",
           "esi": "0x0",
-          "esp": "0xf002",
+          "esp": "0xffe2",
           "flags": "0x297",
           "fs": "0x0",
           "gs": "0x0",
           "ip": "0x4",
           "si": "0x0",
-          "sp": "0xf002",
+          "sp": "0xffe2",
           "ss": "0x4000"
         },
         "status": "returned",
         "writes": [
           {
-            "bytes": "feeffeeff34cc66500000000",
-            "linear": "0x4eff4"
+            "bytes": "deffdefff34cc66500000000",
+            "linear": "0x4ffd4"
           },
           {
             "bytes": "4d49472d323900",
@@ -5105,7 +5105,7 @@
           },
           {
             "bytes": "4d49472d32392073712e00000000000000000000000000000000000000000000",
-            "linear": "0x65a8c"
+            "linear": "0x66386"
           }
         ],
         "registers": {
@@ -5126,24 +5126,24 @@
           "eflags": "0x283",
           "es": "0x6000",
           "esi": "0x0",
-          "esp": "0xf002",
+          "esp": "0xffe2",
           "flags": "0x283",
           "fs": "0x0",
           "gs": "0x0",
           "ip": "0x4",
           "si": "0x0",
-          "sp": "0xf002",
+          "sp": "0xffe2",
           "ss": "0x4000"
         },
         "status": "returned",
         "writes": [
           {
-            "bytes": "feeffeef75728c5a00000000",
-            "linear": "0x4eff4"
+            "bytes": "deffdeff7572866300000000",
+            "linear": "0x4ffd4"
           },
           {
             "bytes": "4d49472d32392073712e00",
-            "linear": "0x65a8c"
+            "linear": "0x66386"
           }
         ]
       },
@@ -5194,8 +5194,28 @@
         "high_halves": {},
         "memory": [
           {
+            "bytes": "4d49472d323900",
+            "offset": "0x7000",
+            "segment": "0x6000"
+          },
+          {
+            "bytes": "4d49472d323900",
+            "offset": "0x7000",
+            "segment": "0x6000"
+          },
+          {
+            "bytes": "2073712e00",
+            "offset": "0x7200",
+            "segment": "0x6000"
+          },
+          {
+            "bytes": "2073712e00",
+            "offset": "0x7200",
+            "segment": "0x6000"
+          },
+          {
             "bytes": "0300",
-            "offset": "0xf002",
+            "offset": "0xffe2",
             "segment": "0x4000"
           },
           {
@@ -5205,7 +5225,7 @@
           },
           {
             "bytes": "0500",
-            "offset": "0x5d08",
+            "offset": "0x6572",
             "segment": "0x6000"
           },
           {
@@ -5215,7 +5235,7 @@
           },
           {
             "bytes": "0200",
-            "offset": "0x5d16",
+            "offset": "0x6580",
             "segment": "0x6000"
           },
           {
@@ -5225,7 +5245,7 @@
           },
           {
             "bytes": "0070",
-            "offset": "0x518a",
+            "offset": "0x5b72",
             "segment": "0x6000"
           },
           {
@@ -5235,27 +5255,7 @@
           },
           {
             "bytes": "0072",
-            "offset": "0x5190",
-            "segment": "0x6000"
-          },
-          {
-            "bytes": "4d49472d323900",
-            "offset": "0x7000",
-            "segment": "0x6000"
-          },
-          {
-            "bytes": "4d49472d323900",
-            "offset": "0x7000",
-            "segment": "0x6000"
-          },
-          {
-            "bytes": "2073712e00",
-            "offset": "0x7200",
-            "segment": "0x6000"
-          },
-          {
-            "bytes": "2073712e00",
-            "offset": "0x7200",
+            "offset": "0x5b78",
             "segment": "0x6000"
           }
         ],
@@ -5266,7 +5266,7 @@
             "size": 32
           },
           {
-            "offset": "0x5a8c",
+            "offset": "0x6386",
             "segment": "0x6000",
             "size": 32
           }
@@ -5280,7 +5280,7 @@
           "di": "0x0",
           "flags": "0x202",
           "si": "0x0",
-          "sp": "0xf000"
+          "sp": "0xffe0"
         },
         "segments": {
           "ds": "0x6000",
@@ -5300,7 +5300,7 @@
           },
           {
             "bytes": "0000000000000000000000000000000000000000000000000000000000000000",
-            "linear": "0x65a8c"
+            "linear": "0x66386"
           }
         ],
         "registers": {
@@ -5321,20 +5321,20 @@
           "eflags": "0x283",
           "es": "0x6000",
           "esi": "0x0",
-          "esp": "0xf002",
+          "esp": "0xffe2",
           "flags": "0x283",
           "fs": "0x0",
           "gs": "0x0",
           "ip": "0x4",
           "si": "0x0",
-          "sp": "0xf002",
+          "sp": "0xffe2",
           "ss": "0x4000"
         },
         "status": "returned",
         "writes": [
           {
-            "bytes": "feeffeeff34cc66500000000",
-            "linear": "0x4eff4"
+            "bytes": "deffdefff34cc66500000000",
+            "linear": "0x4ffd4"
           },
           {
             "bytes": "4d49472d32392073712e00",
@@ -5357,7 +5357,7 @@
           },
           {
             "bytes": "4d49472d32397878787878787878787878787878787878782e00787878787878",
-            "linear": "0x65a8c"
+            "linear": "0x66386"
           }
         ],
         "registers": {
@@ -5378,24 +5378,24 @@
           "eflags": "0x212",
           "es": "0x6000",
           "esi": "0x0",
-          "esp": "0xf002",
+          "esp": "0xffe2",
           "flags": "0x212",
           "fs": "0x0",
           "gs": "0x0",
           "ip": "0x4",
           "si": "0x0",
-          "sp": "0xf002",
+          "sp": "0xffe2",
           "ss": "0x4000"
         },
         "status": "returned",
         "writes": [
           {
-            "bytes": "feeffeef75728c5a00000000",
-            "linear": "0x4eff4"
+            "bytes": "deffdeff7572866300000000",
+            "linear": "0x4ffd4"
           },
           {
             "bytes": "4d49472d32397878787878787878787878787878787878782e007878787878787878787800",
-            "linear": "0x65a8c"
+            "linear": "0x66386"
           }
         ]
       },
@@ -5446,8 +5446,28 @@
         "high_halves": {},
         "memory": [
           {
+            "bytes": "78787878787878787878787878787878787878787878787878787878787800",
+            "offset": "0x7200",
+            "segment": "0x6000"
+          },
+          {
+            "bytes": "78787878787878787878787878787878787878787878787878787878787800",
+            "offset": "0x7200",
+            "segment": "0x6000"
+          },
+          {
+            "bytes": "4d49472d323900",
+            "offset": "0x7000",
+            "segment": "0x6000"
+          },
+          {
+            "bytes": "4d49472d323900",
+            "offset": "0x7000",
+            "segment": "0x6000"
+          },
+          {
             "bytes": "0300",
-            "offset": "0xf002",
+            "offset": "0xffe2",
             "segment": "0x4000"
           },
           {
@@ -5457,7 +5477,7 @@
           },
           {
             "bytes": "0700",
-            "offset": "0x5d08",
+            "offset": "0x6572",
             "segment": "0x6000"
           },
           {
@@ -5467,7 +5487,7 @@
           },
           {
             "bytes": "0200",
-            "offset": "0x5d16",
+            "offset": "0x6580",
             "segment": "0x6000"
           },
           {
@@ -5477,7 +5497,7 @@
           },
           {
             "bytes": "0070",
-            "offset": "0x518a",
+            "offset": "0x5b72",
             "segment": "0x6000"
           },
           {
@@ -5487,27 +5507,7 @@
           },
           {
             "bytes": "0072",
-            "offset": "0x5194",
-            "segment": "0x6000"
-          },
-          {
-            "bytes": "4d49472d323900",
-            "offset": "0x7000",
-            "segment": "0x6000"
-          },
-          {
-            "bytes": "4d49472d323900",
-            "offset": "0x7000",
-            "segment": "0x6000"
-          },
-          {
-            "bytes": "78787878787878787878787878787878787878787878787878787878787800",
-            "offset": "0x7200",
-            "segment": "0x6000"
-          },
-          {
-            "bytes": "78787878787878787878787878787878787878787878787878787878787800",
-            "offset": "0x7200",
+            "offset": "0x5b7c",
             "segment": "0x6000"
           }
         ],
@@ -5518,7 +5518,7 @@
             "size": 32
           },
           {
-            "offset": "0x5a8c",
+            "offset": "0x6386",
             "segment": "0x6000",
             "size": 32
           }
@@ -5532,7 +5532,7 @@
           "di": "0x0",
           "flags": "0x202",
           "si": "0x0",
-          "sp": "0xf000"
+          "sp": "0xffe0"
         },
         "segments": {
           "ds": "0x6000",
@@ -5552,7 +5552,7 @@
           },
           {
             "bytes": "0000000000000000000000000000000000000000000000000000000000000000",
-            "linear": "0x65a8c"
+            "linear": "0x66386"
           }
         ],
         "registers": {
@@ -5573,20 +5573,20 @@
           "eflags": "0x212",
           "es": "0x6000",
           "esi": "0x0",
-          "esp": "0xf002",
+          "esp": "0xffe2",
           "flags": "0x212",
           "fs": "0x0",
           "gs": "0x0",
           "ip": "0x4",
           "si": "0x0",
-          "sp": "0xf002",
+          "sp": "0xffe2",
           "ss": "0x4000"
         },
         "status": "returned",
         "writes": [
           {
-            "bytes": "feeffeeff34cc66500000000",
-            "linear": "0x4eff4"
+            "bytes": "deffdefff34cc66500000000",
+            "linear": "0x4ffd4"
           },
           {
             "bytes": "4d49472d32397878787878787878787878787878787878782e007878787878787878787800",
@@ -5609,7 +5609,7 @@
           },
           {
             "bytes": "412d313000000000000000000000000000000000000000000000000000000000",
-            "linear": "0x65a8c"
+            "linear": "0x66386"
           }
         ],
         "registers": {
@@ -5630,24 +5630,24 @@
           "eflags": "0x297",
           "es": "0x6000",
           "esi": "0x0",
-          "esp": "0xf002",
+          "esp": "0xffe2",
           "flags": "0x297",
           "fs": "0x0",
           "gs": "0x0",
           "ip": "0x4",
           "si": "0x0",
-          "sp": "0xf002",
+          "sp": "0xffe2",
           "ss": "0x4000"
         },
         "status": "returned",
         "writes": [
           {
-            "bytes": "feeffeef75728c5a00000000",
-            "linear": "0x4eff4"
+            "bytes": "deffdeff7572866300000000",
+            "linear": "0x4ffd4"
           },
           {
             "bytes": "412d313000",
-            "linear": "0x65a8c"
+            "linear": "0x66386"
           }
         ]
       },
@@ -5698,8 +5698,18 @@
         "high_halves": {},
         "memory": [
           {
+            "bytes": "412d313000",
+            "offset": "0x7000",
+            "segment": "0x6000"
+          },
+          {
+            "bytes": "412d313000",
+            "offset": "0x7000",
+            "segment": "0x6000"
+          },
+          {
             "bytes": "0300",
-            "offset": "0xf002",
+            "offset": "0xffe2",
             "segment": "0x4000"
           },
           {
@@ -5709,7 +5719,7 @@
           },
           {
             "bytes": "0000",
-            "offset": "0x5d08",
+            "offset": "0x6572",
             "segment": "0x6000"
           },
           {
@@ -5719,7 +5729,7 @@
           },
           {
             "bytes": "8500",
-            "offset": "0x5d16",
+            "offset": "0x6580",
             "segment": "0x6000"
           },
           {
@@ -5729,7 +5739,7 @@
           },
           {
             "bytes": "0070",
-            "offset": "0x5190",
+            "offset": "0x5b78",
             "segment": "0x6000"
           },
           {
@@ -5739,17 +5749,7 @@
           },
           {
             "bytes": "0072",
-            "offset": "0x5186",
-            "segment": "0x6000"
-          },
-          {
-            "bytes": "412d313000",
-            "offset": "0x7000",
-            "segment": "0x6000"
-          },
-          {
-            "bytes": "412d313000",
-            "offset": "0x7000",
+            "offset": "0x5b6e",
             "segment": "0x6000"
           },
           {
@@ -5770,7 +5770,7 @@
             "size": 32
           },
           {
-            "offset": "0x5a8c",
+            "offset": "0x6386",
             "segment": "0x6000",
             "size": 32
           }
@@ -5784,7 +5784,7 @@
           "di": "0x0",
           "flags": "0x202",
           "si": "0x0",
-          "sp": "0xf000"
+          "sp": "0xffe0"
         },
         "segments": {
           "ds": "0x6000",
@@ -5804,7 +5804,7 @@
           },
           {
             "bytes": "0000000000000000000000000000000000000000000000000000000000000000",
-            "linear": "0x65a8c"
+            "linear": "0x66386"
           }
         ],
         "registers": {
@@ -5825,20 +5825,20 @@
           "eflags": "0x297",
           "es": "0x6000",
           "esi": "0x0",
-          "esp": "0xf002",
+          "esp": "0xffe2",
           "flags": "0x297",
           "fs": "0x0",
           "gs": "0x0",
           "ip": "0x4",
           "si": "0x0",
-          "sp": "0xf002",
+          "sp": "0xffe2",
           "ss": "0x4000"
         },
         "status": "returned",
         "writes": [
           {
-            "bytes": "feeffeeff34cc66500000000",
-            "linear": "0x4eff4"
+            "bytes": "deffdefff34cc66500000000",
+            "linear": "0x4ffd4"
           },
           {
             "bytes": "412d313000",
@@ -5861,7 +5861,7 @@
           },
           {
             "bytes": "2073712e2073712e000000000000000000000000000000000000000000000000",
-            "linear": "0x65a8c"
+            "linear": "0x66386"
           }
         ],
         "registers": {
@@ -5882,24 +5882,24 @@
           "eflags": "0x293",
           "es": "0x6000",
           "esi": "0x0",
-          "esp": "0xf002",
+          "esp": "0xffe2",
           "flags": "0x293",
           "fs": "0x0",
           "gs": "0x0",
           "ip": "0x4",
           "si": "0x0",
-          "sp": "0xf002",
+          "sp": "0xffe2",
           "ss": "0x4000"
         },
         "status": "returned",
         "writes": [
           {
-            "bytes": "feeffeef75728c5a00000000",
-            "linear": "0x4eff4"
+            "bytes": "deffdeff7572866300000000",
+            "linear": "0x4ffd4"
           },
           {
             "bytes": "2073712e2073712e00",
-            "linear": "0x65a8c"
+            "linear": "0x66386"
           }
         ]
       },
@@ -5950,8 +5950,28 @@
         "high_halves": {},
         "memory": [
           {
+            "bytes": "412d313000",
+            "offset": "0x7000",
+            "segment": "0x6000"
+          },
+          {
+            "bytes": "412d313000",
+            "offset": "0x7000",
+            "segment": "0x6000"
+          },
+          {
+            "bytes": "2073712e00",
+            "offset": "0x7200",
+            "segment": "0x6000"
+          },
+          {
+            "bytes": "2073712e00",
+            "offset": "0x7200",
+            "segment": "0x6000"
+          },
+          {
             "bytes": "0300",
-            "offset": "0xf002",
+            "offset": "0xffe2",
             "segment": "0x4000"
           },
           {
@@ -5961,7 +5981,7 @@
           },
           {
             "bytes": "0500",
-            "offset": "0x5d08",
+            "offset": "0x6572",
             "segment": "0x6000"
           },
           {
@@ -5971,7 +5991,7 @@
           },
           {
             "bytes": "8500",
-            "offset": "0x5d16",
+            "offset": "0x6580",
             "segment": "0x6000"
           },
           {
@@ -5981,7 +6001,7 @@
           },
           {
             "bytes": "0070",
-            "offset": "0x5190",
+            "offset": "0x5b78",
             "segment": "0x6000"
           },
           {
@@ -5991,27 +6011,7 @@
           },
           {
             "bytes": "0072",
-            "offset": "0x5190",
-            "segment": "0x6000"
-          },
-          {
-            "bytes": "412d313000",
-            "offset": "0x7000",
-            "segment": "0x6000"
-          },
-          {
-            "bytes": "412d313000",
-            "offset": "0x7000",
-            "segment": "0x6000"
-          },
-          {
-            "bytes": "2073712e00",
-            "offset": "0x7200",
-            "segment": "0x6000"
-          },
-          {
-            "bytes": "2073712e00",
-            "offset": "0x7200",
+            "offset": "0x5b78",
             "segment": "0x6000"
           }
         ],
@@ -6022,7 +6022,7 @@
             "size": 32
           },
           {
-            "offset": "0x5a8c",
+            "offset": "0x6386",
             "segment": "0x6000",
             "size": 32
           }
@@ -6036,7 +6036,7 @@
           "di": "0x0",
           "flags": "0x202",
           "si": "0x0",
-          "sp": "0xf000"
+          "sp": "0xffe0"
         },
         "segments": {
           "ds": "0x6000",
@@ -6056,7 +6056,7 @@
           },
           {
             "bytes": "0000000000000000000000000000000000000000000000000000000000000000",
-            "linear": "0x65a8c"
+            "linear": "0x66386"
           }
         ],
         "registers": {
@@ -6077,20 +6077,20 @@
           "eflags": "0x293",
           "es": "0x6000",
           "esi": "0x0",
-          "esp": "0xf002",
+          "esp": "0xffe2",
           "flags": "0x293",
           "fs": "0x0",
           "gs": "0x0",
           "ip": "0x4",
           "si": "0x0",
-          "sp": "0xf002",
+          "sp": "0xffe2",
           "ss": "0x4000"
         },
         "status": "returned",
         "writes": [
           {
-            "bytes": "feeffeeff34cc66500000000",
-            "linear": "0x4eff4"
+            "bytes": "deffdefff34cc66500000000",
+            "linear": "0x4ffd4"
           },
           {
             "bytes": "2073712e2073712e00",
@@ -6113,7 +6113,7 @@
           },
           {
             "bytes": "412d313078787878787878787878787878787878787878782e00787878787878",
-            "linear": "0x65a8c"
+            "linear": "0x66386"
           }
         ],
         "registers": {
@@ -6134,24 +6134,24 @@
           "eflags": "0x216",
           "es": "0x6000",
           "esi": "0x0",
-          "esp": "0xf002",
+          "esp": "0xffe2",
           "flags": "0x216",
           "fs": "0x0",
           "gs": "0x0",
           "ip": "0x4",
           "si": "0x0",
-          "sp": "0xf002",
+          "sp": "0xffe2",
           "ss": "0x4000"
         },
         "status": "returned",
         "writes": [
           {
-            "bytes": "feeffeef75728c5a00000000",
-            "linear": "0x4eff4"
+            "bytes": "deffdeff7572866300000000",
+            "linear": "0x4ffd4"
           },
           {
             "bytes": "412d313078787878787878787878787878787878787878782e00787878787878787800",
-            "linear": "0x65a8c"
+            "linear": "0x66386"
           }
         ]
       },
@@ -6202,8 +6202,28 @@
         "high_halves": {},
         "memory": [
           {
+            "bytes": "78787878787878787878787878787878787878787878787878787878787800",
+            "offset": "0x7200",
+            "segment": "0x6000"
+          },
+          {
+            "bytes": "78787878787878787878787878787878787878787878787878787878787800",
+            "offset": "0x7200",
+            "segment": "0x6000"
+          },
+          {
+            "bytes": "412d313000",
+            "offset": "0x7000",
+            "segment": "0x6000"
+          },
+          {
+            "bytes": "412d313000",
+            "offset": "0x7000",
+            "segment": "0x6000"
+          },
+          {
             "bytes": "0300",
-            "offset": "0xf002",
+            "offset": "0xffe2",
             "segment": "0x4000"
           },
           {
@@ -6213,7 +6233,7 @@
           },
           {
             "bytes": "0700",
-            "offset": "0x5d08",
+            "offset": "0x6572",
             "segment": "0x6000"
           },
           {
@@ -6223,7 +6243,7 @@
           },
           {
             "bytes": "8500",
-            "offset": "0x5d16",
+            "offset": "0x6580",
             "segment": "0x6000"
           },
           {
@@ -6233,7 +6253,7 @@
           },
           {
             "bytes": "0070",
-            "offset": "0x5190",
+            "offset": "0x5b78",
             "segment": "0x6000"
           },
           {
@@ -6243,27 +6263,7 @@
           },
           {
             "bytes": "0072",
-            "offset": "0x5194",
-            "segment": "0x6000"
-          },
-          {
-            "bytes": "412d313000",
-            "offset": "0x7000",
-            "segment": "0x6000"
-          },
-          {
-            "bytes": "412d313000",
-            "offset": "0x7000",
-            "segment": "0x6000"
-          },
-          {
-            "bytes": "78787878787878787878787878787878787878787878787878787878787800",
-            "offset": "0x7200",
-            "segment": "0x6000"
-          },
-          {
-            "bytes": "78787878787878787878787878787878787878787878787878787878787800",
-            "offset": "0x7200",
+            "offset": "0x5b7c",
             "segment": "0x6000"
           }
         ],
@@ -6274,7 +6274,7 @@
             "size": 32
           },
           {
-            "offset": "0x5a8c",
+            "offset": "0x6386",
             "segment": "0x6000",
             "size": 32
           }
@@ -6288,7 +6288,7 @@
           "di": "0x0",
           "flags": "0x202",
           "si": "0x0",
-          "sp": "0xf000"
+          "sp": "0xffe0"
         },
         "segments": {
           "ds": "0x6000",
@@ -6308,7 +6308,7 @@
           },
           {
             "bytes": "0000000000000000000000000000000000000000000000000000000000000000",
-            "linear": "0x65a8c"
+            "linear": "0x66386"
           }
         ],
         "registers": {
@@ -6329,20 +6329,20 @@
           "eflags": "0x216",
           "es": "0x6000",
           "esi": "0x0",
-          "esp": "0xf002",
+          "esp": "0xffe2",
           "flags": "0x216",
           "fs": "0x0",
           "gs": "0x0",
           "ip": "0x4",
           "si": "0x0",
-          "sp": "0xf002",
+          "sp": "0xffe2",
           "ss": "0x4000"
         },
         "status": "returned",
         "writes": [
           {
-            "bytes": "feeffeeff34cc66500000000",
-            "linear": "0x4eff4"
+            "bytes": "deffdefff34cc66500000000",
+            "linear": "0x4ffd4"
           },
           {
             "bytes": "412d313078787878787878787878787878787878787878782e00787878787878787800",
@@ -6381,7 +6381,7 @@
           },
           {
             "bytes": "0174",
-            "linear": "0x65460"
+            "linear": "0x65e42"
           }
         ],
         "registers": {
@@ -6402,24 +6402,24 @@
           "eflags": "0x202",
           "es": "0x6000",
           "esi": "0x0",
-          "esp": "0xf002",
+          "esp": "0xffe2",
           "flags": "0x202",
           "fs": "0x0",
           "gs": "0x0",
           "ip": "0x4",
           "si": "0x0",
-          "sp": "0xf002",
+          "sp": "0xffe2",
           "ss": "0x4000"
         },
         "status": "returned",
         "writes": [
           {
-            "bytes": "006000000000feef2c7500600072006000740100007200600000",
-            "linear": "0x4efe6"
+            "bytes": "006000000000deff2c7500600072006000740100007200600000",
+            "linear": "0x4ffc6"
           },
           {
             "bytes": "0174",
-            "linear": "0x65460"
+            "linear": "0x65e42"
           },
           {
             "bytes": "11",
@@ -6474,13 +6474,33 @@
         "high_halves": {},
         "memory": [
           {
+            "bytes": "a0b1c2d3e4f5060708090a0b0c0d0e0f",
+            "offset": "0x7400",
+            "segment": "0x6000"
+          },
+          {
+            "bytes": "a0b1c2d3e4f5060708090a0b0c0d0e0f",
+            "offset": "0x7400",
+            "segment": "0x6000"
+          },
+          {
+            "bytes": "11223344556677889900aabbccddeeff",
+            "offset": "0x7200",
+            "segment": "0x6000"
+          },
+          {
+            "bytes": "11223344556677889900aabbccddeeff",
+            "offset": "0x7200",
+            "segment": "0x6000"
+          },
+          {
             "bytes": "0072",
-            "offset": "0xf002",
+            "offset": "0xffe2",
             "segment": "0x4000"
           },
           {
             "bytes": "0100",
-            "offset": "0xf004",
+            "offset": "0xffe4",
             "segment": "0x4000"
           },
           {
@@ -6490,7 +6510,7 @@
           },
           {
             "bytes": "0000",
-            "offset": "0x796",
+            "offset": "0x880",
             "segment": "0x6000"
           },
           {
@@ -6500,7 +6520,7 @@
           },
           {
             "bytes": "0074",
-            "offset": "0x5460",
+            "offset": "0x5e42",
             "segment": "0x6000"
           },
           {
@@ -6510,27 +6530,7 @@
           },
           {
             "bytes": "0060",
-            "offset": "0x5462",
-            "segment": "0x6000"
-          },
-          {
-            "bytes": "a0b1c2d3e4f5060708090a0b0c0d0e0f",
-            "offset": "0x7400",
-            "segment": "0x6000"
-          },
-          {
-            "bytes": "a0b1c2d3e4f5060708090a0b0c0d0e0f",
-            "offset": "0x7400",
-            "segment": "0x6000"
-          },
-          {
-            "bytes": "11223344556677889900aabbccddeeff",
-            "offset": "0x7200",
-            "segment": "0x6000"
-          },
-          {
-            "bytes": "11223344556677889900aabbccddeeff",
-            "offset": "0x7200",
+            "offset": "0x5e44",
             "segment": "0x6000"
           }
         ],
@@ -6561,7 +6561,7 @@
             "size": 2
           },
           {
-            "offset": "0x5460",
+            "offset": "0x5e42",
             "segment": "0x6000",
             "size": 2
           }
@@ -6575,7 +6575,7 @@
           "di": "0x0",
           "flags": "0x202",
           "si": "0x0",
-          "sp": "0xf000"
+          "sp": "0xffe0"
         },
         "segments": {
           "ds": "0x6000",
@@ -6611,7 +6611,7 @@
           },
           {
             "bytes": "0074",
-            "linear": "0x65460"
+            "linear": "0x65e42"
           }
         ],
         "registers": {
@@ -6632,20 +6632,20 @@
           "eflags": "0x202",
           "es": "0x6000",
           "esi": "0x0",
-          "esp": "0xf002",
+          "esp": "0xffe2",
           "flags": "0x202",
           "fs": "0x0",
           "gs": "0x0",
           "ip": "0x4",
           "si": "0x0",
-          "sp": "0xf002",
+          "sp": "0xffe2",
           "ss": "0x4000"
         },
         "status": "returned",
         "writes": [
           {
-            "bytes": "006000000000feefcb4f00600072006000740100007200600000",
-            "linear": "0x4efe6"
+            "bytes": "006000000000deffcb4f00600072006000740100007200600000",
+            "linear": "0x4ffc6"
           },
           {
             "bytes": "0174",
@@ -6688,7 +6688,7 @@
           },
           {
             "bytes": "0474",
-            "linear": "0x65460"
+            "linear": "0x65e42"
           }
         ],
         "registers": {
@@ -6709,24 +6709,24 @@
           "eflags": "0x202",
           "es": "0x6000",
           "esi": "0x0",
-          "esp": "0xf002",
+          "esp": "0xffe2",
           "flags": "0x202",
           "fs": "0x0",
           "gs": "0x0",
           "ip": "0x4",
           "si": "0x0",
-          "sp": "0xf002",
+          "sp": "0xffe2",
           "ss": "0x4000"
         },
         "status": "returned",
         "writes": [
           {
-            "bytes": "006000000000feef2c7500600072006000740400007200600000",
-            "linear": "0x4efe6"
+            "bytes": "006000000000deff2c7500600072006000740400007200600000",
+            "linear": "0x4ffc6"
           },
           {
             "bytes": "0474",
-            "linear": "0x65460"
+            "linear": "0x65e42"
           },
           {
             "bytes": "11223344",
@@ -6781,13 +6781,33 @@
         "high_halves": {},
         "memory": [
           {
+            "bytes": "a0b1c2d3e4f5060708090a0b0c0d0e0f",
+            "offset": "0x7400",
+            "segment": "0x6000"
+          },
+          {
+            "bytes": "a0b1c2d3e4f5060708090a0b0c0d0e0f",
+            "offset": "0x7400",
+            "segment": "0x6000"
+          },
+          {
+            "bytes": "11223344556677889900aabbccddeeff",
+            "offset": "0x7200",
+            "segment": "0x6000"
+          },
+          {
+            "bytes": "11223344556677889900aabbccddeeff",
+            "offset": "0x7200",
+            "segment": "0x6000"
+          },
+          {
             "bytes": "0072",
-            "offset": "0xf002",
+            "offset": "0xffe2",
             "segment": "0x4000"
           },
           {
             "bytes": "0400",
-            "offset": "0xf004",
+            "offset": "0xffe4",
             "segment": "0x4000"
           },
           {
@@ -6797,7 +6817,7 @@
           },
           {
             "bytes": "0000",
-            "offset": "0x796",
+            "offset": "0x880",
             "segment": "0x6000"
           },
           {
@@ -6807,7 +6827,7 @@
           },
           {
             "bytes": "0074",
-            "offset": "0x5460",
+            "offset": "0x5e42",
             "segment": "0x6000"
           },
           {
@@ -6817,27 +6837,7 @@
           },
           {
             "bytes": "0060",
-            "offset": "0x5462",
-            "segment": "0x6000"
-          },
-          {
-            "bytes": "a0b1c2d3e4f5060708090a0b0c0d0e0f",
-            "offset": "0x7400",
-            "segment": "0x6000"
-          },
-          {
-            "bytes": "a0b1c2d3e4f5060708090a0b0c0d0e0f",
-            "offset": "0x7400",
-            "segment": "0x6000"
-          },
-          {
-            "bytes": "11223344556677889900aabbccddeeff",
-            "offset": "0x7200",
-            "segment": "0x6000"
-          },
-          {
-            "bytes": "11223344556677889900aabbccddeeff",
-            "offset": "0x7200",
+            "offset": "0x5e44",
             "segment": "0x6000"
           }
         ],
@@ -6868,7 +6868,7 @@
             "size": 2
           },
           {
-            "offset": "0x5460",
+            "offset": "0x5e42",
             "segment": "0x6000",
             "size": 2
           }
@@ -6882,7 +6882,7 @@
           "di": "0x0",
           "flags": "0x202",
           "si": "0x0",
-          "sp": "0xf000"
+          "sp": "0xffe0"
         },
         "segments": {
           "ds": "0x6000",
@@ -6918,7 +6918,7 @@
           },
           {
             "bytes": "0074",
-            "linear": "0x65460"
+            "linear": "0x65e42"
           }
         ],
         "registers": {
@@ -6939,20 +6939,20 @@
           "eflags": "0x202",
           "es": "0x6000",
           "esi": "0x0",
-          "esp": "0xf002",
+          "esp": "0xffe2",
           "flags": "0x202",
           "fs": "0x0",
           "gs": "0x0",
           "ip": "0x4",
           "si": "0x0",
-          "sp": "0xf002",
+          "sp": "0xffe2",
           "ss": "0x4000"
         },
         "status": "returned",
         "writes": [
           {
-            "bytes": "006000000000feefcb4f00600072006000740400007200600000",
-            "linear": "0x4efe6"
+            "bytes": "006000000000deffcb4f00600072006000740400007200600000",
+            "linear": "0x4ffc6"
           },
           {
             "bytes": "0474",
@@ -6995,7 +6995,7 @@
           },
           {
             "bytes": "0874",
-            "linear": "0x65460"
+            "linear": "0x65e42"
           }
         ],
         "registers": {
@@ -7016,24 +7016,24 @@
           "eflags": "0x202",
           "es": "0x6000",
           "esi": "0x0",
-          "esp": "0xf002",
+          "esp": "0xffe2",
           "flags": "0x202",
           "fs": "0x0",
           "gs": "0x0",
           "ip": "0x4",
           "si": "0x0",
-          "sp": "0xf002",
+          "sp": "0xffe2",
           "ss": "0x4000"
         },
         "status": "returned",
         "writes": [
           {
-            "bytes": "006000000000feef2c7500600072006000740800007200600000",
-            "linear": "0x4efe6"
+            "bytes": "006000000000deff2c7500600072006000740800007200600000",
+            "linear": "0x4ffc6"
           },
           {
             "bytes": "0874",
-            "linear": "0x65460"
+            "linear": "0x65e42"
           },
           {
             "bytes": "1122334455667788",
@@ -7088,13 +7088,33 @@
         "high_halves": {},
         "memory": [
           {
+            "bytes": "a0b1c2d3e4f5060708090a0b0c0d0e0f",
+            "offset": "0x7400",
+            "segment": "0x6000"
+          },
+          {
+            "bytes": "a0b1c2d3e4f5060708090a0b0c0d0e0f",
+            "offset": "0x7400",
+            "segment": "0x6000"
+          },
+          {
+            "bytes": "11223344556677889900aabbccddeeff",
+            "offset": "0x7200",
+            "segment": "0x6000"
+          },
+          {
+            "bytes": "11223344556677889900aabbccddeeff",
+            "offset": "0x7200",
+            "segment": "0x6000"
+          },
+          {
             "bytes": "0072",
-            "offset": "0xf002",
+            "offset": "0xffe2",
             "segment": "0x4000"
           },
           {
             "bytes": "0800",
-            "offset": "0xf004",
+            "offset": "0xffe4",
             "segment": "0x4000"
           },
           {
@@ -7104,7 +7124,7 @@
           },
           {
             "bytes": "0000",
-            "offset": "0x796",
+            "offset": "0x880",
             "segment": "0x6000"
           },
           {
@@ -7114,7 +7134,7 @@
           },
           {
             "bytes": "0074",
-            "offset": "0x5460",
+            "offset": "0x5e42",
             "segment": "0x6000"
           },
           {
@@ -7124,27 +7144,7 @@
           },
           {
             "bytes": "0060",
-            "offset": "0x5462",
-            "segment": "0x6000"
-          },
-          {
-            "bytes": "a0b1c2d3e4f5060708090a0b0c0d0e0f",
-            "offset": "0x7400",
-            "segment": "0x6000"
-          },
-          {
-            "bytes": "a0b1c2d3e4f5060708090a0b0c0d0e0f",
-            "offset": "0x7400",
-            "segment": "0x6000"
-          },
-          {
-            "bytes": "11223344556677889900aabbccddeeff",
-            "offset": "0x7200",
-            "segment": "0x6000"
-          },
-          {
-            "bytes": "11223344556677889900aabbccddeeff",
-            "offset": "0x7200",
+            "offset": "0x5e44",
             "segment": "0x6000"
           }
         ],
@@ -7175,7 +7175,7 @@
             "size": 2
           },
           {
-            "offset": "0x5460",
+            "offset": "0x5e42",
             "segment": "0x6000",
             "size": 2
           }
@@ -7189,7 +7189,7 @@
           "di": "0x0",
           "flags": "0x202",
           "si": "0x0",
-          "sp": "0xf000"
+          "sp": "0xffe0"
         },
         "segments": {
           "ds": "0x6000",
@@ -7225,7 +7225,7 @@
           },
           {
             "bytes": "0074",
-            "linear": "0x65460"
+            "linear": "0x65e42"
           }
         ],
         "registers": {
@@ -7246,20 +7246,20 @@
           "eflags": "0x202",
           "es": "0x6000",
           "esi": "0x0",
-          "esp": "0xf002",
+          "esp": "0xffe2",
           "flags": "0x202",
           "fs": "0x0",
           "gs": "0x0",
           "ip": "0x4",
           "si": "0x0",
-          "sp": "0xf002",
+          "sp": "0xffe2",
           "ss": "0x4000"
         },
         "status": "returned",
         "writes": [
           {
-            "bytes": "006000000000feefcb4f00600072006000740800007200600000",
-            "linear": "0x4efe6"
+            "bytes": "006000000000deffcb4f00600072006000740800007200600000",
+            "linear": "0x4ffc6"
           },
           {
             "bytes": "0874",
@@ -7302,7 +7302,7 @@
           },
           {
             "bytes": "0174",
-            "linear": "0x65460"
+            "linear": "0x65e42"
           }
         ],
         "registers": {
@@ -7323,24 +7323,24 @@
           "eflags": "0x202",
           "es": "0x6000",
           "esi": "0x0",
-          "esp": "0xf002",
+          "esp": "0xffe2",
           "flags": "0x202",
           "fs": "0x0",
           "gs": "0x0",
           "ip": "0x4",
           "si": "0x0",
-          "sp": "0xf002",
+          "sp": "0xffe2",
           "ss": "0x4000"
         },
         "status": "returned",
         "writes": [
           {
-            "bytes": "006000000000feef2c7500600074006000720100007200600000",
-            "linear": "0x4efe6"
+            "bytes": "006000000000deff2c7500600074006000720100007200600000",
+            "linear": "0x4ffc6"
           },
           {
             "bytes": "0174",
-            "linear": "0x65460"
+            "linear": "0x65e42"
           },
           {
             "bytes": "a0",
@@ -7395,13 +7395,33 @@
         "high_halves": {},
         "memory": [
           {
+            "bytes": "a0b1c2d3e4f5060708090a0b0c0d0e0f",
+            "offset": "0x7400",
+            "segment": "0x6000"
+          },
+          {
+            "bytes": "a0b1c2d3e4f5060708090a0b0c0d0e0f",
+            "offset": "0x7400",
+            "segment": "0x6000"
+          },
+          {
+            "bytes": "11223344556677889900aabbccddeeff",
+            "offset": "0x7200",
+            "segment": "0x6000"
+          },
+          {
+            "bytes": "11223344556677889900aabbccddeeff",
+            "offset": "0x7200",
+            "segment": "0x6000"
+          },
+          {
             "bytes": "0072",
-            "offset": "0xf002",
+            "offset": "0xffe2",
             "segment": "0x4000"
           },
           {
             "bytes": "0100",
-            "offset": "0xf004",
+            "offset": "0xffe4",
             "segment": "0x4000"
           },
           {
@@ -7411,7 +7431,7 @@
           },
           {
             "bytes": "0100",
-            "offset": "0x796",
+            "offset": "0x880",
             "segment": "0x6000"
           },
           {
@@ -7421,7 +7441,7 @@
           },
           {
             "bytes": "0074",
-            "offset": "0x5460",
+            "offset": "0x5e42",
             "segment": "0x6000"
           },
           {
@@ -7431,27 +7451,7 @@
           },
           {
             "bytes": "0060",
-            "offset": "0x5462",
-            "segment": "0x6000"
-          },
-          {
-            "bytes": "a0b1c2d3e4f5060708090a0b0c0d0e0f",
-            "offset": "0x7400",
-            "segment": "0x6000"
-          },
-          {
-            "bytes": "a0b1c2d3e4f5060708090a0b0c0d0e0f",
-            "offset": "0x7400",
-            "segment": "0x6000"
-          },
-          {
-            "bytes": "11223344556677889900aabbccddeeff",
-            "offset": "0x7200",
-            "segment": "0x6000"
-          },
-          {
-            "bytes": "11223344556677889900aabbccddeeff",
-            "offset": "0x7200",
+            "offset": "0x5e44",
             "segment": "0x6000"
           }
         ],
@@ -7482,7 +7482,7 @@
             "size": 2
           },
           {
-            "offset": "0x5460",
+            "offset": "0x5e42",
             "segment": "0x6000",
             "size": 2
           }
@@ -7496,7 +7496,7 @@
           "di": "0x0",
           "flags": "0x202",
           "si": "0x0",
-          "sp": "0xf000"
+          "sp": "0xffe0"
         },
         "segments": {
           "ds": "0x6000",
@@ -7532,7 +7532,7 @@
           },
           {
             "bytes": "0074",
-            "linear": "0x65460"
+            "linear": "0x65e42"
           }
         ],
         "registers": {
@@ -7553,20 +7553,20 @@
           "eflags": "0x202",
           "es": "0x6000",
           "esi": "0x0",
-          "esp": "0xf002",
+          "esp": "0xffe2",
           "flags": "0x202",
           "fs": "0x0",
           "gs": "0x0",
           "ip": "0x4",
           "si": "0x0",
-          "sp": "0xf002",
+          "sp": "0xffe2",
           "ss": "0x4000"
         },
         "status": "returned",
         "writes": [
           {
-            "bytes": "006000000000feefcb4f00600074006000720100007200600000",
-            "linear": "0x4efe6"
+            "bytes": "006000000000deffcb4f00600074006000720100007200600000",
+            "linear": "0x4ffc6"
           },
           {
             "bytes": "0174",
@@ -7609,7 +7609,7 @@
           },
           {
             "bytes": "0474",
-            "linear": "0x65460"
+            "linear": "0x65e42"
           }
         ],
         "registers": {
@@ -7630,24 +7630,24 @@
           "eflags": "0x202",
           "es": "0x6000",
           "esi": "0x0",
-          "esp": "0xf002",
+          "esp": "0xffe2",
           "flags": "0x202",
           "fs": "0x0",
           "gs": "0x0",
           "ip": "0x4",
           "si": "0x0",
-          "sp": "0xf002",
+          "sp": "0xffe2",
           "ss": "0x4000"
         },
         "status": "returned",
         "writes": [
           {
-            "bytes": "006000000000feef2c7500600074006000720400007200600000",
-            "linear": "0x4efe6"
+            "bytes": "006000000000deff2c7500600074006000720400007200600000",
+            "linear": "0x4ffc6"
           },
           {
             "bytes": "0474",
-            "linear": "0x65460"
+            "linear": "0x65e42"
           },
           {
             "bytes": "a0b1c2d3",
@@ -7702,13 +7702,33 @@
         "high_halves": {},
         "memory": [
           {
+            "bytes": "a0b1c2d3e4f5060708090a0b0c0d0e0f",
+            "offset": "0x7400",
+            "segment": "0x6000"
+          },
+          {
+            "bytes": "a0b1c2d3e4f5060708090a0b0c0d0e0f",
+            "offset": "0x7400",
+            "segment": "0x6000"
+          },
+          {
+            "bytes": "11223344556677889900aabbccddeeff",
+            "offset": "0x7200",
+            "segment": "0x6000"
+          },
+          {
+            "bytes": "11223344556677889900aabbccddeeff",
+            "offset": "0x7200",
+            "segment": "0x6000"
+          },
+          {
             "bytes": "0072",
-            "offset": "0xf002",
+            "offset": "0xffe2",
             "segment": "0x4000"
           },
           {
             "bytes": "0400",
-            "offset": "0xf004",
+            "offset": "0xffe4",
             "segment": "0x4000"
           },
           {
@@ -7718,7 +7738,7 @@
           },
           {
             "bytes": "0100",
-            "offset": "0x796",
+            "offset": "0x880",
             "segment": "0x6000"
           },
           {
@@ -7728,7 +7748,7 @@
           },
           {
             "bytes": "0074",
-            "offset": "0x5460",
+            "offset": "0x5e42",
             "segment": "0x6000"
           },
           {
@@ -7738,27 +7758,7 @@
           },
           {
             "bytes": "0060",
-            "offset": "0x5462",
-            "segment": "0x6000"
-          },
-          {
-            "bytes": "a0b1c2d3e4f5060708090a0b0c0d0e0f",
-            "offset": "0x7400",
-            "segment": "0x6000"
-          },
-          {
-            "bytes": "a0b1c2d3e4f5060708090a0b0c0d0e0f",
-            "offset": "0x7400",
-            "segment": "0x6000"
-          },
-          {
-            "bytes": "11223344556677889900aabbccddeeff",
-            "offset": "0x7200",
-            "segment": "0x6000"
-          },
-          {
-            "bytes": "11223344556677889900aabbccddeeff",
-            "offset": "0x7200",
+            "offset": "0x5e44",
             "segment": "0x6000"
           }
         ],
@@ -7789,7 +7789,7 @@
             "size": 2
           },
           {
-            "offset": "0x5460",
+            "offset": "0x5e42",
             "segment": "0x6000",
             "size": 2
           }
@@ -7803,7 +7803,7 @@
           "di": "0x0",
           "flags": "0x202",
           "si": "0x0",
-          "sp": "0xf000"
+          "sp": "0xffe0"
         },
         "segments": {
           "ds": "0x6000",
@@ -7839,7 +7839,7 @@
           },
           {
             "bytes": "0074",
-            "linear": "0x65460"
+            "linear": "0x65e42"
           }
         ],
         "registers": {
@@ -7860,20 +7860,20 @@
           "eflags": "0x202",
           "es": "0x6000",
           "esi": "0x0",
-          "esp": "0xf002",
+          "esp": "0xffe2",
           "flags": "0x202",
           "fs": "0x0",
           "gs": "0x0",
           "ip": "0x4",
           "si": "0x0",
-          "sp": "0xf002",
+          "sp": "0xffe2",
           "ss": "0x4000"
         },
         "status": "returned",
         "writes": [
           {
-            "bytes": "006000000000feefcb4f00600074006000720400007200600000",
-            "linear": "0x4efe6"
+            "bytes": "006000000000deffcb4f00600074006000720400007200600000",
+            "linear": "0x4ffc6"
           },
           {
             "bytes": "0474",
@@ -7916,7 +7916,7 @@
           },
           {
             "bytes": "0874",
-            "linear": "0x65460"
+            "linear": "0x65e42"
           }
         ],
         "registers": {
@@ -7937,24 +7937,24 @@
           "eflags": "0x202",
           "es": "0x6000",
           "esi": "0x0",
-          "esp": "0xf002",
+          "esp": "0xffe2",
           "flags": "0x202",
           "fs": "0x0",
           "gs": "0x0",
           "ip": "0x4",
           "si": "0x0",
-          "sp": "0xf002",
+          "sp": "0xffe2",
           "ss": "0x4000"
         },
         "status": "returned",
         "writes": [
           {
-            "bytes": "006000000000feef2c7500600074006000720800007200600000",
-            "linear": "0x4efe6"
+            "bytes": "006000000000deff2c7500600074006000720800007200600000",
+            "linear": "0x4ffc6"
           },
           {
             "bytes": "0874",
-            "linear": "0x65460"
+            "linear": "0x65e42"
           },
           {
             "bytes": "a0b1c2d3e4f50607",
@@ -8009,13 +8009,33 @@
         "high_halves": {},
         "memory": [
           {
+            "bytes": "a0b1c2d3e4f5060708090a0b0c0d0e0f",
+            "offset": "0x7400",
+            "segment": "0x6000"
+          },
+          {
+            "bytes": "a0b1c2d3e4f5060708090a0b0c0d0e0f",
+            "offset": "0x7400",
+            "segment": "0x6000"
+          },
+          {
+            "bytes": "11223344556677889900aabbccddeeff",
+            "offset": "0x7200",
+            "segment": "0x6000"
+          },
+          {
+            "bytes": "11223344556677889900aabbccddeeff",
+            "offset": "0x7200",
+            "segment": "0x6000"
+          },
+          {
             "bytes": "0072",
-            "offset": "0xf002",
+            "offset": "0xffe2",
             "segment": "0x4000"
           },
           {
             "bytes": "0800",
-            "offset": "0xf004",
+            "offset": "0xffe4",
             "segment": "0x4000"
           },
           {
@@ -8025,7 +8045,7 @@
           },
           {
             "bytes": "0100",
-            "offset": "0x796",
+            "offset": "0x880",
             "segment": "0x6000"
           },
           {
@@ -8035,7 +8055,7 @@
           },
           {
             "bytes": "0074",
-            "offset": "0x5460",
+            "offset": "0x5e42",
             "segment": "0x6000"
           },
           {
@@ -8045,27 +8065,7 @@
           },
           {
             "bytes": "0060",
-            "offset": "0x5462",
-            "segment": "0x6000"
-          },
-          {
-            "bytes": "a0b1c2d3e4f5060708090a0b0c0d0e0f",
-            "offset": "0x7400",
-            "segment": "0x6000"
-          },
-          {
-            "bytes": "a0b1c2d3e4f5060708090a0b0c0d0e0f",
-            "offset": "0x7400",
-            "segment": "0x6000"
-          },
-          {
-            "bytes": "11223344556677889900aabbccddeeff",
-            "offset": "0x7200",
-            "segment": "0x6000"
-          },
-          {
-            "bytes": "11223344556677889900aabbccddeeff",
-            "offset": "0x7200",
+            "offset": "0x5e44",
             "segment": "0x6000"
           }
         ],
@@ -8096,7 +8096,7 @@
             "size": 2
           },
           {
-            "offset": "0x5460",
+            "offset": "0x5e42",
             "segment": "0x6000",
             "size": 2
           }
@@ -8110,7 +8110,7 @@
           "di": "0x0",
           "flags": "0x202",
           "si": "0x0",
-          "sp": "0xf000"
+          "sp": "0xffe0"
         },
         "segments": {
           "ds": "0x6000",
@@ -8146,7 +8146,7 @@
           },
           {
             "bytes": "0074",
-            "linear": "0x65460"
+            "linear": "0x65e42"
           }
         ],
         "registers": {
@@ -8167,20 +8167,20 @@
           "eflags": "0x202",
           "es": "0x6000",
           "esi": "0x0",
-          "esp": "0xf002",
+          "esp": "0xffe2",
           "flags": "0x202",
           "fs": "0x0",
           "gs": "0x0",
           "ip": "0x4",
           "si": "0x0",
-          "sp": "0xf002",
+          "sp": "0xffe2",
           "ss": "0x4000"
         },
         "status": "returned",
         "writes": [
           {
-            "bytes": "006000000000feefcb4f00600074006000720800007200600000",
-            "linear": "0x4efe6"
+            "bytes": "006000000000deffcb4f00600074006000720800007200600000",
+            "linear": "0x4ffc6"
           },
           {
             "bytes": "0874",
@@ -8207,7 +8207,7 @@
           },
           {
             "bytes": "7a000000",
-            "linear": "0x65460"
+            "linear": "0x65e42"
           }
         ],
         "registers": {
@@ -8228,20 +8228,20 @@
           "eflags": "0x246",
           "es": "0x6000",
           "esi": "0x0",
-          "esp": "0xf002",
+          "esp": "0xffe2",
           "flags": "0x246",
           "fs": "0x0",
           "gs": "0x0",
           "ip": "0x4",
           "si": "0x0",
-          "sp": "0xf002",
+          "sp": "0xffe2",
           "ss": "0x4000"
         },
         "status": "returned",
         "writes": [
           {
             "bytes": "7a000000",
-            "linear": "0x65460"
+            "linear": "0x65e42"
           }
         ]
       },
@@ -8298,7 +8298,7 @@
           },
           {
             "bytes": "00000000",
-            "offset": "0x3bb4",
+            "offset": "0x46fa",
             "segment": "0x6000"
           }
         ],
@@ -8309,7 +8309,7 @@
             "size": 4
           },
           {
-            "offset": "0x5460",
+            "offset": "0x5e42",
             "segment": "0x6000",
             "size": 4
           }
@@ -8323,7 +8323,7 @@
           "di": "0x0",
           "flags": "0x202",
           "si": "0x0",
-          "sp": "0xf000"
+          "sp": "0xffe0"
         },
         "segments": {
           "ds": "0x6000",
@@ -8343,7 +8343,7 @@
           },
           {
             "bytes": "00000000",
-            "linear": "0x65460"
+            "linear": "0x65e42"
           }
         ],
         "registers": {
@@ -8364,13 +8364,13 @@
           "eflags": "0x246",
           "es": "0x6000",
           "esi": "0x0",
-          "esp": "0xf002",
+          "esp": "0xffe2",
           "flags": "0x246",
           "fs": "0x0",
           "gs": "0x0",
           "ip": "0x4",
           "si": "0x0",
-          "sp": "0xf002",
+          "sp": "0xffe2",
           "ss": "0x4000"
         },
         "status": "returned",
@@ -8396,7 +8396,7 @@
           },
           {
             "bytes": "7a015555",
-            "linear": "0x65460"
+            "linear": "0x65e42"
           }
         ],
         "registers": {
@@ -8417,20 +8417,20 @@
           "eflags": "0x246",
           "es": "0x6000",
           "esi": "0x0",
-          "esp": "0xf002",
+          "esp": "0xffe2",
           "flags": "0x246",
           "fs": "0x0",
           "gs": "0x0",
           "ip": "0x4",
           "si": "0x0",
-          "sp": "0xf002",
+          "sp": "0xffe2",
           "ss": "0x4000"
         },
         "status": "returned",
         "writes": [
           {
             "bytes": "7a015555",
-            "linear": "0x65460"
+            "linear": "0x65e42"
           }
         ]
       },
@@ -8487,7 +8487,7 @@
           },
           {
             "bytes": "00015555",
-            "offset": "0x3bb4",
+            "offset": "0x46fa",
             "segment": "0x6000"
           }
         ],
@@ -8498,7 +8498,7 @@
             "size": 4
           },
           {
-            "offset": "0x5460",
+            "offset": "0x5e42",
             "segment": "0x6000",
             "size": 4
           }
@@ -8512,7 +8512,7 @@
           "di": "0x0",
           "flags": "0x202",
           "si": "0x0",
-          "sp": "0xf000"
+          "sp": "0xffe0"
         },
         "segments": {
           "ds": "0x6000",
@@ -8532,7 +8532,7 @@
           },
           {
             "bytes": "00000000",
-            "linear": "0x65460"
+            "linear": "0x65e42"
           }
         ],
         "registers": {
@@ -8553,13 +8553,13 @@
           "eflags": "0x246",
           "es": "0x6000",
           "esi": "0x0",
-          "esp": "0xf002",
+          "esp": "0xffe2",
           "flags": "0x246",
           "fs": "0x0",
           "gs": "0x0",
           "ip": "0x4",
           "si": "0x0",
-          "sp": "0xf002",
+          "sp": "0xffe2",
           "ss": "0x4000"
         },
         "status": "returned",
@@ -8585,7 +8585,7 @@
           },
           {
             "bytes": "7affff7f",
-            "linear": "0x65460"
+            "linear": "0x65e42"
           }
         ],
         "registers": {
@@ -8606,20 +8606,20 @@
           "eflags": "0x246",
           "es": "0x6000",
           "esi": "0x0",
-          "esp": "0xf002",
+          "esp": "0xffe2",
           "flags": "0x246",
           "fs": "0x0",
           "gs": "0x0",
           "ip": "0x4",
           "si": "0x0",
-          "sp": "0xf002",
+          "sp": "0xffe2",
           "ss": "0x4000"
         },
         "status": "returned",
         "writes": [
           {
             "bytes": "7affff7f",
-            "linear": "0x65460"
+            "linear": "0x65e42"
           }
         ]
       },
@@ -8676,7 +8676,7 @@
           },
           {
             "bytes": "00ffff7f",
-            "offset": "0x3bb4",
+            "offset": "0x46fa",
             "segment": "0x6000"
           }
         ],
@@ -8687,7 +8687,7 @@
             "size": 4
           },
           {
-            "offset": "0x5460",
+            "offset": "0x5e42",
             "segment": "0x6000",
             "size": 4
           }
@@ -8701,7 +8701,7 @@
           "di": "0x0",
           "flags": "0x202",
           "si": "0x0",
-          "sp": "0xf000"
+          "sp": "0xffe0"
         },
         "segments": {
           "ds": "0x6000",
@@ -8721,7 +8721,7 @@
           },
           {
             "bytes": "00000000",
-            "linear": "0x65460"
+            "linear": "0x65e42"
           }
         ],
         "registers": {
@@ -8742,13 +8742,13 @@
           "eflags": "0x246",
           "es": "0x6000",
           "esi": "0x0",
-          "esp": "0xf002",
+          "esp": "0xffe2",
           "flags": "0x246",
           "fs": "0x0",
           "gs": "0x0",
           "ip": "0x4",
           "si": "0x0",
-          "sp": "0xf002",
+          "sp": "0xffe2",
           "ss": "0x4000"
         },
         "status": "returned",
@@ -8774,7 +8774,7 @@
           },
           {
             "bytes": "00000000000230300a0014000102313014002800020232301e003c0003023330280050000402343032006400050235303c0078000602363046008c0007023730",
-            "linear": "0x65ff0"
+            "linear": "0x665d8"
           },
           {
             "bytes": "0000",
@@ -8782,7 +8782,7 @@
           },
           {
             "bytes": "0000",
-            "linear": "0x65464"
+            "linear": "0x65e46"
           }
         ],
         "registers": {
@@ -8803,24 +8803,24 @@
           "eflags": "0x246",
           "es": "0x6000",
           "esi": "0x0",
-          "esp": "0xf002",
+          "esp": "0xffe2",
           "flags": "0x246",
           "fs": "0x0",
           "gs": "0x0",
           "ip": "0x4",
           "si": "0x0",
-          "sp": "0xf002",
+          "sp": "0xffe2",
           "ss": "0x4000"
         },
         "status": "returned",
         "writes": [
           {
             "bytes": "00000000",
-            "linear": "0x4eff6"
+            "linear": "0x4ffd6"
           },
           {
             "bytes": "0000",
-            "linear": "0x4effe"
+            "linear": "0x4ffde"
           }
         ]
       },
@@ -8871,33 +8871,13 @@
         "high_halves": {},
         "memory": [
           {
-            "bytes": "ffff",
-            "offset": "0x5528",
-            "segment": "0x6000"
-          },
-          {
-            "bytes": "ffff",
-            "offset": "0x3b78",
-            "segment": "0x6000"
-          },
-          {
-            "bytes": "1000",
-            "offset": "0x5520",
-            "segment": "0x6000"
-          },
-          {
-            "bytes": "1000",
-            "offset": "0x5466",
-            "segment": "0x6000"
-          },
-          {
             "bytes": "00000000000230300a0014000102313014002800020232301e003c0003023330280050000402343032006400050235303c0078000602363046008c0007023730",
             "offset": "0x523a",
             "segment": "0x6000"
           },
           {
             "bytes": "00000000000230300a0014000102313014002800020232301e003c0003023330280050000402343032006400050235303c0078000602363046008c0007023730",
-            "offset": "0x5ff0",
+            "offset": "0x65d8",
             "segment": "0x6000"
           },
           {
@@ -8907,7 +8887,27 @@
           },
           {
             "bytes": "33034404",
-            "offset": "0x60ca",
+            "offset": "0x6934",
+            "segment": "0x6000"
+          },
+          {
+            "bytes": "ffff",
+            "offset": "0x5528",
+            "segment": "0x6000"
+          },
+          {
+            "bytes": "ffff",
+            "offset": "0x175c",
+            "segment": "0x6000"
+          },
+          {
+            "bytes": "1000",
+            "offset": "0x5520",
+            "segment": "0x6000"
+          },
+          {
+            "bytes": "1000",
+            "offset": "0x5e48",
             "segment": "0x6000"
           },
           {
@@ -8917,7 +8917,7 @@
           },
           {
             "bytes": "2143",
-            "offset": "0x6c1a",
+            "offset": "0x713a",
             "segment": "0x6000"
           }
         ],
@@ -8928,7 +8928,7 @@
             "size": 64
           },
           {
-            "offset": "0x5ff0",
+            "offset": "0x65d8",
             "segment": "0x6000",
             "size": 64
           },
@@ -8938,7 +8938,7 @@
             "size": 2
           },
           {
-            "offset": "0x5464",
+            "offset": "0x5e46",
             "segment": "0x6000",
             "size": 2
           }
@@ -8952,7 +8952,7 @@
           "di": "0x0",
           "flags": "0x202",
           "si": "0x0",
-          "sp": "0xf000"
+          "sp": "0xffe0"
         },
         "segments": {
           "ds": "0x6000",
@@ -8972,7 +8972,7 @@
           },
           {
             "bytes": "00000000000230300a0014000102313014002800020232301e003c0003023330280050000402343032006400050235303c0078000602363046008c0007023730",
-            "linear": "0x65ff0"
+            "linear": "0x665d8"
           },
           {
             "bytes": "0000",
@@ -8980,7 +8980,7 @@
           },
           {
             "bytes": "0000",
-            "linear": "0x65464"
+            "linear": "0x65e46"
           }
         ],
         "registers": {
@@ -9001,24 +9001,24 @@
           "eflags": "0x246",
           "es": "0x6000",
           "esi": "0x0",
-          "esp": "0xf002",
+          "esp": "0xffe2",
           "flags": "0x246",
           "fs": "0x0",
           "gs": "0x0",
           "ip": "0x4",
           "si": "0x0",
-          "sp": "0xf002",
+          "sp": "0xffe2",
           "ss": "0x4000"
         },
         "status": "returned",
         "writes": [
           {
             "bytes": "00000000",
-            "linear": "0x4eff6"
+            "linear": "0x4ffd6"
           },
           {
             "bytes": "0000",
-            "linear": "0x4effe"
+            "linear": "0x4ffde"
           }
         ]
       },
@@ -9037,7 +9037,7 @@
           },
           {
             "bytes": "00000000000230300a0014000102313014002800020232301e003c0003023330280050000402343032006400050235303c0078000602363046008c0007023730",
-            "linear": "0x65ff0"
+            "linear": "0x665d8"
           },
           {
             "bytes": "0000",
@@ -9045,7 +9045,7 @@
           },
           {
             "bytes": "0000",
-            "linear": "0x65464"
+            "linear": "0x65e46"
           }
         ],
         "registers": {
@@ -9066,24 +9066,24 @@
           "eflags": "0x246",
           "es": "0x6000",
           "esi": "0x0",
-          "esp": "0xf002",
+          "esp": "0xffe2",
           "flags": "0x246",
           "fs": "0x0",
           "gs": "0x0",
           "ip": "0x4",
           "si": "0x0",
-          "sp": "0xf002",
+          "sp": "0xffe2",
           "ss": "0x4000"
         },
         "status": "returned",
         "writes": [
           {
             "bytes": "00000000",
-            "linear": "0x4eff6"
+            "linear": "0x4ffd6"
           },
           {
             "bytes": "0000",
-            "linear": "0x4effe"
+            "linear": "0x4ffde"
           }
         ]
       },
@@ -9134,33 +9134,13 @@
         "high_halves": {},
         "memory": [
           {
-            "bytes": "ffff",
-            "offset": "0x5528",
-            "segment": "0x6000"
-          },
-          {
-            "bytes": "ffff",
-            "offset": "0x3b78",
-            "segment": "0x6000"
-          },
-          {
-            "bytes": "1100",
-            "offset": "0x5520",
-            "segment": "0x6000"
-          },
-          {
-            "bytes": "1100",
-            "offset": "0x5466",
-            "segment": "0x6000"
-          },
-          {
             "bytes": "00000000000230300a0014000102313014002800020232301e003c0003023330280050000402343032006400050235303c0078000602363046008c0007023730",
             "offset": "0x523a",
             "segment": "0x6000"
           },
           {
             "bytes": "00000000000230300a0014000102313014002800020232301e003c0003023330280050000402343032006400050235303c0078000602363046008c0007023730",
-            "offset": "0x5ff0",
+            "offset": "0x65d8",
             "segment": "0x6000"
           },
           {
@@ -9170,7 +9150,27 @@
           },
           {
             "bytes": "33034404",
-            "offset": "0x60ca",
+            "offset": "0x6934",
+            "segment": "0x6000"
+          },
+          {
+            "bytes": "ffff",
+            "offset": "0x5528",
+            "segment": "0x6000"
+          },
+          {
+            "bytes": "ffff",
+            "offset": "0x175c",
+            "segment": "0x6000"
+          },
+          {
+            "bytes": "1100",
+            "offset": "0x5520",
+            "segment": "0x6000"
+          },
+          {
+            "bytes": "1100",
+            "offset": "0x5e48",
             "segment": "0x6000"
           },
           {
@@ -9180,7 +9180,7 @@
           },
           {
             "bytes": "2143",
-            "offset": "0x6c1a",
+            "offset": "0x713a",
             "segment": "0x6000"
           }
         ],
@@ -9191,7 +9191,7 @@
             "size": 64
           },
           {
-            "offset": "0x5ff0",
+            "offset": "0x65d8",
             "segment": "0x6000",
             "size": 64
           },
@@ -9201,7 +9201,7 @@
             "size": 2
           },
           {
-            "offset": "0x5464",
+            "offset": "0x5e46",
             "segment": "0x6000",
             "size": 2
           }
@@ -9215,7 +9215,7 @@
           "di": "0x0",
           "flags": "0x202",
           "si": "0x0",
-          "sp": "0xf000"
+          "sp": "0xffe0"
         },
         "segments": {
           "ds": "0x6000",
@@ -9235,7 +9235,7 @@
           },
           {
             "bytes": "00000000000230300a0014000102313014002800020232301e003c0003023330280050000402343032006400050235303c0078000602363046008c0007023730",
-            "linear": "0x65ff0"
+            "linear": "0x665d8"
           },
           {
             "bytes": "0000",
@@ -9243,7 +9243,7 @@
           },
           {
             "bytes": "0000",
-            "linear": "0x65464"
+            "linear": "0x65e46"
           }
         ],
         "registers": {
@@ -9264,24 +9264,24 @@
           "eflags": "0x246",
           "es": "0x6000",
           "esi": "0x0",
-          "esp": "0xf002",
+          "esp": "0xffe2",
           "flags": "0x246",
           "fs": "0x0",
           "gs": "0x0",
           "ip": "0x4",
           "si": "0x0",
-          "sp": "0xf002",
+          "sp": "0xffe2",
           "ss": "0x4000"
         },
         "status": "returned",
         "writes": [
           {
             "bytes": "00000000",
-            "linear": "0x4eff6"
+            "linear": "0x4ffd6"
           },
           {
             "bytes": "0000",
-            "linear": "0x4effe"
+            "linear": "0x4ffde"
           }
         ]
       },
@@ -9300,7 +9300,7 @@
           },
           {
             "bytes": "00000000000230300a0014000102313014002800020232301e003c0003023330280050000402343032006400050235303c0078000602363046008c0007023730",
-            "linear": "0x65ff0"
+            "linear": "0x665d8"
           },
           {
             "bytes": "0000",
@@ -9308,7 +9308,7 @@
           },
           {
             "bytes": "0000",
-            "linear": "0x65464"
+            "linear": "0x65e46"
           }
         ],
         "registers": {
@@ -9329,24 +9329,24 @@
           "eflags": "0x246",
           "es": "0x6000",
           "esi": "0x0",
-          "esp": "0xf002",
+          "esp": "0xffe2",
           "flags": "0x246",
           "fs": "0x0",
           "gs": "0x0",
           "ip": "0x4",
           "si": "0x0",
-          "sp": "0xf002",
+          "sp": "0xffe2",
           "ss": "0x4000"
         },
         "status": "returned",
         "writes": [
           {
             "bytes": "00000000",
-            "linear": "0x4eff6"
+            "linear": "0x4ffd6"
           },
           {
             "bytes": "0000",
-            "linear": "0x4effe"
+            "linear": "0x4ffde"
           }
         ]
       },
@@ -9397,33 +9397,13 @@
         "high_halves": {},
         "memory": [
           {
-            "bytes": "ffff",
-            "offset": "0x5528",
-            "segment": "0x6000"
-          },
-          {
-            "bytes": "ffff",
-            "offset": "0x3b78",
-            "segment": "0x6000"
-          },
-          {
-            "bytes": "f000",
-            "offset": "0x5520",
-            "segment": "0x6000"
-          },
-          {
-            "bytes": "f000",
-            "offset": "0x5466",
-            "segment": "0x6000"
-          },
-          {
             "bytes": "00000000000230300a0014000102313014002800020232301e003c0003023330280050000402343032006400050235303c0078000602363046008c0007023730",
             "offset": "0x523a",
             "segment": "0x6000"
           },
           {
             "bytes": "00000000000230300a0014000102313014002800020232301e003c0003023330280050000402343032006400050235303c0078000602363046008c0007023730",
-            "offset": "0x5ff0",
+            "offset": "0x65d8",
             "segment": "0x6000"
           },
           {
@@ -9433,7 +9413,27 @@
           },
           {
             "bytes": "33034404",
-            "offset": "0x60ca",
+            "offset": "0x6934",
+            "segment": "0x6000"
+          },
+          {
+            "bytes": "ffff",
+            "offset": "0x5528",
+            "segment": "0x6000"
+          },
+          {
+            "bytes": "ffff",
+            "offset": "0x175c",
+            "segment": "0x6000"
+          },
+          {
+            "bytes": "f000",
+            "offset": "0x5520",
+            "segment": "0x6000"
+          },
+          {
+            "bytes": "f000",
+            "offset": "0x5e48",
             "segment": "0x6000"
           },
           {
@@ -9443,7 +9443,7 @@
           },
           {
             "bytes": "2143",
-            "offset": "0x6c1a",
+            "offset": "0x713a",
             "segment": "0x6000"
           }
         ],
@@ -9454,7 +9454,7 @@
             "size": 64
           },
           {
-            "offset": "0x5ff0",
+            "offset": "0x65d8",
             "segment": "0x6000",
             "size": 64
           },
@@ -9464,7 +9464,7 @@
             "size": 2
           },
           {
-            "offset": "0x5464",
+            "offset": "0x5e46",
             "segment": "0x6000",
             "size": 2
           }
@@ -9478,7 +9478,7 @@
           "di": "0x0",
           "flags": "0x202",
           "si": "0x0",
-          "sp": "0xf000"
+          "sp": "0xffe0"
         },
         "segments": {
           "ds": "0x6000",
@@ -9498,7 +9498,7 @@
           },
           {
             "bytes": "00000000000230300a0014000102313014002800020232301e003c0003023330280050000402343032006400050235303c0078000602363046008c0007023730",
-            "linear": "0x65ff0"
+            "linear": "0x665d8"
           },
           {
             "bytes": "0000",
@@ -9506,7 +9506,7 @@
           },
           {
             "bytes": "0000",
-            "linear": "0x65464"
+            "linear": "0x65e46"
           }
         ],
         "registers": {
@@ -9527,24 +9527,24 @@
           "eflags": "0x246",
           "es": "0x6000",
           "esi": "0x0",
-          "esp": "0xf002",
+          "esp": "0xffe2",
           "flags": "0x246",
           "fs": "0x0",
           "gs": "0x0",
           "ip": "0x4",
           "si": "0x0",
-          "sp": "0xf002",
+          "sp": "0xffe2",
           "ss": "0x4000"
         },
         "status": "returned",
         "writes": [
           {
             "bytes": "00000000",
-            "linear": "0x4eff6"
+            "linear": "0x4ffd6"
           },
           {
             "bytes": "0000",
-            "linear": "0x4effe"
+            "linear": "0x4ffde"
           }
         ]
       },
@@ -9563,7 +9563,7 @@
           },
           {
             "bytes": "000001000a0230363303440480000000140029000c0232361e003d000d023336280051000e023436320065000f0235363c0079001002363646008d0011023736",
-            "linear": "0x65ff0"
+            "linear": "0x665d8"
           },
           {
             "bytes": "0000",
@@ -9571,7 +9571,7 @@
           },
           {
             "bytes": "0100",
-            "linear": "0x65464"
+            "linear": "0x65e46"
           }
         ],
         "registers": {
@@ -9592,84 +9592,84 @@
           "eflags": "0x246",
           "es": "0x6000",
           "esi": "0x0",
-          "esp": "0xf002",
+          "esp": "0xffe2",
           "flags": "0x246",
           "fs": "0x0",
           "gs": "0x0",
           "ip": "0x4",
           "si": "0x0",
-          "sp": "0xf002",
+          "sp": "0xffe2",
           "ss": "0x4000"
         },
         "status": "returned",
         "writes": [
           {
-            "bytes": "f0ef79f50000f0eff185260000000001f685feef4470000100000000080001000000",
-            "linear": "0x4efde"
+            "bytes": "d0ff77f50000d0fff185260000000001f685deff4470000100000000080001000000",
+            "linear": "0x4ffbe"
           },
           {
             "bytes": "c39e2600",
-            "linear": "0x61752"
+            "linear": "0x622c2"
           },
           {
             "bytes": "0100",
-            "linear": "0x65464"
+            "linear": "0x65e46"
           },
           {
             "bytes": "01000a02",
-            "linear": "0x65ff2"
+            "linear": "0x665da"
           },
           {
             "bytes": "363303440480000000",
-            "linear": "0x65ff7"
+            "linear": "0x665df"
           },
           {
             "bytes": "29000c02",
-            "linear": "0x66002"
+            "linear": "0x665ea"
           },
           {
             "bytes": "36",
-            "linear": "0x66007"
+            "linear": "0x665ef"
           },
           {
             "bytes": "3d000d02",
-            "linear": "0x6600a"
+            "linear": "0x665f2"
           },
           {
             "bytes": "36",
-            "linear": "0x6600f"
+            "linear": "0x665f7"
           },
           {
             "bytes": "51000e02",
-            "linear": "0x66012"
+            "linear": "0x665fa"
           },
           {
             "bytes": "36",
-            "linear": "0x66017"
+            "linear": "0x665ff"
           },
           {
             "bytes": "65000f02",
-            "linear": "0x6601a"
+            "linear": "0x66602"
           },
           {
             "bytes": "36",
-            "linear": "0x6601f"
+            "linear": "0x66607"
           },
           {
             "bytes": "79001002",
-            "linear": "0x66022"
+            "linear": "0x6660a"
           },
           {
             "bytes": "36",
-            "linear": "0x66027"
+            "linear": "0x6660f"
           },
           {
             "bytes": "8d001102",
-            "linear": "0x6602a"
+            "linear": "0x66612"
           },
           {
             "bytes": "36",
-            "linear": "0x6602f"
+            "linear": "0x66617"
           }
         ]
       },
@@ -9720,33 +9720,13 @@
         "high_halves": {},
         "memory": [
           {
-            "bytes": "0000",
-            "offset": "0x5528",
-            "segment": "0x6000"
-          },
-          {
-            "bytes": "0000",
-            "offset": "0x3b78",
-            "segment": "0x6000"
-          },
-          {
-            "bytes": "1000",
-            "offset": "0x5520",
-            "segment": "0x6000"
-          },
-          {
-            "bytes": "1000",
-            "offset": "0x5466",
-            "segment": "0x6000"
-          },
-          {
             "bytes": "00000000000230300a0014000102313014002800020232301e003c0003023330280050000402343032006400050235303c0078000602363046008c0007023730",
             "offset": "0x523a",
             "segment": "0x6000"
           },
           {
             "bytes": "00000000000230300a0014000102313014002800020232301e003c0003023330280050000402343032006400050235303c0078000602363046008c0007023730",
-            "offset": "0x5ff0",
+            "offset": "0x65d8",
             "segment": "0x6000"
           },
           {
@@ -9756,7 +9736,27 @@
           },
           {
             "bytes": "33034404",
-            "offset": "0x5cda",
+            "offset": "0x6544",
+            "segment": "0x6000"
+          },
+          {
+            "bytes": "0000",
+            "offset": "0x5528",
+            "segment": "0x6000"
+          },
+          {
+            "bytes": "0000",
+            "offset": "0x175c",
+            "segment": "0x6000"
+          },
+          {
+            "bytes": "1000",
+            "offset": "0x5520",
+            "segment": "0x6000"
+          },
+          {
+            "bytes": "1000",
+            "offset": "0x5e48",
             "segment": "0x6000"
           },
           {
@@ -9766,7 +9766,7 @@
           },
           {
             "bytes": "2143",
-            "offset": "0x6c1a",
+            "offset": "0x713a",
             "segment": "0x6000"
           }
         ],
@@ -9777,7 +9777,7 @@
             "size": 64
           },
           {
-            "offset": "0x5ff0",
+            "offset": "0x65d8",
             "segment": "0x6000",
             "size": 64
           },
@@ -9787,7 +9787,7 @@
             "size": 2
           },
           {
-            "offset": "0x5464",
+            "offset": "0x5e46",
             "segment": "0x6000",
             "size": 2
           }
@@ -9801,7 +9801,7 @@
           "di": "0x0",
           "flags": "0x202",
           "si": "0x0",
-          "sp": "0xf000"
+          "sp": "0xffe0"
         },
         "segments": {
           "ds": "0x6000",
@@ -9821,7 +9821,7 @@
           },
           {
             "bytes": "00000000000230300a0014000102313014002800020232301e003c0003023330280050000402343032006400050235303c0078000602363046008c0007023730",
-            "linear": "0x65ff0"
+            "linear": "0x665d8"
           },
           {
             "bytes": "0100",
@@ -9829,7 +9829,7 @@
           },
           {
             "bytes": "0000",
-            "linear": "0x65464"
+            "linear": "0x65e46"
           }
         ],
         "registers": {
@@ -9850,20 +9850,20 @@
           "eflags": "0x246",
           "es": "0x6000",
           "esi": "0x0",
-          "esp": "0xf002",
+          "esp": "0xffe2",
           "flags": "0x246",
           "fs": "0x0",
           "gs": "0x0",
           "ip": "0x4",
           "si": "0x0",
-          "sp": "0xf002",
+          "sp": "0xffe2",
           "ss": "0x4000"
         },
         "status": "returned",
         "writes": [
           {
-            "bytes": "f0efb7fc0000f0ef5dd426000000000162d4feefbf4a000100000000010008000000",
-            "linear": "0x4efde"
+            "bytes": "d0ffb7fc0000d0ff5dd426000000000162d4deffbf4a000100000000010008000000",
+            "linear": "0x4ffbe"
           },
           {
             "bytes": "01000a02",
@@ -9942,7 +9942,7 @@
           },
           {
             "bytes": "000001000a0230360a0015000b023136140029000c0232361e003d000d023336280051000e023436320065000f0235363c0079001002363646008d0011023736",
-            "linear": "0x65ff0"
+            "linear": "0x665d8"
           },
           {
             "bytes": "0000",
@@ -9950,7 +9950,7 @@
           },
           {
             "bytes": "0000",
-            "linear": "0x65464"
+            "linear": "0x65e46"
           }
         ],
         "registers": {
@@ -9971,88 +9971,88 @@
           "eflags": "0x202",
           "es": "0x6000",
           "esi": "0x0",
-          "esp": "0xf002",
+          "esp": "0xffe2",
           "flags": "0x202",
           "fs": "0x0",
           "gs": "0x0",
           "ip": "0x4",
           "si": "0x0",
-          "sp": "0xf002",
+          "sp": "0xffe2",
           "ss": "0x4000"
         },
         "status": "returned",
         "writes": [
           {
             "bytes": "000000000800",
-            "linear": "0x4eff6"
+            "linear": "0x4ffd6"
           },
           {
             "bytes": "0000",
-            "linear": "0x4effe"
+            "linear": "0x4ffde"
           },
           {
             "bytes": "01000a02",
-            "linear": "0x65ff2"
+            "linear": "0x665da"
           },
           {
             "bytes": "36",
-            "linear": "0x65ff7"
+            "linear": "0x665df"
           },
           {
             "bytes": "15000b02",
-            "linear": "0x65ffa"
+            "linear": "0x665e2"
           },
           {
             "bytes": "36",
-            "linear": "0x65fff"
+            "linear": "0x665e7"
           },
           {
             "bytes": "29000c02",
-            "linear": "0x66002"
+            "linear": "0x665ea"
           },
           {
             "bytes": "36",
-            "linear": "0x66007"
+            "linear": "0x665ef"
           },
           {
             "bytes": "3d000d02",
-            "linear": "0x6600a"
+            "linear": "0x665f2"
           },
           {
             "bytes": "36",
-            "linear": "0x6600f"
+            "linear": "0x665f7"
           },
           {
             "bytes": "51000e02",
-            "linear": "0x66012"
+            "linear": "0x665fa"
           },
           {
             "bytes": "36",
-            "linear": "0x66017"
+            "linear": "0x665ff"
           },
           {
             "bytes": "65000f02",
-            "linear": "0x6601a"
+            "linear": "0x66602"
           },
           {
             "bytes": "36",
-            "linear": "0x6601f"
+            "linear": "0x66607"
           },
           {
             "bytes": "79001002",
-            "linear": "0x66022"
+            "linear": "0x6660a"
           },
           {
             "bytes": "36",
-            "linear": "0x66027"
+            "linear": "0x6660f"
           },
           {
             "bytes": "8d001102",
-            "linear": "0x6602a"
+            "linear": "0x66612"
           },
           {
             "bytes": "36",
-            "linear": "0x6602f"
+            "linear": "0x66617"
           }
         ]
       },
@@ -10103,33 +10103,13 @@
         "high_halves": {},
         "memory": [
           {
-            "bytes": "0000",
-            "offset": "0x5528",
-            "segment": "0x6000"
-          },
-          {
-            "bytes": "0000",
-            "offset": "0x3b78",
-            "segment": "0x6000"
-          },
-          {
-            "bytes": "1100",
-            "offset": "0x5520",
-            "segment": "0x6000"
-          },
-          {
-            "bytes": "1100",
-            "offset": "0x5466",
-            "segment": "0x6000"
-          },
-          {
             "bytes": "00000000000230300a0014000102313014002800020232301e003c0003023330280050000402343032006400050235303c0078000602363046008c0007023730",
             "offset": "0x523a",
             "segment": "0x6000"
           },
           {
             "bytes": "00000000000230300a0014000102313014002800020232301e003c0003023330280050000402343032006400050235303c0078000602363046008c0007023730",
-            "offset": "0x5ff0",
+            "offset": "0x65d8",
             "segment": "0x6000"
           },
           {
@@ -10139,7 +10119,27 @@
           },
           {
             "bytes": "33034404",
-            "offset": "0x5cda",
+            "offset": "0x6544",
+            "segment": "0x6000"
+          },
+          {
+            "bytes": "0000",
+            "offset": "0x5528",
+            "segment": "0x6000"
+          },
+          {
+            "bytes": "0000",
+            "offset": "0x175c",
+            "segment": "0x6000"
+          },
+          {
+            "bytes": "1100",
+            "offset": "0x5520",
+            "segment": "0x6000"
+          },
+          {
+            "bytes": "1100",
+            "offset": "0x5e48",
             "segment": "0x6000"
           },
           {
@@ -10149,7 +10149,7 @@
           },
           {
             "bytes": "2143",
-            "offset": "0x6c1a",
+            "offset": "0x713a",
             "segment": "0x6000"
           }
         ],
@@ -10160,7 +10160,7 @@
             "size": 64
           },
           {
-            "offset": "0x5ff0",
+            "offset": "0x65d8",
             "segment": "0x6000",
             "size": 64
           },
@@ -10170,7 +10170,7 @@
             "size": 2
           },
           {
-            "offset": "0x5464",
+            "offset": "0x5e46",
             "segment": "0x6000",
             "size": 2
           }
@@ -10184,7 +10184,7 @@
           "di": "0x0",
           "flags": "0x202",
           "si": "0x0",
-          "sp": "0xf000"
+          "sp": "0xffe0"
         },
         "segments": {
           "ds": "0x6000",
@@ -10204,7 +10204,7 @@
           },
           {
             "bytes": "00000000000230300a0014000102313014002800020232301e003c0003023330280050000402343032006400050235303c0078000602363046008c0007023730",
-            "linear": "0x65ff0"
+            "linear": "0x665d8"
           },
           {
             "bytes": "0000",
@@ -10212,7 +10212,7 @@
           },
           {
             "bytes": "0000",
-            "linear": "0x65464"
+            "linear": "0x65e46"
           }
         ],
         "registers": {
@@ -10233,24 +10233,24 @@
           "eflags": "0x202",
           "es": "0x6000",
           "esi": "0x0",
-          "esp": "0xf002",
+          "esp": "0xffe2",
           "flags": "0x202",
           "fs": "0x0",
           "gs": "0x0",
           "ip": "0x4",
           "si": "0x0",
-          "sp": "0xf002",
+          "sp": "0xffe2",
           "ss": "0x4000"
         },
         "status": "returned",
         "writes": [
           {
             "bytes": "00000000",
-            "linear": "0x4eff6"
+            "linear": "0x4ffd6"
           },
           {
             "bytes": "08000000",
-            "linear": "0x4effc"
+            "linear": "0x4ffdc"
           },
           {
             "bytes": "01000a02",
@@ -10333,7 +10333,7 @@
           },
           {
             "bytes": "000001000a0230360a0015000b023136140029000c0232361e003d000d023336280051000e023436320065000f0235363c007900100236363303440480000000",
-            "linear": "0x65ff0"
+            "linear": "0x665d8"
           },
           {
             "bytes": "0000",
@@ -10341,7 +10341,7 @@
           },
           {
             "bytes": "0700",
-            "linear": "0x65464"
+            "linear": "0x65e46"
           }
         ],
         "registers": {
@@ -10362,84 +10362,84 @@
           "eflags": "0x246",
           "es": "0x6000",
           "esi": "0x0",
-          "esp": "0xf002",
+          "esp": "0xffe2",
           "flags": "0x246",
           "fs": "0x0",
           "gs": "0x0",
           "ip": "0x4",
           "si": "0x0",
-          "sp": "0xf002",
+          "sp": "0xffe2",
           "ss": "0x4000"
         },
         "status": "returned",
         "writes": [
           {
-            "bytes": "f0ef79f50000f0eff185260000000001f685feef4470000100000000080007000000",
-            "linear": "0x4efde"
+            "bytes": "d0ff77f50000d0fff185260000000001f685deff4470000100000000080007000000",
+            "linear": "0x4ffbe"
           },
           {
             "bytes": "c39e2600",
-            "linear": "0x61752"
+            "linear": "0x622c2"
           },
           {
             "bytes": "0700",
-            "linear": "0x65464"
+            "linear": "0x65e46"
           },
           {
             "bytes": "01000a02",
-            "linear": "0x65ff2"
+            "linear": "0x665da"
           },
           {
             "bytes": "36",
-            "linear": "0x65ff7"
+            "linear": "0x665df"
           },
           {
             "bytes": "15000b02",
-            "linear": "0x65ffa"
+            "linear": "0x665e2"
           },
           {
             "bytes": "36",
-            "linear": "0x65fff"
+            "linear": "0x665e7"
           },
           {
             "bytes": "29000c02",
-            "linear": "0x66002"
+            "linear": "0x665ea"
           },
           {
             "bytes": "36",
-            "linear": "0x66007"
+            "linear": "0x665ef"
           },
           {
             "bytes": "3d000d02",
-            "linear": "0x6600a"
+            "linear": "0x665f2"
           },
           {
             "bytes": "36",
-            "linear": "0x6600f"
+            "linear": "0x665f7"
           },
           {
             "bytes": "51000e02",
-            "linear": "0x66012"
+            "linear": "0x665fa"
           },
           {
             "bytes": "36",
-            "linear": "0x66017"
+            "linear": "0x665ff"
           },
           {
             "bytes": "65000f02",
-            "linear": "0x6601a"
+            "linear": "0x66602"
           },
           {
             "bytes": "36",
-            "linear": "0x6601f"
+            "linear": "0x66607"
           },
           {
             "bytes": "79001002",
-            "linear": "0x66022"
+            "linear": "0x6660a"
           },
           {
             "bytes": "363303440480000000",
-            "linear": "0x66027"
+            "linear": "0x6660f"
           }
         ]
       },
@@ -10490,33 +10490,13 @@
         "high_halves": {},
         "memory": [
           {
-            "bytes": "0000",
-            "offset": "0x5528",
-            "segment": "0x6000"
-          },
-          {
-            "bytes": "0000",
-            "offset": "0x3b78",
-            "segment": "0x6000"
-          },
-          {
-            "bytes": "f000",
-            "offset": "0x5520",
-            "segment": "0x6000"
-          },
-          {
-            "bytes": "f000",
-            "offset": "0x5466",
-            "segment": "0x6000"
-          },
-          {
             "bytes": "00000000000230300a0014000102313014002800020232301e003c0003023330280050000402343032006400050235303c0078000602363046008c0007023730",
             "offset": "0x523a",
             "segment": "0x6000"
           },
           {
             "bytes": "00000000000230300a0014000102313014002800020232301e003c0003023330280050000402343032006400050235303c0078000602363046008c0007023730",
-            "offset": "0x5ff0",
+            "offset": "0x65d8",
             "segment": "0x6000"
           },
           {
@@ -10526,7 +10506,27 @@
           },
           {
             "bytes": "33034404",
-            "offset": "0x5cda",
+            "offset": "0x6544",
+            "segment": "0x6000"
+          },
+          {
+            "bytes": "0000",
+            "offset": "0x5528",
+            "segment": "0x6000"
+          },
+          {
+            "bytes": "0000",
+            "offset": "0x175c",
+            "segment": "0x6000"
+          },
+          {
+            "bytes": "f000",
+            "offset": "0x5520",
+            "segment": "0x6000"
+          },
+          {
+            "bytes": "f000",
+            "offset": "0x5e48",
             "segment": "0x6000"
           },
           {
@@ -10536,7 +10536,7 @@
           },
           {
             "bytes": "2143",
-            "offset": "0x6c1a",
+            "offset": "0x713a",
             "segment": "0x6000"
           }
         ],
@@ -10547,7 +10547,7 @@
             "size": 64
           },
           {
-            "offset": "0x5ff0",
+            "offset": "0x65d8",
             "segment": "0x6000",
             "size": 64
           },
@@ -10557,7 +10557,7 @@
             "size": 2
           },
           {
-            "offset": "0x5464",
+            "offset": "0x5e46",
             "segment": "0x6000",
             "size": 2
           }
@@ -10571,7 +10571,7 @@
           "di": "0x0",
           "flags": "0x202",
           "si": "0x0",
-          "sp": "0xf000"
+          "sp": "0xffe0"
         },
         "segments": {
           "ds": "0x6000",
@@ -10591,7 +10591,7 @@
           },
           {
             "bytes": "00000000000230300a0014000102313014002800020232301e003c0003023330280050000402343032006400050235303c0078000602363046008c0007023730",
-            "linear": "0x65ff0"
+            "linear": "0x665d8"
           },
           {
             "bytes": "0700",
@@ -10599,7 +10599,7 @@
           },
           {
             "bytes": "0000",
-            "linear": "0x65464"
+            "linear": "0x65e46"
           }
         ],
         "registers": {
@@ -10620,20 +10620,20 @@
           "eflags": "0x246",
           "es": "0x6000",
           "esi": "0x0",
-          "esp": "0xf002",
+          "esp": "0xffe2",
           "flags": "0x246",
           "fs": "0x0",
           "gs": "0x0",
           "ip": "0x4",
           "si": "0x0",
-          "sp": "0xf002",
+          "sp": "0xffe2",
           "ss": "0x4000"
         },
         "status": "returned",
         "writes": [
           {
-            "bytes": "f0efb7fc0000f0ef5dd426000000000162d4feefbf4a000100000000070008000000",
-            "linear": "0x4efde"
+            "bytes": "d0ffb7fc0000d0ff5dd426000000000162d4deffbf4a000100000000070008000000",
+            "linear": "0x4ffbe"
           },
           {
             "bytes": "01000a02",
@@ -10712,7 +10712,7 @@
           },
           {
             "bytes": "000001000a0230363303440480000000140029000c0232361e003d000d023336280051000e023436320065000f0235363c0079001002363646008d0011023736",
-            "linear": "0x65ff0"
+            "linear": "0x665d8"
           },
           {
             "bytes": "0000",
@@ -10720,7 +10720,7 @@
           },
           {
             "bytes": "0100",
-            "linear": "0x65464"
+            "linear": "0x65e46"
           }
         ],
         "registers": {
@@ -10741,84 +10741,84 @@
           "eflags": "0x246",
           "es": "0x6000",
           "esi": "0x0",
-          "esp": "0xf002",
+          "esp": "0xffe2",
           "flags": "0x246",
           "fs": "0x0",
           "gs": "0x0",
           "ip": "0x4",
           "si": "0x0",
-          "sp": "0xf002",
+          "sp": "0xffe2",
           "ss": "0x4000"
         },
         "status": "returned",
         "writes": [
           {
-            "bytes": "f0ef79f50000f0eff185260000000001f685feef4470000100000000080001000000",
-            "linear": "0x4efde"
+            "bytes": "d0ff77f50000d0fff185260000000001f685deff4470000100000000080001000000",
+            "linear": "0x4ffbe"
           },
           {
             "bytes": "c39e2600",
-            "linear": "0x61752"
+            "linear": "0x622c2"
           },
           {
             "bytes": "0100",
-            "linear": "0x65464"
+            "linear": "0x65e46"
           },
           {
             "bytes": "01000a02",
-            "linear": "0x65ff2"
+            "linear": "0x665da"
           },
           {
             "bytes": "363303440480000000",
-            "linear": "0x65ff7"
+            "linear": "0x665df"
           },
           {
             "bytes": "29000c02",
-            "linear": "0x66002"
+            "linear": "0x665ea"
           },
           {
             "bytes": "36",
-            "linear": "0x66007"
+            "linear": "0x665ef"
           },
           {
             "bytes": "3d000d02",
-            "linear": "0x6600a"
+            "linear": "0x665f2"
           },
           {
             "bytes": "36",
-            "linear": "0x6600f"
+            "linear": "0x665f7"
           },
           {
             "bytes": "51000e02",
-            "linear": "0x66012"
+            "linear": "0x665fa"
           },
           {
             "bytes": "36",
-            "linear": "0x66017"
+            "linear": "0x665ff"
           },
           {
             "bytes": "65000f02",
-            "linear": "0x6601a"
+            "linear": "0x66602"
           },
           {
             "bytes": "36",
-            "linear": "0x6601f"
+            "linear": "0x66607"
           },
           {
             "bytes": "79001002",
-            "linear": "0x66022"
+            "linear": "0x6660a"
           },
           {
             "bytes": "36",
-            "linear": "0x66027"
+            "linear": "0x6660f"
           },
           {
             "bytes": "8d001102",
-            "linear": "0x6602a"
+            "linear": "0x66612"
           },
           {
             "bytes": "36",
-            "linear": "0x6602f"
+            "linear": "0x66617"
           }
         ]
       },
@@ -10869,33 +10869,13 @@
         "high_halves": {},
         "memory": [
           {
-            "bytes": "0300",
-            "offset": "0x5528",
-            "segment": "0x6000"
-          },
-          {
-            "bytes": "0300",
-            "offset": "0x3b78",
-            "segment": "0x6000"
-          },
-          {
-            "bytes": "1000",
-            "offset": "0x5520",
-            "segment": "0x6000"
-          },
-          {
-            "bytes": "1000",
-            "offset": "0x5466",
-            "segment": "0x6000"
-          },
-          {
             "bytes": "00000000000230300a0014000102313014002800020232301e003c0003023330280050000402343032006400050235303c0078000602363046008c0007023730",
             "offset": "0x523a",
             "segment": "0x6000"
           },
           {
             "bytes": "00000000000230300a0014000102313014002800020232301e003c0003023330280050000402343032006400050235303c0078000602363046008c0007023730",
-            "offset": "0x5ff0",
+            "offset": "0x65d8",
             "segment": "0x6000"
           },
           {
@@ -10905,7 +10885,27 @@
           },
           {
             "bytes": "33034404",
-            "offset": "0x5d0a",
+            "offset": "0x6574",
+            "segment": "0x6000"
+          },
+          {
+            "bytes": "0300",
+            "offset": "0x5528",
+            "segment": "0x6000"
+          },
+          {
+            "bytes": "0300",
+            "offset": "0x175c",
+            "segment": "0x6000"
+          },
+          {
+            "bytes": "1000",
+            "offset": "0x5520",
+            "segment": "0x6000"
+          },
+          {
+            "bytes": "1000",
+            "offset": "0x5e48",
             "segment": "0x6000"
           },
           {
@@ -10915,7 +10915,7 @@
           },
           {
             "bytes": "2143",
-            "offset": "0x6c1a",
+            "offset": "0x713a",
             "segment": "0x6000"
           }
         ],
@@ -10926,7 +10926,7 @@
             "size": 64
           },
           {
-            "offset": "0x5ff0",
+            "offset": "0x65d8",
             "segment": "0x6000",
             "size": 64
           },
@@ -10936,7 +10936,7 @@
             "size": 2
           },
           {
-            "offset": "0x5464",
+            "offset": "0x5e46",
             "segment": "0x6000",
             "size": 2
           }
@@ -10950,7 +10950,7 @@
           "di": "0x0",
           "flags": "0x202",
           "si": "0x0",
-          "sp": "0xf000"
+          "sp": "0xffe0"
         },
         "segments": {
           "ds": "0x6000",
@@ -10970,7 +10970,7 @@
           },
           {
             "bytes": "00000000000230300a0014000102313014002800020232301e003c0003023330280050000402343032006400050235303c0078000602363046008c0007023730",
-            "linear": "0x65ff0"
+            "linear": "0x665d8"
           },
           {
             "bytes": "0100",
@@ -10978,7 +10978,7 @@
           },
           {
             "bytes": "0000",
-            "linear": "0x65464"
+            "linear": "0x65e46"
           }
         ],
         "registers": {
@@ -10999,20 +10999,20 @@
           "eflags": "0x246",
           "es": "0x6000",
           "esi": "0x0",
-          "esp": "0xf002",
+          "esp": "0xffe2",
           "flags": "0x246",
           "fs": "0x0",
           "gs": "0x0",
           "ip": "0x4",
           "si": "0x0",
-          "sp": "0xf002",
+          "sp": "0xffe2",
           "ss": "0x4000"
         },
         "status": "returned",
         "writes": [
           {
-            "bytes": "f0efb7fc0000f0ef5dd426000000000162d4feefbf4a000100000000010008000000",
-            "linear": "0x4efde"
+            "bytes": "d0ffb7fc0000d0ff5dd426000000000162d4deffbf4a000100000000010008000000",
+            "linear": "0x4ffbe"
           },
           {
             "bytes": "01000a02",
@@ -11091,7 +11091,7 @@
           },
           {
             "bytes": "000001000a0230360a0015000b023136140029000c0232361e003d000d023336280051000e023436320065000f0235363c0079001002363646008d0011023736",
-            "linear": "0x65ff0"
+            "linear": "0x665d8"
           },
           {
             "bytes": "0000",
@@ -11099,7 +11099,7 @@
           },
           {
             "bytes": "0000",
-            "linear": "0x65464"
+            "linear": "0x65e46"
           }
         ],
         "registers": {
@@ -11120,88 +11120,88 @@
           "eflags": "0x202",
           "es": "0x6000",
           "esi": "0x0",
-          "esp": "0xf002",
+          "esp": "0xffe2",
           "flags": "0x202",
           "fs": "0x0",
           "gs": "0x0",
           "ip": "0x4",
           "si": "0x0",
-          "sp": "0xf002",
+          "sp": "0xffe2",
           "ss": "0x4000"
         },
         "status": "returned",
         "writes": [
           {
             "bytes": "000000000800",
-            "linear": "0x4eff6"
+            "linear": "0x4ffd6"
           },
           {
             "bytes": "0000",
-            "linear": "0x4effe"
+            "linear": "0x4ffde"
           },
           {
             "bytes": "01000a02",
-            "linear": "0x65ff2"
+            "linear": "0x665da"
           },
           {
             "bytes": "36",
-            "linear": "0x65ff7"
+            "linear": "0x665df"
           },
           {
             "bytes": "15000b02",
-            "linear": "0x65ffa"
+            "linear": "0x665e2"
           },
           {
             "bytes": "36",
-            "linear": "0x65fff"
+            "linear": "0x665e7"
           },
           {
             "bytes": "29000c02",
-            "linear": "0x66002"
+            "linear": "0x665ea"
           },
           {
             "bytes": "36",
-            "linear": "0x66007"
+            "linear": "0x665ef"
           },
           {
             "bytes": "3d000d02",
-            "linear": "0x6600a"
+            "linear": "0x665f2"
           },
           {
             "bytes": "36",
-            "linear": "0x6600f"
+            "linear": "0x665f7"
           },
           {
             "bytes": "51000e02",
-            "linear": "0x66012"
+            "linear": "0x665fa"
           },
           {
             "bytes": "36",
-            "linear": "0x66017"
+            "linear": "0x665ff"
           },
           {
             "bytes": "65000f02",
-            "linear": "0x6601a"
+            "linear": "0x66602"
           },
           {
             "bytes": "36",
-            "linear": "0x6601f"
+            "linear": "0x66607"
           },
           {
             "bytes": "79001002",
-            "linear": "0x66022"
+            "linear": "0x6660a"
           },
           {
             "bytes": "36",
-            "linear": "0x66027"
+            "linear": "0x6660f"
           },
           {
             "bytes": "8d001102",
-            "linear": "0x6602a"
+            "linear": "0x66612"
           },
           {
             "bytes": "36",
-            "linear": "0x6602f"
+            "linear": "0x66617"
           }
         ]
       },
@@ -11252,33 +11252,13 @@
         "high_halves": {},
         "memory": [
           {
-            "bytes": "0300",
-            "offset": "0x5528",
-            "segment": "0x6000"
-          },
-          {
-            "bytes": "0300",
-            "offset": "0x3b78",
-            "segment": "0x6000"
-          },
-          {
-            "bytes": "1100",
-            "offset": "0x5520",
-            "segment": "0x6000"
-          },
-          {
-            "bytes": "1100",
-            "offset": "0x5466",
-            "segment": "0x6000"
-          },
-          {
             "bytes": "00000000000230300a0014000102313014002800020232301e003c0003023330280050000402343032006400050235303c0078000602363046008c0007023730",
             "offset": "0x523a",
             "segment": "0x6000"
           },
           {
             "bytes": "00000000000230300a0014000102313014002800020232301e003c0003023330280050000402343032006400050235303c0078000602363046008c0007023730",
-            "offset": "0x5ff0",
+            "offset": "0x65d8",
             "segment": "0x6000"
           },
           {
@@ -11288,7 +11268,27 @@
           },
           {
             "bytes": "33034404",
-            "offset": "0x5d0a",
+            "offset": "0x6574",
+            "segment": "0x6000"
+          },
+          {
+            "bytes": "0300",
+            "offset": "0x5528",
+            "segment": "0x6000"
+          },
+          {
+            "bytes": "0300",
+            "offset": "0x175c",
+            "segment": "0x6000"
+          },
+          {
+            "bytes": "1100",
+            "offset": "0x5520",
+            "segment": "0x6000"
+          },
+          {
+            "bytes": "1100",
+            "offset": "0x5e48",
             "segment": "0x6000"
           },
           {
@@ -11298,7 +11298,7 @@
           },
           {
             "bytes": "2143",
-            "offset": "0x6c1a",
+            "offset": "0x713a",
             "segment": "0x6000"
           }
         ],
@@ -11309,7 +11309,7 @@
             "size": 64
           },
           {
-            "offset": "0x5ff0",
+            "offset": "0x65d8",
             "segment": "0x6000",
             "size": 64
           },
@@ -11319,7 +11319,7 @@
             "size": 2
           },
           {
-            "offset": "0x5464",
+            "offset": "0x5e46",
             "segment": "0x6000",
             "size": 2
           }
@@ -11333,7 +11333,7 @@
           "di": "0x0",
           "flags": "0x202",
           "si": "0x0",
-          "sp": "0xf000"
+          "sp": "0xffe0"
         },
         "segments": {
           "ds": "0x6000",
@@ -11353,7 +11353,7 @@
           },
           {
             "bytes": "00000000000230300a0014000102313014002800020232301e003c0003023330280050000402343032006400050235303c0078000602363046008c0007023730",
-            "linear": "0x65ff0"
+            "linear": "0x665d8"
           },
           {
             "bytes": "0000",
@@ -11361,7 +11361,7 @@
           },
           {
             "bytes": "0000",
-            "linear": "0x65464"
+            "linear": "0x65e46"
           }
         ],
         "registers": {
@@ -11382,24 +11382,24 @@
           "eflags": "0x202",
           "es": "0x6000",
           "esi": "0x0",
-          "esp": "0xf002",
+          "esp": "0xffe2",
           "flags": "0x202",
           "fs": "0x0",
           "gs": "0x0",
           "ip": "0x4",
           "si": "0x0",
-          "sp": "0xf002",
+          "sp": "0xffe2",
           "ss": "0x4000"
         },
         "status": "returned",
         "writes": [
           {
             "bytes": "00000000",
-            "linear": "0x4eff6"
+            "linear": "0x4ffd6"
           },
           {
             "bytes": "08000000",
-            "linear": "0x4effc"
+            "linear": "0x4ffdc"
           },
           {
             "bytes": "01000a02",
@@ -11482,7 +11482,7 @@
           },
           {
             "bytes": "000001000a0230360a0015000b023136140029000c0232361e003d000d023336280051000e023436320065000f0235363c007900100236363303440480000000",
-            "linear": "0x65ff0"
+            "linear": "0x665d8"
           },
           {
             "bytes": "0000",
@@ -11490,7 +11490,7 @@
           },
           {
             "bytes": "0700",
-            "linear": "0x65464"
+            "linear": "0x65e46"
           }
         ],
         "registers": {
@@ -11511,84 +11511,84 @@
           "eflags": "0x246",
           "es": "0x6000",
           "esi": "0x0",
-          "esp": "0xf002",
+          "esp": "0xffe2",
           "flags": "0x246",
           "fs": "0x0",
           "gs": "0x0",
           "ip": "0x4",
           "si": "0x0",
-          "sp": "0xf002",
+          "sp": "0xffe2",
           "ss": "0x4000"
         },
         "status": "returned",
         "writes": [
           {
-            "bytes": "f0ef79f50000f0eff185260000000001f685feef4470000100000000080007000000",
-            "linear": "0x4efde"
+            "bytes": "d0ff77f50000d0fff185260000000001f685deff4470000100000000080007000000",
+            "linear": "0x4ffbe"
           },
           {
             "bytes": "c39e2600",
-            "linear": "0x61752"
+            "linear": "0x622c2"
           },
           {
             "bytes": "0700",
-            "linear": "0x65464"
+            "linear": "0x65e46"
           },
           {
             "bytes": "01000a02",
-            "linear": "0x65ff2"
+            "linear": "0x665da"
           },
           {
             "bytes": "36",
-            "linear": "0x65ff7"
+            "linear": "0x665df"
           },
           {
             "bytes": "15000b02",
-            "linear": "0x65ffa"
+            "linear": "0x665e2"
           },
           {
             "bytes": "36",
-            "linear": "0x65fff"
+            "linear": "0x665e7"
           },
           {
             "bytes": "29000c02",
-            "linear": "0x66002"
+            "linear": "0x665ea"
           },
           {
             "bytes": "36",
-            "linear": "0x66007"
+            "linear": "0x665ef"
           },
           {
             "bytes": "3d000d02",
-            "linear": "0x6600a"
+            "linear": "0x665f2"
           },
           {
             "bytes": "36",
-            "linear": "0x6600f"
+            "linear": "0x665f7"
           },
           {
             "bytes": "51000e02",
-            "linear": "0x66012"
+            "linear": "0x665fa"
           },
           {
             "bytes": "36",
-            "linear": "0x66017"
+            "linear": "0x665ff"
           },
           {
             "bytes": "65000f02",
-            "linear": "0x6601a"
+            "linear": "0x66602"
           },
           {
             "bytes": "36",
-            "linear": "0x6601f"
+            "linear": "0x66607"
           },
           {
             "bytes": "79001002",
-            "linear": "0x66022"
+            "linear": "0x6660a"
           },
           {
             "bytes": "363303440480000000",
-            "linear": "0x66027"
+            "linear": "0x6660f"
           }
         ]
       },
@@ -11639,33 +11639,13 @@
         "high_halves": {},
         "memory": [
           {
-            "bytes": "0300",
-            "offset": "0x5528",
-            "segment": "0x6000"
-          },
-          {
-            "bytes": "0300",
-            "offset": "0x3b78",
-            "segment": "0x6000"
-          },
-          {
-            "bytes": "f000",
-            "offset": "0x5520",
-            "segment": "0x6000"
-          },
-          {
-            "bytes": "f000",
-            "offset": "0x5466",
-            "segment": "0x6000"
-          },
-          {
             "bytes": "00000000000230300a0014000102313014002800020232301e003c0003023330280050000402343032006400050235303c0078000602363046008c0007023730",
             "offset": "0x523a",
             "segment": "0x6000"
           },
           {
             "bytes": "00000000000230300a0014000102313014002800020232301e003c0003023330280050000402343032006400050235303c0078000602363046008c0007023730",
-            "offset": "0x5ff0",
+            "offset": "0x65d8",
             "segment": "0x6000"
           },
           {
@@ -11675,7 +11655,27 @@
           },
           {
             "bytes": "33034404",
-            "offset": "0x5d0a",
+            "offset": "0x6574",
+            "segment": "0x6000"
+          },
+          {
+            "bytes": "0300",
+            "offset": "0x5528",
+            "segment": "0x6000"
+          },
+          {
+            "bytes": "0300",
+            "offset": "0x175c",
+            "segment": "0x6000"
+          },
+          {
+            "bytes": "f000",
+            "offset": "0x5520",
+            "segment": "0x6000"
+          },
+          {
+            "bytes": "f000",
+            "offset": "0x5e48",
             "segment": "0x6000"
           },
           {
@@ -11685,7 +11685,7 @@
           },
           {
             "bytes": "2143",
-            "offset": "0x6c1a",
+            "offset": "0x713a",
             "segment": "0x6000"
           }
         ],
@@ -11696,7 +11696,7 @@
             "size": 64
           },
           {
-            "offset": "0x5ff0",
+            "offset": "0x65d8",
             "segment": "0x6000",
             "size": 64
           },
@@ -11706,7 +11706,7 @@
             "size": 2
           },
           {
-            "offset": "0x5464",
+            "offset": "0x5e46",
             "segment": "0x6000",
             "size": 2
           }
@@ -11720,7 +11720,7 @@
           "di": "0x0",
           "flags": "0x202",
           "si": "0x0",
-          "sp": "0xf000"
+          "sp": "0xffe0"
         },
         "segments": {
           "ds": "0x6000",
@@ -11740,7 +11740,7 @@
           },
           {
             "bytes": "00000000000230300a0014000102313014002800020232301e003c0003023330280050000402343032006400050235303c0078000602363046008c0007023730",
-            "linear": "0x65ff0"
+            "linear": "0x665d8"
           },
           {
             "bytes": "0700",
@@ -11748,7 +11748,7 @@
           },
           {
             "bytes": "0000",
-            "linear": "0x65464"
+            "linear": "0x65e46"
           }
         ],
         "registers": {
@@ -11769,20 +11769,20 @@
           "eflags": "0x246",
           "es": "0x6000",
           "esi": "0x0",
-          "esp": "0xf002",
+          "esp": "0xffe2",
           "flags": "0x246",
           "fs": "0x0",
           "gs": "0x0",
           "ip": "0x4",
           "si": "0x0",
-          "sp": "0xf002",
+          "sp": "0xffe2",
           "ss": "0x4000"
         },
         "status": "returned",
         "writes": [
           {
-            "bytes": "f0efb7fc0000f0ef5dd426000000000162d4feefbf4a000100000000070008000000",
-            "linear": "0x4efde"
+            "bytes": "d0ffb7fc0000d0ff5dd426000000000162d4deffbf4a000100000000070008000000",
+            "linear": "0x4ffbe"
           },
           {
             "bytes": "01000a02",

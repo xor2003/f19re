@@ -4,25 +4,50 @@
  * Each ported module's externs resolve here so a test exe links. */
 #include "inttype.h"
 
+/* EGAME-only globals: satellite test exes (START/END/SU) do not reference
+   them, and the full init set (~2.5KB of tables) would overflow the
+   satellites' 64K DGROUP.  portcheck defines EXE_<NAME> per target. */
+#if !defined(EXE_START) && !defined(EXE_END) && !defined(EXE_SU)
+#define EGAME_ONLY 1
+#endif
+
 int16 g_mapX, g_mapY;
-int16 g_clipMinX, g_clipMinY, g_clipMaxX, g_clipMaxY;
+int16 g_clipMinX, g_clipMinY, g_clipMaxX = 0x13F, g_clipMaxY = 0x6F;
 int16 g_drawColor, g_vtxX, g_vtxY;
 int16 g_viewParamsBuf[16];
+/* page-descriptor records @0x579A +0x18 — oracle init: each record's last
+   word is a near self-pointer; those slots are the g_page* pointer vars. */
+#ifdef EGAME_ONLY
+int16 g_pageRecs[5][12] = {
+    {0,2,2,0,0,0,1,0,0x6c,0,0x13f, (int16)g_pageRecs[0]},
+    {1,2,2,0,0,0,1,0,0x6c,0,0x13f, (int16)g_pageRecs[1]},
+    {2,2,2,0,0,0,0,0,0xc7,0,0x13f, (int16)g_pageRecs[2]},
+    {0,2,2,0,0,0,1,0x7c,0xc3,0x28,0x8f, (int16)g_pageRecs[3]},
+    {0,2,2,0,0,0,1,0x7c,0xc4,0xb0,0x118, (int16)g_pageRecs[4]},
+};
+#endif
 int16 *g_viewParams = g_viewParamsBuf;
-int16 g_skyColorIndex;
+int16 g_skyColorIndex = 6;              /* word_38374 — oracle init */
 int8  g_renderPageToggle, g_timerTick;
 int32 g_viewTargetX, g_viewTargetY;
 int16 g_viewTargetAlt, g_viewTargetObj;
 int16 g_viewHeading, g_viewPitch, g_viewRoll;
 int16 g_crashCamX, g_crashCamY, g_crashCamZ;
-int16 g_viewClipBottom, g_camRotMatrix[9];
+int16 g_viewClipBottom = 1, g_camRotMatrix[9];   /* oracle init 1 */
 int8  g_horizonGroundColor, g_savedPosVisible;
 struct ViewSnapshot { int32 worldX, worldY; int16 alt, heading, pitch, roll; };
 struct ViewSnapshot g_viewSnapshotRing[16];
 int16 g_rearViewShape[4], g_leftViewShape[4], g_rightViewShape[4], g_frontViewShape[4];
 void far gfx_waitRetrace(void) {}
 void far gfx_waitRetrace2(void) {}
-char colorLut[16];
+/* colorLut @ds:0x9DC = 16-byte ramp + lodDist block (0x80<<i words at +0x10)
+   + 0x2710 defaults — egkeys.c aliases lodDist* at +0x18..+0x20. Oracle init. */
+char colorLut[0x32] = {
+    0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,
+    -128,0, 0,1, 0,2, 0,4, 0,8, 0,0x10, 0,0x20, 0,0x40,
+    0x10,0x27, 0x10,0x27, 0x10,0x27, 0x10,0x27, 0x10,0x27, 0x10,0x27,
+    0x10,0x27, -1,-1, -23,-1
+};
 char g_colorPalettes[256];
 
 #ifndef EXE_START /* src_start/stutil.c provides START's 5-arg drawLine */
@@ -41,9 +66,9 @@ int16 g_mapOriginX, g_mapOriginY, g_projErr, g_viewScale, g_projX, g_projY;
 int16 mapMul(int16 a, int16 b) { return 0; }
 int16 mapDiv(int16 a, int16 b) { return 0; }
 
-int16 g_radarScopeRange;
+int16 g_radarScopeRange = 1;            /* word_346E6 — oracle init */
 int16 g_mapCenterX, g_mapCenterY;
-int16 g_mapZoomLevel;
+int16 g_mapZoomLevel = 8;             /* word_346E4 — oracle init */
 int16 g_externalCamDist = 4;           /* word_343C6 — oracle init */
 int16 g_viewX_, g_viewY_, g_projDepth, g_ourHead, g_vprojX, g_vprojY;
 /* asm-faithful fixed-point helpers (START sub_14559/14565/144F2 =
@@ -71,14 +96,18 @@ int16 fixedMulQ14(int16 a, int16 b) {
 }
 
 struct GaugeParams { int16 bufPtr, srcX, srcY, page, dstX, dstY, width, height; };
-struct GaugeParams gaugeSpriteParams;
+#ifdef EGAME_ONLY
+struct GaugeParams gaugeSpriteParams = {0, 0, 7, 7, 0x7C, 0xC3, 0x28, 0x8F};  /* @0x5840 — oracle init */
+#endif
 struct SpriteParams {
     int16 bufPtr, srcX, srcY, page, dstX, dstY, width, height;  /* +0x00..+0x0E */
     int16 pad16[4];         /* +0x10..+0x17 */
     uint8 flags;            /* +0x18 */
     uint8 transparent;      /* +0x19 */
 };
-struct SpriteParams blitSpriteParams;   /* @0x5856 */
+#ifdef EGAME_ONLY
+struct SpriteParams blitSpriteParams = {0,0,0,0,0,0,0,0, {0,0,0,0}, 1, 1};    /* @0x5856 — oracle init */
+#endif
 int16 gfxBufPtr;
 uint8 g_drawPage;
 void far gfx_blitSpriteClipped(int16 *p) {}
@@ -92,7 +121,13 @@ int16 g_modelEdgeCount, g_vtxSignMaskLo = 0, g_vtxSignMaskHi = 0;
 int8 g_modelWideVtxFlag;
 
 struct VpParms { int16 f[11]; };
-struct VpParms *g_vpParms;
+#ifdef EGAME_ONLY
+struct VpParms *g_vpParms = (struct VpParms *)g_pageRecs[0];  /* @0x57B0 cell */
+#else
+int16 g_vpParmsBuf[11] =                /* satellites: stutil.c pokes f[2] */
+    {0, 2, 2, 0, 0, 0, 1, 0, 0x6C, 0, 0x13F};   /* mirror of oracle rec0 */
+int16 *g_vpParms = g_vpParmsBuf;
+#endif
 int16 g_clipMaxX, g_clipMaxY;
 int16 far gfx_clipWindow(int16 a, int16 b) { return 0; }
 void far gfx_setOrigin(int16 a) {}
@@ -149,7 +184,7 @@ void far gfx_setBlitOffset(int16 a) {}
 int16 g_viewRotMatrix[9];
 void far buildRotationMatrixFar(int16 *m, int16 a, int16 b, int16 c) {}
 void far drawProjectionSphere(int16 a) {}
-int16 g_posVisibleFlag, g_detailLevel;
+int16 g_posVisibleFlag = 1, g_detailLevel;      /* oracle init 1 */
 int8 g_offscreenRender, g_frameSyncPending;
 int16 g_sortedObjCount, g_spinAngle, g_frameRateScaling;
 
@@ -262,7 +297,9 @@ struct CommData FAR *commData;
 int16 g_scopeClipLeft = 0, g_scopeClipRight = 0, g_scopeClipTop = 0, g_scopeClipBottom = 0;
 int16 g_mapMode = 0;
 int16 g_panelLabelOn = 1;   /* oracle inits the cell to 1 (word_33BEA=0001) */
-int16 *g_pageFront, *g_pageBack;
+#ifdef EGAME_ONLY
+int16 *g_pageFront = g_pageRecs[0], *g_pageBack = g_pageRecs[1];
+#endif
 union REGS regs;
 
 void FAR fillSpanRect(int16 a,int16 b,int16 c,int16 d,int16 e) {}
@@ -270,27 +307,30 @@ uint8 far gfx_getDrawPage(void) { return 0; }
 void  far gfx_setDrawPage(int16 a) {}
 void FAR gfx_drawString(int16 *a,const char *b,int16 c) {}
 
-int16 *g_pageOffscreen;
+#ifdef EGAME_ONLY
+int16 *g_pageOffscreen = g_pageRecs[2];
+#endif
 void FAR gfx_copyRect(int16 a,int16 b,int16 c,int16 d,int16 e,int16 f,int16 g,int16 h) {}
-int16 pageFrontBuf[1] = {0}, pageBackBuf[1] = {0}, pageOffBuf[1] = {0};
 
 int16 g_threatActiveTimer, g_threatTimerInit, g_threatRefX, g_threatRefY, g_threatRefZ, g_threatRefHead;
 int16 g_unusedEventHist0, g_planeScanCount;
 int16 g_missionStatus = 1;                        /* oracle dseg:0x4ef0 init */
-int16 g_difficultyTier;
-int16 g_playerPlaneFlags, g_bombDamageMask, g_gunHits, g_damageTakenFlag;
+int16 g_difficultyTier = 1;           /* word_33D88 — oracle init; aliases
+                                         g_isCampaignMission write site */
+int16 g_playerPlaneFlags, g_gunHits, g_damageTakenFlag;
+int16 g_bombDamageMask = 4;           /* word_33D64 — oracle init */
 int16 g_viewX_, g_viewY_, g_viewZ, g_ourHead, g_autopilotEngaged, waypointIndex;
 char strBuf[64];
 struct { int16 lead[3]; struct { int16 active; int16 f02; int16 alertLevel; int16 pad[5]; } planes[74]; } g_planeTable;
 struct { int16 state; int16 pad[8]; } g_targetSlots[4];
-int16 g_waypointNameBase;
+int16 g_waypointNameBase = 1;         /* word_2F470 — oracle init 1 */
 struct TileObject;                  /* full def in eg3dmap.c / egtarget.c */
 struct TileObject *g_nearestTileObj;
 int16 g_rotMatrix[9];                 /* @0x80B6 — 3x3 camera/view rotation matrix */
 int16 g_targetLock;                   /* word_351D8 — target-lock acquired flag */
 int16 g_storeDefCount;                /* word_3838E — number of g_storeDefs entries */
 int16 g_selGridX, g_selGridY, g_selTileId;  /* word_36F3A/3C/46 — store-query cache */
-int16 g_selStoreState;                /* word_343BE — store-selection state */
+int16 g_selStoreState = -1;           /* word_343BE — oracle init ffff */
 struct { int16 mapX,mapY,u4,type,ttl,uA; } mapEvents[4];
 #if defined(EXE_START) || defined(EXE_END) || defined(EXE_SU)
 void appendMapEvent(int16 a, int16 b) {}
@@ -303,7 +343,9 @@ void refreshActivePanel(int16 a) {}
 
 int16 g_scopeArcColor, g_targetBearing, g_targetRange, g_viewX_2, g_vprojXlo, g_vprojYlo;
 char g_itoaScratch[24];
-struct { int8 name[8]; int16 lethality, dangerTier, flags; } g_samSpecs[22] = { /* @0x487c SAM/threat spec table — 14-byte records, oracle init */
+#ifdef EGAME_ONLY
+struct { int8 name[8]; int16 lethality, dangerTier, flags; } g_samSpecs[23] = { /* @0x486e SAM/threat spec table — 14-byte records, oracle init */
+    {"None",     0, 0, 0},
     {"SA-2",   200, 3, 0}, {"SA-5",   350, 2, 0}, {"SA-8B",  125, 5, 0},
     {"SA-10",  320, 7, 1}, {"SA-11",  200, 5, 0}, {"SA-12",  290, 6, 1},
     {"SA-13",  125, 3, 0}, {"SA-N-4", 200, 4, 1}, {"SA-N-5", 150, 3, 0},
@@ -313,11 +355,13 @@ struct { int8 name[8]; int16 lethality, dangerTier, flags; } g_samSpecs[22] = { 
     {"",        80, 7, 1}, {"",       100, 8, 1}, {"OTH",    500, 5, 1},
     {"",        40, 3, 0}
 };
+#endif
 
 int16 g_inputDisabled, g_axisInputAccum[4], g_soundPriorityFloor, g_ejectState;
 int16 g_smokeTimer;                    /* word_34B0A — flag-0x20 duration counter */
 int8 g_commEventFlag;                  /* byte_38D18 */
-int16 g_frameRateScaling = 4, g_frameSyncWait, g_timeAccelMode, g_bulletTrackCount;
+int16 g_frameRateScaling = 4, g_timeAccelMode = 1, g_bulletTrackCount;
+int16 g_frameSyncWait = 1;            /* word_34AFE — oracle init */
 int16 g_threatDisplayTtl;
 int16 FAR misc_readJoystick(int16 a) { return 0; }
 void FAR audio_playSound(int16 a) {}
@@ -325,9 +369,13 @@ void FAR audio_engineDroneOn(void) {}
 int16 g_engineThrust;                   /* word_33588 */
 /* lodDist* cells alias colorLut+0x18..0x1E in the original (lodTab[4..7]);
    macros in egkeys.c provide the names - these bytes live in colorLut. */
+#ifdef EGAME_ONLY
 int16 g_particles[32];                  /* @0x5260 struct Particle[8] ring */
+#endif
 int16 g_smokeSourceIdx = -1, g_smokeParticleSlot;  /* word_343BE / word_34110 */
+#ifdef EGAME_ONLY
 int16 g_maneuverTable[3*8*8];             /* @0x52A2 — [skill][relBearing][aspect] */
+#endif
 int16 g_activeThreatCount;                /* word_351CC */
 int16 g_closestThreatIndex;               /* word_385D2 */
 int16 g_hitMapX, g_hitMapY, g_hitAlt;     /* word_38378/38384/3838A */
@@ -343,8 +391,8 @@ uint8 g_aircraftModels[4];
 int16 flt15_buf1[16];
 /* egmath.c drawWorldObject stubs */
 int32 g_ViewX, g_ViewY, g_camEyeX, g_camEyeY;
-int16 g_camEyeZ;
-int16 g_viewMode;
+int16 g_camEyeZ = 1;                     /* oracle init 1 */
+int16 g_viewMode = 1;                    /* oracle init 1 */
 int8  g_camExtFlag;
 int16 g_aimClipSave;
 int16 g_lockCooldown;
@@ -358,7 +406,9 @@ void pascal shiftLongRightInPlace(int16 c, int32 *p) { *p >>= c; }
 int16 FAR projectSceneObject(uint8 FAR *m, int16 a, int16 b, int16 c, int16 d, int16 e, int16 f) { return 0; }
 /* drawTargetView stubs */
 int16 g_targetInHudFlag, g_detailLevel, g_gfxModeUnset, frameTick;
-int16 *g_targetViewParams;
+#ifdef EGAME_ONLY
+int16 *g_targetViewParams = g_pageRecs[4];  /* @0x5810 — rec4 ptr cell */
+#endif
 int16 g_trkRoll, g_trkBearing, g_trkPitch, g_trkRange, g_trkSize, g_trkScale;
 int16 g_viewX_, g_viewY_, g_ourHead, g_ourRoll, g_extViewPitch;
 int8  g_extraScaleShift, g_offscreenRender;
@@ -381,8 +431,8 @@ int16 g_unusedLoadDoneFlag;
 int16 getTimeOfDay(void) { return 0; }
 #endif
 int16 g_trackedEnemyIdx = -1;          /* word_343B4 — map-tracked object, -1 none */
-int16 g_gunAmmo;
-int16 g_fuelRemaining;
+int16 g_gunAmmo = 0x28A;              /* word_33D82 — oracle init */
+int16 g_fuelRemaining = 0x1388;       /* word_33D66 — oracle init */
 int16 g_stores[4][2];
 int16 g_wpnSlots[0x18];               /* @0x5236: 4 weapon-slot records, stride 0xC */
 int16 g_fireRecs[0x18];               /* @0x5230: stride-0xC fire records (g_wpnSlots aliases +6) */
@@ -422,7 +472,7 @@ void  far setInt9Handler(void) { }                    /* seg003:0x000e */
 void  far restoreInt9Handler(void) { }                /* seg003:0x005e */
 uint8 far *g_floppyMotorPtr;                          /* dword_354C2 */
 char  *regnName = (char *)"regn.xxx";                 /* word_2EEE8 */
-char  *scenarioPlh[8];                                /* @0x7A */
+char  *scenarioPlh[8] = {"regn.xxx","lb.xxx","pg.xxx","nc.xxx","ce.xxx",0,0,0};  /* @0x7A */
 int16 g_cornerSpeed;                 /* word_38A10 — maneuvering-speed ref */
 int16 g_knots;                       /* word_373E8 — airspeed, knots */
 int16 g_climbRate;                   /* word_38D1E — vertical speed */
@@ -446,24 +496,67 @@ int16 g_missionStage;                  /* word_37622 — campaign progress count
 int16 g_currentWeaponType;             /* word_388C4 — current weapon/target type */
 int16 g_airTargetLock = -1;            /* word_343BA — locked air target index */
 int16 g_groundTargetLock = -1;         /* word_343BC — locked ground target index */
-int16 g_lockedTargetKilled;            /* word_35AE4 — locked target was destroyed */
-int16 g_objTypes[0x40];                /* @0x49D6: 32B type records name[30]+kills */
+int16 g_lockedTargetKilled = -1;       /* word_35AE4 — oracle init ffff */
+struct ObjType { char name[0x12]; int16 maxSpeed, range, maneuverability, modelId, pad1A, pad1C, kills; };
+#ifdef EGAME_ONLY
+struct ObjType g_objTypes[19] = {      /* @0x49D6: 32B type records name[30]+kills */
+    {"MIG-23\0 Flogger",  740, 560, 3, 0x11, 10,   2, 0},
+    {"MIG-25\0 Foxbat",   570, 700, 2, 0x12, 0,    2, 0},
+    {"MIG-29\0 Fulcrum",  700, 400, 5, 0x13, 20,   2, 0},
+    {"MIG-31\0 Foxhound", 790, 930, 3, 0x14, 0,    2, 0},
+    {"Su-27\0\0 Flanker", 725, 715, 4, 0x13, 20,   2, 0},
+    {"IL-76\0\0 Mainstay",400, 4000,1, 0x10, 12,   2, 0},
+    {"F-4E\0\0\0 Phantom",800, 520, 4, 0x12, 11,   2, 0},
+    {"F-14\0\0\0 Tomcat", 800, 800, 4, 0x13, 8,    2, 0},
+    {"F-18\0\0\0 Hornet", 660, 461, 5, -1,   0,    2, 0},
+    {"An-72\0\0 Coaler",  350, 620, 2, 0,    9,    2, 0},
+    {"F-18\0\0\0 Hornet", 660, 461, 5, -1,   4,    2, 0},
+    {"MIG-23\0 Flogger",  740, 560, 3, 0,    4,    2, 0},
+    {"F-14\0\0\0 Tomcat", 800, 800, 4, -1,   8,    2, 0},
+    {"F-4E\0\0\0 Phantom",800, 520, 4, -1,   11,   2, 0},
+    {"Yak-38\0 Forger",   550, 300, 3, 0x11, 16,   2, 0},
+    {"Tu-95\0\0 Bear",    410, 5100,1, 0,    18,   2, 0},
+    {"Mi-24\0\0 Hind",    200, 300, 1, 0x11, 19,   2, 0},
+    {"F-5\0\0\0\0 Tiger", 500, 250, 3, 0x16, 16,   2, 0},
+    {"767\0\0\0\0 Boeing",400, 1000,1, -1,   18,   2, 0},
+};
+#endif
 void notifyViewObj(int16 idx) { }      /* sub_14C98: hwPortWrite view-target cmd */
 int16 placeString(int16 idx) { return 0; }   /* sub_14D03: build target name */
 int16 g_enemyGroundRemaining;        /* word_38500 — live ground-target count */
 void hwPortWrite(int16 cmd) { }        /* sub_14CAC noop */
 void far gfx_setFadeSteps(int16 n) { }    /* sub_2F15B */
-int16 *g_mapTerrainMode;                  /* word_3468E */
+#ifdef EGAME_ONLY
+int16 *g_mapTerrainMode = g_pageRecs[3];    /* word_3468E — @0x57F8 rec3 ptr */
+#endif
 void testWorldPosVisible(int16 x, int16 y, int16 z) { } /* sub_17E29: sets g_projClipFlag */
 void sub_19979(void) { } void sub_19E4F(void) { } void sub_1A0BD(void) { }
 void sub_1A300(void) { } void nullsub_3(void) { }
 void projectVertex(int32 x, int32 y, int32 z) { }       /* sub_11372 */
 void FAR gfx_drawStatusBox(int16 *p,int16 a,int16 b,int16 c,int16 d,int16 e,int16 f) { } /* sub_2F0F7 */
-int16 g_weaponMask, g_curPanelMode, g_chaffCount, g_rocketCount;
-struct CellRect { int16 x1, y1, x2, y2; } g_weaponCells[7];
+int16 g_weaponMask = 4, g_curPanelMode;   /* oracle init 4 */
+int16 g_chaffCount = 0x12;            /* word_33D6C — oracle init */
+int16 g_rocketCount = 0x0C;           /* word_33D6A — oracle init */
+#ifdef EGAME_ONLY
+struct CellRect { int16 x1, y1, x2, y2; } g_weaponCells[7] = {   /* @0x5742 */
+    {4,2,0x1e,0x15}, {0xd,7,0x37,0x23}, {0x3b,7,0x59,0x23}, {0x50,0x25,0x65,0x39},
+    {0x2f,0x26,0x4a,0x36}, {0x11,0x2e,0x36,0x42}, {5,0x36,0x1f,0x47},
+};
+#endif
 int16 g_scanDir;                      /* word_38D1A */
 int8 g_projClipFlag;                  /* byte_32242 */
-int16 g_statCells[0x50];              /* struct StatCell[] @0x56AA */
+struct StatCell { int16 x1, y1, x2, y2, val; };
+#ifdef EGAME_ONLY
+struct StatCell g_statCells[19] = {   /* @0x56AA — oracle init: HUD status boxes */
+    {0x11c,0x78,0x127,0x7f,0}, {0x12c,0x78,0x137,0x7f,0},
+    {0x132,0x85,0x13c,0x8a,0}, {0x16,0x85,0x24,0x8a,0}, {0x2,0x85,0x10,0x8a,0},
+    {0x11f,0x85,0x129,0x8a,0}, {0x11f,0x90,0x129,0x95,0}, {0x11f,0x9b,0x129,0xa0,0},
+    {0x98,0x72,0xa8,0x75,3}, {0x98,0xb4,0xa8,0xb7,3},
+    {0xa,0x74,0x10,0x78,0xa}, {0x13,0x74,0x19,0x78,0xa}, {0x1c,0x74,0x23,0x78,0xa},
+    {0xa,0x79,0x10,0x7c,0xa}, {0x13,0x79,0x19,0x7c,0xa}, {0x1c,0x79,0x23,0x7c,0xa},
+    {0xa,0x7d,0x10,0x80,0xa}, {0x13,0x7d,0x19,0x80,0xa}, {0x1c,0x7d,0x23,0x80,0xa}
+};
+#endif
 struct StoreDef { int16 subIdx; uint16 coordX; uint16 coordY; int8 pad[8]; int16 nameIdx; };
 struct StoreDef g_storeDefs[4];         /* @0x80C8 */
 int8  g_airTargetMark, g_gndTargetMark; /* byte_38380 / byte_384E0 */
@@ -496,8 +589,34 @@ struct Missile missiles[20] = {        /* @0x4EFE 26B records — oracle init */
     {"Mk 35",   "IN Cluster", 0x1D, 2}, {"ISC B-1", "Minelets",  0x1D, 1},
     {"135 mm",  "Camera",     -1,   1}, {"1900lbs", "Extra Fuel",-2,   1},
     {"20 mm",   "Guns",        0,   1}, {"Special", "Equip",     0x26, 1}};
-int16 g_wpnSpriteX[4], g_wpnSpriteY[4];    /* @0x5968/@0x5970 sprite src */
-int16 sams[0x80];                      /* @0x4C36 18B records */
+#ifdef EGAME_ONLY
+int16 g_wpnSpriteX[4] = {0xA4,0xA4,0xA4,0x10D}, g_wpnSpriteY[4] = {0,0x17,0x2E,0x49};  /* @0x5968/@0x5970 sprite src */
+#endif
+struct Sam { char name[8]; int16 lockRange, maxSpeed, weaponClass, turnRate, modelId; };
+#ifdef EGAME_ONLY
+struct Sam sams[39] = {                /* @0x4C36 18B records — oracle init */
+    {"None",   0,   0,    0, 1, 19}, {"SA-2",  125, 2000, 1, 4, 19},
+    {"SA-5",   150, 1800, 1, 1, 19}, {"SA-8B",  65, 1200, 2, 3, 19},
+    {"SA-10",  125, 1800, 3, 2, 19}, {"SA-11", 100, 1500, 2, 3, 19},
+    {"SA-12",  150, 2000, 3, 2, 19}, {"SA-13",  65,  900, 0, 4, 19},
+    {"SA-N-4", 30,  1200, 2, 3, 19}, {"SA-N-5", 30,  900,-1, 4, 19},
+    {"SA-N-6", 125, 1800, 3, 2, 19}, {"SA-N-7", 100, 1500, 2, 3, 19},
+    {"Hawk",   125, 900,  2, 3, 19}, {"Rapier", 65, 1200, 2, 4, 19},
+    {"Tiger",  30,  900,  1, 3, 19}, {"Seacat", 30,  900, 1, 3, 19},
+    {"AA-2",   14,  1500,-1, 4, 19}, {"AA-8",   12, 1800, 0, 5, 19},
+    {"AA-6",   50,  2400, 2, 2, 19}, {"AA-7",   34, 1800, 2, 2, 19},
+    {"AA-9",   82,  2000, 2, 3, 19}, {"AA-10",  64, 2000, 3, 4, 19},
+    {"AIM120", 32,  2400, 7, 4, 1},  {"AIM-9",  17, 2000, 7, 8, 1},
+    {"HARM",   20,  1200, 4, 2, 1},  {"Penguin",32,  500, 5, 2, 19},
+    {"Harpoon",60,  500,  5, 2, 19}, {"AGM-65", 32,  800, 6, 2, 13},
+    {"LGBOMB", 10,  0,   28, 2, 15}, {"RTBOMB", 0,   0,  29, 2, 15},
+    {"FFBOMB", 0,   0,   30, 2, 15}, {"AIM-7W", 44, 2400, 2, 4, 1},
+    {"AIM-9W", 12,  2000, 0, 5, 1},  {"SA-14",  16,  900, 0, 5, 1},
+    {"AA-6",   50,  2400,-1, 2, 19}, {"AA-7",   34, 1800,-1, 2, 19},
+    {"AA-9",   82,  2000,-1, 3, 19}, {"AA-10",  64, 2000, 0, 4, 19},
+    {"Equip.", 0,   0,   29, 0, 14},
+};
+#endif
 int16 g_keyCode;                        /* word_384CE: pending keycode */
 int16 g_threatScopeRange = 4;           /* word_343B2: threat gauge level / scope range — oracle init */
 int16 g_scopeSweepTimer = 1;            /* word_343C0: threat-scope sweep countdown */
@@ -515,7 +634,8 @@ int16 g_missionTimeLimit;               /* word_384C6 — mission deadline, tick
 int16 g_threatSpec;                     /* word_351CA — spec of threat being prosecuted */
 int16 g_northSouthSign;                 /* word_37484: theater N/S direction sign */
 int16 dispatchKeyCmd(int16 key) { return 0; }   /* sub_1D4C6: key-command dispatch */
-int16 frameTick, g_nightMode, g_unusedFrameVal, g_missionTick; /* 343B6/33D8A/35450/354C0 */
+int16 frameTick, g_unusedFrameVal, g_missionTick; /* 343B6/35450/354C0 */
+int16 g_nightMode = 1;                  /* word_33D8A — oracle init */
 int16 g_wpPanelMode, g_wpSelectIdx;      /* word_37AB6 / word_33702 */
 void drawFuelCell(int16 amount, int16 color) { } /* sub_19D5E */
 void far gfx_setObjAttr(int16 a) { } /* sub_2F0CF */
@@ -523,7 +643,7 @@ void far beginEdgeGroup(void) { }   /* sub_21D2E */
 void far insertEdge(void) { }       /* sub_21EB0 */
 void far endEdgeGroup(void) { }     /* sub_21D18 */
 int16 g_edgeQuad[4];                    /* word_32A09 */
-int16 g_tapeClipX;                     /* word_346D8 */
+int16 g_tapeClipX = 0x6D;             /* word_346D8 — oracle init */
 int16 g_setupSlots[0x20];              /* @0x37622 */
 int16 g_replayCount;                   /* word_351C4 */
 struct Projectile { int16 mapX, mapY, alt, speed, worldX, worldY, worldZ, ttl, specIdx, weaponIdx, targetLock, targetRef; };
@@ -538,7 +658,7 @@ int16 g_autopilotAltitude;            /* word_33D84 */
 int16 g_fireCooldown;                 /* word_34B02 */
 int16 g_unusedEventHist2;             /* word_384CC — event-history shift stage 3 */
 int16 g_prevThreatIndex = -1;         /* word_343C8 — previous g_closestThreatIndex */
-int16 g_isCampaignMission;            /* word_33D88 — gameData->isCampaignMission copy */
+/* g_isCampaignMission merged into g_difficultyTier — one oracle cell word_33D88 */
 int16 g_autoCrashDive;                /* word_354BE — low-altitude dive warning */
 int16 g_inLandingCorridor = 1;        /* word_343CA — inside landing-proximity box */
 int16 g_landingTimer;                 /* word_343D2 — landing-progress counter */
@@ -553,13 +673,24 @@ int16 g_rollInput, g_pitchInput;      /* word_384C8 / word_38A0E — stick input
 int16 g_gees;                         /* word_354BA — computed gees*16 */
 int16 g_stallSpeed;                   /* word_36DDC — stall speed ref */
 int16 g_liftForce;                    /* word_379BA — lift at current speed */
-int8  g_geeTable[0x100];              /* @0x4624 — roll->gee LUT */
+#ifdef EGAME_ONLY
+int8  g_geeTable[0x80] = {            /* @0x4624 — roll->gee LUT (gees*16) */
+    0x10,0x10,0x10,0x10,0x10,0x10,0x11,0x11,0x11,0x11,0x11,0x11,0x11,0x11,0x12,0x12,
+    0x12,0x12,0x12,0x12,0x12,0x13,0x13,0x14,0x14,0x15,0x16,0x16,0x17,0x18,0x19,0x19,
+    0x1a,0x1b,0x1b,0x1c,0x1d,0x1d,0x1e,0x1f,0x1f,0x20,0x22,0x24,0x25,0x27,0x29,0x2b,
+    0x2c,0x2e,0x30,0x34,0x38,0x3c,0x40,0x48,0x50,0x60,0x70,0x80,0x90,0xa0,0xb0,0xc0,
+    0xd0,0xc0,0xb0,0xa0,0x90,0x80,0x70,0x60,0x50,0x48,0x40,0x3c,0x38,0x34,0x30,0x2e,
+    0x2c,0x2b,0x29,0x27,0x25,0x24,0x22,0x20,0x1f,0x1f,0x1e,0x1d,0x1d,0x1c,0x1b,0x1b,
+    0x1a,0x19,0x19,0x18,0x17,0x16,0x16,0x15,0x14,0x14,0x13,0x13,0x12,0x12,0x12,0x12,
+    0x12,0x12,0x12,0x11,0x11,0x11,0x11,0x11,0x11,0x11,0x11,0x10,0x10,0x10,0x10,0x10,
+};
+#endif
 char  g_geeStrBuf[0x10];              /* @0x6640 — HUD gee string */
 int16 g_joyCalibTimer;                /* word_3358A — joy-calib debounce */
-int16 g_joySensitivity;               /* word_34B00 — setup sensitivity */
+int16 g_joySensitivity = 2;           /* word_34B00 — oracle init */
 uint8 g_joyRawX, g_joyRawY;           /* @0x3345E/0x3345F — driver raw axes */
 int8  g_highGeeFlag;                  /* byte_38B0A — g-meter needle flag */
-int8  g_exitStatus;                   /* byte_2EEE5 — app exit code */
+int8  g_exitStatus = (int8)0x81;      /* byte_2EEE5 — oracle init 0x81 */
 int16 g_yawMatrix[9], g_pitchMatrix[9], g_rollMatrix[9]; /* 0x46B8/0x46CA/0x46DC */
 void far applyViewScaleMode(void) {}            /* sub_2208E (seg002) */
 void far initJoystickCalibration(void) {}       /* sub_22C5E (seg002) */
