@@ -44,7 +44,7 @@ int16 mapDiv(int16 a, int16 b) { return 0; }
 int16 g_radarScopeRange;
 int16 g_mapCenterX, g_mapCenterY;
 int16 g_mapZoomLevel;
-int16 g_externalCamDist;
+int16 g_externalCamDist = 4;           /* word_343C6 — oracle init */
 int16 g_viewX_, g_viewY_, g_projDepth, g_ourHead, g_vprojX, g_vprojY;
 /* asm-faithful fixed-point helpers (START sub_14559/14565/144F2 =
  * EGAME sub_11C1B/11C27/11BB4): Q8.8 angle -> Q15 sine via LUT interp */
@@ -173,7 +173,7 @@ struct { int16 gridX[9]; int16 gridY[11]; int16 lut[3]; } g_neighborSampling;
 uint8 g_shapeTargetCategory[128];
 int16 g_geeShakeToggle;		/* EN-only: key-toggled gee-warning override */
 struct { uint8 lod, subIndex, tileX, tileY; int16 value; uint8 shape, pad7; } g_dynTileEntries[16];
-int16 g_tileEntryIdx, g_render3DTiles;
+int16 g_tileEntryIdx, g_render3DTiles = 1; /* word_343CC = 1 oracle init */
 
 int16 g_objRelX, g_objRelY;
 int16 g_objTransform[4];
@@ -303,7 +303,16 @@ void refreshActivePanel(int16 a) {}
 
 int16 g_scopeArcColor, g_targetBearing, g_targetRange, g_viewX_2, g_vprojXlo, g_vprojYlo;
 char g_itoaScratch[24];
-struct { int8 name[8]; int16 lethality, dangerTier, flags; } g_samSpecs[16]; /* @0x4894 threat/weapon spec table (aNone) — 'Net ','SA-2',... 14-byte records */
+struct { int8 name[8]; int16 lethality, dangerTier, flags; } g_samSpecs[22] = { /* @0x487c SAM/threat spec table — 14-byte records, oracle init */
+    {"SA-2",   200, 3, 0}, {"SA-5",   350, 2, 0}, {"SA-8B",  125, 5, 0},
+    {"SA-10",  320, 7, 1}, {"SA-11",  200, 5, 0}, {"SA-12",  290, 6, 1},
+    {"SA-13",  125, 3, 0}, {"SA-N-4", 200, 4, 1}, {"SA-N-5", 150, 3, 0},
+    {"SA-N-6", 320, 6, 1}, {"SA-N-7", 200, 5, 0}, {"Hawk",   175, 6, 1},
+    {"Rapier",  75, 8, 0}, {"Tiger",   65, 4, 0}, {"Seacat", 200, 2, 0},
+    {"IL76",   200, 8, 3}, {"",        50, 5, 0}, {"",        70, 6, 0},
+    {"",        80, 7, 1}, {"",       100, 8, 1}, {"OTH",    500, 5, 1},
+    {"",        40, 3, 0}
+};
 
 int16 g_inputDisabled, g_axisInputAccum[4], g_soundPriorityFloor, g_ejectState;
 int16 g_smokeTimer;                    /* word_34B0A — flag-0x20 duration counter */
@@ -317,7 +326,7 @@ int16 g_engineThrust;                   /* word_33588 */
 /* lodDist* cells alias colorLut+0x18..0x1E in the original (lodTab[4..7]);
    macros in egkeys.c provide the names - these bytes live in colorLut. */
 int16 g_particles[32];                  /* @0x5260 struct Particle[8] ring */
-int16 g_smokeSourceIdx, g_smokeParticleSlot;  /* word_343BE / word_34110 */
+int16 g_smokeSourceIdx = -1, g_smokeParticleSlot;  /* word_343BE / word_34110 */
 int16 g_maneuverTable[3*8*8];             /* @0x52A2 — [skill][relBearing][aspect] */
 int16 g_activeThreatCount;                /* word_351CC */
 int16 g_closestThreatIndex;               /* word_385D2 */
@@ -371,7 +380,7 @@ int16 g_unusedLoadDoneFlag;
 #ifndef EXE_START /* src_start/stutil.c provides the real definition */
 int16 getTimeOfDay(void) { return 0; }
 #endif
-int16 g_trackedEnemyIdx;
+int16 g_trackedEnemyIdx = -1;          /* word_343B4 — map-tracked object, -1 none */
 int16 g_gunAmmo;
 int16 g_fuelRemaining;
 int16 g_stores[4][2];
@@ -432,11 +441,11 @@ int16 g_wreckAlt;                      /* word_3845E */
 int16 g_wreckFallVel;                  /* word_379B8 */
 int16 g_wreckX, g_wreckY;              /* word_3837E / word_38392 — wreck world pos */
 int16 g_liveObjCount;                  /* word_384FC — remaining live objects */
-int16 g_selSimObj;                     /* word_343C4 — selected/viewed sim object idx */
+int16 g_selSimObj = -1;                /* word_343C4 — selected/viewed sim object idx */
 int16 g_missionStage;                  /* word_37622 — campaign progress counter */
 int16 g_currentWeaponType;             /* word_388C4 — current weapon/target type */
-int16 g_airTargetLock;                 /* word_343BA — locked air target index */
-int16 g_groundTargetLock;              /* word_343BC — locked ground target index */
+int16 g_airTargetLock = -1;            /* word_343BA — locked air target index */
+int16 g_groundTargetLock = -1;         /* word_343BC — locked ground target index */
 int16 g_lockedTargetKilled;            /* word_35AE4 — locked target was destroyed */
 int16 g_objTypes[0x40];                /* @0x49D6: 32B type records name[30]+kills */
 void notifyViewObj(int16 idx) { }      /* sub_14C98: hwPortWrite view-target cmd */
@@ -491,7 +500,7 @@ int16 g_wpnSpriteX[4], g_wpnSpriteY[4];    /* @0x5968/@0x5970 sprite src */
 int16 sams[0x80];                      /* @0x4C36 18B records */
 int16 g_keyCode;                        /* word_384CE: pending keycode */
 int16 g_threatScopeRange = 4;           /* word_343B2: threat gauge level / scope range — oracle init */
-int16 g_scopeSweepTimer;                /* word_343C0: threat-scope sweep countdown */
+int16 g_scopeSweepTimer = 1;            /* word_343C0: threat-scope sweep countdown */
 int16 g_prevScopeRange;                 /* word_384F6: last drawn scope range */
 int16 g_scopeArcRange;                  /* word_3831A */
 int16 g_threatLabelTarget;              /* word_38372: >=0 plane idx, <0 ~idx simObjects */
@@ -528,10 +537,10 @@ int16 g_mapExtentX, g_mapExtentY;     /* word_36FEA / word_36FEC — theater map
 int16 g_autopilotAltitude;            /* word_33D84 */
 int16 g_fireCooldown;                 /* word_34B02 */
 int16 g_unusedEventHist2;             /* word_384CC — event-history shift stage 3 */
-int16 g_prevThreatIndex;              /* word_343C8 — previous g_closestThreatIndex */
+int16 g_prevThreatIndex = -1;         /* word_343C8 — previous g_closestThreatIndex */
 int16 g_isCampaignMission;            /* word_33D88 — gameData->isCampaignMission copy */
 int16 g_autoCrashDive;                /* word_354BE — low-altitude dive warning */
-int16 g_inLandingCorridor;            /* word_343CA — inside landing-proximity box */
+int16 g_inLandingCorridor = 1;        /* word_343CA — inside landing-proximity box */
 int16 g_landingTimer;                 /* word_343D2 — landing-progress counter */
 int16 g_targetLeadAngle;              /* word_385D0 — drift/lead angle accum */
 int16 g_frameRateAccum;               /* word_343CE — frame counter vs scaling*4 */

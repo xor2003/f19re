@@ -295,14 +295,17 @@ def reaches_lcall(img, hdr, off, end):
     return False
 
 
-def find_ints(img, hdr, off, end):
+def find_ints(img, hdr, off, end, windows=None):
     """Image offsets of `int NN` instructions reachable through the
     routine's call graph — BFS over rel16 call/jmp targets and lcall
     seg:off immediates inside the image.  Callee windows extend to the
     first ret (big file-IO helpers exceed a fixed 0x400 cap).  duspec
     turns them into a prepatched oracle fixture (`CD xx` -> `31 C0` xor
     ax,ax: a bounded "service succeeded, ax=0" answer symmetric to the
-    cand build's zero-returning stubs).  int3/into/iret are left alone."""
+    cand build's zero-returning stubs).  int3/into/iret are left alone.
+    When `windows` is a list, every visited scan window is appended so
+    callers can re-scan callee code for data refs (callee-read globals —
+    e.g. a divisor inside a helper — are invisible to body-only pulls)."""
     md = capstone.Cs(capstone.CS_ARCH_X86, capstone.CS_MODE_16)
     imax = len(img) - hdr
     seen, work, budget = set(), [(off, end)], 40000
@@ -312,6 +315,8 @@ def find_ints(img, hdr, off, end):
         if cur in seen or not (0 <= cur < imax):
             continue
         seen.add(cur)
+        if windows is not None:
+            windows.append((cur, cend))
         for i in md.disasm(img[hdr + cur:hdr + min(cend, imax)], cur):
             budget -= 1
             if not budget or i.mnemonic in ('ret', 'retf', 'iret'):
@@ -339,6 +344,38 @@ def find_ints(img, hdr, off, end):
                 if 0 <= tgt < imax:
                     work.append((tgt, min(tgt + 0x1800, imax)))
     return sorted(sites)
+
+
+def call_targets(img, hdr, off, end):
+    """Image offsets the routine body's direct `call rel16` instructions
+    target — one call level, enough to reach helper routines whose global
+    reads (divisor cells, table fields) a body-only pull scan misses."""
+    md = capstone.Cs(capstone.CS_ARCH_X86, capstone.CS_MODE_16)
+    imax = len(img) - hdr
+    out = []
+    for i in md.disasm(img[hdr + off:hdr + end], off):
+        if i.bytes and i.bytes[0] == 0xE8:
+            disp = int.from_bytes(i.bytes[1:3], 'little', signed=True)
+            tgt = (i.address + 3 + disp) & 0xFFFF
+            if 0 <= tgt < imax and tgt != off:
+                out.append(tgt)
+    return out
+
+
+def deep_refs(img, hdr, targets, skip):
+    """Merge pull + segptr cells from direct-call target windows (each
+    scanned over a bounded extent).  Stores stay body-only — callee
+    stores would break positional obs pairing."""
+    pulls, segptrs = {}, set()
+    imax = len(img) - hdr
+    for tgt in dict.fromkeys(targets):
+        if tgt == skip:
+            continue
+        p, _st, s = mem_refs(img, hdr, tgt, min(tgt + 0x400, imax))
+        for off, psz in p.items():
+            pulls[off] = max(pulls.get(off, 0), psz)
+        segptrs |= set(s)
+    return pulls, segptrs
 
 
 def covered():
@@ -429,6 +466,22 @@ for suite, cfg in SUITES.items():
 
         o_pull, o_st, o_seg = mem_refs(oimg, ohdr, f_o, e_o)
         c_pull, c_st, c_seg = mem_refs(cimg, chdr, f_c, e_c)
+        # Callee-read globals (a divisor inside a helper like
+        # setup3DTransform) are invisible to body-only pulls: the oracle's
+        # own pull covers its mirror while the cand reads scratch zeros —
+        # one-sided div0.  Scan direct `call` targets one level deep for
+        # pull/segptr cells only (stores stay body-only to protect
+        # positional obs pairing).
+        dp, ds2 = deep_refs(oimg, ohdr, call_targets(oimg, ohdr, f_o, e_o), f_o)
+        for off, psz in dp.items():
+            o_pull[off] = max(o_pull.get(off, 0), psz)
+        o_seg = sorted(set(o_seg) | ds2)
+        dp, ds2 = deep_refs(cimg, chdr, call_targets(cimg, chdr, f_c, e_c), f_c)
+        for off, psz in dp.items():
+            c_pull[off] = max(c_pull.get(off, 0), psz)
+        c_seg = sorted(set(c_seg) | ds2)
+        ints_o = find_ints(oimg, ohdr, f_o, e_o)
+        ints_c = find_ints(cimg, chdr, f_c, e_c)
         # instruction-order paired store-cell obs: byte-exact ports put the
         # i-th DS store on both sides at the same logical cell.  A count
         # mismatch means the paths diverged structurally — skip obs rather
@@ -515,12 +568,10 @@ for suite, cfg in SUITES.items():
         # it changes only driver-ABI bytes inside DGROUP that no sane
         # routine reads as data.
         case['stub_slots'] = True
-        ints = find_ints(oimg, ohdr, f_o, e_o)
-        if ints:
-            case['int_stub'] = ints
-        cints = find_ints(cimg, chdr, f_c, e_c)
-        if cints:
-            case['int_stub_c'] = cints
+        if ints_o:
+            case['int_stub'] = ints_o
+        if ints_c:
+            case['int_stub_c'] = ints_c
         cases.append(case)
 
     # shard into ~25-case files so each replay group finishes within the

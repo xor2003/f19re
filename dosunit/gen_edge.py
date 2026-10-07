@@ -306,33 +306,33 @@ CASES = [
 
 # moveDst far-ptr (oracle ds:0x98c8 / cand ds:0x3f18) -> ds:0x8000 scratch
 # NB: cand offsets shift on every test-exe relink — re-derive by disasm.
-MOVEDST = {'commFetch': (0x98c8, 0x3f18), 'memAppend': (0x98c8, 0x3f18)}
+MOVEDST = {'commFetch': (0x98c8, 0x4286), 'memAppend': (0x98c8, 0x4286)}
 # shared read-pos cell + oracle buffer base (cand base derived by pairing)
-BUFPOS = {'bufReadBytes': (0x1714, 0x686e, 0x12c2),
-          'bufReadFile': (0x1714, 0x686e, 0x12c2)}
+BUFPOS = {'bufReadBytes': (0x1714, 0x6bd8, 0x12c2),
+          'bufReadFile': (0x1714, 0x6bd8, 0x12c2)}
 # loadWorldStrings: commData far-ptr cells (o/c) and every movedata dest
 # pair, in readWorldData's call order, lifted from each side's disasm.
 WORLDSRC = {
     'loadWorldStrings': dict(
-        comm=(0x9ed6, 0x3caa),          # far ptr -> repointed at ds:0x8000
-        bufptr=(0x6c26, 0x545e),        # worldBufPtr (off,seg) advanced end
-        ready=(0x99f2, 0x49b4),         # worldDataReady
-        fields=[(0x86b6, 0x666a, 2),    # worldRouteTable
-                (0x9ed4, 0x337c, 2),    # worldRouteCount
-                (0x86c6, 0x87b6, 16),   # worldObjects   (objCount<<4)
-                (0x9a1c, 0x496a, 2),    # worldSamCount
-                (0x8ea8, 0x7368, 72),   # worldSamTable  (36*samCount)
-                (0x998a, 0x3b92, 100),  # unitTypeTable
-                (0x9922, 0x60e0, 100),  # worldUnitFlags
-                (0x9bea, 0x5a72, 0x1f0),# worldStringBuf tail (cand head
-                                        #  0x5974 overlapped by flightData
-                                        #  through 0x5a72 = head+0xfe)
-                (0x8b7a, 0x5354, 0x100),# gridFlags
-                (0x99f0, 0x7bbc, 2),    # worldGridSize
-                (0x86a6, 0x3332, 2),    # worldMiscHeader
-                (0x42,   0x8dce, 16),   # weaponDataBlock
-                (0x8c7a, 0x50e2, 36),   # targetBlockWd
-                (0x9182, 0x5472, 0x600)]  # flightDataBuf
+        comm=(0x9ed6, 0x4016),          # far ptr -> repointed at ds:0x8000
+        bufptr=(0x6c26, 0x57a2),        # worldBufPtr (off,seg) advanced end
+        ready=(0x99f2, 0x4cfe),         # worldDataReady
+        fields=[(0x86b6, 0x68c8, 2),    # worldRouteTable
+                (0x9ed4, 0x36ea, 2),    # worldRouteCount
+                (0x86c6, 0x878e, 16),   # worldObjects   (objCount<<4)
+                (0x9a1c, 0x4cd4, 2),    # worldSamCount
+                (0x8ea8, 0x7346, 72),   # worldSamTable  (36*samCount)
+                (0x998a, 0x3f00, 100),  # unitTypeTable
+                (0x9922, 0x6340, 100),  # worldUnitFlags
+                (0x9bea, 0x5db6, 0x1f0),# worldStringBuf tail (cand head
+                                        #  0x5cb8 overlapped by flightData
+                                        #  through 0x5db6 = head+0xfe)
+                (0x8b7a, 0x5698, 0x100),# gridFlags
+                (0x99f0, 0x7b98, 2),    # worldGridSize
+                (0x86a6, 0x36a0, 2),    # worldMiscHeader
+                (0x42,   0x8da6, 16),   # weaponDataBlock
+                (0x8c7a, 0x5428, 36),   # targetBlockWd
+                (0x9182, 0x57b6, 0x600)]  # flightDataBuf
     ),
 }
 
