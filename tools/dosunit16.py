@@ -216,7 +216,7 @@ def build_vector(vid, f_o, f_c, args, case, ds_seg, flags='0x0202'):
     return vec, pairs
 
 
-def run_case(case, vectors, srcs):
+def run_case(case, vectors, srcs, grp_key):
     """Emit vectors for one function across its arg sets."""
     f_o = case['oracle_off']
     f_c = case['cand_off']
@@ -238,7 +238,7 @@ def run_case(case, vectors, srcs):
                 vcase['check_regs'] = spec['check_regs']
         vec, pairs = build_vector(vid, f_o, f_c, args, vcase, ds_seg)
         vectors.append(vec)
-        srcs[vid] = (vcase, pairs)
+        srcs[(grp_key, vid)] = (vcase, pairs)
     return out
 
 
@@ -280,7 +280,7 @@ def main():
             case['cand_dgrp'] = cd
             case['code_c'] = [[0, cd]]
         case['oracle_off'], case['cand_off'] = f_o, f_c
-        problems += run_case(case, grp['vectors'], srcs)
+        problems += run_case(case, grp['vectors'], srcs, key)
         for rng in case.get('code_o', []):
             grp['code_o'].add(
                 (LOAD * 16 + int(str(rng[0]), 0), int(str(rng[1]), 0)))
@@ -328,7 +328,9 @@ def main():
         if r.returncode not in (0, 1, 2) or not os.path.exists(out_path):
             print('dosunit failed:', r.stdout[-500:], r.stderr[-500:])
             return 1
-        results += json.load(open(out_path))['results']
+        for res in json.load(open(out_path))['results']:
+            res['_grp'] = key   # disambiguate same-fn cases across groups
+            results.append(res)
     if emit_only:
         return 0
     rep = {'results': results}
@@ -336,7 +338,10 @@ def main():
     n_agree = n_diff = n_inc = 0
     for res in rep['results']:
         vid = res['id']
-        case, pairs = srcs[vid]
+        key = (res.get('_grp'), vid)
+        if key not in srcs:          # legacy out.json without group tag
+            key = next(k for k in srcs if k[1] == vid)
+        case, pairs = srcs[key]
         o, c = res['oracle'], res['candidate']
         want = case.get('check_regs', ['ax'])
         o_regs = ' '.join(f"{k}={o['registers'].get(k)}" for k in want)

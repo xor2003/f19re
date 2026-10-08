@@ -191,8 +191,9 @@ mzmap (jump-table headers, no call-reachable exports).
    stream (drawLine/drawClippedLineEx were corrupted by `90 90`->`90 a0`).
    Result: `python3 dosunit/coverage.py` prints the inventory
    (dedicated/probe-agree/probe-mix/artifact/incomplete/skipped).
-   Latest full sweep (post dsss+iseen+reloc-drop): 76 dedicated + 212
-   probe-agree + 5 probe-mix + 11 artifact + 7 incomplete + 0 skipped —
+   Latest full sweep (post dsss+iseen+reloc-drop+call_stub_c+partial
+   dedicated specs): 83 dedicated + 212 probe-agree + 0 probe-mix +
+   11 artifact + 5 incomplete (all in/out hardware io) + 0 skipped —
    0 diff, 0 uncovered across all 311 ported routines.  The former 5
    skipped entry points probe under call/int/dsss stubbing: gfxInit and
    openBlitClosePic 5/5 AGREE, main and waitForKeyPress 5/5 AGREE-FAULT
@@ -222,18 +223,36 @@ mzmap (jump-table headers, no call-reachable exports).
 
    Incomplete taxonomy (not regressions — sandbox limits):
    - device_io_or_halt (in/out port io): runGameSession (session loop
-     drives real hardware), sub_16076/sub_16486/sub_1714C/sub_17280.
-   - looping (budget_exhausted): drawStoreIcons, loadPicFromFileAt —
-     loops proportional to seeded counts.
-   - probe-mix (partial vectors incomplete): allocBuffer (cand-side
-     alloc retry loop on seeded freelist), drawClippedLineEx/
-     drawClippedLineRegion (one vector: one-sided div0 on a seeded
-     divisor cell), drawGaugeBar (oracle writes into declared code
-     bytes — SMC guard), drawStringCentered (cand fetch outside
-     declared code ranges).
+     drives real hardware), sub_16076/sub_16486/sub_1714C/sub_17280 —
+     the only remaining incompletes; port io cannot be modeled.
    - artifact class: diffs proven to be probe mechanics, listed in
      coverage.py ARTIFACTS (stub callees, write-stream overlap,
      binary-relative pointer values, ds:=ss provenance).
+
+   Partial-coverage routines have dedicated specs in
+   dosunit/partial.json (dosunit/gen_partial.py, 12 cases / 36
+   vectors, all AGREE): allocBuffer ok+err paths on END and START
+   copies (call_stub/call_stub_c force `dos_alloc`->const segment on
+   both sides; the err arm nops cleanup/print/exit so the post-exit
+   fallthrough compares), both drawStringCentered twins (START's
+   alloc+zerofill observes the zeroed DS window; EGAME's rec-set +
+   strlen/strupr + driver draw stubs the resident lcall and observes
+   rec fields + the uppercased seeded string), drawClippedLineEx/
+   drawClippedLineRegion (all in-graph calls stubbed `zero` —
+   symmetric with the cand thunk bodies; window-cell stores
+   compared), drawGaugeBar (fillRectBoth's driver lcalls stubbed —
+   they write into the runtime ljmp-slot table which the code-range
+   guard rejects; window-record ptrs seeded at fixed scratch cells so
+   the callee's [bx+4] stores are observed; [0x4efa] gate toggled
+   per-vector), drawStoreIcons lo/hi cases (dead-overlay drawString
+   near-calls nopped; es-record ptr seeded at a scratch window
+   covering both 0x13 arms; first-lcall answer toggled for the
+   byte_98E6 gate), loadPicFromFileAt (showPicFile nopped on both
+   sides — the hand-asm PIC decoder loops on seeded bytes; openFile/
+   closeFile run real code through int_stub/dsss_stub).
+   dosunit16.py keys verdict sources by (group, id): duplicate fn
+   names across cases (the two drawStringCentered twins) no longer
+   cross-wire obs pairs.
 
 ## MSC 5.1 codegen facts (F19)
 

@@ -219,8 +219,8 @@ def call_stub_exe(exe, base, sites):
     immutable.  Cached per unique (base content, site list) pair."""
     import hashlib
     src = open(base, 'rb').read()
-    tag = hashlib.md5(src + b'v2' + b''.join(
-        s.to_bytes(2, 'little') + p for s, p in sites)).hexdigest()[:8]
+    tag = hashlib.md5(src + b'v3' + b''.join(
+        s.to_bytes(4, 'little') + p for s, p in sites)).hexdigest()[:8]
     out = os.path.join(ROOT, 'build/%s-calls-%s.EXE'
                        % (os.path.basename(exe)[:-4], tag))
     if not os.path.exists(out):
@@ -332,6 +332,16 @@ def emit(cases, out_path):
                     exe, case.get('oracle_exe', exe), c['call_stub'])
             except AssertionError as e:
                 raise AssertionError('%s: %s' % (c['fn'], e))
+        if c.get('call_stub_c'):
+            # symmetric stub for the candidate test exe: calls whose
+            # callee the spec models (dos helpers, unported routines)
+            # must answer identically in the cand build.
+            cexe = os.path.join(ROOT, 'build/%s.EXE' % mod)
+            try:
+                case['cand_exe'] = call_stub_exe(
+                    cexe, case.get('cand_exe', cexe), c['call_stub_c'])
+            except AssertionError as e:
+                raise AssertionError('%s(c): %s' % (c['fn'], e))
         if c.get('dsss_stub'):
             # `ds := ss` writes in the oracle graph -> nops: DS==SS only
             # holds in real DOS; under the split scratch-DS/stack sandbox

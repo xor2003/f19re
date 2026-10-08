@@ -639,212 +639,218 @@ def pick_ds(oexe, ohdr, cexe, chdr):
     return '0x%x' % seg
 
 
-for suite, cfg in SUITES.items():
-    segs = seg_bases(os.path.join(ROOT, cfg['omap']))
-    omap_set = set()
-    for line in open(os.path.join(ROOT, cfg['omap']), errors='replace'):
-        m = re.match(r'(\w+): \w+ (?:NEAR|FAR) [0-9a-f]+-', line.strip())
-        if m:
-            omap_set.add(m.group(1))
-    defs = ported_defs(cfg['srcdir'], omap_set)
-    # every module the cand build compiles real code from: the suite dir,
-    # plus base src/*.c when the suite is an override layer (src_en)
-    # rather than a standalone satellite (src_start/src_end/src_su).
-    ported = set(defs)
-    if os.path.basename(os.path.abspath(
-            os.path.join(ROOT, cfg['srcdir']))) == 'src_en':
-        ported |= set(ported_defs('src', omap_set))
-    defs = {n: t for n, t in defs.items()
-            if n not in covered() and n not in SKIP}
+def main():
+    for suite, cfg in SUITES.items():
+    
+        segs = seg_bases(os.path.join(ROOT, cfg['omap']))
+        omap_set = set()
+        for line in open(os.path.join(ROOT, cfg['omap']), errors='replace'):
+            m = re.match(r'(\w+): \w+ (?:NEAR|FAR) [0-9a-f]+-', line.strip())
+            if m:
+                omap_set.add(m.group(1))
+        defs = ported_defs(cfg['srcdir'], omap_set)
+        # every module the cand build compiles real code from: the suite dir,
+        # plus base src/*.c when the suite is an override layer (src_en)
+        # rather than a standalone satellite (src_start/src_end/src_su).
+        ported = set(defs)
+        if os.path.basename(os.path.abspath(
+                os.path.join(ROOT, cfg['srcdir']))) == 'src_en':
+            ported |= set(ported_defs('src', omap_set))
+        defs = {n: t for n, t in defs.items()
+                if n not in covered() and n not in SKIP}
+    
+        # candidate module exe + its dseg image window for pull guards
+        cexe = os.path.join(ROOT, 'build/%s.EXE' % cfg['mod'])
+        cmap = os.path.join(ROOT, 'build/%s.MAP' % cfg['mod'])
+        cimg, chdr = mz_img(cexe)
+        cdgrp = cand_dgrp(cmap)
+        cdata_end = len(cimg) - chdr - cdgrp   # initialized data extent
+    
+        # oracle image for pull guards
+        oexe, omap_rel, odgrp = EXE[cfg['exe']]
+        oimg, ohdr = mz_img(oexe)
+        odata_end = len(oimg) - ohdr - odgrp
+        oentries = entry_names(os.path.join(ROOT, omap_rel), segs)
+        # candidate-side trivial stubs: suite stubs file + shared stubs —
+        # calls into them are patched to the stub's observable answer.  A
+        # name the suite ports for real (stubs.c keeps a guarded twin that
+        # drops out of this build) is never stubbed.
+        stubs = stub_models(
+            glob.glob(os.path.join(ROOT, cfg['srcdir'], '*stub*.c'))
+            + glob.glob(os.path.join(ROOT, 'src', '*stub*.c'))
+            + [os.path.join(ROOT, 'src', '_stub.c')])
+        stubs = {n: f for n, f in stubs.items() if n not in ported}
+        # invented-name stubs (ovl_*, ovlCall_*, textOp_*) encode the lcall's
+        # off field — index them by it for far-call targets the map doesn't
+        # cover.  Only names that are not real map entries qualify.
+        offstubs = {}
+        entryname_set = set(oentries.values())
+        for n, f in stubs.items():
+            if n in entryname_set:
+                continue
+            m = re.search(r'_([0-9A-Fa-f]{3,5})$', n)
+            if m:
+                offstubs.setdefault(int(m.group(1), 16), f)
+    
+        ds = pick_ds(oexe, ohdr, cexe, chdr)
+        cases, skipped, vacuous = [], [], []
+        for name in sorted(defs):
+            f_o, e_o, kind = oracle_extent(name, os.path.join(ROOT, cfg['omap']),
+                                           segs)
+            if f_o is None:
+                skipped.append((name, 'not in oracle map'))
+                continue
+            if kind == 'FAR':
+                skipped.append((name, 'FAR frame'))
+                continue
+            f_c, e_c = cand_extent(cmap, name, cdgrp)
+            if f_c is None:
+                skipped.append((name, 'not in cand map'))
+                continue
+    
+            o_pull, o_st, o_seg = mem_refs(oimg, ohdr, f_o, e_o)
+            c_pull, c_st, c_seg = mem_refs(cimg, chdr, f_c, e_c)
+            # Callee-read globals (a divisor inside a helper like
+            # setup3DTransform) are invisible to body-only pulls: the oracle's
+            # own pull covers its mirror while the cand reads scratch zeros —
+            # one-sided div0.  Scan direct `call` targets one level deep for
+            # pull/segptr cells only (stores stay body-only to protect
+            # positional obs pairing).
+            dp, ds2 = deep_refs(oimg, ohdr, call_targets(oimg, ohdr, f_o, e_o), f_o)
+            for off, psz in dp.items():
+                o_pull[off] = max(o_pull.get(off, 0), psz)
+            o_seg = sorted(set(o_seg) | ds2)
+            dp, ds2 = deep_refs(cimg, chdr, call_targets(cimg, chdr, f_c, e_c), f_c)
+            for off, psz in dp.items():
+                c_pull[off] = max(c_pull.get(off, 0), psz)
+            c_seg = sorted(set(c_seg) | ds2)
+            dsss_o, dsss_c = [], []
+            ints_o = find_ints(oimg, ohdr, f_o, e_o, dsss=dsss_o)
+            ints_c = find_ints(cimg, chdr, f_c, e_c, dsss=dsss_c)
+            for s in FORCE_INTS.get((cfg['exe'], name), []):
+                assert oimg[ohdr + s] == 0xCD, (name, hex(s))
+                if s not in ints_o:
+                    ints_o.append(s)
+            # calls into cand-side trivial stubs (overlay routines, isr/dos
+            # helpers) get patched to the stub's observable answer — oracle
+            # must not run code the candidate does not implement.
+            csites = find_calls(oimg, ohdr, f_o, e_o, oentries, stubs, offstubs)
+            # instruction-order paired store-cell obs: byte-exact ports put the
+            # i-th DS store on both sides at the same logical cell.  A count
+            # mismatch means the paths diverged structurally — skip obs rather
+            # than pair wrong cells.
+            obs = []
+            if o_st and len(o_st) == len(c_st):
+                obs = [(o, c, min(osz, csz))
+                       for (o, osz), (c, csz) in zip(o_st, c_st)][:24]
+            # Seed every obs cell with a sentinel on BOTH sides.  A cell the
+            # routine never writes then reads back identical a5a5 bytes; only a
+            # real store (or a real divergence) can produce an obs mismatch.
+            # Without this, untouched cells compare the two images' init bytes —
+            # layout-legit differences masquerading as behavior diffs.
+            sent = {'o': {o for o, _, _ in obs}, 'c': {c for _, c, _ in obs}}
+            patch = []
+            for off, psz in sorted(o_pull.items()):
+                psz = min(psz, odata_end - off)
+                if psz > 0 and off not in sent['o']:
+                    patch.append((off, None, psz))
+            for off, psz in sorted(c_pull.items()):
+                psz = min(psz, cdata_end - off)
+                if psz > 0 and off not in sent['c']:
+                    patch.append((None, off, psz))
+            patch += [(o, c, sz, 'a5' * sz) for o, c, sz in obs]
+            # Cells consumed as far-pointer segments: force the scratch DS so
+            # the deref stays in mapped space (image seg values point nowhere;
+            # the seg half of a les/lds dword is otherwise left unpatched).
+            dsle = struct.pack('<H', int(ds, 0)).hex()
+            for off in o_seg:
+                patch.append((off, None, 2, dsle))
+            for off in c_seg:
+                patch.append((None, off, 2, dsle))
+            # Resident-driver callees (fillRect/putpixel family, reached via
+            # lcall into the resident table) do rep-stosb writes to the video
+            # page globals — natural values like 0xA000/0x3A00 land in
+            # unmapped guest space.  Naming a segment in any patch maps its
+            # whole 64K window (see real16_guest._segment_pages); one byte at
+            # each video base turns those faults into real execution.
+            patch.append({'seg': '0xa000', 'off': '0x0', 'bytes': '00'})
+            patch.append({'seg': '0x3a00', 'off': '0x0', 'bytes': '00'})
+    
+            rt = defs[name]
+            regs = (['ax', 'dx'] if rt in ('int32', 'uint32', 'long')
+                    else [] if rt == 'void' else ['ax'])
+            if not regs and not obs:
+                vacuous.append(name)    # void + no paired stores = nothing checks
+    
+            # Far-pointer args: fixed probe vectors fill arg words with scalars
+            # whose seg half lands in unmapped space (unmapped_access aborts
+            # before any real code runs).  far_arg_sites flags pair STARTS;
+            # which adjacent word pair is the real ptr is ambiguous (push-run
+            # order is callee-dependent), so every flagged WORD gets a
+            # distinct 0x800x value — any seg:off reading then resolves to a
+            # seg in 0x8000-0x8fff, all inside one mapped/seeded window.
+            vecs = VECTORS
+            fa = set(far_arg_sites(oimg, ohdr, f_o, e_o))
+            fa |= set(far_arg_sites(cimg, chdr, f_c, e_c))
+            words = sorted({w for i in fa for w in (i, i + 1)})
+            if words:
+                hi = words[-1]
+                # any pair (0x8000+4s : 0x8000+4o) resolves to linear
+                # 0x88000+0x40s+0x4o — seed the 0x400 window it lands in.
+                seed = (b'PROBE-EDGE-SEED-0123456789-ABCDEF-0123456789-'
+                        b'abcdef' + b'\0' * 0x80)[:0x100] * 4
+                vecs = []
+                for v in VECTORS:
+                    a = list(v) + [0] * max(0, hi + 1 - len(v))
+                    ps = [{'seg': '0x8000', 'off': '0x8000',
+                           'bytes': seed.hex()}]
+                    for w in words:
+                        a[w] = 0x8000 + w * 4
+                    vecs.append({'args': a, 'patch': ps})
+    
+            case = {'fn': name, 'exe': cfg['exe'], 'mod': cfg['mod'],
+                    'ds': ds, 'patch': patch, 'vectors': vecs}
+            if obs:
+                case['obs'] = obs
+            if regs != ['ax']:
+                case['regs'] = regs
+            # Stub every oracle driver slot to retf unconditionally: near-BFS
+            # can't see lcalls hidden behind indirect dispatch (printObjective
+            # escapes at a slot with no static 0x9A in its call graph), and the
+            # slotstub fixture is inert for routines that never reach one —
+            # it changes only driver-ABI bytes inside DGROUP that no sane
+            # routine reads as data.
+            case['stub_slots'] = True
+            if ints_o:
+                case['int_stub'] = ints_o
+            if ints_c:
+                case['int_stub_c'] = ints_c
+            if dsss_o:
+                case['dsss_stub'] = dsss_o
+            if dsss_c:
+                case['dsss_stub_c'] = dsss_c
+            if csites:
+                case['call_stub'] = csites
+            cases.append(case)
+    
+        # shard into ~25-case files so each replay group finishes within the
+        # subprocess timeout even with instruction-limit burners
+        SHARD = 25
+        if len(cases) <= SHARD:
+            emit(cases, os.path.join(ROOT, 'dosunit/%s.json' % suite))
+            print('%s: %d cases (%d skipped)' % (suite, len(cases), len(skipped)))
+        else:
+            for si in range(0, len(cases), SHARD):
+                emit(cases[si:si + SHARD],
+                     os.path.join(ROOT, 'dosunit/%s_%d.json' % (suite, si // SHARD)))
+            print('%s: %d cases in %d shards (%d skipped)'
+                  % (suite, len(cases), (len(cases) + SHARD - 1) // SHARD,
+                     len(skipped)))
+        if skipped:
+            print('   skipped:', ', '.join('%s=%s' % kv for kv in skipped[:8]))
+        if vacuous:
+            print('   vacuous (void, no paired stores): %d' % len(vacuous))
 
-    # candidate module exe + its dseg image window for pull guards
-    cexe = os.path.join(ROOT, 'build/%s.EXE' % cfg['mod'])
-    cmap = os.path.join(ROOT, 'build/%s.MAP' % cfg['mod'])
-    cimg, chdr = mz_img(cexe)
-    cdgrp = cand_dgrp(cmap)
-    cdata_end = len(cimg) - chdr - cdgrp   # initialized data extent
 
-    # oracle image for pull guards
-    oexe, omap_rel, odgrp = EXE[cfg['exe']]
-    oimg, ohdr = mz_img(oexe)
-    odata_end = len(oimg) - ohdr - odgrp
-    oentries = entry_names(os.path.join(ROOT, omap_rel), segs)
-    # candidate-side trivial stubs: suite stubs file + shared stubs —
-    # calls into them are patched to the stub's observable answer.  A
-    # name the suite ports for real (stubs.c keeps a guarded twin that
-    # drops out of this build) is never stubbed.
-    stubs = stub_models(
-        glob.glob(os.path.join(ROOT, cfg['srcdir'], '*stub*.c'))
-        + glob.glob(os.path.join(ROOT, 'src', '*stub*.c'))
-        + [os.path.join(ROOT, 'src', '_stub.c')])
-    stubs = {n: f for n, f in stubs.items() if n not in ported}
-    # invented-name stubs (ovl_*, ovlCall_*, textOp_*) encode the lcall's
-    # off field — index them by it for far-call targets the map doesn't
-    # cover.  Only names that are not real map entries qualify.
-    offstubs = {}
-    entryname_set = set(oentries.values())
-    for n, f in stubs.items():
-        if n in entryname_set:
-            continue
-        m = re.search(r'_([0-9A-Fa-f]{3,5})$', n)
-        if m:
-            offstubs.setdefault(int(m.group(1), 16), f)
-
-    ds = pick_ds(oexe, ohdr, cexe, chdr)
-    cases, skipped, vacuous = [], [], []
-    for name in sorted(defs):
-        f_o, e_o, kind = oracle_extent(name, os.path.join(ROOT, cfg['omap']),
-                                       segs)
-        if f_o is None:
-            skipped.append((name, 'not in oracle map'))
-            continue
-        if kind == 'FAR':
-            skipped.append((name, 'FAR frame'))
-            continue
-        f_c, e_c = cand_extent(cmap, name, cdgrp)
-        if f_c is None:
-            skipped.append((name, 'not in cand map'))
-            continue
-
-        o_pull, o_st, o_seg = mem_refs(oimg, ohdr, f_o, e_o)
-        c_pull, c_st, c_seg = mem_refs(cimg, chdr, f_c, e_c)
-        # Callee-read globals (a divisor inside a helper like
-        # setup3DTransform) are invisible to body-only pulls: the oracle's
-        # own pull covers its mirror while the cand reads scratch zeros —
-        # one-sided div0.  Scan direct `call` targets one level deep for
-        # pull/segptr cells only (stores stay body-only to protect
-        # positional obs pairing).
-        dp, ds2 = deep_refs(oimg, ohdr, call_targets(oimg, ohdr, f_o, e_o), f_o)
-        for off, psz in dp.items():
-            o_pull[off] = max(o_pull.get(off, 0), psz)
-        o_seg = sorted(set(o_seg) | ds2)
-        dp, ds2 = deep_refs(cimg, chdr, call_targets(cimg, chdr, f_c, e_c), f_c)
-        for off, psz in dp.items():
-            c_pull[off] = max(c_pull.get(off, 0), psz)
-        c_seg = sorted(set(c_seg) | ds2)
-        dsss_o, dsss_c = [], []
-        ints_o = find_ints(oimg, ohdr, f_o, e_o, dsss=dsss_o)
-        ints_c = find_ints(cimg, chdr, f_c, e_c, dsss=dsss_c)
-        for s in FORCE_INTS.get((cfg['exe'], name), []):
-            assert oimg[ohdr + s] == 0xCD, (name, hex(s))
-            if s not in ints_o:
-                ints_o.append(s)
-        # calls into cand-side trivial stubs (overlay routines, isr/dos
-        # helpers) get patched to the stub's observable answer — oracle
-        # must not run code the candidate does not implement.
-        csites = find_calls(oimg, ohdr, f_o, e_o, oentries, stubs, offstubs)
-        # instruction-order paired store-cell obs: byte-exact ports put the
-        # i-th DS store on both sides at the same logical cell.  A count
-        # mismatch means the paths diverged structurally — skip obs rather
-        # than pair wrong cells.
-        obs = []
-        if o_st and len(o_st) == len(c_st):
-            obs = [(o, c, min(osz, csz))
-                   for (o, osz), (c, csz) in zip(o_st, c_st)][:24]
-        # Seed every obs cell with a sentinel on BOTH sides.  A cell the
-        # routine never writes then reads back identical a5a5 bytes; only a
-        # real store (or a real divergence) can produce an obs mismatch.
-        # Without this, untouched cells compare the two images' init bytes —
-        # layout-legit differences masquerading as behavior diffs.
-        sent = {'o': {o for o, _, _ in obs}, 'c': {c for _, c, _ in obs}}
-        patch = []
-        for off, psz in sorted(o_pull.items()):
-            psz = min(psz, odata_end - off)
-            if psz > 0 and off not in sent['o']:
-                patch.append((off, None, psz))
-        for off, psz in sorted(c_pull.items()):
-            psz = min(psz, cdata_end - off)
-            if psz > 0 and off not in sent['c']:
-                patch.append((None, off, psz))
-        patch += [(o, c, sz, 'a5' * sz) for o, c, sz in obs]
-        # Cells consumed as far-pointer segments: force the scratch DS so
-        # the deref stays in mapped space (image seg values point nowhere;
-        # the seg half of a les/lds dword is otherwise left unpatched).
-        dsle = struct.pack('<H', int(ds, 0)).hex()
-        for off in o_seg:
-            patch.append((off, None, 2, dsle))
-        for off in c_seg:
-            patch.append((None, off, 2, dsle))
-        # Resident-driver callees (fillRect/putpixel family, reached via
-        # lcall into the resident table) do rep-stosb writes to the video
-        # page globals — natural values like 0xA000/0x3A00 land in
-        # unmapped guest space.  Naming a segment in any patch maps its
-        # whole 64K window (see real16_guest._segment_pages); one byte at
-        # each video base turns those faults into real execution.
-        patch.append({'seg': '0xa000', 'off': '0x0', 'bytes': '00'})
-        patch.append({'seg': '0x3a00', 'off': '0x0', 'bytes': '00'})
-
-        rt = defs[name]
-        regs = (['ax', 'dx'] if rt in ('int32', 'uint32', 'long')
-                else [] if rt == 'void' else ['ax'])
-        if not regs and not obs:
-            vacuous.append(name)    # void + no paired stores = nothing checks
-
-        # Far-pointer args: fixed probe vectors fill arg words with scalars
-        # whose seg half lands in unmapped space (unmapped_access aborts
-        # before any real code runs).  far_arg_sites flags pair STARTS;
-        # which adjacent word pair is the real ptr is ambiguous (push-run
-        # order is callee-dependent), so every flagged WORD gets a
-        # distinct 0x800x value — any seg:off reading then resolves to a
-        # seg in 0x8000-0x8fff, all inside one mapped/seeded window.
-        vecs = VECTORS
-        fa = set(far_arg_sites(oimg, ohdr, f_o, e_o))
-        fa |= set(far_arg_sites(cimg, chdr, f_c, e_c))
-        words = sorted({w for i in fa for w in (i, i + 1)})
-        if words:
-            hi = words[-1]
-            # any pair (0x8000+4s : 0x8000+4o) resolves to linear
-            # 0x88000+0x40s+0x4o — seed the 0x400 window it lands in.
-            seed = (b'PROBE-EDGE-SEED-0123456789-ABCDEF-0123456789-'
-                    b'abcdef' + b'\0' * 0x80)[:0x100] * 4
-            vecs = []
-            for v in VECTORS:
-                a = list(v) + [0] * max(0, hi + 1 - len(v))
-                ps = [{'seg': '0x8000', 'off': '0x8000',
-                       'bytes': seed.hex()}]
-                for w in words:
-                    a[w] = 0x8000 + w * 4
-                vecs.append({'args': a, 'patch': ps})
-
-        case = {'fn': name, 'exe': cfg['exe'], 'mod': cfg['mod'],
-                'ds': ds, 'patch': patch, 'vectors': vecs}
-        if obs:
-            case['obs'] = obs
-        if regs != ['ax']:
-            case['regs'] = regs
-        # Stub every oracle driver slot to retf unconditionally: near-BFS
-        # can't see lcalls hidden behind indirect dispatch (printObjective
-        # escapes at a slot with no static 0x9A in its call graph), and the
-        # slotstub fixture is inert for routines that never reach one —
-        # it changes only driver-ABI bytes inside DGROUP that no sane
-        # routine reads as data.
-        case['stub_slots'] = True
-        if ints_o:
-            case['int_stub'] = ints_o
-        if ints_c:
-            case['int_stub_c'] = ints_c
-        if dsss_o:
-            case['dsss_stub'] = dsss_o
-        if dsss_c:
-            case['dsss_stub_c'] = dsss_c
-        if csites:
-            case['call_stub'] = csites
-        cases.append(case)
-
-    # shard into ~25-case files so each replay group finishes within the
-    # subprocess timeout even with instruction-limit burners
-    SHARD = 25
-    if len(cases) <= SHARD:
-        emit(cases, os.path.join(ROOT, 'dosunit/%s.json' % suite))
-        print('%s: %d cases (%d skipped)' % (suite, len(cases), len(skipped)))
-    else:
-        for si in range(0, len(cases), SHARD):
-            emit(cases[si:si + SHARD],
-                 os.path.join(ROOT, 'dosunit/%s_%d.json' % (suite, si // SHARD)))
-        print('%s: %d cases in %d shards (%d skipped)'
-              % (suite, len(cases), (len(cases) + SHARD - 1) // SHARD,
-                 len(skipped)))
-    if skipped:
-        print('   skipped:', ', '.join('%s=%s' % kv for kv in skipped[:8]))
-    if vacuous:
-        print('   vacuous (void, no paired stores): %d' % len(vacuous))
+if __name__ == '__main__':
+    main()
