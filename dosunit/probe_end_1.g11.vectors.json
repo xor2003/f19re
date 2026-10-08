@@ -3,14 +3,14 @@
  "candidate_load_segment": "0x1000",
  "vectors": [
   {
-   "id": "readStageStream#0",
+   "id": "readWorldData#0",
    "oracle_entry": {
-    "segment": "0xff0",
-    "offset": "0x224c"
+    "segment": "0x1000",
+    "offset": "0x45f"
    },
    "candidate_entry": {
-    "segment": "0xff0",
-    "offset": "0x623c"
+    "segment": "0x1000",
+    "offset": "0x67a4"
    },
    "registers": {
     "sp": "0xffe0",
@@ -27,55 +27,41 @@
    "frame": {
     "kind": "near16",
     "target": {
-     "segment": "0xff0",
-     "offset": "0x4"
-    }
+     "segment": "0x1000",
+     "offset": "0x0"
+    },
+    "sp_guard": true
    },
    "memory": [
     {
      "segment": "0x3000",
-     "offset": "0x1",
-     "bytes": "000000000000004d532052756e2d54696d65204c696272617279202d20436f707972696768742028632920313938382c204d6963726f736f667420436f727011"
-    },
-    {
-     "segment": "0x3000",
      "offset": "0x2",
      "bytes": "0000000000004d532052756e2d54696d65204c696272617279202d20436f707972696768742028632920313938382c204d6963726f736f667420436f72701100"
     },
     {
      "segment": "0x3000",
-     "offset": "0x194a",
-     "bytes": "00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
+     "offset": "0x8",
+     "bytes": "4d532052756e2d54696d65204c696272617279202d20436f707972696768742028632920313938382c204d6963726f736f667420436f72701100000000000000"
     },
     {
      "segment": "0x3000",
-     "offset": "0x6b0d",
-     "bytes": "0055aaff0055aaff0055aaff0055aaff0055aaff0055aaff0055aaff0055aaff0055aaff0055aaff0055aaff0055aaff0055aaff0055aaff0055aaff0055aaff"
+     "offset": "0xa",
+     "bytes": "2052756e2d54696d65204c696272617279202d20436f707972696768742028632920313938382c204d6963726f736f667420436f727011000000000000000000"
     },
     {
      "segment": "0x3000",
-     "offset": "0x6b1d",
-     "bytes": "0055aaff0055aaff0055aaff0055aaff0055aaff0055aaff0055aaff0055aaff0055aaff0055aaff0055aaff0055aaff3c3c4e4d53473e3e000052363030300d"
+     "offset": "0xc",
+     "bytes": "756e2d54696d65204c696272617279202d20436f707972696768742028632920313938382c204d6963726f736f667420436f7270110000000000000000000000"
     },
     {
      "segment": "0x3000",
-     "offset": "0x6b2d",
-     "bytes": "0055aaff0055aaff0055aaff0055aaff0055aaff0055aaff0055aaff0055aaff3c3c4e4d53473e3e000052363030300d0a2d20737461636b206f766572666c6f"
+     "offset": "0x72",
+     "bytes": "53412d35000000005e010200000053412d38420000007d000500000053412d313000000040010700010053412d3131000000c8000500000053412d3132000000"
     },
     {
      "segment": "0x3000",
-     "offset": "0x6b3d",
-     "bytes": "0055aaff0055aaff0055aaff0055aaff3c3c4e4d53473e3e000052363030300d0a2d20737461636b206f766572666c6f770d0a00030052363030330d0a2d2069"
-    },
-    {
-     "segment": "0x3000",
-     "offset": "0x8648",
-     "bytes": "00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
-    },
-    {
-     "segment": "0x3000",
-     "offset": "0x2",
-     "bytes": "0000000000004d532052756e2d54696d65204c696272617279202d20436f707972696768742028632920313938382c204d6963726f736f667420436f72701100"
+     "offset": "0x6aa4",
+     "bytes": "8181810101000000000000000000000000000000000000000000c26ad90943000000000000000000f09f0000000000000000000001000000000000160202180d"
     },
     {
      "segment": "0x3000",
@@ -84,72 +70,62 @@
     },
     {
      "segment": "0x3000",
-     "offset": "0x325e",
+     "offset": "0x1942",
      "bytes": "0000"
     },
     {
      "segment": "0x3000",
-     "offset": "0x41c0",
+     "offset": "0x6aa2",
+     "bytes": "1400"
+    },
+    {
+     "segment": "0x3000",
+     "offset": "0x6acc",
+     "bytes": "f09f"
+    },
+    {
+     "segment": "0x3000",
+     "offset": "0x6ace",
      "bytes": "0000"
     },
     {
      "segment": "0x3000",
-     "offset": "0x41ca",
+     "offset": "0x6ad0",
      "bytes": "0000"
     },
     {
      "segment": "0x3000",
-     "offset": "0x41d4",
+     "offset": "0x6ad4",
      "bytes": "0000"
     },
     {
      "segment": "0x3000",
-     "offset": "0x8640",
+     "offset": "0x6ad8",
+     "bytes": "0100"
+    },
+    {
+     "segment": "0x3000",
+     "offset": "0x6ada",
      "bytes": "0000"
     },
     {
      "segment": "0x3000",
-     "offset": "0x8641",
+     "offset": "0x6adc",
      "bytes": "0000"
     },
     {
      "segment": "0x3000",
-     "offset": "0x8642",
+     "offset": "0x6c26",
      "bytes": "0000"
     },
     {
      "segment": "0x3000",
-     "offset": "0x8644",
+     "offset": "0x6c28",
      "bytes": "0000"
     },
     {
      "segment": "0x3000",
-     "offset": "0x8646",
-     "bytes": "0000"
-    },
-    {
-     "segment": "0x3000",
-     "offset": "0x8647",
-     "bytes": "0000"
-    },
-    {
-     "segment": "0x3000",
-     "offset": "0x8688",
-     "bytes": "0000"
-    },
-    {
-     "segment": "0x3000",
-     "offset": "0x868a",
-     "bytes": "0000"
-    },
-    {
-     "segment": "0x3000",
-     "offset": "0x868c",
-     "bytes": "0000"
-    },
-    {
-     "segment": "0x3000",
-     "offset": "0x868e",
+     "offset": "0x0",
      "bytes": "0000"
     },
     {
@@ -159,17 +135,17 @@
     },
     {
      "segment": "0x3000",
-     "offset": "0x1920",
-     "bytes": "8974"
-    },
-    {
-     "segment": "0x3000",
-     "offset": "0x1981",
+     "offset": "0x191c",
      "bytes": "0000"
     },
     {
      "segment": "0x3000",
-     "offset": "0x1983",
+     "offset": "0x1922",
+     "bytes": "0000"
+    },
+    {
+     "segment": "0x3000",
+     "offset": "0x198d",
      "bytes": "0000"
     },
     {
@@ -181,6 +157,16 @@
      "segment": "0x3000",
      "offset": "0x1995",
      "bytes": "0000"
+    },
+    {
+     "segment": "0x3000",
+     "offset": "0x1998",
+     "bytes": "0000"
+    },
+    {
+     "segment": "0x3000",
+     "offset": "0x199a",
+     "bytes": "1400"
     },
     {
      "segment": "0x3000",
@@ -209,21 +195,6 @@
     },
     {
      "segment": "0x3000",
-     "offset": "0x19be",
-     "bytes": "0000"
-    },
-    {
-     "segment": "0x3000",
-     "offset": "0x19bf",
-     "bytes": "0000"
-    },
-    {
-     "segment": "0x3000",
-     "offset": "0x19c4",
-     "bytes": "0000"
-    },
-    {
-     "segment": "0x3000",
      "offset": "0x19c6",
      "bytes": "b0ab"
     },
@@ -234,7 +205,12 @@
     },
     {
      "segment": "0x3000",
-     "offset": "0x19e6",
+     "offset": "0x19de",
+     "bytes": "0100"
+    },
+    {
+     "segment": "0x3000",
+     "offset": "0x19e0",
      "bytes": "0000"
     },
     {
@@ -269,26 +245,6 @@
     },
     {
      "segment": "0x3000",
-     "offset": "0x1d4c",
-     "bytes": "a5a5"
-    },
-    {
-     "segment": "0x3000",
-     "offset": "0x5496",
-     "bytes": "a5a5"
-    },
-    {
-     "segment": "0x3000",
-     "offset": "0x325e",
-     "bytes": "0030"
-    },
-    {
-     "segment": "0x3000",
-     "offset": "0x9ee4",
-     "bytes": "0030"
-    },
-    {
-     "segment": "0x3000",
      "offset": "0x2c",
      "bytes": "0030"
     },
@@ -308,35 +264,19 @@
      "bytes": "00"
     }
    ],
-   "observations": [
-    {
-     "segment": "0x3000",
-     "offset": "0x1d4c",
-     "size": 2
-    },
-    {
-     "segment": "0x3000",
-     "offset": "0x5496",
-     "size": 2
-    }
-   ],
-   "obs_pairs": [
-    [
-     0,
-     1
-    ]
-   ],
+   "observations": [],
+   "obs_pairs": [],
    "flags_mask": "0x08d5"
   },
   {
-   "id": "readStageStream#1",
+   "id": "readWorldData#1",
    "oracle_entry": {
-    "segment": "0xff0",
-    "offset": "0x224c"
+    "segment": "0x1000",
+    "offset": "0x45f"
    },
    "candidate_entry": {
-    "segment": "0xff0",
-    "offset": "0x623c"
+    "segment": "0x1000",
+    "offset": "0x67a4"
    },
    "registers": {
     "sp": "0xffe0",
@@ -353,55 +293,41 @@
    "frame": {
     "kind": "near16",
     "target": {
-     "segment": "0xff0",
-     "offset": "0x4"
-    }
+     "segment": "0x1000",
+     "offset": "0x0"
+    },
+    "sp_guard": true
    },
    "memory": [
     {
      "segment": "0x3000",
-     "offset": "0x1",
-     "bytes": "000000000000004d532052756e2d54696d65204c696272617279202d20436f707972696768742028632920313938382c204d6963726f736f667420436f727011"
-    },
-    {
-     "segment": "0x3000",
      "offset": "0x2",
      "bytes": "0000000000004d532052756e2d54696d65204c696272617279202d20436f707972696768742028632920313938382c204d6963726f736f667420436f72701100"
     },
     {
      "segment": "0x3000",
-     "offset": "0x194a",
-     "bytes": "00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
+     "offset": "0x8",
+     "bytes": "4d532052756e2d54696d65204c696272617279202d20436f707972696768742028632920313938382c204d6963726f736f667420436f72701100000000000000"
     },
     {
      "segment": "0x3000",
-     "offset": "0x6b0d",
-     "bytes": "0055aaff0055aaff0055aaff0055aaff0055aaff0055aaff0055aaff0055aaff0055aaff0055aaff0055aaff0055aaff0055aaff0055aaff0055aaff0055aaff"
+     "offset": "0xa",
+     "bytes": "2052756e2d54696d65204c696272617279202d20436f707972696768742028632920313938382c204d6963726f736f667420436f727011000000000000000000"
     },
     {
      "segment": "0x3000",
-     "offset": "0x6b1d",
-     "bytes": "0055aaff0055aaff0055aaff0055aaff0055aaff0055aaff0055aaff0055aaff0055aaff0055aaff0055aaff0055aaff3c3c4e4d53473e3e000052363030300d"
+     "offset": "0xc",
+     "bytes": "756e2d54696d65204c696272617279202d20436f707972696768742028632920313938382c204d6963726f736f667420436f7270110000000000000000000000"
     },
     {
      "segment": "0x3000",
-     "offset": "0x6b2d",
-     "bytes": "0055aaff0055aaff0055aaff0055aaff0055aaff0055aaff0055aaff0055aaff3c3c4e4d53473e3e000052363030300d0a2d20737461636b206f766572666c6f"
+     "offset": "0x72",
+     "bytes": "53412d35000000005e010200000053412d38420000007d000500000053412d313000000040010700010053412d3131000000c8000500000053412d3132000000"
     },
     {
      "segment": "0x3000",
-     "offset": "0x6b3d",
-     "bytes": "0055aaff0055aaff0055aaff0055aaff3c3c4e4d53473e3e000052363030300d0a2d20737461636b206f766572666c6f770d0a00030052363030330d0a2d2069"
-    },
-    {
-     "segment": "0x3000",
-     "offset": "0x8648",
-     "bytes": "00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
-    },
-    {
-     "segment": "0x3000",
-     "offset": "0x2",
-     "bytes": "0000000000004d532052756e2d54696d65204c696272617279202d20436f707972696768742028632920313938382c204d6963726f736f667420436f72701100"
+     "offset": "0x6aa4",
+     "bytes": "8181810101000000000000000000000000000000000000000000c26ad90943000000000000000000f09f0000000000000000000001000000000000160202180d"
     },
     {
      "segment": "0x3000",
@@ -410,72 +336,62 @@
     },
     {
      "segment": "0x3000",
-     "offset": "0x325e",
+     "offset": "0x1942",
      "bytes": "0000"
     },
     {
      "segment": "0x3000",
-     "offset": "0x41c0",
+     "offset": "0x6aa2",
+     "bytes": "1400"
+    },
+    {
+     "segment": "0x3000",
+     "offset": "0x6acc",
+     "bytes": "f09f"
+    },
+    {
+     "segment": "0x3000",
+     "offset": "0x6ace",
      "bytes": "0000"
     },
     {
      "segment": "0x3000",
-     "offset": "0x41ca",
+     "offset": "0x6ad0",
      "bytes": "0000"
     },
     {
      "segment": "0x3000",
-     "offset": "0x41d4",
+     "offset": "0x6ad4",
      "bytes": "0000"
     },
     {
      "segment": "0x3000",
-     "offset": "0x8640",
+     "offset": "0x6ad8",
+     "bytes": "0100"
+    },
+    {
+     "segment": "0x3000",
+     "offset": "0x6ada",
      "bytes": "0000"
     },
     {
      "segment": "0x3000",
-     "offset": "0x8641",
+     "offset": "0x6adc",
      "bytes": "0000"
     },
     {
      "segment": "0x3000",
-     "offset": "0x8642",
+     "offset": "0x6c26",
      "bytes": "0000"
     },
     {
      "segment": "0x3000",
-     "offset": "0x8644",
+     "offset": "0x6c28",
      "bytes": "0000"
     },
     {
      "segment": "0x3000",
-     "offset": "0x8646",
-     "bytes": "0000"
-    },
-    {
-     "segment": "0x3000",
-     "offset": "0x8647",
-     "bytes": "0000"
-    },
-    {
-     "segment": "0x3000",
-     "offset": "0x8688",
-     "bytes": "0000"
-    },
-    {
-     "segment": "0x3000",
-     "offset": "0x868a",
-     "bytes": "0000"
-    },
-    {
-     "segment": "0x3000",
-     "offset": "0x868c",
-     "bytes": "0000"
-    },
-    {
-     "segment": "0x3000",
-     "offset": "0x868e",
+     "offset": "0x0",
      "bytes": "0000"
     },
     {
@@ -485,17 +401,17 @@
     },
     {
      "segment": "0x3000",
-     "offset": "0x1920",
-     "bytes": "8974"
-    },
-    {
-     "segment": "0x3000",
-     "offset": "0x1981",
+     "offset": "0x191c",
      "bytes": "0000"
     },
     {
      "segment": "0x3000",
-     "offset": "0x1983",
+     "offset": "0x1922",
+     "bytes": "0000"
+    },
+    {
+     "segment": "0x3000",
+     "offset": "0x198d",
      "bytes": "0000"
     },
     {
@@ -507,6 +423,16 @@
      "segment": "0x3000",
      "offset": "0x1995",
      "bytes": "0000"
+    },
+    {
+     "segment": "0x3000",
+     "offset": "0x1998",
+     "bytes": "0000"
+    },
+    {
+     "segment": "0x3000",
+     "offset": "0x199a",
+     "bytes": "1400"
     },
     {
      "segment": "0x3000",
@@ -535,21 +461,6 @@
     },
     {
      "segment": "0x3000",
-     "offset": "0x19be",
-     "bytes": "0000"
-    },
-    {
-     "segment": "0x3000",
-     "offset": "0x19bf",
-     "bytes": "0000"
-    },
-    {
-     "segment": "0x3000",
-     "offset": "0x19c4",
-     "bytes": "0000"
-    },
-    {
-     "segment": "0x3000",
      "offset": "0x19c6",
      "bytes": "b0ab"
     },
@@ -560,7 +471,12 @@
     },
     {
      "segment": "0x3000",
-     "offset": "0x19e6",
+     "offset": "0x19de",
+     "bytes": "0100"
+    },
+    {
+     "segment": "0x3000",
+     "offset": "0x19e0",
      "bytes": "0000"
     },
     {
@@ -595,26 +511,6 @@
     },
     {
      "segment": "0x3000",
-     "offset": "0x1d4c",
-     "bytes": "a5a5"
-    },
-    {
-     "segment": "0x3000",
-     "offset": "0x5496",
-     "bytes": "a5a5"
-    },
-    {
-     "segment": "0x3000",
-     "offset": "0x325e",
-     "bytes": "0030"
-    },
-    {
-     "segment": "0x3000",
-     "offset": "0x9ee4",
-     "bytes": "0030"
-    },
-    {
-     "segment": "0x3000",
      "offset": "0x2c",
      "bytes": "0030"
     },
@@ -634,35 +530,19 @@
      "bytes": "00"
     }
    ],
-   "observations": [
-    {
-     "segment": "0x3000",
-     "offset": "0x1d4c",
-     "size": 2
-    },
-    {
-     "segment": "0x3000",
-     "offset": "0x5496",
-     "size": 2
-    }
-   ],
-   "obs_pairs": [
-    [
-     0,
-     1
-    ]
-   ],
+   "observations": [],
+   "obs_pairs": [],
    "flags_mask": "0x08d5"
   },
   {
-   "id": "readStageStream#2",
+   "id": "readWorldData#2",
    "oracle_entry": {
-    "segment": "0xff0",
-    "offset": "0x224c"
+    "segment": "0x1000",
+    "offset": "0x45f"
    },
    "candidate_entry": {
-    "segment": "0xff0",
-    "offset": "0x623c"
+    "segment": "0x1000",
+    "offset": "0x67a4"
    },
    "registers": {
     "sp": "0xffe0",
@@ -679,55 +559,41 @@
    "frame": {
     "kind": "near16",
     "target": {
-     "segment": "0xff0",
-     "offset": "0x4"
-    }
+     "segment": "0x1000",
+     "offset": "0x0"
+    },
+    "sp_guard": true
    },
    "memory": [
     {
      "segment": "0x3000",
-     "offset": "0x1",
-     "bytes": "000000000000004d532052756e2d54696d65204c696272617279202d20436f707972696768742028632920313938382c204d6963726f736f667420436f727011"
-    },
-    {
-     "segment": "0x3000",
      "offset": "0x2",
      "bytes": "0000000000004d532052756e2d54696d65204c696272617279202d20436f707972696768742028632920313938382c204d6963726f736f667420436f72701100"
     },
     {
      "segment": "0x3000",
-     "offset": "0x194a",
-     "bytes": "00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
+     "offset": "0x8",
+     "bytes": "4d532052756e2d54696d65204c696272617279202d20436f707972696768742028632920313938382c204d6963726f736f667420436f72701100000000000000"
     },
     {
      "segment": "0x3000",
-     "offset": "0x6b0d",
-     "bytes": "0055aaff0055aaff0055aaff0055aaff0055aaff0055aaff0055aaff0055aaff0055aaff0055aaff0055aaff0055aaff0055aaff0055aaff0055aaff0055aaff"
+     "offset": "0xa",
+     "bytes": "2052756e2d54696d65204c696272617279202d20436f707972696768742028632920313938382c204d6963726f736f667420436f727011000000000000000000"
     },
     {
      "segment": "0x3000",
-     "offset": "0x6b1d",
-     "bytes": "0055aaff0055aaff0055aaff0055aaff0055aaff0055aaff0055aaff0055aaff0055aaff0055aaff0055aaff0055aaff3c3c4e4d53473e3e000052363030300d"
+     "offset": "0xc",
+     "bytes": "756e2d54696d65204c696272617279202d20436f707972696768742028632920313938382c204d6963726f736f667420436f7270110000000000000000000000"
     },
     {
      "segment": "0x3000",
-     "offset": "0x6b2d",
-     "bytes": "0055aaff0055aaff0055aaff0055aaff0055aaff0055aaff0055aaff0055aaff3c3c4e4d53473e3e000052363030300d0a2d20737461636b206f766572666c6f"
+     "offset": "0x72",
+     "bytes": "53412d35000000005e010200000053412d38420000007d000500000053412d313000000040010700010053412d3131000000c8000500000053412d3132000000"
     },
     {
      "segment": "0x3000",
-     "offset": "0x6b3d",
-     "bytes": "0055aaff0055aaff0055aaff0055aaff3c3c4e4d53473e3e000052363030300d0a2d20737461636b206f766572666c6f770d0a00030052363030330d0a2d2069"
-    },
-    {
-     "segment": "0x3000",
-     "offset": "0x8648",
-     "bytes": "00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
-    },
-    {
-     "segment": "0x3000",
-     "offset": "0x2",
-     "bytes": "0000000000004d532052756e2d54696d65204c696272617279202d20436f707972696768742028632920313938382c204d6963726f736f667420436f72701100"
+     "offset": "0x6aa4",
+     "bytes": "8181810101000000000000000000000000000000000000000000c26ad90943000000000000000000f09f0000000000000000000001000000000000160202180d"
     },
     {
      "segment": "0x3000",
@@ -736,72 +602,62 @@
     },
     {
      "segment": "0x3000",
-     "offset": "0x325e",
+     "offset": "0x1942",
      "bytes": "0000"
     },
     {
      "segment": "0x3000",
-     "offset": "0x41c0",
+     "offset": "0x6aa2",
+     "bytes": "1400"
+    },
+    {
+     "segment": "0x3000",
+     "offset": "0x6acc",
+     "bytes": "f09f"
+    },
+    {
+     "segment": "0x3000",
+     "offset": "0x6ace",
      "bytes": "0000"
     },
     {
      "segment": "0x3000",
-     "offset": "0x41ca",
+     "offset": "0x6ad0",
      "bytes": "0000"
     },
     {
      "segment": "0x3000",
-     "offset": "0x41d4",
+     "offset": "0x6ad4",
      "bytes": "0000"
     },
     {
      "segment": "0x3000",
-     "offset": "0x8640",
+     "offset": "0x6ad8",
+     "bytes": "0100"
+    },
+    {
+     "segment": "0x3000",
+     "offset": "0x6ada",
      "bytes": "0000"
     },
     {
      "segment": "0x3000",
-     "offset": "0x8641",
+     "offset": "0x6adc",
      "bytes": "0000"
     },
     {
      "segment": "0x3000",
-     "offset": "0x8642",
+     "offset": "0x6c26",
      "bytes": "0000"
     },
     {
      "segment": "0x3000",
-     "offset": "0x8644",
+     "offset": "0x6c28",
      "bytes": "0000"
     },
     {
      "segment": "0x3000",
-     "offset": "0x8646",
-     "bytes": "0000"
-    },
-    {
-     "segment": "0x3000",
-     "offset": "0x8647",
-     "bytes": "0000"
-    },
-    {
-     "segment": "0x3000",
-     "offset": "0x8688",
-     "bytes": "0000"
-    },
-    {
-     "segment": "0x3000",
-     "offset": "0x868a",
-     "bytes": "0000"
-    },
-    {
-     "segment": "0x3000",
-     "offset": "0x868c",
-     "bytes": "0000"
-    },
-    {
-     "segment": "0x3000",
-     "offset": "0x868e",
+     "offset": "0x0",
      "bytes": "0000"
     },
     {
@@ -811,17 +667,17 @@
     },
     {
      "segment": "0x3000",
-     "offset": "0x1920",
-     "bytes": "8974"
-    },
-    {
-     "segment": "0x3000",
-     "offset": "0x1981",
+     "offset": "0x191c",
      "bytes": "0000"
     },
     {
      "segment": "0x3000",
-     "offset": "0x1983",
+     "offset": "0x1922",
+     "bytes": "0000"
+    },
+    {
+     "segment": "0x3000",
+     "offset": "0x198d",
      "bytes": "0000"
     },
     {
@@ -833,6 +689,16 @@
      "segment": "0x3000",
      "offset": "0x1995",
      "bytes": "0000"
+    },
+    {
+     "segment": "0x3000",
+     "offset": "0x1998",
+     "bytes": "0000"
+    },
+    {
+     "segment": "0x3000",
+     "offset": "0x199a",
+     "bytes": "1400"
     },
     {
      "segment": "0x3000",
@@ -861,21 +727,6 @@
     },
     {
      "segment": "0x3000",
-     "offset": "0x19be",
-     "bytes": "0000"
-    },
-    {
-     "segment": "0x3000",
-     "offset": "0x19bf",
-     "bytes": "0000"
-    },
-    {
-     "segment": "0x3000",
-     "offset": "0x19c4",
-     "bytes": "0000"
-    },
-    {
-     "segment": "0x3000",
      "offset": "0x19c6",
      "bytes": "b0ab"
     },
@@ -886,7 +737,12 @@
     },
     {
      "segment": "0x3000",
-     "offset": "0x19e6",
+     "offset": "0x19de",
+     "bytes": "0100"
+    },
+    {
+     "segment": "0x3000",
+     "offset": "0x19e0",
      "bytes": "0000"
     },
     {
@@ -921,26 +777,6 @@
     },
     {
      "segment": "0x3000",
-     "offset": "0x1d4c",
-     "bytes": "a5a5"
-    },
-    {
-     "segment": "0x3000",
-     "offset": "0x5496",
-     "bytes": "a5a5"
-    },
-    {
-     "segment": "0x3000",
-     "offset": "0x325e",
-     "bytes": "0030"
-    },
-    {
-     "segment": "0x3000",
-     "offset": "0x9ee4",
-     "bytes": "0030"
-    },
-    {
-     "segment": "0x3000",
      "offset": "0x2c",
      "bytes": "0030"
     },
@@ -960,35 +796,19 @@
      "bytes": "00"
     }
    ],
-   "observations": [
-    {
-     "segment": "0x3000",
-     "offset": "0x1d4c",
-     "size": 2
-    },
-    {
-     "segment": "0x3000",
-     "offset": "0x5496",
-     "size": 2
-    }
-   ],
-   "obs_pairs": [
-    [
-     0,
-     1
-    ]
-   ],
+   "observations": [],
+   "obs_pairs": [],
    "flags_mask": "0x08d5"
   },
   {
-   "id": "readStageStream#3",
+   "id": "readWorldData#3",
    "oracle_entry": {
-    "segment": "0xff0",
-    "offset": "0x224c"
+    "segment": "0x1000",
+    "offset": "0x45f"
    },
    "candidate_entry": {
-    "segment": "0xff0",
-    "offset": "0x623c"
+    "segment": "0x1000",
+    "offset": "0x67a4"
    },
    "registers": {
     "sp": "0xffe0",
@@ -1005,55 +825,41 @@
    "frame": {
     "kind": "near16",
     "target": {
-     "segment": "0xff0",
-     "offset": "0x4"
-    }
+     "segment": "0x1000",
+     "offset": "0x0"
+    },
+    "sp_guard": true
    },
    "memory": [
     {
      "segment": "0x3000",
-     "offset": "0x1",
-     "bytes": "000000000000004d532052756e2d54696d65204c696272617279202d20436f707972696768742028632920313938382c204d6963726f736f667420436f727011"
-    },
-    {
-     "segment": "0x3000",
      "offset": "0x2",
      "bytes": "0000000000004d532052756e2d54696d65204c696272617279202d20436f707972696768742028632920313938382c204d6963726f736f667420436f72701100"
     },
     {
      "segment": "0x3000",
-     "offset": "0x194a",
-     "bytes": "00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
+     "offset": "0x8",
+     "bytes": "4d532052756e2d54696d65204c696272617279202d20436f707972696768742028632920313938382c204d6963726f736f667420436f72701100000000000000"
     },
     {
      "segment": "0x3000",
-     "offset": "0x6b0d",
-     "bytes": "0055aaff0055aaff0055aaff0055aaff0055aaff0055aaff0055aaff0055aaff0055aaff0055aaff0055aaff0055aaff0055aaff0055aaff0055aaff0055aaff"
+     "offset": "0xa",
+     "bytes": "2052756e2d54696d65204c696272617279202d20436f707972696768742028632920313938382c204d6963726f736f667420436f727011000000000000000000"
     },
     {
      "segment": "0x3000",
-     "offset": "0x6b1d",
-     "bytes": "0055aaff0055aaff0055aaff0055aaff0055aaff0055aaff0055aaff0055aaff0055aaff0055aaff0055aaff0055aaff3c3c4e4d53473e3e000052363030300d"
+     "offset": "0xc",
+     "bytes": "756e2d54696d65204c696272617279202d20436f707972696768742028632920313938382c204d6963726f736f667420436f7270110000000000000000000000"
     },
     {
      "segment": "0x3000",
-     "offset": "0x6b2d",
-     "bytes": "0055aaff0055aaff0055aaff0055aaff0055aaff0055aaff0055aaff0055aaff3c3c4e4d53473e3e000052363030300d0a2d20737461636b206f766572666c6f"
+     "offset": "0x72",
+     "bytes": "53412d35000000005e010200000053412d38420000007d000500000053412d313000000040010700010053412d3131000000c8000500000053412d3132000000"
     },
     {
      "segment": "0x3000",
-     "offset": "0x6b3d",
-     "bytes": "0055aaff0055aaff0055aaff0055aaff3c3c4e4d53473e3e000052363030300d0a2d20737461636b206f766572666c6f770d0a00030052363030330d0a2d2069"
-    },
-    {
-     "segment": "0x3000",
-     "offset": "0x8648",
-     "bytes": "00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
-    },
-    {
-     "segment": "0x3000",
-     "offset": "0x2",
-     "bytes": "0000000000004d532052756e2d54696d65204c696272617279202d20436f707972696768742028632920313938382c204d6963726f736f667420436f72701100"
+     "offset": "0x6aa4",
+     "bytes": "8181810101000000000000000000000000000000000000000000c26ad90943000000000000000000f09f0000000000000000000001000000000000160202180d"
     },
     {
      "segment": "0x3000",
@@ -1062,72 +868,62 @@
     },
     {
      "segment": "0x3000",
-     "offset": "0x325e",
+     "offset": "0x1942",
      "bytes": "0000"
     },
     {
      "segment": "0x3000",
-     "offset": "0x41c0",
+     "offset": "0x6aa2",
+     "bytes": "1400"
+    },
+    {
+     "segment": "0x3000",
+     "offset": "0x6acc",
+     "bytes": "f09f"
+    },
+    {
+     "segment": "0x3000",
+     "offset": "0x6ace",
      "bytes": "0000"
     },
     {
      "segment": "0x3000",
-     "offset": "0x41ca",
+     "offset": "0x6ad0",
      "bytes": "0000"
     },
     {
      "segment": "0x3000",
-     "offset": "0x41d4",
+     "offset": "0x6ad4",
      "bytes": "0000"
     },
     {
      "segment": "0x3000",
-     "offset": "0x8640",
+     "offset": "0x6ad8",
+     "bytes": "0100"
+    },
+    {
+     "segment": "0x3000",
+     "offset": "0x6ada",
      "bytes": "0000"
     },
     {
      "segment": "0x3000",
-     "offset": "0x8641",
+     "offset": "0x6adc",
      "bytes": "0000"
     },
     {
      "segment": "0x3000",
-     "offset": "0x8642",
+     "offset": "0x6c26",
      "bytes": "0000"
     },
     {
      "segment": "0x3000",
-     "offset": "0x8644",
+     "offset": "0x6c28",
      "bytes": "0000"
     },
     {
      "segment": "0x3000",
-     "offset": "0x8646",
-     "bytes": "0000"
-    },
-    {
-     "segment": "0x3000",
-     "offset": "0x8647",
-     "bytes": "0000"
-    },
-    {
-     "segment": "0x3000",
-     "offset": "0x8688",
-     "bytes": "0000"
-    },
-    {
-     "segment": "0x3000",
-     "offset": "0x868a",
-     "bytes": "0000"
-    },
-    {
-     "segment": "0x3000",
-     "offset": "0x868c",
-     "bytes": "0000"
-    },
-    {
-     "segment": "0x3000",
-     "offset": "0x868e",
+     "offset": "0x0",
      "bytes": "0000"
     },
     {
@@ -1137,17 +933,17 @@
     },
     {
      "segment": "0x3000",
-     "offset": "0x1920",
-     "bytes": "8974"
-    },
-    {
-     "segment": "0x3000",
-     "offset": "0x1981",
+     "offset": "0x191c",
      "bytes": "0000"
     },
     {
      "segment": "0x3000",
-     "offset": "0x1983",
+     "offset": "0x1922",
+     "bytes": "0000"
+    },
+    {
+     "segment": "0x3000",
+     "offset": "0x198d",
      "bytes": "0000"
     },
     {
@@ -1159,6 +955,16 @@
      "segment": "0x3000",
      "offset": "0x1995",
      "bytes": "0000"
+    },
+    {
+     "segment": "0x3000",
+     "offset": "0x1998",
+     "bytes": "0000"
+    },
+    {
+     "segment": "0x3000",
+     "offset": "0x199a",
+     "bytes": "1400"
     },
     {
      "segment": "0x3000",
@@ -1187,21 +993,6 @@
     },
     {
      "segment": "0x3000",
-     "offset": "0x19be",
-     "bytes": "0000"
-    },
-    {
-     "segment": "0x3000",
-     "offset": "0x19bf",
-     "bytes": "0000"
-    },
-    {
-     "segment": "0x3000",
-     "offset": "0x19c4",
-     "bytes": "0000"
-    },
-    {
-     "segment": "0x3000",
      "offset": "0x19c6",
      "bytes": "b0ab"
     },
@@ -1212,7 +1003,12 @@
     },
     {
      "segment": "0x3000",
-     "offset": "0x19e6",
+     "offset": "0x19de",
+     "bytes": "0100"
+    },
+    {
+     "segment": "0x3000",
+     "offset": "0x19e0",
      "bytes": "0000"
     },
     {
@@ -1247,26 +1043,6 @@
     },
     {
      "segment": "0x3000",
-     "offset": "0x1d4c",
-     "bytes": "a5a5"
-    },
-    {
-     "segment": "0x3000",
-     "offset": "0x5496",
-     "bytes": "a5a5"
-    },
-    {
-     "segment": "0x3000",
-     "offset": "0x325e",
-     "bytes": "0030"
-    },
-    {
-     "segment": "0x3000",
-     "offset": "0x9ee4",
-     "bytes": "0030"
-    },
-    {
-     "segment": "0x3000",
      "offset": "0x2c",
      "bytes": "0030"
     },
@@ -1286,35 +1062,19 @@
      "bytes": "00"
     }
    ],
-   "observations": [
-    {
-     "segment": "0x3000",
-     "offset": "0x1d4c",
-     "size": 2
-    },
-    {
-     "segment": "0x3000",
-     "offset": "0x5496",
-     "size": 2
-    }
-   ],
-   "obs_pairs": [
-    [
-     0,
-     1
-    ]
-   ],
+   "observations": [],
+   "obs_pairs": [],
    "flags_mask": "0x08d5"
   },
   {
-   "id": "readStageStream#4",
+   "id": "readWorldData#4",
    "oracle_entry": {
-    "segment": "0xff0",
-    "offset": "0x224c"
+    "segment": "0x1000",
+    "offset": "0x45f"
    },
    "candidate_entry": {
-    "segment": "0xff0",
-    "offset": "0x623c"
+    "segment": "0x1000",
+    "offset": "0x67a4"
    },
    "registers": {
     "sp": "0xffe0",
@@ -1331,55 +1091,41 @@
    "frame": {
     "kind": "near16",
     "target": {
-     "segment": "0xff0",
-     "offset": "0x4"
-    }
+     "segment": "0x1000",
+     "offset": "0x0"
+    },
+    "sp_guard": true
    },
    "memory": [
     {
      "segment": "0x3000",
-     "offset": "0x1",
-     "bytes": "000000000000004d532052756e2d54696d65204c696272617279202d20436f707972696768742028632920313938382c204d6963726f736f667420436f727011"
-    },
-    {
-     "segment": "0x3000",
      "offset": "0x2",
      "bytes": "0000000000004d532052756e2d54696d65204c696272617279202d20436f707972696768742028632920313938382c204d6963726f736f667420436f72701100"
     },
     {
      "segment": "0x3000",
-     "offset": "0x194a",
-     "bytes": "00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
+     "offset": "0x8",
+     "bytes": "4d532052756e2d54696d65204c696272617279202d20436f707972696768742028632920313938382c204d6963726f736f667420436f72701100000000000000"
     },
     {
      "segment": "0x3000",
-     "offset": "0x6b0d",
-     "bytes": "0055aaff0055aaff0055aaff0055aaff0055aaff0055aaff0055aaff0055aaff0055aaff0055aaff0055aaff0055aaff0055aaff0055aaff0055aaff0055aaff"
+     "offset": "0xa",
+     "bytes": "2052756e2d54696d65204c696272617279202d20436f707972696768742028632920313938382c204d6963726f736f667420436f727011000000000000000000"
     },
     {
      "segment": "0x3000",
-     "offset": "0x6b1d",
-     "bytes": "0055aaff0055aaff0055aaff0055aaff0055aaff0055aaff0055aaff0055aaff0055aaff0055aaff0055aaff0055aaff3c3c4e4d53473e3e000052363030300d"
+     "offset": "0xc",
+     "bytes": "756e2d54696d65204c696272617279202d20436f707972696768742028632920313938382c204d6963726f736f667420436f7270110000000000000000000000"
     },
     {
      "segment": "0x3000",
-     "offset": "0x6b2d",
-     "bytes": "0055aaff0055aaff0055aaff0055aaff0055aaff0055aaff0055aaff0055aaff3c3c4e4d53473e3e000052363030300d0a2d20737461636b206f766572666c6f"
+     "offset": "0x72",
+     "bytes": "53412d35000000005e010200000053412d38420000007d000500000053412d313000000040010700010053412d3131000000c8000500000053412d3132000000"
     },
     {
      "segment": "0x3000",
-     "offset": "0x6b3d",
-     "bytes": "0055aaff0055aaff0055aaff0055aaff3c3c4e4d53473e3e000052363030300d0a2d20737461636b206f766572666c6f770d0a00030052363030330d0a2d2069"
-    },
-    {
-     "segment": "0x3000",
-     "offset": "0x8648",
-     "bytes": "00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
-    },
-    {
-     "segment": "0x3000",
-     "offset": "0x2",
-     "bytes": "0000000000004d532052756e2d54696d65204c696272617279202d20436f707972696768742028632920313938382c204d6963726f736f667420436f72701100"
+     "offset": "0x6aa4",
+     "bytes": "8181810101000000000000000000000000000000000000000000c26ad90943000000000000000000f09f0000000000000000000001000000000000160202180d"
     },
     {
      "segment": "0x3000",
@@ -1388,72 +1134,62 @@
     },
     {
      "segment": "0x3000",
-     "offset": "0x325e",
+     "offset": "0x1942",
      "bytes": "0000"
     },
     {
      "segment": "0x3000",
-     "offset": "0x41c0",
+     "offset": "0x6aa2",
+     "bytes": "1400"
+    },
+    {
+     "segment": "0x3000",
+     "offset": "0x6acc",
+     "bytes": "f09f"
+    },
+    {
+     "segment": "0x3000",
+     "offset": "0x6ace",
      "bytes": "0000"
     },
     {
      "segment": "0x3000",
-     "offset": "0x41ca",
+     "offset": "0x6ad0",
      "bytes": "0000"
     },
     {
      "segment": "0x3000",
-     "offset": "0x41d4",
+     "offset": "0x6ad4",
      "bytes": "0000"
     },
     {
      "segment": "0x3000",
-     "offset": "0x8640",
+     "offset": "0x6ad8",
+     "bytes": "0100"
+    },
+    {
+     "segment": "0x3000",
+     "offset": "0x6ada",
      "bytes": "0000"
     },
     {
      "segment": "0x3000",
-     "offset": "0x8641",
+     "offset": "0x6adc",
      "bytes": "0000"
     },
     {
      "segment": "0x3000",
-     "offset": "0x8642",
+     "offset": "0x6c26",
      "bytes": "0000"
     },
     {
      "segment": "0x3000",
-     "offset": "0x8644",
+     "offset": "0x6c28",
      "bytes": "0000"
     },
     {
      "segment": "0x3000",
-     "offset": "0x8646",
-     "bytes": "0000"
-    },
-    {
-     "segment": "0x3000",
-     "offset": "0x8647",
-     "bytes": "0000"
-    },
-    {
-     "segment": "0x3000",
-     "offset": "0x8688",
-     "bytes": "0000"
-    },
-    {
-     "segment": "0x3000",
-     "offset": "0x868a",
-     "bytes": "0000"
-    },
-    {
-     "segment": "0x3000",
-     "offset": "0x868c",
-     "bytes": "0000"
-    },
-    {
-     "segment": "0x3000",
-     "offset": "0x868e",
+     "offset": "0x0",
      "bytes": "0000"
     },
     {
@@ -1463,17 +1199,17 @@
     },
     {
      "segment": "0x3000",
-     "offset": "0x1920",
-     "bytes": "8974"
-    },
-    {
-     "segment": "0x3000",
-     "offset": "0x1981",
+     "offset": "0x191c",
      "bytes": "0000"
     },
     {
      "segment": "0x3000",
-     "offset": "0x1983",
+     "offset": "0x1922",
+     "bytes": "0000"
+    },
+    {
+     "segment": "0x3000",
+     "offset": "0x198d",
      "bytes": "0000"
     },
     {
@@ -1485,6 +1221,16 @@
      "segment": "0x3000",
      "offset": "0x1995",
      "bytes": "0000"
+    },
+    {
+     "segment": "0x3000",
+     "offset": "0x1998",
+     "bytes": "0000"
+    },
+    {
+     "segment": "0x3000",
+     "offset": "0x199a",
+     "bytes": "1400"
     },
     {
      "segment": "0x3000",
@@ -1513,21 +1259,6 @@
     },
     {
      "segment": "0x3000",
-     "offset": "0x19be",
-     "bytes": "0000"
-    },
-    {
-     "segment": "0x3000",
-     "offset": "0x19bf",
-     "bytes": "0000"
-    },
-    {
-     "segment": "0x3000",
-     "offset": "0x19c4",
-     "bytes": "0000"
-    },
-    {
-     "segment": "0x3000",
      "offset": "0x19c6",
      "bytes": "b0ab"
     },
@@ -1538,7 +1269,12 @@
     },
     {
      "segment": "0x3000",
-     "offset": "0x19e6",
+     "offset": "0x19de",
+     "bytes": "0100"
+    },
+    {
+     "segment": "0x3000",
+     "offset": "0x19e0",
      "bytes": "0000"
     },
     {
@@ -1573,26 +1309,6 @@
     },
     {
      "segment": "0x3000",
-     "offset": "0x1d4c",
-     "bytes": "a5a5"
-    },
-    {
-     "segment": "0x3000",
-     "offset": "0x5496",
-     "bytes": "a5a5"
-    },
-    {
-     "segment": "0x3000",
-     "offset": "0x325e",
-     "bytes": "0030"
-    },
-    {
-     "segment": "0x3000",
-     "offset": "0x9ee4",
-     "bytes": "0030"
-    },
-    {
-     "segment": "0x3000",
      "offset": "0x2c",
      "bytes": "0030"
     },
@@ -1612,24 +1328,8 @@
      "bytes": "00"
     }
    ],
-   "observations": [
-    {
-     "segment": "0x3000",
-     "offset": "0x1d4c",
-     "size": 2
-    },
-    {
-     "segment": "0x3000",
-     "offset": "0x5496",
-     "size": 2
-    }
-   ],
-   "obs_pairs": [
-    [
-     0,
-     1
-    ]
-   ],
+   "observations": [],
+   "obs_pairs": [],
    "flags_mask": "0x08d5"
   }
  ],

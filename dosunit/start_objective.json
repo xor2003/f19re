@@ -1,0 +1,127 @@
+[
+ {
+  "fn": "printObjective",
+  "oracle_exe": "build/START-slotstub.EXE",
+  "oracle_map": "map/start_en.map",
+  "cand_exe": "build/STUTIL.EXE",
+  "cand_map": "build/STUTIL.MAP",
+  "ds": "0x3000",
+  "check_regs": [],
+  "code_o": [
+   [
+    0,
+    65536
+   ],
+   [
+    68346,
+    545
+   ]
+  ],
+  "code_c": [
+   [
+    0,
+    57712
+   ]
+  ],
+  "oracle_dgrp": 65536,
+  "patches": [
+   {
+    "o_off": "0xb950",
+    "c_off": "0x13b4",
+    "bytes": "4f4e43343200"
+   },
+   {
+    "o_off": "0xca70",
+    "c_off": "0x8a30",
+    "bytes": "00d0"
+   },
+   {
+    "off": "0xd000",
+    "bytes": "4f626a4e616d6500"
+   },
+   {
+    "o_off": "0x3f60",
+    "c_off": "0xba98",
+    "bytes": "506174726f6c00"
+   },
+   {
+    "o_off": "0x4db6",
+    "c_off": "0x9966",
+    "bytes": "31323a303000"
+   },
+   {
+    "o_off": "0x4dbc",
+    "c_off": "0x99f4",
+    "bytes": "31333a303000"
+   },
+   {
+    "o_off": "0x4dc8",
+    "c_off": "0x9978",
+    "bytes": "58595a00"
+   }
+  ],
+  "observe": [
+   {
+    "o_off": "0xb96a",
+    "c_off": "0xafb8",
+    "size": 288
+   }
+  ],
+  "vectors": [
+   {
+    "args": [0],
+    "patches": [
+     {"o_off": "0x4b10", "c_off": "0x62fc", "bytes": "010000000000000000000000"}
+    ]
+   },
+   {
+    "args": [0],
+    "patches": [
+     {"o_off": "0x4b10", "c_off": "0x62fc", "bytes": "020000002000000000000000"}
+    ]
+   },
+   {
+    "args": [0],
+    "patches": [
+     {"o_off": "0x4b10", "c_off": "0x62fc", "bytes": "020000000200000000000000"}
+    ]
+   },
+   {
+    "args": [0],
+    "patches": [
+     {"o_off": "0x4b10", "c_off": "0x62fc", "bytes": "030000000000000000000000"}
+    ]
+   },
+   {
+    "args": [0],
+    "patches": [
+     {"o_off": "0x4b10", "c_off": "0x62fc", "bytes": "040000000000000000000000"}
+    ]
+   },
+   {
+    "args": [0],
+    "patches": [
+     {"o_off": "0x4b10", "c_off": "0x62fc", "bytes": "050000000000000000000000"}
+    ]
+   },
+   {
+    "args": [0],
+    "patches": [
+     {"o_off": "0x4b10", "c_off": "0x62fc", "bytes": "060000000000000000000000"}
+    ]
+   },
+   {
+    "args": [0],
+    "patches": [
+     {"o_off": "0x4b10", "c_off": "0x62fc", "bytes": "070000000000000000000000"}
+    ]
+   },
+   {
+    "args": [0],
+    "patches": [
+     {"o_off": "0x4b10", "c_off": "0x62fc", "bytes": "080000000000feff00000000"}
+    ]
+   }
+  ]
+ }
+]

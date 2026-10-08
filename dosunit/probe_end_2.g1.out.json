@@ -10,14 +10,14 @@
           }
         ],
         "code_scope": "declared",
-        "file_sha256": "f631c69de33598b193843845b8840e2f091fd9ef1b63f9f7a1bcf46b2402d01f",
-        "image_sha256": "388c930305daa06559f0710cdce85105d7aee06121a32212cf1cf09fcc443936",
+        "file_sha256": "ef864803d3dbfbb17359cd778bfab9e1bc4e72c1c39b126f2641f41fc5c5675b",
+        "image_sha256": "bb49be8f790b43d2f3067305d5e66222a7c92b18f46cb311be3cd237ec5b6f40",
         "image_size": 38489,
         "load_segment": "0x1000",
         "reloc_sha256": "1f604c594125607c2f6c3b4c3dba3333d186d0737075c660cfe195f62a898b1d"
       },
-      "path": "/home/xor/games/f19ru/F19/build/ENBRIEF-ints-017b4bd0.EXE",
-      "sha256": "f631c69de33598b193843845b8840e2f091fd9ef1b63f9f7a1bcf46b2402d01f"
+      "path": "/home/xor/games/f19ru/F19/build/ENBRIEF-dsss-bf3501c2.EXE",
+      "sha256": "ef864803d3dbfbb17359cd778bfab9e1bc4e72c1c39b126f2641f41fc5c5675b"
     },
     "oracle": {
       "image": {
@@ -33,14 +33,14 @@
           }
         ],
         "code_scope": "declared",
-        "file_sha256": "379a27c1a31acc3694f8f3312623298fd71cbeb68e6cf41e41c37ccf70a5fbbd",
-        "image_sha256": "c0cd5ae5206766b903d9fe03d215d9974f2eb52f5619da0bc87f40094073b6e3",
+        "file_sha256": "b8c2b58b338fac65db583e570dc3620ca741309f3d3cd608cc584e17102337cb",
+        "image_sha256": "515b57daaf98ca21e6ba20071de0c9430e89caa06d93b0df268f5696bf8e0510",
         "image_size": 74800,
         "load_segment": "0x1000",
         "reloc_sha256": "054bf8e00a98db7a713addc35c7d1f1580413a17c6c87aa8c9eec471d2f03ab7"
       },
-      "path": "/home/xor/games/f19ru/F19/build/END-ints-0dc5efc7.EXE",
-      "sha256": "379a27c1a31acc3694f8f3312623298fd71cbeb68e6cf41e41c37ccf70a5fbbd"
+      "path": "/home/xor/games/f19ru/F19/build/END-dsss-545ff51d.EXE",
+      "sha256": "b8c2b58b338fac65db583e570dc3620ca741309f3d3cd608cc584e17102337cb"
     }
   },
   "instruction_limit": 100000,
@@ -61,40 +61,40 @@
         "detail": "",
         "effective_flags_mask": "0x8d5",
         "events": [],
-        "instructions": 31,
+        "instructions": 19,
         "observations": [],
         "registers": {
           "ax": "0x0",
           "bp": "0x0",
-          "bx": "0xffda",
-          "cs": "0xff0",
-          "cx": "0x72d4",
+          "bx": "0xffde",
+          "cs": "0x1000",
+          "cx": "0x6269",
           "di": "0x0",
           "ds": "0x3000",
           "dx": "0x0",
           "eax": "0x0",
           "ebp": "0x0",
-          "ebx": "0xffda",
-          "ecx": "0x72d4",
+          "ebx": "0xffde",
+          "ecx": "0x6269",
           "edi": "0x0",
           "edx": "0x0",
-          "eflags": "0x292",
+          "eflags": "0x206",
           "es": "0x3000",
           "esi": "0x0",
-          "esp": "0xffe2",
-          "flags": "0x292",
+          "esp": "0xffe0",
+          "flags": "0x206",
           "fs": "0x0",
           "gs": "0x0",
-          "ip": "0x4",
+          "ip": "0x6270",
           "si": "0x0",
-          "sp": "0xffe2",
+          "sp": "0xffe0",
           "ss": "0x4000"
         },
         "status": "returned",
         "writes": [
           {
-            "bytes": "d47200001e680000",
-            "linear": "0x4ffd8"
+            "bytes": "000000000000",
+            "linear": "0x4ffda"
           }
         ]
       },
@@ -129,17 +129,17 @@
         "observables_source": "default",
         "reason": "declared observations diverge"
       },
-      "id": "seedRandom#0",
+      "id": "restoreInterrupts#0",
       "initial_state": {
         "candidate_entry": {
-          "offset": "0x6817",
-          "segment": "0xff0"
+          "offset": "0x6260",
+          "segment": "0x1000"
         },
         "frame": {
           "kind": "near16",
           "target": {
-            "offset": "0x4",
-            "segment": "0xff0"
+            "offset": "0x0",
+            "segment": "0x1000"
           }
         },
         "high_halves": {},
@@ -150,23 +150,8 @@
             "segment": "0x3000"
           },
           {
-            "bytes": "000000004d532052756e2d54696d65204c696272617279202d20436f707972696768742028632920313938382c204d6963726f736f667420436f727011000000",
-            "offset": "0x4",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "00004d532052756e2d54696d65204c696272617279202d20436f707972696768742028632920313938382c204d6963726f736f667420436f7270110000000000",
-            "offset": "0x6",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "4d532052756e2d54696d65204c696272617279202d20436f707972696768742028632920313938382c204d6963726f736f667420436f72701100000000000000",
-            "offset": "0x8",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "0000000000004d532052756e2d54696d65204c696272617279202d20436f707972696768742028632920313938382c204d6963726f736f667420436f72701100",
-            "offset": "0x2",
+            "bytes": "8181810101000000000000000000000000000000000000000000c26ad90943000000000000000000f09f0000000000000000000001000000000000160202180d",
+            "offset": "0x6aa4",
             "segment": "0x3000"
           },
           {
@@ -175,43 +160,28 @@
             "segment": "0x3000"
           },
           {
-            "bytes": "0000",
-            "offset": "0x3b33",
+            "bytes": "1400",
+            "offset": "0x6aa2",
+            "segment": "0x3000"
+          },
+          {
+            "bytes": "f09f",
+            "offset": "0x6acc",
             "segment": "0x3000"
           },
           {
             "bytes": "0000",
-            "offset": "0x41da",
+            "offset": "0x6ace",
             "segment": "0x3000"
           },
           {
             "bytes": "0000",
-            "offset": "0x41db",
+            "offset": "0x6ad0",
             "segment": "0x3000"
           },
           {
             "bytes": "0000",
-            "offset": "0x41dc",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "0006",
-            "offset": "0x41dd",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "0000",
-            "offset": "0x6a95",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "0000",
-            "offset": "0x6a9d",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "0000",
-            "offset": "0x6aa0",
+            "offset": "0x6ad4",
             "segment": "0x3000"
           },
           {
@@ -231,17 +201,7 @@
           },
           {
             "bytes": "0000",
-            "offset": "0x6af2",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "0000",
-            "offset": "0x6af6",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "0000",
-            "offset": "0x6afc",
+            "offset": "0x0",
             "segment": "0x3000"
           },
           {
@@ -250,18 +210,18 @@
             "segment": "0x3000"
           },
           {
-            "bytes": "8974",
-            "offset": "0x1920",
+            "bytes": "0000",
+            "offset": "0x191c",
             "segment": "0x3000"
           },
           {
             "bytes": "0000",
-            "offset": "0x1981",
+            "offset": "0x1922",
             "segment": "0x3000"
           },
           {
             "bytes": "0000",
-            "offset": "0x1983",
+            "offset": "0x198d",
             "segment": "0x3000"
           },
           {
@@ -272,6 +232,16 @@
           {
             "bytes": "0000",
             "offset": "0x1995",
+            "segment": "0x3000"
+          },
+          {
+            "bytes": "0000",
+            "offset": "0x1998",
+            "segment": "0x3000"
+          },
+          {
+            "bytes": "1400",
+            "offset": "0x199a",
             "segment": "0x3000"
           },
           {
@@ -300,21 +270,6 @@
             "segment": "0x3000"
           },
           {
-            "bytes": "0000",
-            "offset": "0x19be",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "0000",
-            "offset": "0x19bf",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "0000",
-            "offset": "0x19c4",
-            "segment": "0x3000"
-          },
-          {
             "bytes": "b0ab",
             "offset": "0x19c6",
             "segment": "0x3000"
@@ -325,8 +280,13 @@
             "segment": "0x3000"
           },
           {
+            "bytes": "0100",
+            "offset": "0x19de",
+            "segment": "0x3000"
+          },
+          {
             "bytes": "0000",
-            "offset": "0x19e6",
+            "offset": "0x19e0",
             "segment": "0x3000"
           },
           {
@@ -361,11 +321,6 @@
           },
           {
             "bytes": "0030",
-            "offset": "0x6af2",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "0030",
             "offset": "0x2c",
             "segment": "0x3000"
           },
@@ -387,8 +342,8 @@
         ],
         "observations": [],
         "oracle_entry": {
-          "offset": "0xdf3",
-          "segment": "0xff0"
+          "offset": "0x3e6",
+          "segment": "0x1000"
         },
         "registers": {
           "bp": "0x0",
@@ -407,13 +362,13 @@
         "detail": "",
         "effective_flags_mask": "0x8d5",
         "events": [],
-        "instructions": 16,
+        "instructions": 13,
         "observations": [],
         "registers": {
           "ax": "0x0",
           "bp": "0x0",
           "bx": "0x0",
-          "cs": "0xff0",
+          "cs": "0x1000",
           "cx": "0x0",
           "di": "0x0",
           "ds": "0x3000",
@@ -424,26 +379,22 @@
           "ecx": "0x0",
           "edi": "0x0",
           "edx": "0x0",
-          "eflags": "0x292",
+          "eflags": "0x202",
           "es": "0x3000",
           "esi": "0x0",
-          "esp": "0xffe2",
-          "flags": "0x292",
+          "esp": "0xffe0",
+          "flags": "0x202",
           "fs": "0x0",
           "gs": "0x0",
-          "ip": "0x4",
+          "ip": "0x3f6",
           "si": "0x0",
-          "sp": "0xffe2",
+          "sp": "0xffe0",
           "ss": "0x4000"
         },
         "status": "returned",
         "writes": [
           {
-            "bytes": "00000000",
-            "linear": "0x36ad8"
-          },
-          {
-            "bytes": "0000fa0d0000",
+            "bytes": "000000000000",
             "linear": "0x4ffda"
           }
         ]
@@ -455,40 +406,40 @@
         "detail": "",
         "effective_flags_mask": "0x8d5",
         "events": [],
-        "instructions": 31,
+        "instructions": 19,
         "observations": [],
         "registers": {
           "ax": "0x0",
           "bp": "0x0",
-          "bx": "0xffda",
-          "cs": "0xff0",
-          "cx": "0x72d4",
+          "bx": "0xffde",
+          "cs": "0x1000",
+          "cx": "0x6269",
           "di": "0x0",
           "ds": "0x3000",
           "dx": "0x0",
           "eax": "0x0",
           "ebp": "0x0",
-          "ebx": "0xffda",
-          "ecx": "0x72d4",
+          "ebx": "0xffde",
+          "ecx": "0x6269",
           "edi": "0x0",
           "edx": "0x0",
-          "eflags": "0x292",
+          "eflags": "0x206",
           "es": "0x3000",
           "esi": "0x0",
-          "esp": "0xffe2",
-          "flags": "0x292",
+          "esp": "0xffe0",
+          "flags": "0x206",
           "fs": "0x0",
           "gs": "0x0",
-          "ip": "0x4",
+          "ip": "0x6270",
           "si": "0x0",
-          "sp": "0xffe2",
+          "sp": "0xffe0",
           "ss": "0x4000"
         },
         "status": "returned",
         "writes": [
           {
-            "bytes": "d47200001e680000",
-            "linear": "0x4ffd8"
+            "bytes": "000000000000",
+            "linear": "0x4ffda"
           }
         ]
       },
@@ -523,17 +474,17 @@
         "observables_source": "default",
         "reason": "declared observations diverge"
       },
-      "id": "seedRandom#1",
+      "id": "restoreInterrupts#1",
       "initial_state": {
         "candidate_entry": {
-          "offset": "0x6817",
-          "segment": "0xff0"
+          "offset": "0x6260",
+          "segment": "0x1000"
         },
         "frame": {
           "kind": "near16",
           "target": {
-            "offset": "0x4",
-            "segment": "0xff0"
+            "offset": "0x0",
+            "segment": "0x1000"
           }
         },
         "high_halves": {},
@@ -544,23 +495,8 @@
             "segment": "0x3000"
           },
           {
-            "bytes": "000000004d532052756e2d54696d65204c696272617279202d20436f707972696768742028632920313938382c204d6963726f736f667420436f727011000000",
-            "offset": "0x4",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "00004d532052756e2d54696d65204c696272617279202d20436f707972696768742028632920313938382c204d6963726f736f667420436f7270110000000000",
-            "offset": "0x6",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "4d532052756e2d54696d65204c696272617279202d20436f707972696768742028632920313938382c204d6963726f736f667420436f72701100000000000000",
-            "offset": "0x8",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "0000000000004d532052756e2d54696d65204c696272617279202d20436f707972696768742028632920313938382c204d6963726f736f667420436f72701100",
-            "offset": "0x2",
+            "bytes": "8181810101000000000000000000000000000000000000000000c26ad90943000000000000000000f09f0000000000000000000001000000000000160202180d",
+            "offset": "0x6aa4",
             "segment": "0x3000"
           },
           {
@@ -569,43 +505,28 @@
             "segment": "0x3000"
           },
           {
-            "bytes": "0000",
-            "offset": "0x3b33",
+            "bytes": "1400",
+            "offset": "0x6aa2",
+            "segment": "0x3000"
+          },
+          {
+            "bytes": "f09f",
+            "offset": "0x6acc",
             "segment": "0x3000"
           },
           {
             "bytes": "0000",
-            "offset": "0x41da",
+            "offset": "0x6ace",
             "segment": "0x3000"
           },
           {
             "bytes": "0000",
-            "offset": "0x41db",
+            "offset": "0x6ad0",
             "segment": "0x3000"
           },
           {
             "bytes": "0000",
-            "offset": "0x41dc",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "0006",
-            "offset": "0x41dd",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "0000",
-            "offset": "0x6a95",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "0000",
-            "offset": "0x6a9d",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "0000",
-            "offset": "0x6aa0",
+            "offset": "0x6ad4",
             "segment": "0x3000"
           },
           {
@@ -625,17 +546,7 @@
           },
           {
             "bytes": "0000",
-            "offset": "0x6af2",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "0000",
-            "offset": "0x6af6",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "0000",
-            "offset": "0x6afc",
+            "offset": "0x0",
             "segment": "0x3000"
           },
           {
@@ -644,18 +555,18 @@
             "segment": "0x3000"
           },
           {
-            "bytes": "8974",
-            "offset": "0x1920",
+            "bytes": "0000",
+            "offset": "0x191c",
             "segment": "0x3000"
           },
           {
             "bytes": "0000",
-            "offset": "0x1981",
+            "offset": "0x1922",
             "segment": "0x3000"
           },
           {
             "bytes": "0000",
-            "offset": "0x1983",
+            "offset": "0x198d",
             "segment": "0x3000"
           },
           {
@@ -666,6 +577,16 @@
           {
             "bytes": "0000",
             "offset": "0x1995",
+            "segment": "0x3000"
+          },
+          {
+            "bytes": "0000",
+            "offset": "0x1998",
+            "segment": "0x3000"
+          },
+          {
+            "bytes": "1400",
+            "offset": "0x199a",
             "segment": "0x3000"
           },
           {
@@ -694,21 +615,6 @@
             "segment": "0x3000"
           },
           {
-            "bytes": "0000",
-            "offset": "0x19be",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "0000",
-            "offset": "0x19bf",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "0000",
-            "offset": "0x19c4",
-            "segment": "0x3000"
-          },
-          {
             "bytes": "b0ab",
             "offset": "0x19c6",
             "segment": "0x3000"
@@ -719,8 +625,13 @@
             "segment": "0x3000"
           },
           {
+            "bytes": "0100",
+            "offset": "0x19de",
+            "segment": "0x3000"
+          },
+          {
             "bytes": "0000",
-            "offset": "0x19e6",
+            "offset": "0x19e0",
             "segment": "0x3000"
           },
           {
@@ -755,11 +666,6 @@
           },
           {
             "bytes": "0030",
-            "offset": "0x6af2",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "0030",
             "offset": "0x2c",
             "segment": "0x3000"
           },
@@ -781,8 +687,8 @@
         ],
         "observations": [],
         "oracle_entry": {
-          "offset": "0xdf3",
-          "segment": "0xff0"
+          "offset": "0x3e6",
+          "segment": "0x1000"
         },
         "registers": {
           "bp": "0x0",
@@ -801,13 +707,13 @@
         "detail": "",
         "effective_flags_mask": "0x8d5",
         "events": [],
-        "instructions": 16,
+        "instructions": 13,
         "observations": [],
         "registers": {
           "ax": "0x0",
           "bp": "0x0",
           "bx": "0x0",
-          "cs": "0xff0",
+          "cs": "0x1000",
           "cx": "0x0",
           "di": "0x0",
           "ds": "0x3000",
@@ -818,26 +724,22 @@
           "ecx": "0x0",
           "edi": "0x0",
           "edx": "0x0",
-          "eflags": "0x292",
+          "eflags": "0x202",
           "es": "0x3000",
           "esi": "0x0",
-          "esp": "0xffe2",
-          "flags": "0x292",
+          "esp": "0xffe0",
+          "flags": "0x202",
           "fs": "0x0",
           "gs": "0x0",
-          "ip": "0x4",
+          "ip": "0x3f6",
           "si": "0x0",
-          "sp": "0xffe2",
+          "sp": "0xffe0",
           "ss": "0x4000"
         },
         "status": "returned",
         "writes": [
           {
-            "bytes": "00000000",
-            "linear": "0x36ad8"
-          },
-          {
-            "bytes": "0000fa0d0000",
+            "bytes": "000000000000",
             "linear": "0x4ffda"
           }
         ]
@@ -849,40 +751,40 @@
         "detail": "",
         "effective_flags_mask": "0x8d5",
         "events": [],
-        "instructions": 31,
+        "instructions": 19,
         "observations": [],
         "registers": {
           "ax": "0x0",
           "bp": "0x0",
-          "bx": "0xffda",
-          "cs": "0xff0",
-          "cx": "0x72d4",
+          "bx": "0xffde",
+          "cs": "0x1000",
+          "cx": "0x6269",
           "di": "0x0",
           "ds": "0x3000",
           "dx": "0x0",
           "eax": "0x0",
           "ebp": "0x0",
-          "ebx": "0xffda",
-          "ecx": "0x72d4",
+          "ebx": "0xffde",
+          "ecx": "0x6269",
           "edi": "0x0",
           "edx": "0x0",
-          "eflags": "0x292",
+          "eflags": "0x206",
           "es": "0x3000",
           "esi": "0x0",
-          "esp": "0xffe2",
-          "flags": "0x292",
+          "esp": "0xffe0",
+          "flags": "0x206",
           "fs": "0x0",
           "gs": "0x0",
-          "ip": "0x4",
+          "ip": "0x6270",
           "si": "0x0",
-          "sp": "0xffe2",
+          "sp": "0xffe0",
           "ss": "0x4000"
         },
         "status": "returned",
         "writes": [
           {
-            "bytes": "d47200001e680000",
-            "linear": "0x4ffd8"
+            "bytes": "000000000000",
+            "linear": "0x4ffda"
           }
         ]
       },
@@ -917,17 +819,17 @@
         "observables_source": "default",
         "reason": "declared observations diverge"
       },
-      "id": "seedRandom#2",
+      "id": "restoreInterrupts#2",
       "initial_state": {
         "candidate_entry": {
-          "offset": "0x6817",
-          "segment": "0xff0"
+          "offset": "0x6260",
+          "segment": "0x1000"
         },
         "frame": {
           "kind": "near16",
           "target": {
-            "offset": "0x4",
-            "segment": "0xff0"
+            "offset": "0x0",
+            "segment": "0x1000"
           }
         },
         "high_halves": {},
@@ -938,23 +840,8 @@
             "segment": "0x3000"
           },
           {
-            "bytes": "000000004d532052756e2d54696d65204c696272617279202d20436f707972696768742028632920313938382c204d6963726f736f667420436f727011000000",
-            "offset": "0x4",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "00004d532052756e2d54696d65204c696272617279202d20436f707972696768742028632920313938382c204d6963726f736f667420436f7270110000000000",
-            "offset": "0x6",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "4d532052756e2d54696d65204c696272617279202d20436f707972696768742028632920313938382c204d6963726f736f667420436f72701100000000000000",
-            "offset": "0x8",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "0000000000004d532052756e2d54696d65204c696272617279202d20436f707972696768742028632920313938382c204d6963726f736f667420436f72701100",
-            "offset": "0x2",
+            "bytes": "8181810101000000000000000000000000000000000000000000c26ad90943000000000000000000f09f0000000000000000000001000000000000160202180d",
+            "offset": "0x6aa4",
             "segment": "0x3000"
           },
           {
@@ -963,43 +850,28 @@
             "segment": "0x3000"
           },
           {
-            "bytes": "0000",
-            "offset": "0x3b33",
+            "bytes": "1400",
+            "offset": "0x6aa2",
+            "segment": "0x3000"
+          },
+          {
+            "bytes": "f09f",
+            "offset": "0x6acc",
             "segment": "0x3000"
           },
           {
             "bytes": "0000",
-            "offset": "0x41da",
+            "offset": "0x6ace",
             "segment": "0x3000"
           },
           {
             "bytes": "0000",
-            "offset": "0x41db",
+            "offset": "0x6ad0",
             "segment": "0x3000"
           },
           {
             "bytes": "0000",
-            "offset": "0x41dc",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "0006",
-            "offset": "0x41dd",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "0000",
-            "offset": "0x6a95",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "0000",
-            "offset": "0x6a9d",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "0000",
-            "offset": "0x6aa0",
+            "offset": "0x6ad4",
             "segment": "0x3000"
           },
           {
@@ -1019,17 +891,7 @@
           },
           {
             "bytes": "0000",
-            "offset": "0x6af2",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "0000",
-            "offset": "0x6af6",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "0000",
-            "offset": "0x6afc",
+            "offset": "0x0",
             "segment": "0x3000"
           },
           {
@@ -1038,18 +900,18 @@
             "segment": "0x3000"
           },
           {
-            "bytes": "8974",
-            "offset": "0x1920",
+            "bytes": "0000",
+            "offset": "0x191c",
             "segment": "0x3000"
           },
           {
             "bytes": "0000",
-            "offset": "0x1981",
+            "offset": "0x1922",
             "segment": "0x3000"
           },
           {
             "bytes": "0000",
-            "offset": "0x1983",
+            "offset": "0x198d",
             "segment": "0x3000"
           },
           {
@@ -1060,6 +922,16 @@
           {
             "bytes": "0000",
             "offset": "0x1995",
+            "segment": "0x3000"
+          },
+          {
+            "bytes": "0000",
+            "offset": "0x1998",
+            "segment": "0x3000"
+          },
+          {
+            "bytes": "1400",
+            "offset": "0x199a",
             "segment": "0x3000"
           },
           {
@@ -1088,21 +960,6 @@
             "segment": "0x3000"
           },
           {
-            "bytes": "0000",
-            "offset": "0x19be",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "0000",
-            "offset": "0x19bf",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "0000",
-            "offset": "0x19c4",
-            "segment": "0x3000"
-          },
-          {
             "bytes": "b0ab",
             "offset": "0x19c6",
             "segment": "0x3000"
@@ -1113,8 +970,13 @@
             "segment": "0x3000"
           },
           {
+            "bytes": "0100",
+            "offset": "0x19de",
+            "segment": "0x3000"
+          },
+          {
             "bytes": "0000",
-            "offset": "0x19e6",
+            "offset": "0x19e0",
             "segment": "0x3000"
           },
           {
@@ -1149,11 +1011,6 @@
           },
           {
             "bytes": "0030",
-            "offset": "0x6af2",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "0030",
             "offset": "0x2c",
             "segment": "0x3000"
           },
@@ -1175,8 +1032,8 @@
         ],
         "observations": [],
         "oracle_entry": {
-          "offset": "0xdf3",
-          "segment": "0xff0"
+          "offset": "0x3e6",
+          "segment": "0x1000"
         },
         "registers": {
           "bp": "0x0",
@@ -1195,13 +1052,13 @@
         "detail": "",
         "effective_flags_mask": "0x8d5",
         "events": [],
-        "instructions": 16,
+        "instructions": 13,
         "observations": [],
         "registers": {
           "ax": "0x0",
           "bp": "0x0",
           "bx": "0x0",
-          "cs": "0xff0",
+          "cs": "0x1000",
           "cx": "0x0",
           "di": "0x0",
           "ds": "0x3000",
@@ -1212,26 +1069,22 @@
           "ecx": "0x0",
           "edi": "0x0",
           "edx": "0x0",
-          "eflags": "0x292",
+          "eflags": "0x202",
           "es": "0x3000",
           "esi": "0x0",
-          "esp": "0xffe2",
-          "flags": "0x292",
+          "esp": "0xffe0",
+          "flags": "0x202",
           "fs": "0x0",
           "gs": "0x0",
-          "ip": "0x4",
+          "ip": "0x3f6",
           "si": "0x0",
-          "sp": "0xffe2",
+          "sp": "0xffe0",
           "ss": "0x4000"
         },
         "status": "returned",
         "writes": [
           {
-            "bytes": "00000000",
-            "linear": "0x36ad8"
-          },
-          {
-            "bytes": "0000fa0d0000",
+            "bytes": "000000000000",
             "linear": "0x4ffda"
           }
         ]
@@ -1243,40 +1096,40 @@
         "detail": "",
         "effective_flags_mask": "0x8d5",
         "events": [],
-        "instructions": 31,
+        "instructions": 19,
         "observations": [],
         "registers": {
           "ax": "0x0",
           "bp": "0x0",
-          "bx": "0xffda",
-          "cs": "0xff0",
-          "cx": "0x72d4",
+          "bx": "0xffde",
+          "cs": "0x1000",
+          "cx": "0x6269",
           "di": "0x0",
           "ds": "0x3000",
           "dx": "0x0",
           "eax": "0x0",
           "ebp": "0x0",
-          "ebx": "0xffda",
-          "ecx": "0x72d4",
+          "ebx": "0xffde",
+          "ecx": "0x6269",
           "edi": "0x0",
           "edx": "0x0",
-          "eflags": "0x292",
+          "eflags": "0x206",
           "es": "0x3000",
           "esi": "0x0",
-          "esp": "0xffe2",
-          "flags": "0x292",
+          "esp": "0xffe0",
+          "flags": "0x206",
           "fs": "0x0",
           "gs": "0x0",
-          "ip": "0x4",
+          "ip": "0x6270",
           "si": "0x0",
-          "sp": "0xffe2",
+          "sp": "0xffe0",
           "ss": "0x4000"
         },
         "status": "returned",
         "writes": [
           {
-            "bytes": "d47200001e680000",
-            "linear": "0x4ffd8"
+            "bytes": "000000000000",
+            "linear": "0x4ffda"
           }
         ]
       },
@@ -1311,17 +1164,17 @@
         "observables_source": "default",
         "reason": "declared observations diverge"
       },
-      "id": "seedRandom#3",
+      "id": "restoreInterrupts#3",
       "initial_state": {
         "candidate_entry": {
-          "offset": "0x6817",
-          "segment": "0xff0"
+          "offset": "0x6260",
+          "segment": "0x1000"
         },
         "frame": {
           "kind": "near16",
           "target": {
-            "offset": "0x4",
-            "segment": "0xff0"
+            "offset": "0x0",
+            "segment": "0x1000"
           }
         },
         "high_halves": {},
@@ -1332,23 +1185,8 @@
             "segment": "0x3000"
           },
           {
-            "bytes": "000000004d532052756e2d54696d65204c696272617279202d20436f707972696768742028632920313938382c204d6963726f736f667420436f727011000000",
-            "offset": "0x4",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "00004d532052756e2d54696d65204c696272617279202d20436f707972696768742028632920313938382c204d6963726f736f667420436f7270110000000000",
-            "offset": "0x6",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "4d532052756e2d54696d65204c696272617279202d20436f707972696768742028632920313938382c204d6963726f736f667420436f72701100000000000000",
-            "offset": "0x8",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "0000000000004d532052756e2d54696d65204c696272617279202d20436f707972696768742028632920313938382c204d6963726f736f667420436f72701100",
-            "offset": "0x2",
+            "bytes": "8181810101000000000000000000000000000000000000000000c26ad90943000000000000000000f09f0000000000000000000001000000000000160202180d",
+            "offset": "0x6aa4",
             "segment": "0x3000"
           },
           {
@@ -1357,43 +1195,28 @@
             "segment": "0x3000"
           },
           {
-            "bytes": "0000",
-            "offset": "0x3b33",
+            "bytes": "1400",
+            "offset": "0x6aa2",
+            "segment": "0x3000"
+          },
+          {
+            "bytes": "f09f",
+            "offset": "0x6acc",
             "segment": "0x3000"
           },
           {
             "bytes": "0000",
-            "offset": "0x41da",
+            "offset": "0x6ace",
             "segment": "0x3000"
           },
           {
             "bytes": "0000",
-            "offset": "0x41db",
+            "offset": "0x6ad0",
             "segment": "0x3000"
           },
           {
             "bytes": "0000",
-            "offset": "0x41dc",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "0006",
-            "offset": "0x41dd",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "0000",
-            "offset": "0x6a95",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "0000",
-            "offset": "0x6a9d",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "0000",
-            "offset": "0x6aa0",
+            "offset": "0x6ad4",
             "segment": "0x3000"
           },
           {
@@ -1413,17 +1236,7 @@
           },
           {
             "bytes": "0000",
-            "offset": "0x6af2",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "0000",
-            "offset": "0x6af6",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "0000",
-            "offset": "0x6afc",
+            "offset": "0x0",
             "segment": "0x3000"
           },
           {
@@ -1432,18 +1245,18 @@
             "segment": "0x3000"
           },
           {
-            "bytes": "8974",
-            "offset": "0x1920",
+            "bytes": "0000",
+            "offset": "0x191c",
             "segment": "0x3000"
           },
           {
             "bytes": "0000",
-            "offset": "0x1981",
+            "offset": "0x1922",
             "segment": "0x3000"
           },
           {
             "bytes": "0000",
-            "offset": "0x1983",
+            "offset": "0x198d",
             "segment": "0x3000"
           },
           {
@@ -1454,6 +1267,16 @@
           {
             "bytes": "0000",
             "offset": "0x1995",
+            "segment": "0x3000"
+          },
+          {
+            "bytes": "0000",
+            "offset": "0x1998",
+            "segment": "0x3000"
+          },
+          {
+            "bytes": "1400",
+            "offset": "0x199a",
             "segment": "0x3000"
           },
           {
@@ -1482,21 +1305,6 @@
             "segment": "0x3000"
           },
           {
-            "bytes": "0000",
-            "offset": "0x19be",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "0000",
-            "offset": "0x19bf",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "0000",
-            "offset": "0x19c4",
-            "segment": "0x3000"
-          },
-          {
             "bytes": "b0ab",
             "offset": "0x19c6",
             "segment": "0x3000"
@@ -1507,8 +1315,13 @@
             "segment": "0x3000"
           },
           {
+            "bytes": "0100",
+            "offset": "0x19de",
+            "segment": "0x3000"
+          },
+          {
             "bytes": "0000",
-            "offset": "0x19e6",
+            "offset": "0x19e0",
             "segment": "0x3000"
           },
           {
@@ -1543,11 +1356,6 @@
           },
           {
             "bytes": "0030",
-            "offset": "0x6af2",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "0030",
             "offset": "0x2c",
             "segment": "0x3000"
           },
@@ -1569,8 +1377,8 @@
         ],
         "observations": [],
         "oracle_entry": {
-          "offset": "0xdf3",
-          "segment": "0xff0"
+          "offset": "0x3e6",
+          "segment": "0x1000"
         },
         "registers": {
           "bp": "0x0",
@@ -1589,13 +1397,13 @@
         "detail": "",
         "effective_flags_mask": "0x8d5",
         "events": [],
-        "instructions": 16,
+        "instructions": 13,
         "observations": [],
         "registers": {
           "ax": "0x0",
           "bp": "0x0",
           "bx": "0x0",
-          "cs": "0xff0",
+          "cs": "0x1000",
           "cx": "0x0",
           "di": "0x0",
           "ds": "0x3000",
@@ -1606,26 +1414,22 @@
           "ecx": "0x0",
           "edi": "0x0",
           "edx": "0x0",
-          "eflags": "0x292",
+          "eflags": "0x202",
           "es": "0x3000",
           "esi": "0x0",
-          "esp": "0xffe2",
-          "flags": "0x292",
+          "esp": "0xffe0",
+          "flags": "0x202",
           "fs": "0x0",
           "gs": "0x0",
-          "ip": "0x4",
+          "ip": "0x3f6",
           "si": "0x0",
-          "sp": "0xffe2",
+          "sp": "0xffe0",
           "ss": "0x4000"
         },
         "status": "returned",
         "writes": [
           {
-            "bytes": "00000000",
-            "linear": "0x36ad8"
-          },
-          {
-            "bytes": "0000fa0d0000",
+            "bytes": "000000000000",
             "linear": "0x4ffda"
           }
         ]
@@ -1637,40 +1441,40 @@
         "detail": "",
         "effective_flags_mask": "0x8d5",
         "events": [],
-        "instructions": 31,
+        "instructions": 19,
         "observations": [],
         "registers": {
           "ax": "0x0",
           "bp": "0x0",
-          "bx": "0xffda",
-          "cs": "0xff0",
-          "cx": "0x72d4",
+          "bx": "0xffde",
+          "cs": "0x1000",
+          "cx": "0x6269",
           "di": "0x0",
           "ds": "0x3000",
           "dx": "0x0",
           "eax": "0x0",
           "ebp": "0x0",
-          "ebx": "0xffda",
-          "ecx": "0x72d4",
+          "ebx": "0xffde",
+          "ecx": "0x6269",
           "edi": "0x0",
           "edx": "0x0",
-          "eflags": "0x292",
+          "eflags": "0x206",
           "es": "0x3000",
           "esi": "0x0",
-          "esp": "0xffe2",
-          "flags": "0x292",
+          "esp": "0xffe0",
+          "flags": "0x206",
           "fs": "0x0",
           "gs": "0x0",
-          "ip": "0x4",
+          "ip": "0x6270",
           "si": "0x0",
-          "sp": "0xffe2",
+          "sp": "0xffe0",
           "ss": "0x4000"
         },
         "status": "returned",
         "writes": [
           {
-            "bytes": "d47200001e680000",
-            "linear": "0x4ffd8"
+            "bytes": "000000000000",
+            "linear": "0x4ffda"
           }
         ]
       },
@@ -1705,17 +1509,17 @@
         "observables_source": "default",
         "reason": "declared observations diverge"
       },
-      "id": "seedRandom#4",
+      "id": "restoreInterrupts#4",
       "initial_state": {
         "candidate_entry": {
-          "offset": "0x6817",
-          "segment": "0xff0"
+          "offset": "0x6260",
+          "segment": "0x1000"
         },
         "frame": {
           "kind": "near16",
           "target": {
-            "offset": "0x4",
-            "segment": "0xff0"
+            "offset": "0x0",
+            "segment": "0x1000"
           }
         },
         "high_halves": {},
@@ -1726,23 +1530,8 @@
             "segment": "0x3000"
           },
           {
-            "bytes": "000000004d532052756e2d54696d65204c696272617279202d20436f707972696768742028632920313938382c204d6963726f736f667420436f727011000000",
-            "offset": "0x4",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "00004d532052756e2d54696d65204c696272617279202d20436f707972696768742028632920313938382c204d6963726f736f667420436f7270110000000000",
-            "offset": "0x6",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "4d532052756e2d54696d65204c696272617279202d20436f707972696768742028632920313938382c204d6963726f736f667420436f72701100000000000000",
-            "offset": "0x8",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "0000000000004d532052756e2d54696d65204c696272617279202d20436f707972696768742028632920313938382c204d6963726f736f667420436f72701100",
-            "offset": "0x2",
+            "bytes": "8181810101000000000000000000000000000000000000000000c26ad90943000000000000000000f09f0000000000000000000001000000000000160202180d",
+            "offset": "0x6aa4",
             "segment": "0x3000"
           },
           {
@@ -1751,43 +1540,28 @@
             "segment": "0x3000"
           },
           {
-            "bytes": "0000",
-            "offset": "0x3b33",
+            "bytes": "1400",
+            "offset": "0x6aa2",
+            "segment": "0x3000"
+          },
+          {
+            "bytes": "f09f",
+            "offset": "0x6acc",
             "segment": "0x3000"
           },
           {
             "bytes": "0000",
-            "offset": "0x41da",
+            "offset": "0x6ace",
             "segment": "0x3000"
           },
           {
             "bytes": "0000",
-            "offset": "0x41db",
+            "offset": "0x6ad0",
             "segment": "0x3000"
           },
           {
             "bytes": "0000",
-            "offset": "0x41dc",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "0006",
-            "offset": "0x41dd",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "0000",
-            "offset": "0x6a95",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "0000",
-            "offset": "0x6a9d",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "0000",
-            "offset": "0x6aa0",
+            "offset": "0x6ad4",
             "segment": "0x3000"
           },
           {
@@ -1807,17 +1581,7 @@
           },
           {
             "bytes": "0000",
-            "offset": "0x6af2",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "0000",
-            "offset": "0x6af6",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "0000",
-            "offset": "0x6afc",
+            "offset": "0x0",
             "segment": "0x3000"
           },
           {
@@ -1826,18 +1590,18 @@
             "segment": "0x3000"
           },
           {
-            "bytes": "8974",
-            "offset": "0x1920",
+            "bytes": "0000",
+            "offset": "0x191c",
             "segment": "0x3000"
           },
           {
             "bytes": "0000",
-            "offset": "0x1981",
+            "offset": "0x1922",
             "segment": "0x3000"
           },
           {
             "bytes": "0000",
-            "offset": "0x1983",
+            "offset": "0x198d",
             "segment": "0x3000"
           },
           {
@@ -1848,6 +1612,16 @@
           {
             "bytes": "0000",
             "offset": "0x1995",
+            "segment": "0x3000"
+          },
+          {
+            "bytes": "0000",
+            "offset": "0x1998",
+            "segment": "0x3000"
+          },
+          {
+            "bytes": "1400",
+            "offset": "0x199a",
             "segment": "0x3000"
           },
           {
@@ -1876,21 +1650,6 @@
             "segment": "0x3000"
           },
           {
-            "bytes": "0000",
-            "offset": "0x19be",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "0000",
-            "offset": "0x19bf",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "0000",
-            "offset": "0x19c4",
-            "segment": "0x3000"
-          },
-          {
             "bytes": "b0ab",
             "offset": "0x19c6",
             "segment": "0x3000"
@@ -1901,8 +1660,13 @@
             "segment": "0x3000"
           },
           {
+            "bytes": "0100",
+            "offset": "0x19de",
+            "segment": "0x3000"
+          },
+          {
             "bytes": "0000",
-            "offset": "0x19e6",
+            "offset": "0x19e0",
             "segment": "0x3000"
           },
           {
@@ -1937,11 +1701,6 @@
           },
           {
             "bytes": "0030",
-            "offset": "0x6af2",
-            "segment": "0x3000"
-          },
-          {
-            "bytes": "0030",
             "offset": "0x2c",
             "segment": "0x3000"
           },
@@ -1963,8 +1722,8 @@
         ],
         "observations": [],
         "oracle_entry": {
-          "offset": "0xdf3",
-          "segment": "0xff0"
+          "offset": "0x3e6",
+          "segment": "0x1000"
         },
         "registers": {
           "bp": "0x0",
@@ -1983,13 +1742,13 @@
         "detail": "",
         "effective_flags_mask": "0x8d5",
         "events": [],
-        "instructions": 16,
+        "instructions": 13,
         "observations": [],
         "registers": {
           "ax": "0x0",
           "bp": "0x0",
           "bx": "0x0",
-          "cs": "0xff0",
+          "cs": "0x1000",
           "cx": "0x0",
           "di": "0x0",
           "ds": "0x3000",
@@ -2000,26 +1759,22 @@
           "ecx": "0x0",
           "edi": "0x0",
           "edx": "0x0",
-          "eflags": "0x292",
+          "eflags": "0x202",
           "es": "0x3000",
           "esi": "0x0",
-          "esp": "0xffe2",
-          "flags": "0x292",
+          "esp": "0xffe0",
+          "flags": "0x202",
           "fs": "0x0",
           "gs": "0x0",
-          "ip": "0x4",
+          "ip": "0x3f6",
           "si": "0x0",
-          "sp": "0xffe2",
+          "sp": "0xffe0",
           "ss": "0x4000"
         },
         "status": "returned",
         "writes": [
           {
-            "bytes": "00000000",
-            "linear": "0x36ad8"
-          },
-          {
-            "bytes": "0000fa0d0000",
+            "bytes": "000000000000",
             "linear": "0x4ffda"
           }
         ]

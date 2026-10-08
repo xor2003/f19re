@@ -39,7 +39,7 @@
       "sha256": "66fdad8c063ab1afef206108518165cefe16e3d311a409084ad86bcfb388fd4b"
     }
   },
-  "instruction_limit": 100000,
+  "instruction_limit": 200000,
   "policy": {
     "a20": "enabled",
     "high_half_default": "zero",
@@ -96,7 +96,7 @@
           "ax": "0xf5b5",
           "bp": "0x0",
           "bx": "0x1",
-          "cs": "0xff0",
+          "cs": "0x1000",
           "cx": "0xa00",
           "di": "0x0",
           "ds": "0x6000",
@@ -110,19 +110,19 @@
           "eflags": "0x246",
           "es": "0x6000",
           "esi": "0x0",
-          "esp": "0xffe2",
+          "esp": "0xffe0",
           "flags": "0x246",
           "fs": "0x0",
           "gs": "0x0",
-          "ip": "0x4",
+          "ip": "0x567d",
           "si": "0x0",
-          "sp": "0xffe2",
+          "sp": "0xffe0",
           "ss": "0x4000"
         },
         "status": "returned",
         "writes": [
           {
-            "bytes": "d0ff36dc00000100010014000000d6ff5b5800e600000a030000000000200a034b0a0a00deff85560020ff7f0000",
+            "bytes": "d0ff36db00000100010014000000d6ff5b5700e600000a030000000000200a034b0a0a00deff85550020ff7f0000",
             "linear": "0x4ffb2"
           },
           {
@@ -173,14 +173,14 @@
       "id": "computeAttitudeAngles#0",
       "initial_state": {
         "candidate_entry": {
-          "offset": "0x55b0",
-          "segment": "0xff0"
+          "offset": "0x54b0",
+          "segment": "0x1000"
         },
         "frame": {
           "kind": "near16",
           "target": {
-            "offset": "0x4",
-            "segment": "0xff0"
+            "offset": "0x0",
+            "segment": "0x1000"
           }
         },
         "high_halves": {},
@@ -274,8 +274,8 @@
           }
         ],
         "oracle_entry": {
-          "offset": "0x2ffa",
-          "segment": "0xff0"
+          "offset": "0x2efa",
+          "segment": "0x1000"
         },
         "registers": {
           "bp": "0x0",
@@ -333,7 +333,7 @@
           "ax": "0xf5b5",
           "bp": "0x0",
           "bx": "0x1",
-          "cs": "0xff0",
+          "cs": "0x1000",
           "cx": "0xa00",
           "di": "0x0",
           "ds": "0x6000",
@@ -347,19 +347,19 @@
           "eflags": "0x246",
           "es": "0x6000",
           "esi": "0x0",
-          "esp": "0xffe2",
+          "esp": "0xffe0",
           "flags": "0x246",
           "fs": "0x0",
           "gs": "0x0",
-          "ip": "0x4",
+          "ip": "0x30c7",
           "si": "0x0",
-          "sp": "0xffe2",
+          "sp": "0xffe0",
           "ss": "0x4000"
         },
         "status": "returned",
         "writes": [
           {
-            "bytes": "00000100010014000000d6ffc93200e600000a03000000000a030a0000204b0adeffcf300020ff7f0000",
+            "bytes": "00000100010014000000d6ffc93100e600000a03000000000a030a0000204b0adeffcf2f0020ff7f0000",
             "linear": "0x4ffb6"
           },
           {
@@ -414,7 +414,7 @@
           "ax": "0x7ae5",
           "bp": "0x0",
           "bx": "0x1",
-          "cs": "0xff0",
+          "cs": "0x1000",
           "cx": "0x500",
           "di": "0x0",
           "ds": "0x6000",
@@ -428,19 +428,19 @@
           "eflags": "0x246",
           "es": "0x6000",
           "esi": "0x0",
-          "esp": "0xffe2",
+          "esp": "0xffe0",
           "flags": "0x246",
           "fs": "0x0",
           "gs": "0x0",
-          "ip": "0x4",
+          "ip": "0x567d",
           "si": "0x0",
-          "sp": "0xffe2",
+          "sp": "0xffe0",
           "ss": "0x4000"
         },
         "status": "returned",
         "writes": [
           {
-            "bytes": "d0ff36dc0000010001000a000000d6ff5b58005500001d030000000000101d031b050500deff85560010ff7f0000",
+            "bytes": "d0ff36db0000010001000a000000d6ff5b57005500001d030000000000101d031b050500deff85550010ff7f0000",
             "linear": "0x4ffb2"
           },
           {
@@ -491,14 +491,14 @@
       "id": "computeAttitudeAngles#1",
       "initial_state": {
         "candidate_entry": {
-          "offset": "0x55b0",
-          "segment": "0xff0"
+          "offset": "0x54b0",
+          "segment": "0x1000"
         },
         "frame": {
           "kind": "near16",
           "target": {
-            "offset": "0x4",
-            "segment": "0xff0"
+            "offset": "0x0",
+            "segment": "0x1000"
           }
         },
         "high_halves": {},
@@ -592,8 +592,8 @@
           }
         ],
         "oracle_entry": {
-          "offset": "0x2ffa",
-          "segment": "0xff0"
+          "offset": "0x2efa",
+          "segment": "0x1000"
         },
         "registers": {
           "bp": "0x0",
@@ -651,7 +651,7 @@
           "ax": "0x7ae5",
           "bp": "0x0",
           "bx": "0x1",
-          "cs": "0xff0",
+          "cs": "0x1000",
           "cx": "0x500",
           "di": "0x0",
           "ds": "0x6000",
@@ -665,19 +665,19 @@
           "eflags": "0x246",
           "es": "0x6000",
           "esi": "0x0",
-          "esp": "0xffe2",
+          "esp": "0xffe0",
           "flags": "0x246",
           "fs": "0x0",
           "gs": "0x0",
-          "ip": "0x4",
+          "ip": "0x30c7",
           "si": "0x0",
-          "sp": "0xffe2",
+          "sp": "0xffe0",
           "ss": "0x4000"
         },
         "status": "returned",
         "writes": [
           {
-            "bytes": "0000010001000a000000d6ffc932005500001d03000000001d03050000101b05deffcf300010ff7f0000",
+            "bytes": "0000010001000a000000d6ffc931005500001d03000000001d03050000101b05deffcf2f0010ff7f0000",
             "linear": "0x4ffb6"
           },
           {
@@ -732,7 +732,7 @@
           "ax": "0xfae5",
           "bp": "0x0",
           "bx": "0x1",
-          "cs": "0xff0",
+          "cs": "0x1000",
           "cx": "0x500",
           "di": "0x0",
           "ds": "0x6000",
@@ -746,19 +746,19 @@
           "eflags": "0x246",
           "es": "0x6000",
           "esi": "0x0",
-          "esp": "0xffe2",
+          "esp": "0xffe0",
           "flags": "0x246",
           "fs": "0x0",
           "gs": "0x0",
-          "ip": "0x4",
+          "ip": "0x567d",
           "si": "0x0",
-          "sp": "0xffe2",
+          "sp": "0xffe0",
           "ss": "0x4000"
         },
         "status": "returned",
         "writes": [
           {
-            "bytes": "d0ff36dc0000010001000a000000d6ff5b58005500001d030000000000101d031b050500deff85560010ff7f0000",
+            "bytes": "d0ff36db0000010001000a000000d6ff5b57005500001d030000000000101d031b050500deff85550010ff7f0000",
             "linear": "0x4ffb2"
           },
           {
@@ -809,14 +809,14 @@
       "id": "computeAttitudeAngles#2",
       "initial_state": {
         "candidate_entry": {
-          "offset": "0x55b0",
-          "segment": "0xff0"
+          "offset": "0x54b0",
+          "segment": "0x1000"
         },
         "frame": {
           "kind": "near16",
           "target": {
-            "offset": "0x4",
-            "segment": "0xff0"
+            "offset": "0x0",
+            "segment": "0x1000"
           }
         },
         "high_halves": {},
@@ -910,8 +910,8 @@
           }
         ],
         "oracle_entry": {
-          "offset": "0x2ffa",
-          "segment": "0xff0"
+          "offset": "0x2efa",
+          "segment": "0x1000"
         },
         "registers": {
           "bp": "0x0",
@@ -969,7 +969,7 @@
           "ax": "0xfae5",
           "bp": "0x0",
           "bx": "0x1",
-          "cs": "0xff0",
+          "cs": "0x1000",
           "cx": "0x500",
           "di": "0x0",
           "ds": "0x6000",
@@ -983,19 +983,19 @@
           "eflags": "0x246",
           "es": "0x6000",
           "esi": "0x0",
-          "esp": "0xffe2",
+          "esp": "0xffe0",
           "flags": "0x246",
           "fs": "0x0",
           "gs": "0x0",
-          "ip": "0x4",
+          "ip": "0x30c7",
           "si": "0x0",
-          "sp": "0xffe2",
+          "sp": "0xffe0",
           "ss": "0x4000"
         },
         "status": "returned",
         "writes": [
           {
-            "bytes": "0000010001000a000000d6ffc932005500001d03000000001d03050000101b05deffcf300010ff7f0000",
+            "bytes": "0000010001000a000000d6ffc931005500001d03000000001d03050000101b05deffcf2f0010ff7f0000",
             "linear": "0x4ffb6"
           },
           {
@@ -1050,7 +1050,7 @@
           "ax": "0x0",
           "bp": "0x0",
           "bx": "0x1",
-          "cs": "0xff0",
+          "cs": "0x1000",
           "cx": "0x0",
           "di": "0x0",
           "ds": "0x6000",
@@ -1064,19 +1064,19 @@
           "eflags": "0x246",
           "es": "0x6000",
           "esi": "0x0",
-          "esp": "0xffe2",
+          "esp": "0xffe0",
           "flags": "0x246",
           "fs": "0x0",
           "gs": "0x0",
-          "ip": "0x4",
+          "ip": "0x567d",
           "si": "0x0",
-          "sp": "0xffe2",
+          "sp": "0xffe0",
           "ss": "0x4000"
         },
         "status": "returned",
         "writes": [
           {
-            "bytes": "d0ff36dc00000100010000000000d6ff5b58000000002403000000000000240300000000deff85560000ff7f0000",
+            "bytes": "d0ff36db00000100010000000000d6ff5b57000000002403000000000000240300000000deff85550000ff7f0000",
             "linear": "0x4ffb2"
           },
           {
@@ -1127,14 +1127,14 @@
       "id": "computeAttitudeAngles#3",
       "initial_state": {
         "candidate_entry": {
-          "offset": "0x55b0",
-          "segment": "0xff0"
+          "offset": "0x54b0",
+          "segment": "0x1000"
         },
         "frame": {
           "kind": "near16",
           "target": {
-            "offset": "0x4",
-            "segment": "0xff0"
+            "offset": "0x0",
+            "segment": "0x1000"
           }
         },
         "high_halves": {},
@@ -1228,8 +1228,8 @@
           }
         ],
         "oracle_entry": {
-          "offset": "0x2ffa",
-          "segment": "0xff0"
+          "offset": "0x2efa",
+          "segment": "0x1000"
         },
         "registers": {
           "bp": "0x0",
@@ -1287,7 +1287,7 @@
           "ax": "0x0",
           "bp": "0x0",
           "bx": "0x1",
-          "cs": "0xff0",
+          "cs": "0x1000",
           "cx": "0x0",
           "di": "0x0",
           "ds": "0x6000",
@@ -1301,19 +1301,19 @@
           "eflags": "0x246",
           "es": "0x6000",
           "esi": "0x0",
-          "esp": "0xffe2",
+          "esp": "0xffe0",
           "flags": "0x246",
           "fs": "0x0",
           "gs": "0x0",
-          "ip": "0x4",
+          "ip": "0x30c7",
           "si": "0x0",
-          "sp": "0xffe2",
+          "sp": "0xffe0",
           "ss": "0x4000"
         },
         "status": "returned",
         "writes": [
           {
-            "bytes": "00000100010000000000d6ffc932000000002403000000002403000000000000deffcf300000ff7f0000",
+            "bytes": "00000100010000000000d6ffc931000000002403000000002403000000000000deffcf2f0000ff7f0000",
             "linear": "0x4ffb6"
           },
           {
@@ -1368,7 +1368,7 @@
           "ax": "0x3412",
           "bp": "0x0",
           "bx": "0x1",
-          "cs": "0xff0",
+          "cs": "0x1000",
           "cx": "0xb00",
           "di": "0x0",
           "ds": "0x6000",
@@ -1382,19 +1382,19 @@
           "eflags": "0x246",
           "es": "0x6000",
           "esi": "0x0",
-          "esp": "0xffe2",
+          "esp": "0xffe0",
           "flags": "0x246",
           "fs": "0x0",
           "gs": "0x0",
-          "ip": "0x4",
+          "ip": "0x567d",
           "si": "0x0",
-          "sp": "0xffe2",
+          "sp": "0xffe0",
           "ss": "0x4000"
         },
         "status": "returned",
         "writes": [
           {
-            "bytes": "d0ff010016000000d0ff5b5800cf0200040300000000f3240403ee0b0b00d6ff8458f324deff9f56f324d96e0000",
+            "bytes": "d0ff010016000000d0ff5b5700cf0200040300000000f3240403ee0b0b00d6ff8457f324deff9f55f324d96e0000",
             "linear": "0x4ffb2"
           },
           {
@@ -1445,14 +1445,14 @@
       "id": "computeAttitudeAngles#4",
       "initial_state": {
         "candidate_entry": {
-          "offset": "0x55b0",
-          "segment": "0xff0"
+          "offset": "0x54b0",
+          "segment": "0x1000"
         },
         "frame": {
           "kind": "near16",
           "target": {
-            "offset": "0x4",
-            "segment": "0xff0"
+            "offset": "0x0",
+            "segment": "0x1000"
           }
         },
         "high_halves": {},
@@ -1546,8 +1546,8 @@
           }
         ],
         "oracle_entry": {
-          "offset": "0x2ffa",
-          "segment": "0xff0"
+          "offset": "0x2efa",
+          "segment": "0x1000"
         },
         "registers": {
           "bp": "0x0",
@@ -1605,7 +1605,7 @@
           "ax": "0x3412",
           "bp": "0x0",
           "bx": "0x1",
-          "cs": "0xff0",
+          "cs": "0x1000",
           "cx": "0xb00",
           "di": "0x0",
           "ds": "0x6000",
@@ -1619,19 +1619,19 @@
           "eflags": "0x246",
           "es": "0x6000",
           "esi": "0x0",
-          "esp": "0xffe2",
+          "esp": "0xffe0",
           "flags": "0x246",
           "fs": "0x0",
           "gs": "0x0",
-          "ip": "0x4",
+          "ip": "0x30c7",
           "si": "0x0",
-          "sp": "0xffe2",
+          "sp": "0xffe0",
           "ss": "0x4000"
         },
         "status": "returned",
         "writes": [
           {
-            "bytes": "010016000000d0ffc93200cf020004030000000004030b00f324ee0bd6fff232f324deffe930f324d96e0000",
+            "bytes": "010016000000d0ffc93100cf020004030000000004030b00f324ee0bd6fff231f324deffe92ff324d96e0000",
             "linear": "0x4ffb4"
           },
           {
@@ -1686,7 +1686,7 @@
           "ax": "0x51b",
           "bp": "0x0",
           "bx": "0x0",
-          "cs": "0xff0",
+          "cs": "0x1000",
           "cx": "0x500",
           "di": "0x0",
           "ds": "0x6000",
@@ -1700,19 +1700,19 @@
           "eflags": "0x246",
           "es": "0x6000",
           "esi": "0x0",
-          "esp": "0xffe2",
+          "esp": "0xffe0",
           "flags": "0x246",
           "fs": "0x0",
           "gs": "0x0",
-          "ip": "0x4",
+          "ip": "0x567d",
           "si": "0x0",
-          "sp": "0xffe2",
+          "sp": "0xffe0",
           "ss": "0x4000"
         },
         "status": "returned",
         "writes": [
           {
-            "bytes": "d0ff36dc2403000000000a000000d6ff5b58005500001d030000000000101d031b050500defff656001000000000",
+            "bytes": "d0ff36db2403000000000a000000d6ff5b57005500001d030000000000101d031b050500defff655001000000000",
             "linear": "0x4ffb2"
           },
           {
@@ -1767,14 +1767,14 @@
       "id": "computeAttitudeAngles#5",
       "initial_state": {
         "candidate_entry": {
-          "offset": "0x55b0",
-          "segment": "0xff0"
+          "offset": "0x54b0",
+          "segment": "0x1000"
         },
         "frame": {
           "kind": "near16",
           "target": {
-            "offset": "0x4",
-            "segment": "0xff0"
+            "offset": "0x0",
+            "segment": "0x1000"
           }
         },
         "high_halves": {},
@@ -1868,8 +1868,8 @@
           }
         ],
         "oracle_entry": {
-          "offset": "0x2ffa",
-          "segment": "0xff0"
+          "offset": "0x2efa",
+          "segment": "0x1000"
         },
         "registers": {
           "bp": "0x0",
@@ -1927,7 +1927,7 @@
           "ax": "0x51b",
           "bp": "0x0",
           "bx": "0x0",
-          "cs": "0xff0",
+          "cs": "0x1000",
           "cx": "0x500",
           "di": "0x0",
           "ds": "0x6000",
@@ -1941,19 +1941,19 @@
           "eflags": "0x246",
           "es": "0x6000",
           "esi": "0x0",
-          "esp": "0xffe2",
+          "esp": "0xffe0",
           "flags": "0x246",
           "fs": "0x0",
           "gs": "0x0",
-          "ip": "0x4",
+          "ip": "0x30c7",
           "si": "0x0",
-          "sp": "0xffe2",
+          "sp": "0xffe0",
           "ss": "0x4000"
         },
         "status": "returned",
         "writes": [
           {
-            "bytes": "00000a000000d6ffc932005500001d03000000001d03050000101b05deff4031001000000000",
+            "bytes": "00000a000000d6ffc931005500001d03000000001d03050000101b05deff4030001000000000",
             "linear": "0x4ffba"
           },
           {
@@ -2012,7 +2012,7 @@
           "ax": "0x0",
           "bp": "0x0",
           "bx": "0x1",
-          "cs": "0xff0",
+          "cs": "0x1000",
           "cx": "0x0",
           "di": "0x0",
           "ds": "0x6000",
@@ -2026,19 +2026,19 @@
           "eflags": "0x246",
           "es": "0x6000",
           "esi": "0x0",
-          "esp": "0xffe2",
+          "esp": "0xffe0",
           "flags": "0x246",
           "fs": "0x0",
           "gs": "0x0",
-          "ip": "0x4",
+          "ip": "0x567d",
           "si": "0x0",
-          "sp": "0xffe2",
+          "sp": "0xffe0",
           "ss": "0x4000"
         },
         "status": "returned",
         "writes": [
           {
-            "bytes": "d0ff36dc00000100010000000000d6ff5b58000000002403000000000000240300000000deff85560000ca030000",
+            "bytes": "d0ff36db00000100010000000000d6ff5b57000000002403000000000000240300000000deff85550000ca030000",
             "linear": "0x4ffb2"
           },
           {
@@ -2093,14 +2093,14 @@
       "id": "computeAttitudeAngles#6",
       "initial_state": {
         "candidate_entry": {
-          "offset": "0x55b0",
-          "segment": "0xff0"
+          "offset": "0x54b0",
+          "segment": "0x1000"
         },
         "frame": {
           "kind": "near16",
           "target": {
-            "offset": "0x4",
-            "segment": "0xff0"
+            "offset": "0x0",
+            "segment": "0x1000"
           }
         },
         "high_halves": {},
@@ -2194,8 +2194,8 @@
           }
         ],
         "oracle_entry": {
-          "offset": "0x2ffa",
-          "segment": "0xff0"
+          "offset": "0x2efa",
+          "segment": "0x1000"
         },
         "registers": {
           "bp": "0x0",
@@ -2253,7 +2253,7 @@
           "ax": "0x0",
           "bp": "0x0",
           "bx": "0x1",
-          "cs": "0xff0",
+          "cs": "0x1000",
           "cx": "0x0",
           "di": "0x0",
           "ds": "0x6000",
@@ -2267,19 +2267,19 @@
           "eflags": "0x246",
           "es": "0x6000",
           "esi": "0x0",
-          "esp": "0xffe2",
+          "esp": "0xffe0",
           "flags": "0x246",
           "fs": "0x0",
           "gs": "0x0",
-          "ip": "0x4",
+          "ip": "0x30c7",
           "si": "0x0",
-          "sp": "0xffe2",
+          "sp": "0xffe0",
           "ss": "0x4000"
         },
         "status": "returned",
         "writes": [
           {
-            "bytes": "00000100010000000000d6ffc932000000002403000000002403000000000000deffcf300000ca030000",
+            "bytes": "00000100010000000000d6ffc931000000002403000000002403000000000000deffcf2f0000ca030000",
             "linear": "0x4ffb6"
           },
           {
@@ -2338,7 +2338,7 @@
           "ax": "0x0",
           "bp": "0x0",
           "bx": "0x1",
-          "cs": "0xff0",
+          "cs": "0x1000",
           "cx": "0x0",
           "di": "0x0",
           "ds": "0x6000",
@@ -2352,19 +2352,19 @@
           "eflags": "0x246",
           "es": "0x6000",
           "esi": "0x0",
-          "esp": "0xffe2",
+          "esp": "0xffe0",
           "flags": "0x246",
           "fs": "0x0",
           "gs": "0x0",
-          "ip": "0x4",
+          "ip": "0x567d",
           "si": "0x0",
-          "sp": "0xffe2",
+          "sp": "0xffe0",
           "ss": "0x4000"
         },
         "status": "returned",
         "writes": [
           {
-            "bytes": "d0ff36dc00000100010000000000d6ff5b58000000002403000000000000240300000000deff85560000ff7f0000",
+            "bytes": "d0ff36db00000100010000000000d6ff5b57000000002403000000000000240300000000deff85550000ff7f0000",
             "linear": "0x4ffb2"
           },
           {
@@ -2419,14 +2419,14 @@
       "id": "computeAttitudeAngles#7",
       "initial_state": {
         "candidate_entry": {
-          "offset": "0x55b0",
-          "segment": "0xff0"
+          "offset": "0x54b0",
+          "segment": "0x1000"
         },
         "frame": {
           "kind": "near16",
           "target": {
-            "offset": "0x4",
-            "segment": "0xff0"
+            "offset": "0x0",
+            "segment": "0x1000"
           }
         },
         "high_halves": {},
@@ -2520,8 +2520,8 @@
           }
         ],
         "oracle_entry": {
-          "offset": "0x2ffa",
-          "segment": "0xff0"
+          "offset": "0x2efa",
+          "segment": "0x1000"
         },
         "registers": {
           "bp": "0x0",
@@ -2579,7 +2579,7 @@
           "ax": "0x0",
           "bp": "0x0",
           "bx": "0x1",
-          "cs": "0xff0",
+          "cs": "0x1000",
           "cx": "0x0",
           "di": "0x0",
           "ds": "0x6000",
@@ -2593,19 +2593,19 @@
           "eflags": "0x246",
           "es": "0x6000",
           "esi": "0x0",
-          "esp": "0xffe2",
+          "esp": "0xffe0",
           "flags": "0x246",
           "fs": "0x0",
           "gs": "0x0",
-          "ip": "0x4",
+          "ip": "0x30c7",
           "si": "0x0",
-          "sp": "0xffe2",
+          "sp": "0xffe0",
           "ss": "0x4000"
         },
         "status": "returned",
         "writes": [
           {
-            "bytes": "00000100010000000000d6ffc932000000002403000000002403000000000000deffcf300000ff7f0000",
+            "bytes": "00000100010000000000d6ffc931000000002403000000002403000000000000deffcf2f0000ff7f0000",
             "linear": "0x4ffb6"
           },
           {

@@ -125,8 +125,10 @@ def slot_stub_exe(exe, odgrp):
     if not os.path.exists(out):
         data = bytearray(open(exe, 'rb').read())
         hdr = struct.unpack('<H', data[8:10])[0] * 16
-        for s in overlay_slots(exe, odgrp):
+        slots = overlay_slots(exe, odgrp)
+        for s in slots:
             data[hdr + s:hdr + s + 5] = b'\x31\xc0\xcb\x90\x90'
+        _drop_relocs_overlapping(data, [(s, 5) for s in slots])
         open(out, 'wb').write(bytes(data))
     return out
 
@@ -155,6 +157,83 @@ def int_stub_exe(exe, base, sites):
             assert data[hdr + s] == 0xCD, \
                 '%s@%#x byte=%#x' % (base, s, data[hdr + s])
             data[hdr + s:hdr + s + 2] = b'\x31\xc0'
+        _drop_relocs_overlapping(data, [(s, 2) for s in sites])
+        open(out, 'wb').write(bytes(data))
+    return out
+
+
+def dsss_stub_exe(exe, base, sites):
+    """Copy of `base` with reachable `ds := ss` writes nopped out —
+    `push ss;pop ds` and `mov r16,ss; mov ds,r16` are DGROUP-restore
+    no-ops under real DOS (DS==SS), but under the probe DS is the scratch
+    segment while SS is the stack window, so surviving writes land in the
+    wrong space.  Nopping keeps DS on DGROUP, matching the intent.
+    (site, bytes) pairs, cached per (base content, site list)."""
+    import hashlib
+    src = open(base, 'rb').read()
+    tag = hashlib.md5(src + b'dsss' + b''.join(
+        s.to_bytes(2, 'little') + p for s, p in sites)).hexdigest()[:8]
+    out = os.path.join(ROOT, 'build/%s-dsss-%s.EXE'
+                       % (os.path.basename(exe)[:-4], tag))
+    if not os.path.exists(out):
+        data = bytearray(src)
+        hdr = struct.unpack('<H', data[8:10])[0] * 16
+        for s, p in sites:
+            assert data[hdr + s] in (0x16, 0x8E), \
+                '%s@%#x byte=%#x' % (base, s, data[hdr + s])
+            data[hdr + s:hdr + s + len(p)] = p
+        _drop_relocs_overlapping(data, [(s, len(p)) for s, p in sites])
+        open(out, 'wb').write(bytes(data))
+    return out
+
+
+def _drop_relocs_overlapping(data, spans):
+    """Remove MZ relocation entries whose 2-byte target word intersects a
+    patched span — the loader still adds the load segment to that word, so
+    fixture bytes under a reloc site would be rewritten at load time and
+    desync the instruction stream (e.g. an `lcall`'s seg field nop'd to
+    90 90 loads as 90 a0, and `a0` swallows the next two bytes)."""
+    nrel = struct.unpack('<H', data[6:8])[0]
+    rp = struct.unpack('<H', data[24:26])[0]
+    keep = []
+    for i in range(nrel):
+        off, seg = struct.unpack('<HH', data[rp + 4 * i:rp + 4 * i + 4])
+        lin = seg * 16 + off            # image offset of the reloc'd word
+        if any(s - 1 <= lin <= s + n - 1 for s, n in spans):
+            continue
+        keep.append((off, seg))
+    if len(keep) != nrel:
+        for i, (off, seg) in enumerate(keep):
+            struct.pack_into('<HH', data, rp + 4 * i, off, seg)
+        struct.pack_into('<H', data, 6, len(keep))
+
+
+def call_stub_exe(exe, base, sites):
+    """Copy of `base` with each `call rel16`/`lcall seg:off` site whose
+    callee the candidate test exe supplies as a trivial stub patched to
+    the stub's observable answer — nop fill for empty bodies, `xor ax,ax`
+    for `return 0`, `mov ax,imm` for constant returns (sites carry their
+    precomputed replacement bytes).  Symmetric with int_stub_exe: the
+    probe must not run oracle code the candidate does not have.  Fixture
+    (not a vector patch) because declared instruction bytes are
+    immutable.  Cached per unique (base content, site list) pair."""
+    import hashlib
+    src = open(base, 'rb').read()
+    tag = hashlib.md5(src + b'v2' + b''.join(
+        s.to_bytes(2, 'little') + p for s, p in sites)).hexdigest()[:8]
+    out = os.path.join(ROOT, 'build/%s-calls-%s.EXE'
+                       % (os.path.basename(exe)[:-4], tag))
+    if not os.path.exists(out):
+        data = bytearray(src)
+        hdr = struct.unpack('<H', data[8:10])[0] * 16
+        for s, p in sites:
+            want = 5 if data[hdr + s] == 0x9A else 3
+            assert data[hdr + s] in (0xE8, 0x9A), \
+                '%s@%#x byte=%#x' % (base, s, data[hdr + s])
+            assert len(p) == want, '%s@%#x patch %d != %d' % (base, s, len(p), want)
+            data[hdr + s:hdr + s + want] = p
+        _drop_relocs_overlapping(
+            data, [(s, len(p)) for s, p in sites])
         open(out, 'wb').write(bytes(data))
     return out
 
@@ -242,6 +321,31 @@ def emit(cases, out_path):
             try:
                 case['cand_exe'] = int_stub_exe(
                     cexe, case.get('cand_exe', cexe), c['int_stub_c'])
+            except AssertionError as e:
+                raise AssertionError('%s(c): %s' % (c['fn'], e))
+        if c.get('call_stub'):
+            # calls into cand-side trivial stubs -> precomputed nop/xor/mov
+            # answers (unimplemented overlay routines, isr installers, dos
+            # helpers the cand build leaves empty).  (site, bytes) pairs.
+            try:
+                case['oracle_exe'] = call_stub_exe(
+                    exe, case.get('oracle_exe', exe), c['call_stub'])
+            except AssertionError as e:
+                raise AssertionError('%s: %s' % (c['fn'], e))
+        if c.get('dsss_stub'):
+            # `ds := ss` writes in the oracle graph -> nops: DS==SS only
+            # holds in real DOS; under the split scratch-DS/stack sandbox
+            # the write clobbers DGROUP with the SS window.
+            try:
+                case['oracle_exe'] = dsss_stub_exe(
+                    exe, case.get('oracle_exe', exe), c['dsss_stub'])
+            except AssertionError as e:
+                raise AssertionError('%s: %s' % (c['fn'], e))
+        if c.get('dsss_stub_c'):
+            cexe = os.path.join(ROOT, 'build/%s.EXE' % mod)
+            try:
+                case['cand_exe'] = dsss_stub_exe(
+                    cexe, case.get('cand_exe', cexe), c['dsss_stub_c'])
             except AssertionError as e:
                 raise AssertionError('%s(c): %s' % (c['fn'], e))
         if 'obs' in c:

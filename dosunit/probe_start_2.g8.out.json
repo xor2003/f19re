@@ -10,14 +10,14 @@
           }
         ],
         "code_scope": "declared",
-        "file_sha256": "918aac36245682248a4323f38163520c37353412a1dbe23448830740a0fc06a6",
-        "image_sha256": "719b45b500565f1a4075146b3975016330b9e1320da798cae34617a12d4d1942",
+        "file_sha256": "e9a3a522b96d9dca70c2ccc9e9ef30214cfaaf7aee147b182060f9c72e9680c9",
+        "image_sha256": "8c0a43639db7a409b02fa4a7b852da6b11b6667f4580de2701a26af7199a5bd1",
         "image_size": 63455,
         "load_segment": "0x1000",
         "reloc_sha256": "ab2c038d061b56af49c2eba1fe7f6c1c253cd19459339511223f5c45b8082611"
       },
-      "path": "/home/xor/games/f19ru/F19/build/STGEN-ints-553dd421.EXE",
-      "sha256": "918aac36245682248a4323f38163520c37353412a1dbe23448830740a0fc06a6"
+      "path": "/home/xor/games/f19ru/F19/build/STGEN-dsss-8ea3238e.EXE",
+      "sha256": "e9a3a522b96d9dca70c2ccc9e9ef30214cfaaf7aee147b182060f9c72e9680c9"
     },
     "oracle": {
       "image": {
@@ -33,14 +33,14 @@
           }
         ],
         "code_scope": "declared",
-        "file_sha256": "86fa37d6cc2677204ea12bdb03c0a403c788a518a1d9c1ddf274d1c1966fd2e4",
-        "image_sha256": "42030bae71497084ef2b4749dd11a5b7631172b654f042eaa2d89a00eb498440",
+        "file_sha256": "d6f4be024aa651c4daf8013cff3c337817f6448b168c4f4e88cc93e4d28e154a",
+        "image_sha256": "60e9b359c9cce79338a7f3277bc4c2871e4bf8d5b9ba58f4396c4bdf0f786a7d",
         "image_size": 104672,
         "load_segment": "0x1000",
-        "reloc_sha256": "05378000d775fafa2695fb2edb18eda457e2b6349fcbd6c903074abd4b1bb04f"
+        "reloc_sha256": "8a6541a50207b2bfae6e711db57c2b7d92ac85c02b5f500c1274dd265214860a"
       },
-      "path": "/home/xor/games/f19ru/F19/build/START-ints-c390742c.EXE",
-      "sha256": "86fa37d6cc2677204ea12bdb03c0a403c788a518a1d9c1ddf274d1c1966fd2e4"
+      "path": "/home/xor/games/f19ru/F19/build/START-calls-3c8162b3.EXE",
+      "sha256": "d6f4be024aa651c4daf8013cff3c337817f6448b168c4f4e88cc93e4d28e154a"
     }
   },
   "instruction_limit": 100000,
@@ -84,7 +84,7 @@
           "ax": "0x0",
           "bp": "0x0",
           "bx": "0x0",
-          "cs": "0xff0",
+          "cs": "0x1000",
           "cx": "0x0",
           "di": "0x0",
           "ds": "0x3000",
@@ -98,13 +98,13 @@
           "eflags": "0x297",
           "es": "0x3000",
           "esi": "0x0",
-          "esp": "0xffe2",
+          "esp": "0xffe0",
           "flags": "0x297",
           "fs": "0x0",
           "gs": "0x0",
-          "ip": "0x4",
+          "ip": "0xa211",
           "si": "0x0",
-          "sp": "0xffe2",
+          "sp": "0xffe0",
           "ss": "0x4000"
         },
         "status": "returned",
@@ -144,19 +144,19 @@
           "esp"
         ],
         "observables_source": "default",
-        "reason": ""
+        "reason": "declared observations diverge"
       },
       "id": "rtcSync#0",
       "initial_state": {
         "candidate_entry": {
-          "offset": "0xa2d0",
-          "segment": "0xff0"
+          "offset": "0xa1d0",
+          "segment": "0x1000"
         },
         "frame": {
           "kind": "near16",
           "target": {
-            "offset": "0x4",
-            "segment": "0xff0"
+            "offset": "0x0",
+            "segment": "0x1000"
           }
         },
         "high_halves": {},
@@ -615,8 +615,8 @@
           }
         ],
         "oracle_entry": {
-          "offset": "0x26ea",
-          "segment": "0xff0"
+          "offset": "0x25ea",
+          "segment": "0x1000"
         },
         "registers": {
           "bp": "0x0",
@@ -658,7 +658,7 @@
           "ax": "0x0",
           "bp": "0x0",
           "bx": "0x0",
-          "cs": "0xff0",
+          "cs": "0x1000",
           "cx": "0x0",
           "di": "0x0",
           "ds": "0x3000",
@@ -672,13 +672,13 @@
           "eflags": "0x297",
           "es": "0x3000",
           "esi": "0x0",
-          "esp": "0xffe2",
+          "esp": "0xffe0",
           "flags": "0x297",
           "fs": "0x0",
           "gs": "0x0",
-          "ip": "0x4",
+          "ip": "0x262b",
           "si": "0x0",
-          "sp": "0xffe2",
+          "sp": "0xffe0",
           "ss": "0x4000"
         },
         "status": "returned",
@@ -689,7 +689,7 @@
           }
         ]
       },
-      "status": "agreed"
+      "status": "mismatched"
     },
     {
       "candidate": {
@@ -719,7 +719,7 @@
           "ax": "0x0",
           "bp": "0x0",
           "bx": "0x0",
-          "cs": "0xff0",
+          "cs": "0x1000",
           "cx": "0x0",
           "di": "0x0",
           "ds": "0x3000",
@@ -733,13 +733,13 @@
           "eflags": "0x297",
           "es": "0x3000",
           "esi": "0x0",
-          "esp": "0xffe2",
+          "esp": "0xffe0",
           "flags": "0x297",
           "fs": "0x0",
           "gs": "0x0",
-          "ip": "0x4",
+          "ip": "0xa211",
           "si": "0x0",
-          "sp": "0xffe2",
+          "sp": "0xffe0",
           "ss": "0x4000"
         },
         "status": "returned",
@@ -779,19 +779,19 @@
           "esp"
         ],
         "observables_source": "default",
-        "reason": ""
+        "reason": "declared observations diverge"
       },
       "id": "rtcSync#1",
       "initial_state": {
         "candidate_entry": {
-          "offset": "0xa2d0",
-          "segment": "0xff0"
+          "offset": "0xa1d0",
+          "segment": "0x1000"
         },
         "frame": {
           "kind": "near16",
           "target": {
-            "offset": "0x4",
-            "segment": "0xff0"
+            "offset": "0x0",
+            "segment": "0x1000"
           }
         },
         "high_halves": {},
@@ -1250,8 +1250,8 @@
           }
         ],
         "oracle_entry": {
-          "offset": "0x26ea",
-          "segment": "0xff0"
+          "offset": "0x25ea",
+          "segment": "0x1000"
         },
         "registers": {
           "bp": "0x0",
@@ -1293,7 +1293,7 @@
           "ax": "0x0",
           "bp": "0x0",
           "bx": "0x0",
-          "cs": "0xff0",
+          "cs": "0x1000",
           "cx": "0x0",
           "di": "0x0",
           "ds": "0x3000",
@@ -1307,13 +1307,13 @@
           "eflags": "0x297",
           "es": "0x3000",
           "esi": "0x0",
-          "esp": "0xffe2",
+          "esp": "0xffe0",
           "flags": "0x297",
           "fs": "0x0",
           "gs": "0x0",
-          "ip": "0x4",
+          "ip": "0x262b",
           "si": "0x0",
-          "sp": "0xffe2",
+          "sp": "0xffe0",
           "ss": "0x4000"
         },
         "status": "returned",
@@ -1324,7 +1324,7 @@
           }
         ]
       },
-      "status": "agreed"
+      "status": "mismatched"
     },
     {
       "candidate": {
@@ -1354,7 +1354,7 @@
           "ax": "0x0",
           "bp": "0x0",
           "bx": "0x0",
-          "cs": "0xff0",
+          "cs": "0x1000",
           "cx": "0x0",
           "di": "0x0",
           "ds": "0x3000",
@@ -1368,13 +1368,13 @@
           "eflags": "0x297",
           "es": "0x3000",
           "esi": "0x0",
-          "esp": "0xffe2",
+          "esp": "0xffe0",
           "flags": "0x297",
           "fs": "0x0",
           "gs": "0x0",
-          "ip": "0x4",
+          "ip": "0xa211",
           "si": "0x0",
-          "sp": "0xffe2",
+          "sp": "0xffe0",
           "ss": "0x4000"
         },
         "status": "returned",
@@ -1414,19 +1414,19 @@
           "esp"
         ],
         "observables_source": "default",
-        "reason": ""
+        "reason": "declared observations diverge"
       },
       "id": "rtcSync#2",
       "initial_state": {
         "candidate_entry": {
-          "offset": "0xa2d0",
-          "segment": "0xff0"
+          "offset": "0xa1d0",
+          "segment": "0x1000"
         },
         "frame": {
           "kind": "near16",
           "target": {
-            "offset": "0x4",
-            "segment": "0xff0"
+            "offset": "0x0",
+            "segment": "0x1000"
           }
         },
         "high_halves": {},
@@ -1885,8 +1885,8 @@
           }
         ],
         "oracle_entry": {
-          "offset": "0x26ea",
-          "segment": "0xff0"
+          "offset": "0x25ea",
+          "segment": "0x1000"
         },
         "registers": {
           "bp": "0x0",
@@ -1928,7 +1928,7 @@
           "ax": "0x0",
           "bp": "0x0",
           "bx": "0x0",
-          "cs": "0xff0",
+          "cs": "0x1000",
           "cx": "0x0",
           "di": "0x0",
           "ds": "0x3000",
@@ -1942,13 +1942,13 @@
           "eflags": "0x297",
           "es": "0x3000",
           "esi": "0x0",
-          "esp": "0xffe2",
+          "esp": "0xffe0",
           "flags": "0x297",
           "fs": "0x0",
           "gs": "0x0",
-          "ip": "0x4",
+          "ip": "0x262b",
           "si": "0x0",
-          "sp": "0xffe2",
+          "sp": "0xffe0",
           "ss": "0x4000"
         },
         "status": "returned",
@@ -1959,7 +1959,7 @@
           }
         ]
       },
-      "status": "agreed"
+      "status": "mismatched"
     },
     {
       "candidate": {
@@ -1989,7 +1989,7 @@
           "ax": "0x0",
           "bp": "0x0",
           "bx": "0x0",
-          "cs": "0xff0",
+          "cs": "0x1000",
           "cx": "0x0",
           "di": "0x0",
           "ds": "0x3000",
@@ -2003,13 +2003,13 @@
           "eflags": "0x297",
           "es": "0x3000",
           "esi": "0x0",
-          "esp": "0xffe2",
+          "esp": "0xffe0",
           "flags": "0x297",
           "fs": "0x0",
           "gs": "0x0",
-          "ip": "0x4",
+          "ip": "0xa211",
           "si": "0x0",
-          "sp": "0xffe2",
+          "sp": "0xffe0",
           "ss": "0x4000"
         },
         "status": "returned",
@@ -2049,19 +2049,19 @@
           "esp"
         ],
         "observables_source": "default",
-        "reason": ""
+        "reason": "declared observations diverge"
       },
       "id": "rtcSync#3",
       "initial_state": {
         "candidate_entry": {
-          "offset": "0xa2d0",
-          "segment": "0xff0"
+          "offset": "0xa1d0",
+          "segment": "0x1000"
         },
         "frame": {
           "kind": "near16",
           "target": {
-            "offset": "0x4",
-            "segment": "0xff0"
+            "offset": "0x0",
+            "segment": "0x1000"
           }
         },
         "high_halves": {},
@@ -2520,8 +2520,8 @@
           }
         ],
         "oracle_entry": {
-          "offset": "0x26ea",
-          "segment": "0xff0"
+          "offset": "0x25ea",
+          "segment": "0x1000"
         },
         "registers": {
           "bp": "0x0",
@@ -2563,7 +2563,7 @@
           "ax": "0x0",
           "bp": "0x0",
           "bx": "0x0",
-          "cs": "0xff0",
+          "cs": "0x1000",
           "cx": "0x0",
           "di": "0x0",
           "ds": "0x3000",
@@ -2577,13 +2577,13 @@
           "eflags": "0x297",
           "es": "0x3000",
           "esi": "0x0",
-          "esp": "0xffe2",
+          "esp": "0xffe0",
           "flags": "0x297",
           "fs": "0x0",
           "gs": "0x0",
-          "ip": "0x4",
+          "ip": "0x262b",
           "si": "0x0",
-          "sp": "0xffe2",
+          "sp": "0xffe0",
           "ss": "0x4000"
         },
         "status": "returned",
@@ -2594,7 +2594,7 @@
           }
         ]
       },
-      "status": "agreed"
+      "status": "mismatched"
     },
     {
       "candidate": {
@@ -2624,7 +2624,7 @@
           "ax": "0x0",
           "bp": "0x0",
           "bx": "0x0",
-          "cs": "0xff0",
+          "cs": "0x1000",
           "cx": "0x0",
           "di": "0x0",
           "ds": "0x3000",
@@ -2638,13 +2638,13 @@
           "eflags": "0x297",
           "es": "0x3000",
           "esi": "0x0",
-          "esp": "0xffe2",
+          "esp": "0xffe0",
           "flags": "0x297",
           "fs": "0x0",
           "gs": "0x0",
-          "ip": "0x4",
+          "ip": "0xa211",
           "si": "0x0",
-          "sp": "0xffe2",
+          "sp": "0xffe0",
           "ss": "0x4000"
         },
         "status": "returned",
@@ -2684,19 +2684,19 @@
           "esp"
         ],
         "observables_source": "default",
-        "reason": ""
+        "reason": "declared observations diverge"
       },
       "id": "rtcSync#4",
       "initial_state": {
         "candidate_entry": {
-          "offset": "0xa2d0",
-          "segment": "0xff0"
+          "offset": "0xa1d0",
+          "segment": "0x1000"
         },
         "frame": {
           "kind": "near16",
           "target": {
-            "offset": "0x4",
-            "segment": "0xff0"
+            "offset": "0x0",
+            "segment": "0x1000"
           }
         },
         "high_halves": {},
@@ -3155,8 +3155,8 @@
           }
         ],
         "oracle_entry": {
-          "offset": "0x26ea",
-          "segment": "0xff0"
+          "offset": "0x25ea",
+          "segment": "0x1000"
         },
         "registers": {
           "bp": "0x0",
@@ -3198,7 +3198,7 @@
           "ax": "0x0",
           "bp": "0x0",
           "bx": "0x0",
-          "cs": "0xff0",
+          "cs": "0x1000",
           "cx": "0x0",
           "di": "0x0",
           "ds": "0x3000",
@@ -3212,13 +3212,13 @@
           "eflags": "0x297",
           "es": "0x3000",
           "esi": "0x0",
-          "esp": "0xffe2",
+          "esp": "0xffe0",
           "flags": "0x297",
           "fs": "0x0",
           "gs": "0x0",
-          "ip": "0x4",
+          "ip": "0x262b",
           "si": "0x0",
-          "sp": "0xffe2",
+          "sp": "0xffe0",
           "ss": "0x4000"
         },
         "status": "returned",
@@ -3229,15 +3229,15 @@
           }
         ]
       },
-      "status": "agreed"
+      "status": "mismatched"
     }
   ],
   "schema": "dosunit.real16_replay.v1",
   "scope": "declared concrete vectors on relocated MZ images; segmented registers and caller frames are explicit; agreement is test evidence only and never a semantic proof",
   "summary": {
-    "agreed": 5,
+    "agreed": 0,
     "incomplete": 0,
-    "mismatched": 0,
+    "mismatched": 5,
     "total": 5
   }
 }

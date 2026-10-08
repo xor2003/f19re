@@ -59,12 +59,25 @@ ARTIFACTS = {
     # START satellite: draw work lives in unported reg-ABI callee sub_141A3
     # (skeleton in STGEN); clip shim returns 0 — unported-callee artifact.
     'drawLine': 'satellite draw callee sub_141A3 is skeleton',
+    # MATCH-verified (stobj.c /Ot).  resFileOpen + record loop store
+    # through own-image far pointers — `ffff 3000 0000` triples carry the
+    # scratch-DS seg as data and land at layout-relative offsets; oracle
+    # union-obs cells (DS:0x1716 LUT clears, 0x152a int21-success flag)
+    # and cand mirrors (DS:0x784c...) therefore read back asymmetric.
+    # Scratch bx/cx return values are the same provenance.  The ds:=ss
+    # write inside resFileOpen's int21 helper (mov bx,ss; mov ds,bx at
+    # 0x483a) is already nopped by the dsss fixture — that much is fixed.
+    'sub_15460': 'record stores via own-image far ptrs; ds:=ss normalized',
 }
 SKIP = {  # entry points / unsynthesizable — kept in sync with gen_probe.SKIP
-    'main', 'gfxInit', 'installCBreakHandler', 'setInt9Handler',
-    'openFile', 'closeFile', 'picBlit', 'openBlitClosePic', 'load15Flt3d3',
-    'waitForKeyPress', 'runGameSession', 'fillSpanRect', 'projectSceneObject',
+    'installCBreakHandler', 'setInt9Handler',
+    'openFile', 'closeFile', 'picBlit', 'load15Flt3d3',
+    'fillSpanRect', 'projectSceneObject',
 }
+# Former skips that now probe cleanly under call_stub/int_stub/dsss:
+# gfxInit/openBlitClosePic 5/5 AGREE, main/waitForKeyPress 5/5 AGREE-FAULT
+# (symmetric key-poll/main-loop budget burn), runGameSession incomplete
+# (oracle reaches device io in the session loop — sandbox limit).
 SUITES = {
     'src_en':   ('map/egame_en.map', 'probe_egame'),
     'src_start': ('map/start_en.map', 'probe_start'),
@@ -130,6 +143,11 @@ def probe_verdicts():
     from collections import Counter, defaultdict
     agg = defaultdict(Counter)
     du = os.path.join(ROOT, 'dosunit')
+    # Cases index globally across specs: shard boundaries shift between
+    # regens, orphaning out.json results whose group moved files — the
+    # fn name in each result id is authoritative.
+    cases = {}
+    outs = []
     for sf in sorted(glob.glob(os.path.join(du, 'probe_*.json'))):
         if '.out.' in sf or '.vectors.' in sf:
             continue
@@ -139,45 +157,47 @@ def probe_verdicts():
             continue
         if not isinstance(data, list):
             continue
-        cases = {c['fn']: c for c in data}
-        for of in sorted(glob.glob(sf[:-5] + '.g*.out.json')):
-            try:
-                res = json.load(open(of))['results']
-            except Exception:
+        for c in data:
+            cases.setdefault(c['fn'], c)
+        outs.extend(sorted(glob.glob(sf[:-5] + '.g*.out.json')))
+    for of in outs:
+        try:
+            res = json.load(open(of))['results']
+        except Exception:
+            continue
+        vp = {}   # emitted obs_pairs survive frag-splitting; spec-derived
+        try:      # pairs_of is only a fallback for pre-paired vectors
+            for v in json.load(
+                    open(of.replace('.out.json', '.vectors.json'))
+                    )['vectors']:
+                vp[v['id']] = v.get('obs_pairs')
+        except Exception:
+            pass
+        for r in res:
+            fn = r['id'].rsplit('#', 1)[0]
+            case = cases.get(fn)
+            if case is None:
                 continue
-            vp = {}   # emitted obs_pairs survive frag-splitting; spec-derived
-            try:      # pairs_of is only a fallback for pre-paired vectors
-                for v in json.load(
-                        open(of.replace('.out.json', '.vectors.json'))
-                        )['vectors']:
-                    vp[v['id']] = v.get('obs_pairs')
-            except Exception:
-                pass
-            for r in res:
-                fn = r['id'].rsplit('#', 1)[0]
-                case = cases.get(fn)
-                if case is None:
-                    continue
-                o, c = r['oracle'], r['candidate']
-                if o['status'] != 'returned' or c['status'] != 'returned':
-                    if (o['status'] == c['status'] and
-                            o.get('detail', '') == c.get('detail', '')):
-                        agg[fn]['agree'] += 1
-                    else:
-                        key = (o['status'], o.get('detail', '')[:28],
-                               c['status'], c.get('detail', '')[:28])
-                        agg[fn]['inc:' + str(key)] += 1
-                    continue
-                want = case.get('check_regs', ['ax'])
-                regs_ok = all(o['registers'].get(k) == c['registers'].get(k)
-                              for k in want)
-                oo = o.get('observations') or []
-                co = c.get('observations') or []
-                obs_ok = all(
-                    i < len(oo) and j < len(co) and
-                    oo[i].get('bytes') == co[j].get('bytes')
-                    for i, j in (vp.get(r['id']) or pairs_of(case)))
-                agg[fn]['agree' if regs_ok and obs_ok else 'diff'] += 1
+            o, c = r['oracle'], r['candidate']
+            if o['status'] != 'returned' or c['status'] != 'returned':
+                if (o['status'] == c['status'] and
+                        o.get('detail', '') == c.get('detail', '')):
+                    agg[fn]['agree'] += 1
+                else:
+                    key = (o['status'], o.get('detail', '')[:28],
+                           c['status'], c.get('detail', '')[:28])
+                    agg[fn]['inc:' + str(key)] += 1
+                continue
+            want = case.get('check_regs', ['ax'])
+            regs_ok = all(o['registers'].get(k) == c['registers'].get(k)
+                          for k in want)
+            oo = o.get('observations') or []
+            co = c.get('observations') or []
+            obs_ok = all(
+                i < len(oo) and j < len(co) and
+                oo[i].get('bytes') == co[j].get('bytes')
+                for i, j in (vp.get(r['id']) or pairs_of(case)))
+            agg[fn]['agree' if regs_ok and obs_ok else 'diff'] += 1
     return agg
 
 

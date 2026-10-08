@@ -6,13 +6,16 @@ Builds a replay-real16 manifest from mzmap/link-map routine addresses, runs
 register/observation verdict of our own (the tool's strict verdict also
 compares raw writes, which always diverge on pushed code addresses).
 
-Geometry: both images load at the same paragraph L=0x1000. A near16 frame
-requires the trap inside the entry code segment window; rel16 callees keep
-correct linears only while the whole reachable graph stays inside
-[S*16, S*16+0xFFFF]. We therefore run both sides at CS=S=L-K (K=0x10) so the
-window covers image offsets 0..0xFFEF, and put the trap just below L*16.
+Geometry: both images load at the same paragraph L=0x1000 and the entry
+segment is the image base itself (CS=L) so `cs:[X]` reads image offset X
+exactly as real DOS does — jump-table switches and cs-relative literal
+reads depend on this.  The frame declares `sp_guard`: RETURNED is
+recognized by a ret-family fetch while SP still points at the synthetic
+caller frame, so the trap target CS:0 (image offset 0) is only the pushed
+return value and is never required to be fetchable — an in-image trap
+would be refused for images >=64K that span every in-CS offset.
 
-  oracle_entry = {S, F_o + K*16}   candidate_entry = {S, F_c + K*16}
+  oracle_entry = {L, F_o}   candidate_entry = {L, F_c}
 
 DS globals: both sides share one scratch DS segment; each side reads whatever
 cells its own code addresses point at, so every referenced cell is patched
@@ -38,15 +41,15 @@ VEXTEST = os.environ.get('VEXTEST', os.path.expanduser('~/vextest'))
 VPY = os.path.join(VEXTEST, '.venv', 'bin', 'python')
 F19EN = os.environ.get('F19EN', '/home/xor/games/f19/F19')
 
-LOAD = 0x1000          # both images at linear 0x10000
-K = 0x10               # CS = 0x0FFF, window covers image offsets 0..0xFFEF
+LOAD = 0x1000          # both images at linear 0x10000; entry CS = LOAD so
+                       # cs:[X] reads image offset X like a real DOS load
 SS = 0x4000            # scratch stack segment (its 64KB window is mapped)
 DS = 0x6000            # scratch data segment
 SP = 0xFFE0            # near window top — chkstk guards (e.g. STGEN's
                        # 0xef60 limit cell) trip when the frame leaves the
                        # callee < ~0xa0 of stack; real DOS gives ~64K
-CS_SEG = LOAD - K      # 0x0FFF
-TRAP_OFF = 0x0004      # trap linear = CS_SEG*16 + 4 = 0xFFF4 < 0x10000
+TRAP_OFF = 0x0000      # pushed return offset (CS:0 = img 0); under sp_guard
+                       # the ret fetch is intercepted before this is fetched
 
 
 def load_image(path):
@@ -107,7 +110,7 @@ def img_slice(path, img_off, size):
 
 
 def build_vector(vid, f_o, f_c, args, case, ds_seg, flags='0x0202'):
-    """One near16 vector: entries offset by K*16 from each side's image off.
+    """One near16 vector: entries at each side's own image offset.
 
     Patches: {'seg'? -> ds, 'off'|'o_off'|'c_off', 'bytes' hex | 'size' N}
     With 'size' and no 'bytes', bytes are pulled from that side's own image
@@ -195,14 +198,16 @@ def build_vector(vid, f_o, f_c, args, case, ds_seg, flags='0x0202'):
                      seg, int(str(o['c_off']), 0), o['size'])
     vec = {
         'id': vid,
-        'oracle_entry': {'segment': u16hex(CS_SEG), 'offset': u16hex(f_o + K * 16)},
-        'candidate_entry': {'segment': u16hex(CS_SEG), 'offset': u16hex(f_c + K * 16)},
+        'oracle_entry': {'segment': u16hex(LOAD), 'offset': u16hex(f_o)},
+        'candidate_entry': {'segment': u16hex(LOAD), 'offset': u16hex(f_c)},
         'registers': {'sp': u16hex(sp), 'bp': '0', 'si': '0', 'di': '0',
                       'flags': flags},
         'segments': {'ds': u16hex(ds_seg), 'es': u16hex(ds_seg),
                      'ss': u16hex(SS)},
         'frame': {'kind': 'near16',
-                  'target': {'segment': u16hex(CS_SEG), 'offset': u16hex(TRAP_OFF)}},
+                  'target': {'segment': u16hex(LOAD),
+                             'offset': u16hex(TRAP_OFF)},
+                  'sp_guard': True},
         'memory': mem,
         'observations': obs,
         'obs_pairs': pairs,   # emitted-obs indices to compare (frag-split aware)
@@ -215,7 +220,7 @@ def run_case(case, vectors, srcs):
     """Emit vectors for one function across its arg sets."""
     f_o = case['oracle_off']
     f_c = case['cand_off']
-    if f_o + K * 16 > 0xFFF0 or f_c + K * 16 > 0xFFF0:
+    if f_o > 0xFFFF or f_c > 0xFFFF:
         return [f"{case['fn']}: entry out of CS window (F_o={f_o:x} F_c={f_c:x})"]
     ds_seg = int(str(case.get('ds', DS)), 0)
     out = []

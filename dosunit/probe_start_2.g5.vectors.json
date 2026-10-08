@@ -3,14 +3,14 @@
  "candidate_load_segment": "0x1000",
  "vectors": [
   {
-   "id": "resFileReadFar#0",
+   "id": "resFileWrite#0",
    "oracle_entry": {
-    "segment": "0xff0",
-    "offset": "0x48fc"
+    "segment": "0x1000",
+    "offset": "0x4814"
    },
    "candidate_entry": {
-    "segment": "0xff0",
-    "offset": "0x109c"
+    "segment": "0x1000",
+    "offset": "0xfb4"
    },
    "registers": {
     "sp": "0xffe0",
@@ -27,11 +27,22 @@
    "frame": {
     "kind": "near16",
     "target": {
-     "segment": "0xff0",
-     "offset": "0x4"
-    }
+     "segment": "0x1000",
+     "offset": "0x0"
+    },
+    "sp_guard": true
    },
    "memory": [
+    {
+     "segment": "0x3000",
+     "offset": "0x8074",
+     "bytes": "00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
+    },
+    {
+     "segment": "0x3000",
+     "offset": "0x8076",
+     "bytes": "00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
+    },
     {
      "segment": "0x3000",
      "offset": "0x1282",
@@ -124,7 +135,37 @@
     },
     {
      "segment": "0x3000",
+     "offset": "0x7e64",
+     "bytes": "0000"
+    },
+    {
+     "segment": "0x3000",
+     "offset": "0x7e65",
+     "bytes": "0000"
+    },
+    {
+     "segment": "0x3000",
+     "offset": "0x7e66",
+     "bytes": "0000"
+    },
+    {
+     "segment": "0x3000",
+     "offset": "0x7e68",
+     "bytes": "0000"
+    },
+    {
+     "segment": "0x3000",
      "offset": "0x7e6a",
+     "bytes": "0000"
+    },
+    {
+     "segment": "0x3000",
+     "offset": "0x7e6c",
+     "bytes": "0000"
+    },
+    {
+     "segment": "0x3000",
+     "offset": "0x7e6d",
      "bytes": "0000"
     },
     {
@@ -210,7 +251,7 @@
     {
      "segment": "0x4000",
      "offset": "0xffea",
-     "bytes": "0000"
+     "bytes": "1080"
     },
     {
      "segment": "0x4000",
@@ -238,14 +279,14 @@
    "flags_mask": "0x08d5"
   },
   {
-   "id": "resFileReadFar#1",
+   "id": "resFileWrite#1",
    "oracle_entry": {
-    "segment": "0xff0",
-    "offset": "0x48fc"
+    "segment": "0x1000",
+    "offset": "0x4814"
    },
    "candidate_entry": {
-    "segment": "0xff0",
-    "offset": "0x109c"
+    "segment": "0x1000",
+    "offset": "0xfb4"
    },
    "registers": {
     "sp": "0xffe0",
@@ -262,11 +303,22 @@
    "frame": {
     "kind": "near16",
     "target": {
-     "segment": "0xff0",
-     "offset": "0x4"
-    }
+     "segment": "0x1000",
+     "offset": "0x0"
+    },
+    "sp_guard": true
    },
    "memory": [
+    {
+     "segment": "0x3000",
+     "offset": "0x8074",
+     "bytes": "00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
+    },
+    {
+     "segment": "0x3000",
+     "offset": "0x8076",
+     "bytes": "00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
+    },
     {
      "segment": "0x3000",
      "offset": "0x1282",
@@ -359,7 +411,37 @@
     },
     {
      "segment": "0x3000",
+     "offset": "0x7e64",
+     "bytes": "0000"
+    },
+    {
+     "segment": "0x3000",
+     "offset": "0x7e65",
+     "bytes": "0000"
+    },
+    {
+     "segment": "0x3000",
+     "offset": "0x7e66",
+     "bytes": "0000"
+    },
+    {
+     "segment": "0x3000",
+     "offset": "0x7e68",
+     "bytes": "0000"
+    },
+    {
+     "segment": "0x3000",
      "offset": "0x7e6a",
+     "bytes": "0000"
+    },
+    {
+     "segment": "0x3000",
+     "offset": "0x7e6c",
+     "bytes": "0000"
+    },
+    {
+     "segment": "0x3000",
+     "offset": "0x7e6d",
      "bytes": "0000"
     },
     {
@@ -445,7 +527,7 @@
     {
      "segment": "0x4000",
      "offset": "0xffea",
-     "bytes": "0500"
+     "bytes": "1080"
     },
     {
      "segment": "0x4000",
@@ -473,14 +555,14 @@
    "flags_mask": "0x08d5"
   },
   {
-   "id": "resFileReadFar#2",
+   "id": "resFileWrite#2",
    "oracle_entry": {
-    "segment": "0xff0",
-    "offset": "0x48fc"
+    "segment": "0x1000",
+    "offset": "0x4814"
    },
    "candidate_entry": {
-    "segment": "0xff0",
-    "offset": "0x109c"
+    "segment": "0x1000",
+    "offset": "0xfb4"
    },
    "registers": {
     "sp": "0xffe0",
@@ -497,11 +579,22 @@
    "frame": {
     "kind": "near16",
     "target": {
-     "segment": "0xff0",
-     "offset": "0x4"
-    }
+     "segment": "0x1000",
+     "offset": "0x0"
+    },
+    "sp_guard": true
    },
    "memory": [
+    {
+     "segment": "0x3000",
+     "offset": "0x8074",
+     "bytes": "00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
+    },
+    {
+     "segment": "0x3000",
+     "offset": "0x8076",
+     "bytes": "00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
+    },
     {
      "segment": "0x3000",
      "offset": "0x1282",
@@ -594,7 +687,37 @@
     },
     {
      "segment": "0x3000",
+     "offset": "0x7e64",
+     "bytes": "0000"
+    },
+    {
+     "segment": "0x3000",
+     "offset": "0x7e65",
+     "bytes": "0000"
+    },
+    {
+     "segment": "0x3000",
+     "offset": "0x7e66",
+     "bytes": "0000"
+    },
+    {
+     "segment": "0x3000",
+     "offset": "0x7e68",
+     "bytes": "0000"
+    },
+    {
+     "segment": "0x3000",
      "offset": "0x7e6a",
+     "bytes": "0000"
+    },
+    {
+     "segment": "0x3000",
+     "offset": "0x7e6c",
+     "bytes": "0000"
+    },
+    {
+     "segment": "0x3000",
+     "offset": "0x7e6d",
      "bytes": "0000"
     },
     {
@@ -680,7 +803,7 @@
     {
      "segment": "0x4000",
      "offset": "0xffea",
-     "bytes": "1000"
+     "bytes": "1080"
     },
     {
      "segment": "0x4000",
@@ -708,14 +831,14 @@
    "flags_mask": "0x08d5"
   },
   {
-   "id": "resFileReadFar#3",
+   "id": "resFileWrite#3",
    "oracle_entry": {
-    "segment": "0xff0",
-    "offset": "0x48fc"
+    "segment": "0x1000",
+    "offset": "0x4814"
    },
    "candidate_entry": {
-    "segment": "0xff0",
-    "offset": "0x109c"
+    "segment": "0x1000",
+    "offset": "0xfb4"
    },
    "registers": {
     "sp": "0xffe0",
@@ -732,11 +855,22 @@
    "frame": {
     "kind": "near16",
     "target": {
-     "segment": "0xff0",
-     "offset": "0x4"
-    }
+     "segment": "0x1000",
+     "offset": "0x0"
+    },
+    "sp_guard": true
    },
    "memory": [
+    {
+     "segment": "0x3000",
+     "offset": "0x8074",
+     "bytes": "00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
+    },
+    {
+     "segment": "0x3000",
+     "offset": "0x8076",
+     "bytes": "00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
+    },
     {
      "segment": "0x3000",
      "offset": "0x1282",
@@ -829,7 +963,37 @@
     },
     {
      "segment": "0x3000",
+     "offset": "0x7e64",
+     "bytes": "0000"
+    },
+    {
+     "segment": "0x3000",
+     "offset": "0x7e65",
+     "bytes": "0000"
+    },
+    {
+     "segment": "0x3000",
+     "offset": "0x7e66",
+     "bytes": "0000"
+    },
+    {
+     "segment": "0x3000",
+     "offset": "0x7e68",
+     "bytes": "0000"
+    },
+    {
+     "segment": "0x3000",
      "offset": "0x7e6a",
+     "bytes": "0000"
+    },
+    {
+     "segment": "0x3000",
+     "offset": "0x7e6c",
+     "bytes": "0000"
+    },
+    {
+     "segment": "0x3000",
+     "offset": "0x7e6d",
      "bytes": "0000"
     },
     {
@@ -915,7 +1079,7 @@
     {
      "segment": "0x4000",
      "offset": "0xffea",
-     "bytes": "0000"
+     "bytes": "1080"
     },
     {
      "segment": "0x4000",
@@ -943,14 +1107,14 @@
    "flags_mask": "0x08d5"
   },
   {
-   "id": "resFileReadFar#4",
+   "id": "resFileWrite#4",
    "oracle_entry": {
-    "segment": "0xff0",
-    "offset": "0x48fc"
+    "segment": "0x1000",
+    "offset": "0x4814"
    },
    "candidate_entry": {
-    "segment": "0xff0",
-    "offset": "0x109c"
+    "segment": "0x1000",
+    "offset": "0xfb4"
    },
    "registers": {
     "sp": "0xffe0",
@@ -967,11 +1131,22 @@
    "frame": {
     "kind": "near16",
     "target": {
-     "segment": "0xff0",
-     "offset": "0x4"
-    }
+     "segment": "0x1000",
+     "offset": "0x0"
+    },
+    "sp_guard": true
    },
    "memory": [
+    {
+     "segment": "0x3000",
+     "offset": "0x8074",
+     "bytes": "00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
+    },
+    {
+     "segment": "0x3000",
+     "offset": "0x8076",
+     "bytes": "00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
+    },
     {
      "segment": "0x3000",
      "offset": "0x1282",
@@ -1064,7 +1239,37 @@
     },
     {
      "segment": "0x3000",
+     "offset": "0x7e64",
+     "bytes": "0000"
+    },
+    {
+     "segment": "0x3000",
+     "offset": "0x7e65",
+     "bytes": "0000"
+    },
+    {
+     "segment": "0x3000",
+     "offset": "0x7e66",
+     "bytes": "0000"
+    },
+    {
+     "segment": "0x3000",
+     "offset": "0x7e68",
+     "bytes": "0000"
+    },
+    {
+     "segment": "0x3000",
      "offset": "0x7e6a",
+     "bytes": "0000"
+    },
+    {
+     "segment": "0x3000",
+     "offset": "0x7e6c",
+     "bytes": "0000"
+    },
+    {
+     "segment": "0x3000",
+     "offset": "0x7e6d",
      "bytes": "0000"
     },
     {
@@ -1150,7 +1355,7 @@
     {
      "segment": "0x4000",
      "offset": "0xffea",
-     "bytes": "0040"
+     "bytes": "1080"
     },
     {
      "segment": "0x4000",

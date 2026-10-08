@@ -173,22 +173,37 @@ mzmap (jump-table headers, no call-reachable exports).
    can't see lcalls hidden behind indirect dispatch, and the fixture is
    inert for routines that never reach a slot). `find_ints` BFS follows
    rel16 calls, jmp tail-calls, short jumps and lcall seg:off immediates
-   (40K-insn budget — initGraphics' graph alone spans 206 regions);
-   reachable `int NN` sites get a cached prepatched fixture
-   build/<EXE>-ints-<tag>.EXE with `CD xx`->`xor ax,ax` (bounded
-   "service succeeded, ax=0", symmetric to the cand build's
-   zero-returning helpers) on BOTH sides (int_stub_c covers the cand
-   image's own CRT/skeleton int sites). Result: `python3
-   dosunit/coverage.py` prints the inventory
+   (40K-insn budget over per-address-deduped instructions — overlapping
+   callee windows no longer rescan shared code); reachable `int NN` sites
+   get a cached prepatched fixture build/<EXE>-ints-<tag>.EXE with
+   `CD xx`->`xor ax,ax` (bounded "service succeeded, ax=0", symmetric to
+   the cand build's zero-returning helpers) on BOTH sides (int_stub_c
+   covers the cand image's own CRT/skeleton int sites). Two more fixture
+   layers stack on the same scheme: `call_stub` nops oracle near/far calls
+   whose target is a cand-side trivial stub (stubs.c/ststubs.c —
+   `sub_<linaddr>` names index linear image offsets; `pop ax` encodes a
+   near-site param-return stub), and `dsss_stub` nops reachable `ds:=ss`
+   writes (`push ss;pop ds` / `mov r,ss;mov ds,r`) — real-DOS no-ops
+   (DS==SS==DGROUP) that would otherwise slam the probe's scratch DS with
+   the stack segment (sub_15460's resFileOpen int21 path).  ALL fixture
+   builders drop MZ reloc entries whose word overlaps a patched span —
+   the loader would otherwise rewrite nop'd `9A` seg fields and desync the
+   stream (drawLine/drawClippedLineEx were corrupted by `90 90`->`90 a0`).
+   Result: `python3 dosunit/coverage.py` prints the inventory
    (dedicated/probe-agree/probe-mix/artifact/incomplete/skipped).
-   Latest full sweep (all 4 test exes rebuilt post missile-table init
-   fix): 64 dedicated + 185 probe-agree + 13 probe-mix + 7 artifact +
-   37 incomplete + 5 skipped — 0 diff, 0 uncovered across all 311
-   ported routines.  Fixture cache keys cover base content, so
+   Latest full sweep (post dsss+iseen+reloc-drop): 76 dedicated + 212
+   probe-agree + 5 probe-mix + 11 artifact + 7 incomplete + 0 skipped —
+   0 diff, 0 uncovered across all 311 ported routines.  The former 5
+   skipped entry points probe under call/int/dsss stubbing: gfxInit and
+   openBlitClosePic 5/5 AGREE, main and waitForKeyPress 5/5 AGREE-FAULT
+   (symmetric budget burn on poll loops), runGameSession incomplete
+   (oracle reaches device io).  Fixture cache keys cover base content, so
    post-relink regen (`gen_probe.py`) is mandatory before trusting
    probe diffs — stale int-stub fixtures replay pre-relink data
    offsets and produce systematic false DIFFs (bombTarget,
-   updateThreatTargeting were both this).
+   updateThreatTargeting were both this).  coverage.py's case index is
+   global across shards — regens reshard cases without orphaning
+   out.json results (result ids carry the fn name).
 
    Dedicated edge specs: `python3 dosunit/gen_edge.py` regenerates
    dosunit/edge.json — disassembles both sides, pairs DS operands
@@ -206,22 +221,19 @@ mzmap (jump-table headers, no call-reachable exports).
    layout: STGEN moveDst 0x3f18 pos 0x686e, ENBRIEF head 0x5966).
 
    Incomplete taxonomy (not regressions — sandbox limits):
-   - unmapped_access:19/20: routines dereference far-ptr args the fixed
-     vectors fill with unmapped segments (drawFarString, fillRectBoth
-     etc.) — need dedicated specs pointing args at scratch DS.
-   - interrupt:0 one-sided: div0 on a vector whose divisor cell wasn't
-     pull-seeded (clip/draw family, info panels) — need index-aware
-     seeding or dedicated specs.
-   - budget_exhausted: loops proportional to args or unterminated
-     do-while scans (advanceBufPos, selectNext*, wrapUnitText*,
-     drawMapView PIC decode, alloc* on ax=0 retry) — symmetric loop
-     exhaustion counts AGREE-FAULT; asymmetric needs seeded bounds.
-   - device_io_or_halt (in/out port io): delayTicks, sub_10E5F.
-   - 5 skipped entry points (main/gfxInit/runGameSession/...) — frame
-     unsynthesizable.
+   - device_io_or_halt (in/out port io): runGameSession (session loop
+     drives real hardware), sub_16076/sub_16486/sub_1714C/sub_17280.
+   - looping (budget_exhausted): drawStoreIcons, loadPicFromFileAt —
+     loops proportional to seeded counts.
+   - probe-mix (partial vectors incomplete): allocBuffer (cand-side
+     alloc retry loop on seeded freelist), drawClippedLineEx/
+     drawClippedLineRegion (one vector: one-sided div0 on a seeded
+     divisor cell), drawGaugeBar (oracle writes into declared code
+     bytes — SMC guard), drawStringCentered (cand fetch outside
+     declared code ranges).
    - artifact class: diffs proven to be probe mechanics, listed in
      coverage.py ARTIFACTS (stub callees, write-stream overlap,
-     binary-relative pointer values).
+     binary-relative pointer values, ds:=ss provenance).
 
 ## MSC 5.1 codegen facts (F19)
 

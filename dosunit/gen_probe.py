@@ -88,9 +88,16 @@ VECTORS = [
 ]
 
 SKIP = {  # entry points / unsynthesizable: hw io, int21, argv/env, overlays
-    'main', 'gfxInit', 'installCBreakHandler', 'setInt9Handler',
-    'openFile', 'closeFile', 'picBlit', 'openBlitClosePic', 'load15Flt3d3',
-    'waitForKeyPress', 'runGameSession', 'fillSpanRect', 'projectSceneObject',
+    'installCBreakHandler', 'setInt9Handler',
+    'openFile', 'closeFile', 'picBlit', 'load15Flt3d3',
+    'fillSpanRect', 'projectSceneObject',
+}
+# Entry points attempted under call_stub/int_stub/dsss coverage: they run
+# to a typed boundary (budget/int/io) but their bodies are pure call
+# sequences — the stub fixtures model everything they reach.  Any that
+# still diverge or exhaust asymmetrically get documented artifacts.
+PROBE_ATTEMPT = {
+    'main', 'gfxInit', 'runGameSession', 'openBlitClosePic', 'waitForKeyPress',
 }
 
 WRITE_MN = {
@@ -332,7 +339,7 @@ def reaches_lcall(img, hdr, off, end):
     return False
 
 
-def find_ints(img, hdr, off, end, windows=None):
+def find_ints(img, hdr, off, end, windows=None, dsss=None):
     """Image offsets of `int NN` instructions reachable through the
     routine's call graph — BFS over rel16 call/jmp targets and lcall
     seg:off immediates inside the image.  Callee windows extend to the
@@ -342,11 +349,22 @@ def find_ints(img, hdr, off, end, windows=None):
     cand build's zero-returning stubs).  int3/into/iret are left alone.
     When `windows` is a list, every visited scan window is appended so
     callers can re-scan callee code for data refs (callee-read globals —
-    e.g. a divisor inside a helper — are invisible to body-only pulls)."""
+    e.g. a divisor inside a helper — are invisible to body-only pulls).
+    When `dsss` is a list, reachable `ds := ss` writes (`push ss;pop ds`,
+    `mov r16,ss; mov ds,r16` — real-DOS no-ops that clobber the probe's
+    scratch DS with the stack window) are appended as (site, bytes)
+    nop-patches."""
     md = capstone.Cs(capstone.CS_ARCH_X86, capstone.CS_MODE_16)
     imax = len(img) - hdr
     seen, work, budget = set(), [(off, end)], 40000
     sites = []
+    dseen = set()
+    # iseen dedups at instruction granularity: overlapping callee windows
+    # would otherwise rescan shared code and exhaust the budget before
+    # deep helpers (resFileOpen's int21 path) are ever reached.  Linear
+    # decode converging at an already-scanned address reproduces the same
+    # stream, so breaking there loses no sites.
+    iseen = set()
     while work and budget > 0:
         cur, cend = work.pop()
         if cur in seen or not (0 <= cur < imax):
@@ -354,13 +372,37 @@ def find_ints(img, hdr, off, end, windows=None):
         seen.add(cur)
         if windows is not None:
             windows.append((cur, cend))
+        prev = None
         for i in md.disasm(img[hdr + cur:hdr + min(cend, imax)], cur):
+            if i.address in iseen:
+                break
+            iseen.add(i.address)
             budget -= 1
             if not budget or i.mnemonic in ('ret', 'retf', 'iret'):
                 break
-            if i.bytes and i.bytes[0] == 0xCD and i.address not in seen:
-                seen.add(i.address)
+            if i.bytes and i.bytes[0] == 0xCD:
                 sites.append(i.address)
+            if dsss is not None and i.mnemonic and i.bytes:
+                # `ds := ss` writes — real-DOS no-ops (DS==SS==DGROUP) that
+                # clobber the probe's scratch DS with the SS window.  The
+                # faithful model is a nop: DGROUP is the scratch DS.
+                #   push ss; pop ds          16 1f   -> nop both
+                #   mov r16,ss; mov ds,r16   8c dR 8e dR -> nop the `8e`
+                if (prev and i.address == prev[0] + prev[1] and
+                        i.bytes[0] == 0x1F and prev[0] not in dseen and
+                        prev[2] == 'push' and prev[3] == 'ss'):
+                    dseen.add(prev[0])
+                    dsss.append((prev[0], b'\x90\x90'))
+                elif (prev and i.address == prev[0] + prev[1] and
+                      i.address not in dseen and
+                      i.mnemonic == 'mov' and
+                      i.op_str.split(',')[0].strip() == 'ds' and
+                      prev[2] == 'mov' and prev[3].endswith(', ss') and
+                      prev[3].split(',')[0].strip() ==
+                      i.op_str.split(',')[1].strip()):
+                    dseen.add(i.address)
+                    dsss.append((i.address, b'\x90\x90'))
+            prev = (i.address, i.size, i.mnemonic, i.op_str)
             if i.bytes and i.bytes[0] in (0x9A, 0xEA):
                 # lcall / jmp far seg:off — image offsets are link-linear
                 # (seg*16+off): resident far helpers, driver routines and
@@ -381,6 +423,141 @@ def find_ints(img, hdr, off, end, windows=None):
                 if 0 <= tgt < imax:
                     work.append((tgt, min(tgt + 0x1800, imax)))
     return sorted(sites)
+
+
+def entry_names(map_path, segs):
+    """image offset -> routine name for every map entry (all segs)."""
+    out = {}
+    for line in open(map_path, errors='replace'):
+        m = re.match(r'(\w+): (\w+) (?:NEAR|FAR) ([0-9a-fA-F]+)-', line.strip())
+        if m and m.group(2) in segs:
+            out[segs[m.group(2)] + int(m.group(3), 16)] = m.group(1)
+    return out
+
+
+def stub_models(paths):
+    """name -> stub model for candidate-side trivial defs: 'void' (empty
+    body), 'zero' (`return 0`), ('const', v) (`return <imm>`), ('param',
+    i) (`return <arg>`).  Anything with a real body is real work and must
+    not be stubbed."""
+    sig = re.compile(
+        r'^(?:int16|int32|uint16|uint32|int8|uint8|void|char|int|long'
+        r'|[A-Za-z_]\w*\s*\*+)\s*(?:far\s+|near\s+)?(\w+)\s*'
+        r'\(([^{};()]*)\)\s*\{\s*([^{}]*)\}', re.M)
+    out = {}
+    for path in paths:
+        if not os.path.exists(path):
+            continue
+        for m in sig.finditer(open(path, errors='replace').read()):
+            name, params, body = m.group(1), m.group(2), m.group(3).strip()
+            if not body:
+                out[name] = 'void'
+                continue
+            rm = re.match(r'^return\s+(.+?)\s*;?$', body, re.S)
+            if not rm:
+                continue
+            expr = rm.group(1)
+            # peel C casts: `return (int16)a;` is still a param return
+            expr = re.sub(r'^\(\s*[A-Za-z_]\w*[\s\*]*\)\s*', '', expr)
+            if re.match(r'^(0x[0-9a-fA-F]+|\d+)$', expr):
+                out[name] = ('const', int(expr, 0) & 0xFFFF)
+            elif re.match(r'^\w+$', expr):
+                plist = [p for p in params.split(',')
+                         if p.strip() and p.strip() != 'void']
+                names = [re.findall(r'\w+', p)[-1] for p in plist]
+                if expr in names:
+                    out[name] = ('param', names.index(expr))
+    return out
+
+
+def find_calls(img, hdr, off, end, entries, stubs, offstubs):
+    """`call rel16`/`lcall seg:off` sites in the routine's reachable graph
+    whose callee the candidate build supplies as a trivial stub — the
+    probe must not run oracle code the candidate does not have (overlay
+    routines, isr installers, dos helpers), so the site gets patched to
+    the stub's observable answer.  BFS mirrors find_ints; near-call
+    targets resolve through the map's entry table, far calls through the
+    same table or the invented-name off index (ovl_*, ovlCall_*,
+    textOp_* all encode the lcall's off field)."""
+    md = capstone.Cs(capstone.CS_ARCH_X86, capstone.CS_MODE_16)
+    imax = len(img) - hdr
+    seen, work, budget = set(), [(off, end)], 40000
+    sites = {}              # site -> patch bytes; overlapping BFS windows
+                            # rescan addresses, so dedupe is mandatory
+    while work and budget > 0:
+        cur, cend = work.pop()
+        if cur in seen or not (0 <= cur < imax):
+            continue
+        seen.add(cur)
+        for i in md.disasm(img[hdr + cur:hdr + min(cend, imax)], cur):
+            budget -= 1
+            if not budget or i.mnemonic in ('ret', 'retf', 'iret'):
+                break
+            op = i.bytes[0] if i.bytes else 0
+            if op in (0x9A, 0xEA):
+                tgt = (int.from_bytes(i.bytes[3:5], 'little') * 16
+                       + int.from_bytes(i.bytes[1:3], 'little'))
+                if 0 <= tgt < imax:
+                    work.append((tgt, min(tgt + 0x1800, imax)))
+                name = entries.get(tgt)
+                form = stubs.get(name) if name is not None else None
+                if form is None:
+                    # invented stub names key on the lcall's off field
+                    # (ovl_*, ovlCall_*, textOp_*) or on the target's
+                    # linear address (sub_<lin>) — try both.  An extent
+                    # aliased to a real name (map 'duplicate') still
+                    # resolves to a cand stub by its sub_<lin> alias.
+                    form = (offstubs.get(int.from_bytes(i.bytes[1:3],
+                                                       'little'))
+                            or offstubs.get(tgt))
+                if op == 0x9A and form is not None and tgt != off:
+                    p = call_patch(5, form)
+                    if p is not None:
+                        sites[i.address] = p
+            elif op in (0xE8, 0xE9):
+                disp = int.from_bytes(i.bytes[1:3], 'little', signed=True)
+                tgt = (i.address + 3 + disp) & 0xFFFF
+                if 0 <= tgt < imax:
+                    work.append((tgt, min(tgt + 0x1800, imax)))
+                if op == 0xE8 and tgt != off:
+                    name = entries.get(tgt)
+                    form = stubs.get(name) if name is not None else None
+                    if form is None:
+                        # near-call targets key on the sub_<lin> alias
+                        # (linear = image base + offset); bare tgt would
+                        # collide with ovl_* off-field keys.
+                        form = offstubs.get(0x10000 + tgt)
+                    if form is not None:
+                        p = call_patch(3, form)
+                        if p is not None:
+                            sites[i.address] = p
+            elif op == 0xEB:
+                disp = int.from_bytes(i.bytes[1:2], 'little', signed=True)
+                tgt = (i.address + 2 + disp) & 0xFFFF
+                if 0 <= tgt < imax:
+                    work.append((tgt, min(tgt + 0x1800, imax)))
+    return sorted(sites.items())
+
+
+def call_patch(size, form):
+    """Replacement bytes for a stubbed call site: `void` preserves ax
+    (an empty-body cand stub leaves it untouched), `zero`/`const` model
+    the stub's return write.  `param` needs a stack-relative read the
+    3-byte window cannot encode; on a 5-byte lcall only param0 fits
+    (`mov bx,sp; mov ax,[bx]`)."""
+    if form == 'void':
+        return b'\x90' * size
+    if form == 'zero':
+        return b'\x31\xc0' + b'\x90' * (size - 2)
+    if form[0] == 'const':
+        return b'\xb8' + form[1].to_bytes(2, 'little') + b'\x90' * (size - 3)
+    if form[0] == 'param' and form[1] == 0:
+        if size == 5:
+            return b'\x8b\xdc\x8b\x07\x90'
+        # 3-byte near site: `pop ax` reads the last-pushed word (param0's
+        # low word); the caller's `add sp,#args` absorbs the imbalance.
+        return b'\x58\x90\x90'
+    return None
 
 
 def call_targets(img, hdr, off, end):
@@ -470,6 +647,13 @@ for suite, cfg in SUITES.items():
         if m:
             omap_set.add(m.group(1))
     defs = ported_defs(cfg['srcdir'], omap_set)
+    # every module the cand build compiles real code from: the suite dir,
+    # plus base src/*.c when the suite is an override layer (src_en)
+    # rather than a standalone satellite (src_start/src_end/src_su).
+    ported = set(defs)
+    if os.path.basename(os.path.abspath(
+            os.path.join(ROOT, cfg['srcdir']))) == 'src_en':
+        ported |= set(ported_defs('src', omap_set))
     defs = {n: t for n, t in defs.items()
             if n not in covered() and n not in SKIP}
 
@@ -484,6 +668,27 @@ for suite, cfg in SUITES.items():
     oexe, omap_rel, odgrp = EXE[cfg['exe']]
     oimg, ohdr = mz_img(oexe)
     odata_end = len(oimg) - ohdr - odgrp
+    oentries = entry_names(os.path.join(ROOT, omap_rel), segs)
+    # candidate-side trivial stubs: suite stubs file + shared stubs —
+    # calls into them are patched to the stub's observable answer.  A
+    # name the suite ports for real (stubs.c keeps a guarded twin that
+    # drops out of this build) is never stubbed.
+    stubs = stub_models(
+        glob.glob(os.path.join(ROOT, cfg['srcdir'], '*stub*.c'))
+        + glob.glob(os.path.join(ROOT, 'src', '*stub*.c'))
+        + [os.path.join(ROOT, 'src', '_stub.c')])
+    stubs = {n: f for n, f in stubs.items() if n not in ported}
+    # invented-name stubs (ovl_*, ovlCall_*, textOp_*) encode the lcall's
+    # off field — index them by it for far-call targets the map doesn't
+    # cover.  Only names that are not real map entries qualify.
+    offstubs = {}
+    entryname_set = set(oentries.values())
+    for n, f in stubs.items():
+        if n in entryname_set:
+            continue
+        m = re.search(r'_([0-9A-Fa-f]{3,5})$', n)
+        if m:
+            offstubs.setdefault(int(m.group(1), 16), f)
 
     ds = pick_ds(oexe, ohdr, cexe, chdr)
     cases, skipped, vacuous = [], [], []
@@ -517,12 +722,17 @@ for suite, cfg in SUITES.items():
         for off, psz in dp.items():
             c_pull[off] = max(c_pull.get(off, 0), psz)
         c_seg = sorted(set(c_seg) | ds2)
-        ints_o = find_ints(oimg, ohdr, f_o, e_o)
-        ints_c = find_ints(cimg, chdr, f_c, e_c)
+        dsss_o, dsss_c = [], []
+        ints_o = find_ints(oimg, ohdr, f_o, e_o, dsss=dsss_o)
+        ints_c = find_ints(cimg, chdr, f_c, e_c, dsss=dsss_c)
         for s in FORCE_INTS.get((cfg['exe'], name), []):
             assert oimg[ohdr + s] == 0xCD, (name, hex(s))
             if s not in ints_o:
                 ints_o.append(s)
+        # calls into cand-side trivial stubs (overlay routines, isr/dos
+        # helpers) get patched to the stub's observable answer — oracle
+        # must not run code the candidate does not implement.
+        csites = find_calls(oimg, ohdr, f_o, e_o, oentries, stubs, offstubs)
         # instruction-order paired store-cell obs: byte-exact ports put the
         # i-th DS store on both sides at the same logical cell.  A count
         # mismatch means the paths diverged structurally — skip obs rather
@@ -613,6 +823,12 @@ for suite, cfg in SUITES.items():
             case['int_stub'] = ints_o
         if ints_c:
             case['int_stub_c'] = ints_c
+        if dsss_o:
+            case['dsss_stub'] = dsss_o
+        if dsss_c:
+            case['dsss_stub_c'] = dsss_c
+        if csites:
+            case['call_stub'] = csites
         cases.append(case)
 
     # shard into ~25-case files so each replay group finishes within the

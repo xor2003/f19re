@@ -3,14 +3,14 @@
  "candidate_load_segment": "0x1000",
  "vectors": [
   {
-   "id": "seedRandom#0",
+   "id": "restoreInterrupts#0",
    "oracle_entry": {
-    "segment": "0xff0",
-    "offset": "0xdf3"
+    "segment": "0x1000",
+    "offset": "0x3e6"
    },
    "candidate_entry": {
-    "segment": "0xff0",
-    "offset": "0x6817"
+    "segment": "0x1000",
+    "offset": "0x6260"
    },
    "registers": {
     "sp": "0xffe0",
@@ -27,9 +27,10 @@
    "frame": {
     "kind": "near16",
     "target": {
-     "segment": "0xff0",
-     "offset": "0x4"
-    }
+     "segment": "0x1000",
+     "offset": "0x0"
+    },
+    "sp_guard": true
    },
    "memory": [
     {
@@ -39,23 +40,8 @@
     },
     {
      "segment": "0x3000",
-     "offset": "0x4",
-     "bytes": "000000004d532052756e2d54696d65204c696272617279202d20436f707972696768742028632920313938382c204d6963726f736f667420436f727011000000"
-    },
-    {
-     "segment": "0x3000",
-     "offset": "0x6",
-     "bytes": "00004d532052756e2d54696d65204c696272617279202d20436f707972696768742028632920313938382c204d6963726f736f667420436f7270110000000000"
-    },
-    {
-     "segment": "0x3000",
-     "offset": "0x8",
-     "bytes": "4d532052756e2d54696d65204c696272617279202d20436f707972696768742028632920313938382c204d6963726f736f667420436f72701100000000000000"
-    },
-    {
-     "segment": "0x3000",
-     "offset": "0x2",
-     "bytes": "0000000000004d532052756e2d54696d65204c696272617279202d20436f707972696768742028632920313938382c204d6963726f736f667420436f72701100"
+     "offset": "0x6aa4",
+     "bytes": "8181810101000000000000000000000000000000000000000000c26ad90943000000000000000000f09f0000000000000000000001000000000000160202180d"
     },
     {
      "segment": "0x3000",
@@ -64,42 +50,27 @@
     },
     {
      "segment": "0x3000",
-     "offset": "0x3b33",
+     "offset": "0x6aa2",
+     "bytes": "1400"
+    },
+    {
+     "segment": "0x3000",
+     "offset": "0x6acc",
+     "bytes": "f09f"
+    },
+    {
+     "segment": "0x3000",
+     "offset": "0x6ace",
      "bytes": "0000"
     },
     {
      "segment": "0x3000",
-     "offset": "0x41da",
+     "offset": "0x6ad0",
      "bytes": "0000"
     },
     {
      "segment": "0x3000",
-     "offset": "0x41db",
-     "bytes": "0000"
-    },
-    {
-     "segment": "0x3000",
-     "offset": "0x41dc",
-     "bytes": "0000"
-    },
-    {
-     "segment": "0x3000",
-     "offset": "0x41dd",
-     "bytes": "0006"
-    },
-    {
-     "segment": "0x3000",
-     "offset": "0x6a95",
-     "bytes": "0000"
-    },
-    {
-     "segment": "0x3000",
-     "offset": "0x6a9d",
-     "bytes": "0000"
-    },
-    {
-     "segment": "0x3000",
-     "offset": "0x6aa0",
+     "offset": "0x6ad4",
      "bytes": "0000"
     },
     {
@@ -119,17 +90,7 @@
     },
     {
      "segment": "0x3000",
-     "offset": "0x6af2",
-     "bytes": "0000"
-    },
-    {
-     "segment": "0x3000",
-     "offset": "0x6af6",
-     "bytes": "0000"
-    },
-    {
-     "segment": "0x3000",
-     "offset": "0x6afc",
+     "offset": "0x0",
      "bytes": "0000"
     },
     {
@@ -139,17 +100,17 @@
     },
     {
      "segment": "0x3000",
-     "offset": "0x1920",
-     "bytes": "8974"
-    },
-    {
-     "segment": "0x3000",
-     "offset": "0x1981",
+     "offset": "0x191c",
      "bytes": "0000"
     },
     {
      "segment": "0x3000",
-     "offset": "0x1983",
+     "offset": "0x1922",
+     "bytes": "0000"
+    },
+    {
+     "segment": "0x3000",
+     "offset": "0x198d",
      "bytes": "0000"
     },
     {
@@ -161,6 +122,16 @@
      "segment": "0x3000",
      "offset": "0x1995",
      "bytes": "0000"
+    },
+    {
+     "segment": "0x3000",
+     "offset": "0x1998",
+     "bytes": "0000"
+    },
+    {
+     "segment": "0x3000",
+     "offset": "0x199a",
+     "bytes": "1400"
     },
     {
      "segment": "0x3000",
@@ -189,21 +160,6 @@
     },
     {
      "segment": "0x3000",
-     "offset": "0x19be",
-     "bytes": "0000"
-    },
-    {
-     "segment": "0x3000",
-     "offset": "0x19bf",
-     "bytes": "0000"
-    },
-    {
-     "segment": "0x3000",
-     "offset": "0x19c4",
-     "bytes": "0000"
-    },
-    {
-     "segment": "0x3000",
      "offset": "0x19c6",
      "bytes": "b0ab"
     },
@@ -214,7 +170,12 @@
     },
     {
      "segment": "0x3000",
-     "offset": "0x19e6",
+     "offset": "0x19de",
+     "bytes": "0100"
+    },
+    {
+     "segment": "0x3000",
+     "offset": "0x19e0",
      "bytes": "0000"
     },
     {
@@ -249,11 +210,6 @@
     },
     {
      "segment": "0x3000",
-     "offset": "0x6af2",
-     "bytes": "0030"
-    },
-    {
-     "segment": "0x3000",
      "offset": "0x2c",
      "bytes": "0030"
     },
@@ -278,14 +234,14 @@
    "flags_mask": "0x08d5"
   },
   {
-   "id": "seedRandom#1",
+   "id": "restoreInterrupts#1",
    "oracle_entry": {
-    "segment": "0xff0",
-    "offset": "0xdf3"
+    "segment": "0x1000",
+    "offset": "0x3e6"
    },
    "candidate_entry": {
-    "segment": "0xff0",
-    "offset": "0x6817"
+    "segment": "0x1000",
+    "offset": "0x6260"
    },
    "registers": {
     "sp": "0xffe0",
@@ -302,9 +258,10 @@
    "frame": {
     "kind": "near16",
     "target": {
-     "segment": "0xff0",
-     "offset": "0x4"
-    }
+     "segment": "0x1000",
+     "offset": "0x0"
+    },
+    "sp_guard": true
    },
    "memory": [
     {
@@ -314,23 +271,8 @@
     },
     {
      "segment": "0x3000",
-     "offset": "0x4",
-     "bytes": "000000004d532052756e2d54696d65204c696272617279202d20436f707972696768742028632920313938382c204d6963726f736f667420436f727011000000"
-    },
-    {
-     "segment": "0x3000",
-     "offset": "0x6",
-     "bytes": "00004d532052756e2d54696d65204c696272617279202d20436f707972696768742028632920313938382c204d6963726f736f667420436f7270110000000000"
-    },
-    {
-     "segment": "0x3000",
-     "offset": "0x8",
-     "bytes": "4d532052756e2d54696d65204c696272617279202d20436f707972696768742028632920313938382c204d6963726f736f667420436f72701100000000000000"
-    },
-    {
-     "segment": "0x3000",
-     "offset": "0x2",
-     "bytes": "0000000000004d532052756e2d54696d65204c696272617279202d20436f707972696768742028632920313938382c204d6963726f736f667420436f72701100"
+     "offset": "0x6aa4",
+     "bytes": "8181810101000000000000000000000000000000000000000000c26ad90943000000000000000000f09f0000000000000000000001000000000000160202180d"
     },
     {
      "segment": "0x3000",
@@ -339,42 +281,27 @@
     },
     {
      "segment": "0x3000",
-     "offset": "0x3b33",
+     "offset": "0x6aa2",
+     "bytes": "1400"
+    },
+    {
+     "segment": "0x3000",
+     "offset": "0x6acc",
+     "bytes": "f09f"
+    },
+    {
+     "segment": "0x3000",
+     "offset": "0x6ace",
      "bytes": "0000"
     },
     {
      "segment": "0x3000",
-     "offset": "0x41da",
+     "offset": "0x6ad0",
      "bytes": "0000"
     },
     {
      "segment": "0x3000",
-     "offset": "0x41db",
-     "bytes": "0000"
-    },
-    {
-     "segment": "0x3000",
-     "offset": "0x41dc",
-     "bytes": "0000"
-    },
-    {
-     "segment": "0x3000",
-     "offset": "0x41dd",
-     "bytes": "0006"
-    },
-    {
-     "segment": "0x3000",
-     "offset": "0x6a95",
-     "bytes": "0000"
-    },
-    {
-     "segment": "0x3000",
-     "offset": "0x6a9d",
-     "bytes": "0000"
-    },
-    {
-     "segment": "0x3000",
-     "offset": "0x6aa0",
+     "offset": "0x6ad4",
      "bytes": "0000"
     },
     {
@@ -394,17 +321,7 @@
     },
     {
      "segment": "0x3000",
-     "offset": "0x6af2",
-     "bytes": "0000"
-    },
-    {
-     "segment": "0x3000",
-     "offset": "0x6af6",
-     "bytes": "0000"
-    },
-    {
-     "segment": "0x3000",
-     "offset": "0x6afc",
+     "offset": "0x0",
      "bytes": "0000"
     },
     {
@@ -414,17 +331,17 @@
     },
     {
      "segment": "0x3000",
-     "offset": "0x1920",
-     "bytes": "8974"
-    },
-    {
-     "segment": "0x3000",
-     "offset": "0x1981",
+     "offset": "0x191c",
      "bytes": "0000"
     },
     {
      "segment": "0x3000",
-     "offset": "0x1983",
+     "offset": "0x1922",
+     "bytes": "0000"
+    },
+    {
+     "segment": "0x3000",
+     "offset": "0x198d",
      "bytes": "0000"
     },
     {
@@ -436,6 +353,16 @@
      "segment": "0x3000",
      "offset": "0x1995",
      "bytes": "0000"
+    },
+    {
+     "segment": "0x3000",
+     "offset": "0x1998",
+     "bytes": "0000"
+    },
+    {
+     "segment": "0x3000",
+     "offset": "0x199a",
+     "bytes": "1400"
     },
     {
      "segment": "0x3000",
@@ -464,21 +391,6 @@
     },
     {
      "segment": "0x3000",
-     "offset": "0x19be",
-     "bytes": "0000"
-    },
-    {
-     "segment": "0x3000",
-     "offset": "0x19bf",
-     "bytes": "0000"
-    },
-    {
-     "segment": "0x3000",
-     "offset": "0x19c4",
-     "bytes": "0000"
-    },
-    {
-     "segment": "0x3000",
      "offset": "0x19c6",
      "bytes": "b0ab"
     },
@@ -489,7 +401,12 @@
     },
     {
      "segment": "0x3000",
-     "offset": "0x19e6",
+     "offset": "0x19de",
+     "bytes": "0100"
+    },
+    {
+     "segment": "0x3000",
+     "offset": "0x19e0",
      "bytes": "0000"
     },
     {
@@ -524,11 +441,6 @@
     },
     {
      "segment": "0x3000",
-     "offset": "0x6af2",
-     "bytes": "0030"
-    },
-    {
-     "segment": "0x3000",
      "offset": "0x2c",
      "bytes": "0030"
     },
@@ -553,14 +465,14 @@
    "flags_mask": "0x08d5"
   },
   {
-   "id": "seedRandom#2",
+   "id": "restoreInterrupts#2",
    "oracle_entry": {
-    "segment": "0xff0",
-    "offset": "0xdf3"
+    "segment": "0x1000",
+    "offset": "0x3e6"
    },
    "candidate_entry": {
-    "segment": "0xff0",
-    "offset": "0x6817"
+    "segment": "0x1000",
+    "offset": "0x6260"
    },
    "registers": {
     "sp": "0xffe0",
@@ -577,9 +489,10 @@
    "frame": {
     "kind": "near16",
     "target": {
-     "segment": "0xff0",
-     "offset": "0x4"
-    }
+     "segment": "0x1000",
+     "offset": "0x0"
+    },
+    "sp_guard": true
    },
    "memory": [
     {
@@ -589,23 +502,8 @@
     },
     {
      "segment": "0x3000",
-     "offset": "0x4",
-     "bytes": "000000004d532052756e2d54696d65204c696272617279202d20436f707972696768742028632920313938382c204d6963726f736f667420436f727011000000"
-    },
-    {
-     "segment": "0x3000",
-     "offset": "0x6",
-     "bytes": "00004d532052756e2d54696d65204c696272617279202d20436f707972696768742028632920313938382c204d6963726f736f667420436f7270110000000000"
-    },
-    {
-     "segment": "0x3000",
-     "offset": "0x8",
-     "bytes": "4d532052756e2d54696d65204c696272617279202d20436f707972696768742028632920313938382c204d6963726f736f667420436f72701100000000000000"
-    },
-    {
-     "segment": "0x3000",
-     "offset": "0x2",
-     "bytes": "0000000000004d532052756e2d54696d65204c696272617279202d20436f707972696768742028632920313938382c204d6963726f736f667420436f72701100"
+     "offset": "0x6aa4",
+     "bytes": "8181810101000000000000000000000000000000000000000000c26ad90943000000000000000000f09f0000000000000000000001000000000000160202180d"
     },
     {
      "segment": "0x3000",
@@ -614,42 +512,27 @@
     },
     {
      "segment": "0x3000",
-     "offset": "0x3b33",
+     "offset": "0x6aa2",
+     "bytes": "1400"
+    },
+    {
+     "segment": "0x3000",
+     "offset": "0x6acc",
+     "bytes": "f09f"
+    },
+    {
+     "segment": "0x3000",
+     "offset": "0x6ace",
      "bytes": "0000"
     },
     {
      "segment": "0x3000",
-     "offset": "0x41da",
+     "offset": "0x6ad0",
      "bytes": "0000"
     },
     {
      "segment": "0x3000",
-     "offset": "0x41db",
-     "bytes": "0000"
-    },
-    {
-     "segment": "0x3000",
-     "offset": "0x41dc",
-     "bytes": "0000"
-    },
-    {
-     "segment": "0x3000",
-     "offset": "0x41dd",
-     "bytes": "0006"
-    },
-    {
-     "segment": "0x3000",
-     "offset": "0x6a95",
-     "bytes": "0000"
-    },
-    {
-     "segment": "0x3000",
-     "offset": "0x6a9d",
-     "bytes": "0000"
-    },
-    {
-     "segment": "0x3000",
-     "offset": "0x6aa0",
+     "offset": "0x6ad4",
      "bytes": "0000"
     },
     {
@@ -669,17 +552,7 @@
     },
     {
      "segment": "0x3000",
-     "offset": "0x6af2",
-     "bytes": "0000"
-    },
-    {
-     "segment": "0x3000",
-     "offset": "0x6af6",
-     "bytes": "0000"
-    },
-    {
-     "segment": "0x3000",
-     "offset": "0x6afc",
+     "offset": "0x0",
      "bytes": "0000"
     },
     {
@@ -689,17 +562,17 @@
     },
     {
      "segment": "0x3000",
-     "offset": "0x1920",
-     "bytes": "8974"
-    },
-    {
-     "segment": "0x3000",
-     "offset": "0x1981",
+     "offset": "0x191c",
      "bytes": "0000"
     },
     {
      "segment": "0x3000",
-     "offset": "0x1983",
+     "offset": "0x1922",
+     "bytes": "0000"
+    },
+    {
+     "segment": "0x3000",
+     "offset": "0x198d",
      "bytes": "0000"
     },
     {
@@ -711,6 +584,16 @@
      "segment": "0x3000",
      "offset": "0x1995",
      "bytes": "0000"
+    },
+    {
+     "segment": "0x3000",
+     "offset": "0x1998",
+     "bytes": "0000"
+    },
+    {
+     "segment": "0x3000",
+     "offset": "0x199a",
+     "bytes": "1400"
     },
     {
      "segment": "0x3000",
@@ -739,21 +622,6 @@
     },
     {
      "segment": "0x3000",
-     "offset": "0x19be",
-     "bytes": "0000"
-    },
-    {
-     "segment": "0x3000",
-     "offset": "0x19bf",
-     "bytes": "0000"
-    },
-    {
-     "segment": "0x3000",
-     "offset": "0x19c4",
-     "bytes": "0000"
-    },
-    {
-     "segment": "0x3000",
      "offset": "0x19c6",
      "bytes": "b0ab"
     },
@@ -764,7 +632,12 @@
     },
     {
      "segment": "0x3000",
-     "offset": "0x19e6",
+     "offset": "0x19de",
+     "bytes": "0100"
+    },
+    {
+     "segment": "0x3000",
+     "offset": "0x19e0",
      "bytes": "0000"
     },
     {
@@ -799,11 +672,6 @@
     },
     {
      "segment": "0x3000",
-     "offset": "0x6af2",
-     "bytes": "0030"
-    },
-    {
-     "segment": "0x3000",
      "offset": "0x2c",
      "bytes": "0030"
     },
@@ -828,14 +696,14 @@
    "flags_mask": "0x08d5"
   },
   {
-   "id": "seedRandom#3",
+   "id": "restoreInterrupts#3",
    "oracle_entry": {
-    "segment": "0xff0",
-    "offset": "0xdf3"
+    "segment": "0x1000",
+    "offset": "0x3e6"
    },
    "candidate_entry": {
-    "segment": "0xff0",
-    "offset": "0x6817"
+    "segment": "0x1000",
+    "offset": "0x6260"
    },
    "registers": {
     "sp": "0xffe0",
@@ -852,9 +720,10 @@
    "frame": {
     "kind": "near16",
     "target": {
-     "segment": "0xff0",
-     "offset": "0x4"
-    }
+     "segment": "0x1000",
+     "offset": "0x0"
+    },
+    "sp_guard": true
    },
    "memory": [
     {
@@ -864,23 +733,8 @@
     },
     {
      "segment": "0x3000",
-     "offset": "0x4",
-     "bytes": "000000004d532052756e2d54696d65204c696272617279202d20436f707972696768742028632920313938382c204d6963726f736f667420436f727011000000"
-    },
-    {
-     "segment": "0x3000",
-     "offset": "0x6",
-     "bytes": "00004d532052756e2d54696d65204c696272617279202d20436f707972696768742028632920313938382c204d6963726f736f667420436f7270110000000000"
-    },
-    {
-     "segment": "0x3000",
-     "offset": "0x8",
-     "bytes": "4d532052756e2d54696d65204c696272617279202d20436f707972696768742028632920313938382c204d6963726f736f667420436f72701100000000000000"
-    },
-    {
-     "segment": "0x3000",
-     "offset": "0x2",
-     "bytes": "0000000000004d532052756e2d54696d65204c696272617279202d20436f707972696768742028632920313938382c204d6963726f736f667420436f72701100"
+     "offset": "0x6aa4",
+     "bytes": "8181810101000000000000000000000000000000000000000000c26ad90943000000000000000000f09f0000000000000000000001000000000000160202180d"
     },
     {
      "segment": "0x3000",
@@ -889,42 +743,27 @@
     },
     {
      "segment": "0x3000",
-     "offset": "0x3b33",
+     "offset": "0x6aa2",
+     "bytes": "1400"
+    },
+    {
+     "segment": "0x3000",
+     "offset": "0x6acc",
+     "bytes": "f09f"
+    },
+    {
+     "segment": "0x3000",
+     "offset": "0x6ace",
      "bytes": "0000"
     },
     {
      "segment": "0x3000",
-     "offset": "0x41da",
+     "offset": "0x6ad0",
      "bytes": "0000"
     },
     {
      "segment": "0x3000",
-     "offset": "0x41db",
-     "bytes": "0000"
-    },
-    {
-     "segment": "0x3000",
-     "offset": "0x41dc",
-     "bytes": "0000"
-    },
-    {
-     "segment": "0x3000",
-     "offset": "0x41dd",
-     "bytes": "0006"
-    },
-    {
-     "segment": "0x3000",
-     "offset": "0x6a95",
-     "bytes": "0000"
-    },
-    {
-     "segment": "0x3000",
-     "offset": "0x6a9d",
-     "bytes": "0000"
-    },
-    {
-     "segment": "0x3000",
-     "offset": "0x6aa0",
+     "offset": "0x6ad4",
      "bytes": "0000"
     },
     {
@@ -944,17 +783,7 @@
     },
     {
      "segment": "0x3000",
-     "offset": "0x6af2",
-     "bytes": "0000"
-    },
-    {
-     "segment": "0x3000",
-     "offset": "0x6af6",
-     "bytes": "0000"
-    },
-    {
-     "segment": "0x3000",
-     "offset": "0x6afc",
+     "offset": "0x0",
      "bytes": "0000"
     },
     {
@@ -964,17 +793,17 @@
     },
     {
      "segment": "0x3000",
-     "offset": "0x1920",
-     "bytes": "8974"
-    },
-    {
-     "segment": "0x3000",
-     "offset": "0x1981",
+     "offset": "0x191c",
      "bytes": "0000"
     },
     {
      "segment": "0x3000",
-     "offset": "0x1983",
+     "offset": "0x1922",
+     "bytes": "0000"
+    },
+    {
+     "segment": "0x3000",
+     "offset": "0x198d",
      "bytes": "0000"
     },
     {
@@ -986,6 +815,16 @@
      "segment": "0x3000",
      "offset": "0x1995",
      "bytes": "0000"
+    },
+    {
+     "segment": "0x3000",
+     "offset": "0x1998",
+     "bytes": "0000"
+    },
+    {
+     "segment": "0x3000",
+     "offset": "0x199a",
+     "bytes": "1400"
     },
     {
      "segment": "0x3000",
@@ -1014,21 +853,6 @@
     },
     {
      "segment": "0x3000",
-     "offset": "0x19be",
-     "bytes": "0000"
-    },
-    {
-     "segment": "0x3000",
-     "offset": "0x19bf",
-     "bytes": "0000"
-    },
-    {
-     "segment": "0x3000",
-     "offset": "0x19c4",
-     "bytes": "0000"
-    },
-    {
-     "segment": "0x3000",
      "offset": "0x19c6",
      "bytes": "b0ab"
     },
@@ -1039,7 +863,12 @@
     },
     {
      "segment": "0x3000",
-     "offset": "0x19e6",
+     "offset": "0x19de",
+     "bytes": "0100"
+    },
+    {
+     "segment": "0x3000",
+     "offset": "0x19e0",
      "bytes": "0000"
     },
     {
@@ -1074,11 +903,6 @@
     },
     {
      "segment": "0x3000",
-     "offset": "0x6af2",
-     "bytes": "0030"
-    },
-    {
-     "segment": "0x3000",
      "offset": "0x2c",
      "bytes": "0030"
     },
@@ -1103,14 +927,14 @@
    "flags_mask": "0x08d5"
   },
   {
-   "id": "seedRandom#4",
+   "id": "restoreInterrupts#4",
    "oracle_entry": {
-    "segment": "0xff0",
-    "offset": "0xdf3"
+    "segment": "0x1000",
+    "offset": "0x3e6"
    },
    "candidate_entry": {
-    "segment": "0xff0",
-    "offset": "0x6817"
+    "segment": "0x1000",
+    "offset": "0x6260"
    },
    "registers": {
     "sp": "0xffe0",
@@ -1127,9 +951,10 @@
    "frame": {
     "kind": "near16",
     "target": {
-     "segment": "0xff0",
-     "offset": "0x4"
-    }
+     "segment": "0x1000",
+     "offset": "0x0"
+    },
+    "sp_guard": true
    },
    "memory": [
     {
@@ -1139,23 +964,8 @@
     },
     {
      "segment": "0x3000",
-     "offset": "0x4",
-     "bytes": "000000004d532052756e2d54696d65204c696272617279202d20436f707972696768742028632920313938382c204d6963726f736f667420436f727011000000"
-    },
-    {
-     "segment": "0x3000",
-     "offset": "0x6",
-     "bytes": "00004d532052756e2d54696d65204c696272617279202d20436f707972696768742028632920313938382c204d6963726f736f667420436f7270110000000000"
-    },
-    {
-     "segment": "0x3000",
-     "offset": "0x8",
-     "bytes": "4d532052756e2d54696d65204c696272617279202d20436f707972696768742028632920313938382c204d6963726f736f667420436f72701100000000000000"
-    },
-    {
-     "segment": "0x3000",
-     "offset": "0x2",
-     "bytes": "0000000000004d532052756e2d54696d65204c696272617279202d20436f707972696768742028632920313938382c204d6963726f736f667420436f72701100"
+     "offset": "0x6aa4",
+     "bytes": "8181810101000000000000000000000000000000000000000000c26ad90943000000000000000000f09f0000000000000000000001000000000000160202180d"
     },
     {
      "segment": "0x3000",
@@ -1164,42 +974,27 @@
     },
     {
      "segment": "0x3000",
-     "offset": "0x3b33",
+     "offset": "0x6aa2",
+     "bytes": "1400"
+    },
+    {
+     "segment": "0x3000",
+     "offset": "0x6acc",
+     "bytes": "f09f"
+    },
+    {
+     "segment": "0x3000",
+     "offset": "0x6ace",
      "bytes": "0000"
     },
     {
      "segment": "0x3000",
-     "offset": "0x41da",
+     "offset": "0x6ad0",
      "bytes": "0000"
     },
     {
      "segment": "0x3000",
-     "offset": "0x41db",
-     "bytes": "0000"
-    },
-    {
-     "segment": "0x3000",
-     "offset": "0x41dc",
-     "bytes": "0000"
-    },
-    {
-     "segment": "0x3000",
-     "offset": "0x41dd",
-     "bytes": "0006"
-    },
-    {
-     "segment": "0x3000",
-     "offset": "0x6a95",
-     "bytes": "0000"
-    },
-    {
-     "segment": "0x3000",
-     "offset": "0x6a9d",
-     "bytes": "0000"
-    },
-    {
-     "segment": "0x3000",
-     "offset": "0x6aa0",
+     "offset": "0x6ad4",
      "bytes": "0000"
     },
     {
@@ -1219,17 +1014,7 @@
     },
     {
      "segment": "0x3000",
-     "offset": "0x6af2",
-     "bytes": "0000"
-    },
-    {
-     "segment": "0x3000",
-     "offset": "0x6af6",
-     "bytes": "0000"
-    },
-    {
-     "segment": "0x3000",
-     "offset": "0x6afc",
+     "offset": "0x0",
      "bytes": "0000"
     },
     {
@@ -1239,17 +1024,17 @@
     },
     {
      "segment": "0x3000",
-     "offset": "0x1920",
-     "bytes": "8974"
-    },
-    {
-     "segment": "0x3000",
-     "offset": "0x1981",
+     "offset": "0x191c",
      "bytes": "0000"
     },
     {
      "segment": "0x3000",
-     "offset": "0x1983",
+     "offset": "0x1922",
+     "bytes": "0000"
+    },
+    {
+     "segment": "0x3000",
+     "offset": "0x198d",
      "bytes": "0000"
     },
     {
@@ -1261,6 +1046,16 @@
      "segment": "0x3000",
      "offset": "0x1995",
      "bytes": "0000"
+    },
+    {
+     "segment": "0x3000",
+     "offset": "0x1998",
+     "bytes": "0000"
+    },
+    {
+     "segment": "0x3000",
+     "offset": "0x199a",
+     "bytes": "1400"
     },
     {
      "segment": "0x3000",
@@ -1289,21 +1084,6 @@
     },
     {
      "segment": "0x3000",
-     "offset": "0x19be",
-     "bytes": "0000"
-    },
-    {
-     "segment": "0x3000",
-     "offset": "0x19bf",
-     "bytes": "0000"
-    },
-    {
-     "segment": "0x3000",
-     "offset": "0x19c4",
-     "bytes": "0000"
-    },
-    {
-     "segment": "0x3000",
      "offset": "0x19c6",
      "bytes": "b0ab"
     },
@@ -1314,7 +1094,12 @@
     },
     {
      "segment": "0x3000",
-     "offset": "0x19e6",
+     "offset": "0x19de",
+     "bytes": "0100"
+    },
+    {
+     "segment": "0x3000",
+     "offset": "0x19e0",
      "bytes": "0000"
     },
     {
@@ -1346,11 +1131,6 @@
      "segment": "0x4000",
      "offset": "0xffec",
      "bytes": "0040"
-    },
-    {
-     "segment": "0x3000",
-     "offset": "0x6af2",
-     "bytes": "0030"
     },
     {
      "segment": "0x3000",
