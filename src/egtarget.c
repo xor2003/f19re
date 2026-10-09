@@ -804,8 +804,8 @@ int16 isTargetOverWater(int16 wpIdx) {
 /* ==== seg000:0xd1c8 ==== */
 extern uint8 FAR g_aircraftModels[];  /* seg004:0x7530 */
 extern uint8 FAR g_world3dData[];       /* seg004:0 */
-extern int16 flt15_buf1[];             /* @0x6378 */
-extern int16 buf3d3[];                 /* @0x602 */
+extern int16 flt15_buf1[];             /* @0x6352 (binary: sub_1D0A8 reads [bx+6352]) */
+extern int16 buf3d3[];                 /* @0x5f6 (terrain shape-offset table; binary: [bx+5f6]) */
 
 int16 shapeDataOffset(int16 shapeId) {
     if (shapeId & 0x100) {

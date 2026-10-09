@@ -16,9 +16,11 @@ extern char regnStr[];              /* "STFLT.xxx" @dseg:5C56 */
 extern char *regnFile;              /* ->"regn.xxx" off_2EEE8 @dseg:0078 */
 extern int16 sign3d3;               /* @dseg:6376 */
 extern size_t size3d3;              /* word_35228 @dseg:63B8 */
-extern uint16 buf3d3[];             /* @dseg:6378 */
+extern uint16 buf3d3[];             /* @dseg:5f6 — terrain offsets; the aircraft 3D3
+ * loader (load15Flt3d3) reuses this table @dseg:6352 for its own offsets */
 extern uint8 flt15_buf2[];          /* @dseg:238A staging */
-extern char FAR g_world3dData[];    /* seg004:A430 */
+extern char FAR g_world3dData[];    /* seg004:0000 (binary: dstPtr = 12D8:0000) */
+extern uint8 FAR g_aircraftModels[];  /* seg004:7530 */
 extern FILE *fileHandle;            /* word_354C8 */
 extern int16 sign3dg;               /* @dseg:0860 */
 extern uint8 buf1_3dg[];            /* @dseg:6ECC */
@@ -39,6 +41,7 @@ extern int16 size3d3_3;             /* @dseg:085E */
 extern int16 size3d3_4;             /* @dseg:0858 */
 extern int16 size3d3_5;             /* @dseg:085A */
 extern int16 size3d3_6;             /* @dseg:085C */
+extern int16 flt15_buf1[];            /* @dseg:6352 — aircraft shape-offset table */
 extern int16 size3d3_7;             /* @dseg:9EBE */
 extern uint8 buf3d3_1[];            /* @dseg:857E */
 extern uint8 buf3d3_2[];            /* @dseg:871C */
@@ -202,10 +205,10 @@ void load15Flt3d3(void) {
     }
     fread(&sign3d3, 2, 1, fileHandle);
     fread(&size3d3, 2, 1, fileHandle);
-    fread(buf3d3, 2, size3d3, fileHandle);
+    fread((uint16 *)flt15_buf1, 2, size3d3, fileHandle);
     fread(&size3d3_2, 2, 1, fileHandle);
     segread(&sregs);
-    for (dst = g_world3dData; size3d3_2 > 0; size3d3_2 -= 0x800, dst += 0x800) {
+    for (dst = (char FAR *)g_aircraftModels; size3d3_2 > 0; size3d3_2 -= 0x800, dst += 0x800) {
         chunk = (size3d3_2 > 0x800) ? 0x800 : size3d3_2;
         fread(flt15_buf2, 1, chunk, fileHandle);
         movedata(sregs.ds, PTR_OFF(flt15_buf2), FP_SEG(dst), FP_OFF(dst), chunk);
